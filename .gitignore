@@ -1,0 +1,9 @@
+backend/node_modules
+backend/.strapi
+backend/.strapi-updater.json
+backend/build
+backend/.env
+frontend/node_modules
+frontend/mvp-and-mmp-features.txt
+frontend/logic.txt
+yarn-error.log
