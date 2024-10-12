@@ -1,0 +1,89 @@
+{
+  "kind": "collectionType",
+  "collectionName": "loans",
+  "info": {
+    "singularName": "loan",
+    "pluralName": "loans",
+    "displayName": "Loan"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "loanAmount": {
+      "type": "decimal"
+    },
+    "interestRate": {
+      "type": "decimal"
+    },
+    "loanStatus": {
+      "type": "enumeration",
+      "enum": [
+        "pending ",
+        "approved",
+        "rejected",
+        "disbursed",
+        "completed",
+        "defaulted"
+      ],
+      "default": "pending "
+    },
+    "repaymentSchedule": {
+      "type": "json"
+    },
+    "loanTerm": {
+      "type": "integer"
+    },
+    "loanType": {
+      "type": "enumeration",
+      "enum": [
+        "personal Loan",
+        "business Loan",
+        "auto loan"
+      ]
+    },
+    "loanCategory": {
+      "type": "enumeration",
+      "enum": [
+        "collateral-based",
+        "salary-based"
+      ]
+    },
+    "loanPurpose": {
+      "type": "blocks"
+    },
+    "applicationDate": {
+      "type": "datetime"
+    },
+    "approvalDate": {
+      "type": "datetime"
+    },
+    "disbursementDate": {
+      "type": "datetime"
+    },
+    "dueDate": {
+      "type": "datetime"
+    },
+    "outstandingAmount": {
+      "type": "decimal"
+    },
+    "Collateral": {
+      "displayName": "Collateral",
+      "type": "component",
+      "repeatable": false,
+      "component": "media-and-documents.collateral"
+    },
+    "latePaymentPenalty": {
+      "type": "decimal"
+    },
+    "loanAgreementDocument": {
+      "allowedTypes": [
+        "images",
+        "files"
+      ],
+      "type": "media",
+      "multiple": true
+    }
+  }
+}

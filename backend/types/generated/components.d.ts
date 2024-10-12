@@ -34,11 +34,20 @@ export interface UserProfileClientDetails extends Struct.ComponentSchema {
   };
 }
 
+export interface MediaAndDocumentsCollateral extends Struct.ComponentSchema {
+  collectionName: 'components_media_and_documents_collaterals';
+  info: {
+    displayName: 'Collateral';
+  };
+  attributes: {};
+}
+
 declare module '@strapi/strapi' {
   export module Public {
     export interface ComponentSchemas {
       'user-profile.details': UserProfileDetails;
       'user-profile.client-details': UserProfileClientDetails;
+      'media-and-documents.collateral': MediaAndDocumentsCollateral;
     }
   }
 }

@@ -1,5 +1,61 @@
 import type { Struct, Schema } from '@strapi/strapi';
 
+export interface ApiLoanLoan extends Struct.CollectionTypeSchema {
+  collectionName: 'loans';
+  info: {
+    singularName: 'loan';
+    pluralName: 'loans';
+    displayName: 'Loan';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    loanAmount: Schema.Attribute.Decimal;
+    interestRate: Schema.Attribute.Decimal;
+    loanStatus: Schema.Attribute.Enumeration<
+      [
+        'pending ',
+        'approved',
+        'rejected',
+        'disbursed',
+        'completed',
+        'defaulted',
+      ]
+    > &
+      Schema.Attribute.DefaultTo<'pending '>;
+    repaymentSchedule: Schema.Attribute.JSON;
+    loanTerm: Schema.Attribute.Integer;
+    loanType: Schema.Attribute.Enumeration<
+      ['personal Loan', 'business Loan', 'auto loan']
+    >;
+    loanCategory: Schema.Attribute.Enumeration<
+      ['collateral-based', 'salary-based']
+    >;
+    loanPurpose: Schema.Attribute.Blocks;
+    applicationDate: Schema.Attribute.DateTime;
+    approvalDate: Schema.Attribute.DateTime;
+    disbursementDate: Schema.Attribute.DateTime;
+    dueDate: Schema.Attribute.DateTime;
+    outstandingAmount: Schema.Attribute.Decimal;
+    Collateral: Schema.Attribute.Component<
+      'media-and-documents.collateral',
+      false
+    >;
+    latePaymentPenalty: Schema.Attribute.Decimal;
+    loanAgreementDocument: Schema.Attribute.Media<'images' | 'files', true>;
+    createdAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    publishedAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String;
+    localizations: Schema.Attribute.Relation<'oneToMany', 'api::loan.loan'>;
+  };
+}
+
 export interface PluginUploadFile extends Struct.CollectionTypeSchema {
   collectionName: 'files';
   info: {
@@ -853,6 +909,7 @@ export interface AdminTransferTokenPermission
 declare module '@strapi/strapi' {
   export module Public {
     export interface ContentTypeSchemas {
+      'api::loan.loan': ApiLoanLoan;
       'plugin::upload.file': PluginUploadFile;
       'plugin::upload.folder': PluginUploadFolder;
       'plugin::i18n.locale': PluginI18NLocale;
