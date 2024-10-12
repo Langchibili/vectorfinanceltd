@@ -1,0 +1,33 @@
+{
+  "kind": "collectionType",
+  "collectionName": "types",
+  "info": {
+    "singularName": "type",
+    "pluralName": "types",
+    "displayName": "Type"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "typeName": {
+      "type": "string"
+    },
+    "description": {
+      "type": "blocks"
+    },
+    "minimumAmount": {
+      "type": "decimal"
+    },
+    "maximumAmount": {
+      "type": "decimal"
+    },
+    "defaultInterestRate": {
+      "type": "decimal"
+    },
+    "loanTermOptions": {
+      "type": "json"
+    }
+  }
+}

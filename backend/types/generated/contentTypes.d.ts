@@ -1,61 +1,5 @@
 import type { Struct, Schema } from '@strapi/strapi';
 
-export interface ApiLoanLoan extends Struct.CollectionTypeSchema {
-  collectionName: 'loans';
-  info: {
-    singularName: 'loan';
-    pluralName: 'loans';
-    displayName: 'Loan';
-  };
-  options: {
-    draftAndPublish: true;
-  };
-  attributes: {
-    loanAmount: Schema.Attribute.Decimal;
-    interestRate: Schema.Attribute.Decimal;
-    loanStatus: Schema.Attribute.Enumeration<
-      [
-        'pending ',
-        'approved',
-        'rejected',
-        'disbursed',
-        'completed',
-        'defaulted',
-      ]
-    > &
-      Schema.Attribute.DefaultTo<'pending '>;
-    repaymentSchedule: Schema.Attribute.JSON;
-    loanTerm: Schema.Attribute.Integer;
-    loanType: Schema.Attribute.Enumeration<
-      ['personal Loan', 'business Loan', 'auto loan']
-    >;
-    loanCategory: Schema.Attribute.Enumeration<
-      ['collateral-based', 'salary-based']
-    >;
-    loanPurpose: Schema.Attribute.Blocks;
-    applicationDate: Schema.Attribute.DateTime;
-    approvalDate: Schema.Attribute.DateTime;
-    disbursementDate: Schema.Attribute.DateTime;
-    dueDate: Schema.Attribute.DateTime;
-    outstandingAmount: Schema.Attribute.Decimal;
-    Collateral: Schema.Attribute.Component<
-      'media-and-documents.collateral',
-      false
-    >;
-    latePaymentPenalty: Schema.Attribute.Decimal;
-    loanAgreementDocument: Schema.Attribute.Media<'images' | 'files', true>;
-    createdAt: Schema.Attribute.DateTime;
-    updatedAt: Schema.Attribute.DateTime;
-    publishedAt: Schema.Attribute.DateTime;
-    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-    locale: Schema.Attribute.String;
-    localizations: Schema.Attribute.Relation<'oneToMany', 'api::loan.loan'>;
-  };
-}
-
 export interface PluginUploadFile extends Struct.CollectionTypeSchema {
   collectionName: 'files';
   info: {
@@ -526,9 +470,14 @@ export interface PluginUsersPermissionsUser
       'plugin::users-permissions.role'
     >;
     profilePicture: Schema.Attribute.Media<
-      'images' | 'files' | 'videos' | 'audios'
+      'images' | 'files' | 'videos' | 'audios',
+      true
     >;
     details: Schema.Attribute.Component<'user-profile.details', false>;
+    clientDetails: Schema.Attribute.Component<
+      'user-profile.client-details',
+      true
+    >;
     createdAt: Schema.Attribute.DateTime;
     updatedAt: Schema.Attribute.DateTime;
     publishedAt: Schema.Attribute.DateTime;
@@ -541,6 +490,201 @@ export interface PluginUsersPermissionsUser
       'oneToMany',
       'plugin::users-permissions.user'
     >;
+  };
+}
+
+export interface ApiApprovalApproval extends Struct.CollectionTypeSchema {
+  collectionName: 'approvals';
+  info: {
+    singularName: 'approval';
+    pluralName: 'approvals';
+    displayName: 'Approval';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    approvalDate: Schema.Attribute.DateTime;
+    approvalStatus: Schema.Attribute.Enumeration<
+      ['Approved', 'Rejected', 'Pending']
+    > &
+      Schema.Attribute.DefaultTo<'Pending'>;
+    comments: Schema.Attribute.Blocks;
+    approvalDocuments: Schema.Attribute.Media<'images' | 'files', true>;
+    createdAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    publishedAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::approval.approval'
+    >;
+  };
+}
+
+export interface ApiLoanLoan extends Struct.CollectionTypeSchema {
+  collectionName: 'loans';
+  info: {
+    singularName: 'loan';
+    pluralName: 'loans';
+    displayName: 'Loan';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    loanAmount: Schema.Attribute.Decimal;
+    interestRate: Schema.Attribute.Decimal;
+    loanStatus: Schema.Attribute.Enumeration<
+      [
+        'pending ',
+        'approved',
+        'rejected',
+        'disbursed',
+        'completed',
+        'defaulted',
+      ]
+    > &
+      Schema.Attribute.DefaultTo<'pending '>;
+    repaymentSchedule: Schema.Attribute.JSON;
+    loanTerm: Schema.Attribute.Integer;
+    loanType: Schema.Attribute.Enumeration<
+      ['personal Loan', 'business Loan', 'auto loan']
+    >;
+    loanCategory: Schema.Attribute.Enumeration<
+      ['collateral-based', 'salary-based']
+    >;
+    loanPurpose: Schema.Attribute.Blocks;
+    applicationDate: Schema.Attribute.DateTime;
+    approvalDate: Schema.Attribute.DateTime;
+    disbursementDate: Schema.Attribute.DateTime;
+    dueDate: Schema.Attribute.DateTime;
+    outstandingAmount: Schema.Attribute.Decimal;
+    Collateral: Schema.Attribute.Component<
+      'media-and-documents.collateral',
+      false
+    >;
+    latePaymentPenalty: Schema.Attribute.Decimal;
+    loanAgreementDocuments: Schema.Attribute.Media<'images' | 'files', true>;
+    createdAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    publishedAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String;
+    localizations: Schema.Attribute.Relation<'oneToMany', 'api::loan.loan'>;
+  };
+}
+
+export interface ApiRepaymentRepayment extends Struct.CollectionTypeSchema {
+  collectionName: 'repayments';
+  info: {
+    singularName: 'repayment';
+    pluralName: 'repayments';
+    displayName: 'Repayment';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    repaymentAmount: Schema.Attribute.Decimal;
+    paymentDate: Schema.Attribute.DateTime;
+    paymentMethod: Schema.Attribute.Enumeration<
+      ['cash', 'bank', 'airtel-money', 'mtn-money']
+    >;
+    latePaymentPenalty: Schema.Attribute.Decimal;
+    transactionID: Schema.Attribute.String;
+    receipt: Schema.Attribute.Media<'images' | 'files', true>;
+    repaymentType: Schema.Attribute.Enumeration<
+      ['partial-payment', 'full-payment', 'late-payment']
+    >;
+    paymentStatus: Schema.Attribute.Enumeration<['Paid', 'Failed', 'Pending']> &
+      Schema.Attribute.DefaultTo<'Pending'>;
+    createdAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    publishedAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::repayment.repayment'
+    >;
+  };
+}
+
+export interface ApiTransactionHistoryTransactionHistory
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'transaction_histories';
+  info: {
+    singularName: 'transaction-history';
+    pluralName: 'transaction-histories';
+    displayName: 'TransactionHistory';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    transactionType: Schema.Attribute.Enumeration<
+      ['loan-application', 'loan-approval', 'loan-disbursement', 'repayment']
+    >;
+    transactionDate: Schema.Attribute.DateTime;
+    amount: Schema.Attribute.Decimal;
+    description: Schema.Attribute.Blocks;
+    documents: Schema.Attribute.Media<'images' | 'files' | 'videos', true>;
+    createdAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    publishedAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::transaction-history.transaction-history'
+    >;
+  };
+}
+
+export interface ApiTypeType extends Struct.CollectionTypeSchema {
+  collectionName: 'types';
+  info: {
+    singularName: 'type';
+    pluralName: 'types';
+    displayName: 'Type';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    typeName: Schema.Attribute.String;
+    description: Schema.Attribute.Blocks;
+    minimumAmount: Schema.Attribute.Decimal;
+    maximumAmount: Schema.Attribute.Decimal;
+    defaultInterestRate: Schema.Attribute.Decimal;
+    loanTermOptions: Schema.Attribute.JSON;
+    createdAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    publishedAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String;
+    localizations: Schema.Attribute.Relation<'oneToMany', 'api::type.type'>;
   };
 }
 
@@ -909,7 +1053,6 @@ export interface AdminTransferTokenPermission
 declare module '@strapi/strapi' {
   export module Public {
     export interface ContentTypeSchemas {
-      'api::loan.loan': ApiLoanLoan;
       'plugin::upload.file': PluginUploadFile;
       'plugin::upload.folder': PluginUploadFolder;
       'plugin::i18n.locale': PluginI18NLocale;
@@ -920,6 +1063,11 @@ declare module '@strapi/strapi' {
       'plugin::users-permissions.permission': PluginUsersPermissionsPermission;
       'plugin::users-permissions.role': PluginUsersPermissionsRole;
       'plugin::users-permissions.user': PluginUsersPermissionsUser;
+      'api::approval.approval': ApiApprovalApproval;
+      'api::loan.loan': ApiLoanLoan;
+      'api::repayment.repayment': ApiRepaymentRepayment;
+      'api::transaction-history.transaction-history': ApiTransactionHistoryTransactionHistory;
+      'api::type.type': ApiTypeType;
       'admin::permission': AdminPermission;
       'admin::user': AdminUser;
       'admin::role': AdminRole;

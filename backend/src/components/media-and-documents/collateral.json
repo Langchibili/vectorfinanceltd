@@ -1,8 +1,59 @@
 {
   "collectionName": "components_media_and_documents_collaterals",
   "info": {
-    "displayName": "Collateral"
+    "displayName": "Collateral",
+    "description": ""
   },
   "options": {},
-  "attributes": {}
+  "attributes": {
+    "collateralType": {
+      "type": "enumeration",
+      "enum": [
+        "vehicle",
+        "land",
+        "house",
+        "electronic",
+        "other"
+      ]
+    },
+    "insurance": {
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ],
+      "type": "media",
+      "multiple": true
+    },
+    "otherCollateralDocuments": {
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ],
+      "type": "media",
+      "multiple": true
+    },
+    "titleDeed": {
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ],
+      "type": "media",
+      "multiple": true
+    },
+    "collateralCondition": {
+      "type": "enumeration",
+      "enum": [
+        "new",
+        "used",
+        "good",
+        "ok"
+      ]
+    }
+  }
 }

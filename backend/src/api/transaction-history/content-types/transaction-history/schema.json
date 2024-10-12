@@ -1,0 +1,44 @@
+{
+  "kind": "collectionType",
+  "collectionName": "transaction_histories",
+  "info": {
+    "singularName": "transaction-history",
+    "pluralName": "transaction-histories",
+    "displayName": "TransactionHistory",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "transactionType": {
+      "type": "enumeration",
+      "enum": [
+        "loan-application",
+        "loan-approval",
+        "loan-disbursement",
+        "repayment"
+      ]
+    },
+    "transactionDate": {
+      "type": "datetime"
+    },
+    "amount": {
+      "type": "decimal"
+    },
+    "description": {
+      "type": "blocks"
+    },
+    "documents": {
+      "type": "media",
+      "multiple": true,
+      "required": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos"
+      ]
+    }
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "kind": "collectionType",
+  "collectionName": "approvals",
+  "info": {
+    "singularName": "approval",
+    "pluralName": "approvals",
+    "displayName": "Approval",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "approvalDate": {
+      "type": "datetime"
+    },
+    "approvalStatus": {
+      "type": "enumeration",
+      "enum": [
+        "Approved",
+        "Rejected",
+        "Pending"
+      ],
+      "default": "Pending"
+    },
+    "comments": {
+      "type": "blocks"
+    },
+    "approvalDocuments": {
+      "type": "media",
+      "multiple": true,
+      "required": false,
+      "allowedTypes": [
+        "images",
+        "files"
+      ]
+    }
+  }
+}

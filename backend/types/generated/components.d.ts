@@ -38,8 +38,28 @@ export interface MediaAndDocumentsCollateral extends Struct.ComponentSchema {
   collectionName: 'components_media_and_documents_collaterals';
   info: {
     displayName: 'Collateral';
+    description: '';
   };
-  attributes: {};
+  attributes: {
+    collateralType: Schema.Attribute.Enumeration<
+      ['vehicle', 'land', 'house', 'electronic', 'other']
+    >;
+    insurance: Schema.Attribute.Media<
+      'images' | 'files' | 'videos' | 'audios',
+      true
+    >;
+    otherCollateralDocuments: Schema.Attribute.Media<
+      'images' | 'files' | 'videos' | 'audios',
+      true
+    >;
+    titleDeed: Schema.Attribute.Media<
+      'images' | 'files' | 'videos' | 'audios',
+      true
+    >;
+    collateralCondition: Schema.Attribute.Enumeration<
+      ['new', 'used', 'good', 'ok']
+    >;
+  };
 }
 
 declare module '@strapi/strapi' {

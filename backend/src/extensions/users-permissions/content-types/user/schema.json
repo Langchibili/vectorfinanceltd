@@ -67,7 +67,7 @@
     },
     "profilePicture": {
       "type": "media",
-      "multiple": false,
+      "multiple": true,
       "required": false,
       "allowedTypes": [
         "images",
@@ -80,6 +80,11 @@
       "type": "component",
       "repeatable": false,
       "component": "user-profile.details"
+    },
+    "clientDetails": {
+      "type": "component",
+      "repeatable": true,
+      "component": "user-profile.client-details"
     }
   }
 }

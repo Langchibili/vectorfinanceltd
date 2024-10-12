@@ -1,0 +1,63 @@
+{
+  "kind": "collectionType",
+  "collectionName": "repayments",
+  "info": {
+    "singularName": "repayment",
+    "pluralName": "repayments",
+    "displayName": "Repayment",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "repaymentAmount": {
+      "type": "decimal"
+    },
+    "paymentDate": {
+      "type": "datetime"
+    },
+    "paymentMethod": {
+      "type": "enumeration",
+      "enum": [
+        "cash",
+        "bank",
+        "airtel-money",
+        "mtn-money"
+      ]
+    },
+    "latePaymentPenalty": {
+      "type": "decimal"
+    },
+    "transactionID": {
+      "type": "string"
+    },
+    "receipt": {
+      "type": "media",
+      "multiple": true,
+      "required": false,
+      "allowedTypes": [
+        "images",
+        "files"
+      ]
+    },
+    "repaymentType": {
+      "type": "enumeration",
+      "enum": [
+        "partial-payment",
+        "full-payment",
+        "late-payment"
+      ]
+    },
+    "paymentStatus": {
+      "type": "enumeration",
+      "enum": [
+        "Paid",
+        "Failed",
+        "Pending"
+      ],
+      "default": "Pending"
+    }
+  }
+}
