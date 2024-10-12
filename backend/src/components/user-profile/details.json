@@ -1,0 +1,32 @@
+{
+  "collectionName": "components_user_profile_details",
+  "info": {
+    "displayName": "details",
+    "icon": "user"
+  },
+  "options": {},
+  "attributes": {
+    "firstname": {
+      "type": "string"
+    },
+    "lastname": {
+      "type": "string"
+    },
+    "age": {
+      "type": "integer"
+    },
+    "gender": {
+      "type": "enumeration",
+      "enum": [
+        "male",
+        "female"
+      ]
+    },
+    "dateOfBirth": {
+      "type": "date"
+    },
+    "address": {
+      "type": "string"
+    }
+  }
+}

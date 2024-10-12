@@ -1,0 +1,33 @@
+{
+  "collectionName": "components_user_profile_client_details",
+  "info": {
+    "displayName": "clientDetails"
+  },
+  "options": {},
+  "attributes": {
+    "employementStatus": {
+      "type": "enumeration",
+      "enum": [
+        "employed",
+        "self-employed",
+        "unemployed"
+      ]
+    },
+    "employerName": {
+      "type": "string"
+    },
+    "monthlyIncome": {
+      "type": "decimal"
+    },
+    "KYCverificationStatus": {
+      "type": "boolean",
+      "default": false
+    },
+    "outstandingLoanBalance": {
+      "type": "decimal"
+    },
+    "loanLimit": {
+      "type": "decimal"
+    }
+  }
+}
