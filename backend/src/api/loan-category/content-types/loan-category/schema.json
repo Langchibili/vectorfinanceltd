@@ -1,0 +1,27 @@
+{
+  "kind": "collectionType",
+  "collectionName": "loan_categories",
+  "info": {
+    "singularName": "loan-category",
+    "pluralName": "loan-categories",
+    "displayName": "loanCategory"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "categoryName": {
+      "type": "string"
+    },
+    "description": {
+      "type": "blocks"
+    },
+    "loans": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::loan.loan",
+      "inversedBy": "loan_categories"
+    }
+  }
+}

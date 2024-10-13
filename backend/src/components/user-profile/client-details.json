@@ -1,7 +1,8 @@
 {
   "collectionName": "components_user_profile_client_details",
   "info": {
-    "displayName": "clientDetails"
+    "displayName": "clientDetails",
+    "description": ""
   },
   "options": {},
   "attributes": {
@@ -28,6 +29,22 @@
     },
     "loanLimit": {
       "type": "decimal"
+    },
+    "NRCfront": {
+      "allowedTypes": [
+        "images",
+        "files"
+      ],
+      "type": "media",
+      "multiple": true
+    },
+    "NRCback": {
+      "allowedTypes": [
+        "images",
+        "files"
+      ],
+      "type": "media",
+      "multiple": true
     }
   }
 }

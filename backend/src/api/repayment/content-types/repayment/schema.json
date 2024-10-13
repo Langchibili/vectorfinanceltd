@@ -58,6 +58,18 @@
         "Pending"
       ],
       "default": "Pending"
+    },
+    "loan": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::loan.loan",
+      "inversedBy": "repayments"
+    },
+    "client": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "repayment"
     }
   }
 }

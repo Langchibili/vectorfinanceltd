@@ -478,6 +478,22 @@ export interface PluginUsersPermissionsUser
       'user-profile.client-details',
       true
     >;
+    pendingLoans: Schema.Attribute.Relation<'oneToMany', 'api::loan.loan'>;
+    fulfilledLoans: Schema.Attribute.Relation<'oneToMany', 'api::loan.loan'>;
+    repayment: Schema.Attribute.Relation<
+      'oneToOne',
+      'api::repayment.repayment'
+    >;
+    loans: Schema.Attribute.Relation<'oneToMany', 'api::loan.loan'>;
+    approvals: Schema.Attribute.Relation<'oneToMany', 'api::approval.approval'>;
+    transactionHistories: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::transaction-history.transaction-history'
+    >;
+    ky_cverification: Schema.Attribute.Relation<
+      'oneToOne',
+      'api::ky-cverification.ky-cverification'
+    >;
     createdAt: Schema.Attribute.DateTime;
     updatedAt: Schema.Attribute.DateTime;
     publishedAt: Schema.Attribute.DateTime;
@@ -512,6 +528,11 @@ export interface ApiApprovalApproval extends Struct.CollectionTypeSchema {
       Schema.Attribute.DefaultTo<'Pending'>;
     comments: Schema.Attribute.Blocks;
     approvalDocuments: Schema.Attribute.Media<'images' | 'files', true>;
+    client: Schema.Attribute.Relation<
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+    loan: Schema.Attribute.Relation<'oneToOne', 'api::loan.loan'>;
     createdAt: Schema.Attribute.DateTime;
     updatedAt: Schema.Attribute.DateTime;
     publishedAt: Schema.Attribute.DateTime;
@@ -523,6 +544,46 @@ export interface ApiApprovalApproval extends Struct.CollectionTypeSchema {
     localizations: Schema.Attribute.Relation<
       'oneToMany',
       'api::approval.approval'
+    >;
+  };
+}
+
+export interface ApiKyCverificationKyCverification
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'ky_cverifications';
+  info: {
+    singularName: 'ky-cverification';
+    pluralName: 'ky-cverifications';
+    displayName: ' KYCverification';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    KYCstatus: Schema.Attribute.Enumeration<
+      ['Pending', 'Verified', 'Rejected']
+    > &
+      Schema.Attribute.DefaultTo<'Pending'>;
+    KYCdetails: Schema.Attribute.Component<
+      'user-profile.client-details',
+      false
+    >;
+    client: Schema.Attribute.Relation<
+      'oneToOne',
+      'plugin::users-permissions.user'
+    >;
+    createdAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    publishedAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::ky-cverification.ky-cverification'
     >;
   };
 }
@@ -572,6 +633,24 @@ export interface ApiLoanLoan extends Struct.CollectionTypeSchema {
     >;
     latePaymentPenalty: Schema.Attribute.Decimal;
     loanAgreementDocuments: Schema.Attribute.Media<'images' | 'files', true>;
+    client: Schema.Attribute.Relation<
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+    repayments: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::repayment.repayment'
+    >;
+    approval: Schema.Attribute.Relation<'oneToOne', 'api::approval.approval'>;
+    type: Schema.Attribute.Relation<'manyToOne', 'api::type.type'>;
+    transactionHstories: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::transaction-history.transaction-history'
+    >;
+    loan_categories: Schema.Attribute.Relation<
+      'manyToMany',
+      'api::loan-category.loan-category'
+    >;
     createdAt: Schema.Attribute.DateTime;
     updatedAt: Schema.Attribute.DateTime;
     publishedAt: Schema.Attribute.DateTime;
@@ -581,6 +660,36 @@ export interface ApiLoanLoan extends Struct.CollectionTypeSchema {
       Schema.Attribute.Private;
     locale: Schema.Attribute.String;
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::loan.loan'>;
+  };
+}
+
+export interface ApiLoanCategoryLoanCategory
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'loan_categories';
+  info: {
+    singularName: 'loan-category';
+    pluralName: 'loan-categories';
+    displayName: 'loanCategory';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    categoryName: Schema.Attribute.String;
+    description: Schema.Attribute.Blocks;
+    loans: Schema.Attribute.Relation<'manyToMany', 'api::loan.loan'>;
+    createdAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    publishedAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::loan-category.loan-category'
+    >;
   };
 }
 
@@ -609,6 +718,11 @@ export interface ApiRepaymentRepayment extends Struct.CollectionTypeSchema {
     >;
     paymentStatus: Schema.Attribute.Enumeration<['Paid', 'Failed', 'Pending']> &
       Schema.Attribute.DefaultTo<'Pending'>;
+    loan: Schema.Attribute.Relation<'manyToOne', 'api::loan.loan'>;
+    client: Schema.Attribute.Relation<
+      'oneToOne',
+      'plugin::users-permissions.user'
+    >;
     createdAt: Schema.Attribute.DateTime;
     updatedAt: Schema.Attribute.DateTime;
     publishedAt: Schema.Attribute.DateTime;
@@ -644,6 +758,11 @@ export interface ApiTransactionHistoryTransactionHistory
     amount: Schema.Attribute.Decimal;
     description: Schema.Attribute.Blocks;
     documents: Schema.Attribute.Media<'images' | 'files' | 'videos', true>;
+    client: Schema.Attribute.Relation<
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+    loan: Schema.Attribute.Relation<'manyToOne', 'api::loan.loan'>;
     createdAt: Schema.Attribute.DateTime;
     updatedAt: Schema.Attribute.DateTime;
     publishedAt: Schema.Attribute.DateTime;
@@ -665,6 +784,7 @@ export interface ApiTypeType extends Struct.CollectionTypeSchema {
     singularName: 'type';
     pluralName: 'types';
     displayName: 'Type';
+    description: '';
   };
   options: {
     draftAndPublish: true;
@@ -676,6 +796,7 @@ export interface ApiTypeType extends Struct.CollectionTypeSchema {
     maximumAmount: Schema.Attribute.Decimal;
     defaultInterestRate: Schema.Attribute.Decimal;
     loanTermOptions: Schema.Attribute.JSON;
+    loans: Schema.Attribute.Relation<'oneToMany', 'api::loan.loan'>;
     createdAt: Schema.Attribute.DateTime;
     updatedAt: Schema.Attribute.DateTime;
     publishedAt: Schema.Attribute.DateTime;
@@ -1064,7 +1185,9 @@ declare module '@strapi/strapi' {
       'plugin::users-permissions.role': PluginUsersPermissionsRole;
       'plugin::users-permissions.user': PluginUsersPermissionsUser;
       'api::approval.approval': ApiApprovalApproval;
+      'api::ky-cverification.ky-cverification': ApiKyCverificationKyCverification;
       'api::loan.loan': ApiLoanLoan;
+      'api::loan-category.loan-category': ApiLoanCategoryLoanCategory;
       'api::repayment.repayment': ApiRepaymentRepayment;
       'api::transaction-history.transaction-history': ApiTransactionHistoryTransactionHistory;
       'api::type.type': ApiTypeType;

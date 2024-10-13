@@ -35,6 +35,18 @@
         "images",
         "files"
       ]
+    },
+    "client": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "approvals"
+    },
+    "loan": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::loan.loan",
+      "mappedBy": "approval"
     }
   }
 }

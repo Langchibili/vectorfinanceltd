@@ -1,0 +1,36 @@
+{
+  "kind": "collectionType",
+  "collectionName": "ky_cverifications",
+  "info": {
+    "singularName": "ky-cverification",
+    "pluralName": "ky-cverifications",
+    "displayName": " KYCverification",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "KYCstatus": {
+      "type": "enumeration",
+      "enum": [
+        "Pending",
+        "Verified",
+        "Rejected"
+      ],
+      "default": "Pending"
+    },
+    "KYCdetails": {
+      "type": "component",
+      "repeatable": false,
+      "component": "user-profile.client-details"
+    },
+    "client": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "ky_cverification"
+    }
+  }
+}

@@ -85,6 +85,46 @@
       "type": "component",
       "repeatable": true,
       "component": "user-profile.client-details"
+    },
+    "pendingLoans": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::loan.loan"
+    },
+    "fulfilledLoans": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::loan.loan"
+    },
+    "repayment": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::repayment.repayment",
+      "mappedBy": "client"
+    },
+    "loans": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::loan.loan",
+      "mappedBy": "client"
+    },
+    "approvals": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::approval.approval",
+      "mappedBy": "client"
+    },
+    "transactionHistories": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::transaction-history.transaction-history",
+      "mappedBy": "client"
+    },
+    "ky_cverification": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::ky-cverification.ky-cverification",
+      "mappedBy": "client"
     }
   }
 }

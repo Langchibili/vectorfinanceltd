@@ -39,6 +39,18 @@
         "files",
         "videos"
       ]
+    },
+    "client": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "transactionHistories"
+    },
+    "loan": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::loan.loan",
+      "inversedBy": "transactionHstories"
     }
   }
 }

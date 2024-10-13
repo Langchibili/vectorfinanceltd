@@ -86,6 +86,42 @@
         "images",
         "files"
       ]
+    },
+    "client": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "loans"
+    },
+    "repayments": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::repayment.repayment",
+      "mappedBy": "loan"
+    },
+    "approval": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::approval.approval",
+      "inversedBy": "loan"
+    },
+    "type": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::type.type",
+      "inversedBy": "loans"
+    },
+    "transactionHstories": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::transaction-history.transaction-history",
+      "mappedBy": "loan"
+    },
+    "loan_categories": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::loan-category.loan-category",
+      "mappedBy": "loans"
     }
   }
 }

@@ -20,6 +20,7 @@ export interface UserProfileClientDetails extends Struct.ComponentSchema {
   collectionName: 'components_user_profile_client_details';
   info: {
     displayName: 'clientDetails';
+    description: '';
   };
   attributes: {
     employementStatus: Schema.Attribute.Enumeration<
@@ -31,6 +32,8 @@ export interface UserProfileClientDetails extends Struct.ComponentSchema {
       Schema.Attribute.DefaultTo<false>;
     outstandingLoanBalance: Schema.Attribute.Decimal;
     loanLimit: Schema.Attribute.Decimal;
+    NRCfront: Schema.Attribute.Media<'images' | 'files', true>;
+    NRCback: Schema.Attribute.Media<'images' | 'files', true>;
   };
 }
 
