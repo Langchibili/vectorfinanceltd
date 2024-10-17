@@ -16,35 +16,16 @@
         "other"
       ]
     },
-    "insurance": {
-      "allowedTypes": [
-        "images",
-        "files",
-        "videos",
-        "audios"
-      ],
-      "type": "media",
-      "multiple": true
-    },
     "otherCollateralDocuments": {
+      "type": "media",
+      "multiple": true,
+      "required": false,
       "allowedTypes": [
         "images",
         "files",
         "videos",
         "audios"
-      ],
-      "type": "media",
-      "multiple": true
-    },
-    "titleDeed": {
-      "allowedTypes": [
-        "images",
-        "files",
-        "videos",
-        "audios"
-      ],
-      "type": "media",
-      "multiple": true
+      ]
     },
     "collateralCondition": {
       "type": "enumeration",
@@ -54,6 +35,35 @@
         "good",
         "ok"
       ]
+    },
+    "vehicle": {
+      "displayName": "vehicle",
+      "type": "component",
+      "repeatable": false,
+      "component": "media-and-documents.vehicle"
+    },
+    "land": {
+      "displayName": "land",
+      "type": "component",
+      "repeatable": false,
+      "component": "media-and-documents.land"
+    },
+    "collateralStatus": {
+      "type": "enumeration",
+      "enum": [
+        "inspected",
+        "pending-inspection",
+        "declined",
+        "accepted"
+      ]
+    },
+    "inspectionDate": {
+      "type": "datetime"
+    },
+    "house": {
+      "type": "component",
+      "repeatable": false,
+      "component": "media-and-documents.house"
     }
   }
 }

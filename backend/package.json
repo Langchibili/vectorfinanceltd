@@ -11,14 +11,16 @@
     "strapi": "strapi"
   },
   "dependencies": {
-    "@strapi/plugin-cloud": "5.0.6",
-    "@strapi/plugin-users-permissions": "5.0.6",
-    "@strapi/strapi": "5.0.6",
-    "mysql2": "3.9.4",
+    "@strapi/plugin-cloud": "4.23.0",
+    "@strapi/plugin-documentation": "^4.25.7",
+    "@strapi/plugin-i18n": "4.23.0",
+    "@strapi/plugin-users-permissions": "4.23.0",
+    "@strapi/strapi": "4.23.0",
+    "mysql": "^2.18.1",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
-    "react-router-dom": "^6.0.0",
-    "styled-components": "^6.0.0"
+    "react-router-dom": "5.3.4",
+    "styled-components": "5.3.3"
   },
   "devDependencies": {},
   "engines": {
@@ -26,6 +28,7 @@
     "npm": ">=6.0.0"
   },
   "strapi": {
-    "uuid": "9ead0872-3b2a-4273-9889-acbf58de9246"
+    "uuid": "5391f9bd-a648-4339-8ecb-e20aeac8003d"
   }
 }
+

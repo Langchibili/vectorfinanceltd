@@ -1,0 +1,24 @@
+{
+  "collectionName": "components_media_and_documents_houses",
+  "info": {
+    "displayName": "house"
+  },
+  "options": {},
+  "attributes": {
+    "titleDeed": {
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos"
+      ],
+      "type": "media",
+      "multiple": true
+    },
+    "dimensions": {
+      "type": "string"
+    },
+    "location": {
+      "type": "string"
+    }
+  }
+}

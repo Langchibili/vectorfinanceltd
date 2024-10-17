@@ -122,6 +122,12 @@
       "relation": "manyToMany",
       "target": "api::loan-category.loan-category",
       "mappedBy": "loans"
+    },
+    "salary": {
+      "displayName": "salary",
+      "type": "component",
+      "repeatable": false,
+      "component": "client-details.salary"
     }
   }
 }

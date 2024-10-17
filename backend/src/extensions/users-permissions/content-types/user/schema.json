@@ -77,13 +77,15 @@
       ]
     },
     "details": {
+      "displayName": "details",
       "type": "component",
       "repeatable": false,
       "component": "user-profile.details"
     },
     "clientDetails": {
+      "displayName": "clientDetails",
       "type": "component",
-      "repeatable": true,
+      "repeatable": false,
       "component": "user-profile.client-details"
     },
     "pendingLoans": {
@@ -125,6 +127,14 @@
       "relation": "oneToOne",
       "target": "api::ky-cverification.ky-cverification",
       "mappedBy": "client"
+    },
+    "fullnames": {
+      "type": "string"
+    },
+    "salary": {
+      "type": "component",
+      "repeatable": false,
+      "component": "client-details.salary"
     }
   }
 }

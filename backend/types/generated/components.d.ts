@@ -1,76 +1,122 @@
-import type { Struct, Schema } from '@strapi/strapi';
+import type { Schema, Attribute } from '@strapi/strapi';
 
-export interface UserProfileDetails extends Struct.ComponentSchema {
-  collectionName: 'components_user_profile_details';
+export interface ClientDetailsSalary extends Schema.Component {
+  collectionName: 'components_client_details_salaries';
   info: {
-    displayName: 'details';
-    icon: 'user';
-  };
-  attributes: {
-    firstname: Schema.Attribute.String;
-    lastname: Schema.Attribute.String;
-    age: Schema.Attribute.Integer;
-    gender: Schema.Attribute.Enumeration<['male', 'female']>;
-    dateOfBirth: Schema.Attribute.Date;
-    address: Schema.Attribute.String;
-  };
-}
-
-export interface UserProfileClientDetails extends Struct.ComponentSchema {
-  collectionName: 'components_user_profile_client_details';
-  info: {
-    displayName: 'clientDetails';
+    displayName: 'salary';
     description: '';
   };
   attributes: {
-    employementStatus: Schema.Attribute.Enumeration<
-      ['employed', 'self-employed', 'unemployed']
-    >;
-    employerName: Schema.Attribute.String;
-    monthlyIncome: Schema.Attribute.Decimal;
-    KYCverificationStatus: Schema.Attribute.Boolean &
-      Schema.Attribute.DefaultTo<false>;
-    outstandingLoanBalance: Schema.Attribute.Decimal;
-    loanLimit: Schema.Attribute.Decimal;
-    NRCfront: Schema.Attribute.Media<'images' | 'files', true>;
-    NRCback: Schema.Attribute.Media<'images' | 'files', true>;
+    salaryAmount: Attribute.String;
+    paySlip: Attribute.Media;
+    verificationVideo: Attribute.Media;
+    employementVerificationNumber: Attribute.Integer;
+    employerName: Attribute.String;
   };
 }
 
-export interface MediaAndDocumentsCollateral extends Struct.ComponentSchema {
+export interface MediaAndDocumentsCollateral extends Schema.Component {
   collectionName: 'components_media_and_documents_collaterals';
   info: {
     displayName: 'Collateral';
     description: '';
   };
   attributes: {
-    collateralType: Schema.Attribute.Enumeration<
+    collateralType: Attribute.Enumeration<
       ['vehicle', 'land', 'house', 'electronic', 'other']
     >;
-    insurance: Schema.Attribute.Media<
-      'images' | 'files' | 'videos' | 'audios',
-      true
+    otherCollateralDocuments: Attribute.Media;
+    collateralCondition: Attribute.Enumeration<['new', 'used', 'good', 'ok']>;
+    vehicle: Attribute.Component<'media-and-documents.vehicle'>;
+    land: Attribute.Component<'media-and-documents.land'>;
+    collateralStatus: Attribute.Enumeration<
+      ['inspected', 'pending-inspection', 'declined', 'accepted']
     >;
-    otherCollateralDocuments: Schema.Attribute.Media<
-      'images' | 'files' | 'videos' | 'audios',
-      true
-    >;
-    titleDeed: Schema.Attribute.Media<
-      'images' | 'files' | 'videos' | 'audios',
-      true
-    >;
-    collateralCondition: Schema.Attribute.Enumeration<
-      ['new', 'used', 'good', 'ok']
-    >;
+    inspectionDate: Attribute.DateTime;
+    house: Attribute.Component<'media-and-documents.house'>;
   };
 }
 
-declare module '@strapi/strapi' {
-  export module Public {
-    export interface ComponentSchemas {
-      'user-profile.details': UserProfileDetails;
-      'user-profile.client-details': UserProfileClientDetails;
+export interface MediaAndDocumentsHouse extends Schema.Component {
+  collectionName: 'components_media_and_documents_houses';
+  info: {
+    displayName: 'house';
+  };
+  attributes: {
+    titleDeed: Attribute.Media;
+    dimensions: Attribute.String;
+    location: Attribute.String;
+  };
+}
+
+export interface MediaAndDocumentsLand extends Schema.Component {
+  collectionName: 'components_media_and_documents_lands';
+  info: {
+    displayName: 'land';
+  };
+  attributes: {
+    titleDeed: Attribute.Media;
+    hectors: Attribute.String;
+    location: Attribute.String;
+  };
+}
+
+export interface MediaAndDocumentsVehicle extends Schema.Component {
+  collectionName: 'components_media_and_documents_vehicles';
+  info: {
+    displayName: 'vehicle';
+  };
+  attributes: {
+    packed: Attribute.Boolean;
+    insurance: Attribute.Media;
+    packingFeePaid: Attribute.Decimal;
+  };
+}
+
+export interface UserProfileClientDetails extends Schema.Component {
+  collectionName: 'components_user_profile_client_details';
+  info: {
+    displayName: 'clientDetails';
+    description: '';
+  };
+  attributes: {
+    employementStatus: Attribute.Enumeration<
+      ['employed', 'self-employed', 'unemployed']
+    >;
+    monthlyIncome: Attribute.Decimal;
+    KYCverificationStatus: Attribute.Boolean & Attribute.DefaultTo<false>;
+    outstandingLoansBalance: Attribute.Decimal;
+    NRCfront: Attribute.Media;
+    NRCback: Attribute.Media;
+  };
+}
+
+export interface UserProfileDetails extends Schema.Component {
+  collectionName: 'components_user_profile_details';
+  info: {
+    displayName: 'details';
+    icon: 'user';
+  };
+  attributes: {
+    firstname: Attribute.String;
+    lastname: Attribute.String;
+    age: Attribute.Integer;
+    gender: Attribute.Enumeration<['male', 'female']>;
+    dateOfBirth: Attribute.Date;
+    address: Attribute.String;
+  };
+}
+
+declare module '@strapi/types' {
+  export module Shared {
+    export interface Components {
+      'client-details.salary': ClientDetailsSalary;
       'media-and-documents.collateral': MediaAndDocumentsCollateral;
+      'media-and-documents.house': MediaAndDocumentsHouse;
+      'media-and-documents.land': MediaAndDocumentsLand;
+      'media-and-documents.vehicle': MediaAndDocumentsVehicle;
+      'user-profile.client-details': UserProfileClientDetails;
+      'user-profile.details': UserProfileDetails;
     }
   }
 }

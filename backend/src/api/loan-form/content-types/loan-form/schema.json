@@ -1,0 +1,23 @@
+{
+  "kind": "singleType",
+  "collectionName": "loan_forms",
+  "info": {
+    "singularName": "loan-form",
+    "pluralName": "loan-forms",
+    "displayName": "LoanForm"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "loanAgreementForm": {
+      "allowedTypes": [
+        "images",
+        "files"
+      ],
+      "type": "media",
+      "multiple": true
+    }
+  }
+}

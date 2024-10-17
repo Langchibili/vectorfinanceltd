@@ -14,9 +14,6 @@
         "unemployed"
       ]
     },
-    "employerName": {
-      "type": "string"
-    },
     "monthlyIncome": {
       "type": "decimal"
     },
@@ -24,27 +21,26 @@
       "type": "boolean",
       "default": false
     },
-    "outstandingLoanBalance": {
-      "type": "decimal"
-    },
-    "loanLimit": {
+    "outstandingLoansBalance": {
       "type": "decimal"
     },
     "NRCfront": {
+      "type": "media",
+      "multiple": true,
+      "required": false,
       "allowedTypes": [
         "images",
         "files"
-      ],
-      "type": "media",
-      "multiple": true
+      ]
     },
     "NRCback": {
+      "type": "media",
+      "multiple": true,
+      "required": false,
       "allowedTypes": [
         "images",
         "files"
-      ],
-      "type": "media",
-      "multiple": true
+      ]
     }
   }
 }

@@ -1,0 +1,37 @@
+{
+  "collectionName": "components_client_details_salaries",
+  "info": {
+    "displayName": "salary",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "salaryAmount": {
+      "type": "string"
+    },
+    "paySlip": {
+      "type": "media",
+      "multiple": true,
+      "required": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos"
+      ]
+    },
+    "verificationVideo": {
+      "type": "media",
+      "multiple": true,
+      "required": false,
+      "allowedTypes": [
+        "videos"
+      ]
+    },
+    "employementVerificationNumber": {
+      "type": "integer"
+    },
+    "employerName": {
+      "type": "string"
+    }
+  }
+}

@@ -3,6 +3,8 @@ backend/.strapi
 backend/.strapi-updater.json
 backend/build
 backend/.env
+backend-err
+backend-old-stuff
 frontend/node_modules
 frontend/mvp-and-mmp-features.txt
 frontend/logic.txt

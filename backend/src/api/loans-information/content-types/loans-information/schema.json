@@ -1,0 +1,18 @@
+{
+  "kind": "singleType",
+  "collectionName": "loans_informations",
+  "info": {
+    "singularName": "loans-information",
+    "pluralName": "loans-informations",
+    "displayName": "loansInformation"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "defaultLoanInterestRate": {
+      "type": "decimal"
+    }
+  }
+}

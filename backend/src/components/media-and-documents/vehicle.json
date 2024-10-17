@@ -1,0 +1,24 @@
+{
+  "collectionName": "components_media_and_documents_vehicles",
+  "info": {
+    "displayName": "vehicle"
+  },
+  "options": {},
+  "attributes": {
+    "packed": {
+      "type": "boolean"
+    },
+    "insurance": {
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos"
+      ],
+      "type": "media",
+      "multiple": true
+    },
+    "packingFeePaid": {
+      "type": "decimal"
+    }
+  }
+}
