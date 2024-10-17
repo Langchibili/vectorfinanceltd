@@ -1,0 +1,21 @@
+{
+  "kind": "singleType",
+  "collectionName": "vehicle_tracking_fees",
+  "info": {
+    "singularName": "vehicle-tracking-fee",
+    "pluralName": "vehicle-tracking-fees",
+    "displayName": "vehicleTrackingFee"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "upfrontTrackingFee": {
+      "type": "decimal"
+    },
+    "monthlyTrackingFee": {
+      "type": "decimal"
+    }
+  }
+}

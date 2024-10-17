@@ -24,7 +24,7 @@
     "outstandingLoansBalance": {
       "type": "decimal"
     },
-    "NRCfront": {
+    "IDfront": {
       "type": "media",
       "multiple": true,
       "required": false,
@@ -33,7 +33,7 @@
         "files"
       ]
     },
-    "NRCback": {
+    "IDback": {
       "type": "media",
       "multiple": true,
       "required": false,

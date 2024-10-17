@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2024-10-16T23:07:39.119Z"
+    "x-generation-date": "2024-10-17T20:25:36.725Z"
   },
   "x-strapi-config": {
     "path": "/documentation",
@@ -1239,7 +1239,7 @@
                             "type": "number",
                             "format": "float"
                           },
-                          "NRCfront": {
+                          "IDfront": {
                             "type": "object",
                             "properties": {
                               "data": {
@@ -1381,7 +1381,7 @@
                               }
                             }
                           },
-                          "NRCback": {
+                          "IDback": {
                             "type": "object",
                             "properties": {
                               "data": {
@@ -3407,9 +3407,6 @@
                                         "id": {
                                           "type": "number"
                                         },
-                                        "salaryAmount": {
-                                          "type": "string"
-                                        },
                                         "paySlip": {
                                           "type": "object",
                                           "properties": {
@@ -3694,11 +3691,21 @@
                                             }
                                           }
                                         },
-                                        "employementVerificationNumber": {
-                                          "type": "integer"
-                                        },
                                         "employerName": {
                                           "type": "string"
+                                        },
+                                        "companyName": {
+                                          "type": "string"
+                                        },
+                                        "companyLocation": {
+                                          "type": "string"
+                                        },
+                                        "employementVerificationNumber": {
+                                          "type": "string"
+                                        },
+                                        "salaryAmount": {
+                                          "type": "number",
+                                          "format": "float"
                                         }
                                       }
                                     },
@@ -3897,7 +3904,7 @@
                                         "type": "number",
                                         "format": "float"
                                       },
-                                      "NRCfront": {
+                                      "IDfront": {
                                         "type": "object",
                                         "properties": {
                                           "data": {
@@ -4039,7 +4046,7 @@
                                           }
                                         }
                                       },
-                                      "NRCback": {
+                                      "IDback": {
                                         "type": "object",
                                         "properties": {
                                           "data": {
@@ -4260,9 +4267,6 @@
                         "properties": {
                           "id": {
                             "type": "number"
-                          },
-                          "salaryAmount": {
-                            "type": "string"
                           },
                           "paySlip": {
                             "type": "object",
@@ -4548,11 +4552,21 @@
                               }
                             }
                           },
-                          "employementVerificationNumber": {
-                            "type": "integer"
-                          },
                           "employerName": {
                             "type": "string"
+                          },
+                          "companyName": {
+                            "type": "string"
+                          },
+                          "companyLocation": {
+                            "type": "string"
+                          },
+                          "employementVerificationNumber": {
+                            "type": "string"
+                          },
+                          "salaryAmount": {
+                            "type": "number",
+                            "format": "float"
                           }
                         }
                       },
@@ -5606,7 +5620,7 @@
                             "type": "number",
                             "format": "float"
                           },
-                          "NRCfront": {
+                          "IDfront": {
                             "type": "object",
                             "properties": {
                               "data": {
@@ -5748,7 +5762,7 @@
                               }
                             }
                           },
-                          "NRCback": {
+                          "IDback": {
                             "type": "object",
                             "properties": {
                               "data": {
@@ -7774,9 +7788,6 @@
                                         "id": {
                                           "type": "number"
                                         },
-                                        "salaryAmount": {
-                                          "type": "string"
-                                        },
                                         "paySlip": {
                                           "type": "object",
                                           "properties": {
@@ -8061,11 +8072,21 @@
                                             }
                                           }
                                         },
-                                        "employementVerificationNumber": {
-                                          "type": "integer"
-                                        },
                                         "employerName": {
                                           "type": "string"
+                                        },
+                                        "companyName": {
+                                          "type": "string"
+                                        },
+                                        "companyLocation": {
+                                          "type": "string"
+                                        },
+                                        "employementVerificationNumber": {
+                                          "type": "string"
+                                        },
+                                        "salaryAmount": {
+                                          "type": "number",
+                                          "format": "float"
                                         }
                                       }
                                     },
@@ -8264,7 +8285,7 @@
                                         "type": "number",
                                         "format": "float"
                                       },
-                                      "NRCfront": {
+                                      "IDfront": {
                                         "type": "object",
                                         "properties": {
                                           "data": {
@@ -8406,7 +8427,7 @@
                                           }
                                         }
                                       },
-                                      "NRCback": {
+                                      "IDback": {
                                         "type": "object",
                                         "properties": {
                                           "data": {
@@ -8627,9 +8648,6 @@
                         "properties": {
                           "id": {
                             "type": "number"
-                          },
-                          "salaryAmount": {
-                            "type": "string"
                           },
                           "paySlip": {
                             "type": "object",
@@ -8915,11 +8933,21 @@
                               }
                             }
                           },
-                          "employementVerificationNumber": {
-                            "type": "integer"
-                          },
                           "employerName": {
                             "type": "string"
+                          },
+                          "companyName": {
+                            "type": "string"
+                          },
+                          "companyLocation": {
+                            "type": "string"
+                          },
+                          "employementVerificationNumber": {
+                            "type": "string"
+                          },
+                          "salaryAmount": {
+                            "type": "number",
+                            "format": "float"
                           }
                         }
                       },
@@ -9066,7 +9094,7 @@
             "type": "number",
             "format": "float"
           },
-          "NRCfront": {
+          "IDfront": {
             "type": "object",
             "properties": {
               "data": {
@@ -9691,7 +9719,7 @@
               }
             }
           },
-          "NRCback": {
+          "IDback": {
             "type": "object",
             "properties": {
               "data": {
@@ -10667,7 +10695,7 @@
                             "type": "number",
                             "format": "float"
                           },
-                          "NRCfront": {
+                          "IDfront": {
                             "type": "object",
                             "properties": {
                               "data": {
@@ -10809,7 +10837,7 @@
                               }
                             }
                           },
-                          "NRCback": {
+                          "IDback": {
                             "type": "object",
                             "properties": {
                               "data": {
@@ -12835,9 +12863,6 @@
                                         "id": {
                                           "type": "number"
                                         },
-                                        "salaryAmount": {
-                                          "type": "string"
-                                        },
                                         "paySlip": {
                                           "type": "object",
                                           "properties": {
@@ -13122,11 +13147,21 @@
                                             }
                                           }
                                         },
-                                        "employementVerificationNumber": {
-                                          "type": "integer"
-                                        },
                                         "employerName": {
                                           "type": "string"
+                                        },
+                                        "companyName": {
+                                          "type": "string"
+                                        },
+                                        "companyLocation": {
+                                          "type": "string"
+                                        },
+                                        "employementVerificationNumber": {
+                                          "type": "string"
+                                        },
+                                        "salaryAmount": {
+                                          "type": "number",
+                                          "format": "float"
                                         }
                                       }
                                     },
@@ -13325,7 +13360,7 @@
                                         "type": "number",
                                         "format": "float"
                                       },
-                                      "NRCfront": {
+                                      "IDfront": {
                                         "type": "object",
                                         "properties": {
                                           "data": {
@@ -13467,7 +13502,7 @@
                                           }
                                         }
                                       },
-                                      "NRCback": {
+                                      "IDback": {
                                         "type": "object",
                                         "properties": {
                                           "data": {
@@ -13688,9 +13723,6 @@
                         "properties": {
                           "id": {
                             "type": "number"
-                          },
-                          "salaryAmount": {
-                            "type": "string"
                           },
                           "paySlip": {
                             "type": "object",
@@ -13976,11 +14008,21 @@
                               }
                             }
                           },
-                          "employementVerificationNumber": {
-                            "type": "integer"
-                          },
                           "employerName": {
                             "type": "string"
+                          },
+                          "companyName": {
+                            "type": "string"
+                          },
+                          "companyLocation": {
+                            "type": "string"
+                          },
+                          "employementVerificationNumber": {
+                            "type": "string"
+                          },
+                          "salaryAmount": {
+                            "type": "number",
+                            "format": "float"
                           }
                         }
                       },
@@ -15339,9 +15381,6 @@
           "id": {
             "type": "number"
           },
-          "salaryAmount": {
-            "type": "string"
-          },
           "paySlip": {
             "type": "object",
             "properties": {
@@ -15626,11 +15665,21 @@
               }
             }
           },
-          "employementVerificationNumber": {
-            "type": "integer"
-          },
           "employerName": {
             "type": "string"
+          },
+          "companyName": {
+            "type": "string"
+          },
+          "companyLocation": {
+            "type": "string"
+          },
+          "employementVerificationNumber": {
+            "type": "string"
+          },
+          "salaryAmount": {
+            "type": "number",
+            "format": "float"
           }
         }
       },
@@ -17475,7 +17524,7 @@
                                           "type": "number",
                                           "format": "float"
                                         },
-                                        "NRCfront": {
+                                        "IDfront": {
                                           "type": "object",
                                           "properties": {
                                             "data": {
@@ -17617,7 +17666,7 @@
                                             }
                                           }
                                         },
-                                        "NRCback": {
+                                        "IDback": {
                                           "type": "object",
                                           "properties": {
                                             "data": {
@@ -18663,7 +18712,7 @@
                                                       "type": "number",
                                                       "format": "float"
                                                     },
-                                                    "NRCfront": {
+                                                    "IDfront": {
                                                       "type": "object",
                                                       "properties": {
                                                         "data": {
@@ -18805,7 +18854,7 @@
                                                         }
                                                       }
                                                     },
-                                                    "NRCback": {
+                                                    "IDback": {
                                                       "type": "object",
                                                       "properties": {
                                                         "data": {
@@ -19026,9 +19075,6 @@
                                       "properties": {
                                         "id": {
                                           "type": "number"
-                                        },
-                                        "salaryAmount": {
-                                          "type": "string"
                                         },
                                         "paySlip": {
                                           "type": "object",
@@ -19314,11 +19360,21 @@
                                             }
                                           }
                                         },
-                                        "employementVerificationNumber": {
-                                          "type": "integer"
-                                        },
                                         "employerName": {
                                           "type": "string"
+                                        },
+                                        "companyName": {
+                                          "type": "string"
+                                        },
+                                        "companyLocation": {
+                                          "type": "string"
+                                        },
+                                        "employementVerificationNumber": {
+                                          "type": "string"
+                                        },
+                                        "salaryAmount": {
+                                          "type": "number",
+                                          "format": "float"
                                         }
                                       }
                                     },
@@ -19625,9 +19681,6 @@
                             "id": {
                               "type": "number"
                             },
-                            "salaryAmount": {
-                              "type": "string"
-                            },
                             "paySlip": {
                               "type": "object",
                               "properties": {
@@ -19912,11 +19965,21 @@
                                 }
                               }
                             },
-                            "employementVerificationNumber": {
-                              "type": "integer"
-                            },
                             "employerName": {
                               "type": "string"
+                            },
+                            "companyName": {
+                              "type": "string"
+                            },
+                            "companyLocation": {
+                              "type": "string"
+                            },
+                            "employementVerificationNumber": {
+                              "type": "string"
+                            },
+                            "salaryAmount": {
+                              "type": "number",
+                              "format": "float"
                             }
                           }
                         },
@@ -23281,7 +23344,7 @@
                                         "type": "number",
                                         "format": "float"
                                       },
-                                      "NRCfront": {
+                                      "IDfront": {
                                         "type": "object",
                                         "properties": {
                                           "data": {
@@ -23423,7 +23486,7 @@
                                           }
                                         }
                                       },
-                                      "NRCback": {
+                                      "IDback": {
                                         "type": "object",
                                         "properties": {
                                           "data": {
@@ -24469,7 +24532,7 @@
                                                     "type": "number",
                                                     "format": "float"
                                                   },
-                                                  "NRCfront": {
+                                                  "IDfront": {
                                                     "type": "object",
                                                     "properties": {
                                                       "data": {
@@ -24611,7 +24674,7 @@
                                                       }
                                                     }
                                                   },
-                                                  "NRCback": {
+                                                  "IDback": {
                                                     "type": "object",
                                                     "properties": {
                                                       "data": {
@@ -24832,9 +24895,6 @@
                                     "properties": {
                                       "id": {
                                         "type": "number"
-                                      },
-                                      "salaryAmount": {
-                                        "type": "string"
                                       },
                                       "paySlip": {
                                         "type": "object",
@@ -25120,11 +25180,21 @@
                                           }
                                         }
                                       },
-                                      "employementVerificationNumber": {
-                                        "type": "integer"
-                                      },
                                       "employerName": {
                                         "type": "string"
+                                      },
+                                      "companyName": {
+                                        "type": "string"
+                                      },
+                                      "companyLocation": {
+                                        "type": "string"
+                                      },
+                                      "employementVerificationNumber": {
+                                        "type": "string"
+                                      },
+                                      "salaryAmount": {
+                                        "type": "number",
+                                        "format": "float"
                                       }
                                     }
                                   },
@@ -25431,9 +25501,6 @@
                           "id": {
                             "type": "number"
                           },
-                          "salaryAmount": {
-                            "type": "string"
-                          },
                           "paySlip": {
                             "type": "object",
                             "properties": {
@@ -25718,11 +25785,21 @@
                               }
                             }
                           },
-                          "employementVerificationNumber": {
-                            "type": "integer"
-                          },
                           "employerName": {
                             "type": "string"
+                          },
+                          "companyName": {
+                            "type": "string"
+                          },
+                          "companyLocation": {
+                            "type": "string"
+                          },
+                          "employementVerificationNumber": {
+                            "type": "string"
+                          },
+                          "salaryAmount": {
+                            "type": "number",
+                            "format": "float"
                           }
                         }
                       },
@@ -27028,7 +27105,7 @@
                             "type": "number",
                             "format": "float"
                           },
-                          "NRCfront": {
+                          "IDfront": {
                             "type": "object",
                             "properties": {
                               "data": {
@@ -27170,7 +27247,7 @@
                               }
                             }
                           },
-                          "NRCback": {
+                          "IDback": {
                             "type": "object",
                             "properties": {
                               "data": {
@@ -29196,9 +29273,6 @@
                                         "id": {
                                           "type": "number"
                                         },
-                                        "salaryAmount": {
-                                          "type": "string"
-                                        },
                                         "paySlip": {
                                           "type": "object",
                                           "properties": {
@@ -29483,11 +29557,21 @@
                                             }
                                           }
                                         },
-                                        "employementVerificationNumber": {
-                                          "type": "integer"
-                                        },
                                         "employerName": {
                                           "type": "string"
+                                        },
+                                        "companyName": {
+                                          "type": "string"
+                                        },
+                                        "companyLocation": {
+                                          "type": "string"
+                                        },
+                                        "employementVerificationNumber": {
+                                          "type": "string"
+                                        },
+                                        "salaryAmount": {
+                                          "type": "number",
+                                          "format": "float"
                                         }
                                       }
                                     },
@@ -29686,7 +29770,7 @@
                                         "type": "number",
                                         "format": "float"
                                       },
-                                      "NRCfront": {
+                                      "IDfront": {
                                         "type": "object",
                                         "properties": {
                                           "data": {
@@ -29828,7 +29912,7 @@
                                           }
                                         }
                                       },
-                                      "NRCback": {
+                                      "IDback": {
                                         "type": "object",
                                         "properties": {
                                           "data": {
@@ -30049,9 +30133,6 @@
                         "properties": {
                           "id": {
                             "type": "number"
-                          },
-                          "salaryAmount": {
-                            "type": "string"
                           },
                           "paySlip": {
                             "type": "object",
@@ -30337,11 +30418,21 @@
                               }
                             }
                           },
-                          "employementVerificationNumber": {
-                            "type": "integer"
-                          },
                           "employerName": {
                             "type": "string"
+                          },
+                          "companyName": {
+                            "type": "string"
+                          },
+                          "companyLocation": {
+                            "type": "string"
+                          },
+                          "employementVerificationNumber": {
+                            "type": "string"
+                          },
+                          "salaryAmount": {
+                            "type": "number",
+                            "format": "float"
                           }
                         }
                       },
@@ -32347,7 +32438,7 @@
                                           "type": "number",
                                           "format": "float"
                                         },
-                                        "NRCfront": {
+                                        "IDfront": {
                                           "type": "object",
                                           "properties": {
                                             "data": {
@@ -32489,7 +32580,7 @@
                                             }
                                           }
                                         },
-                                        "NRCback": {
+                                        "IDback": {
                                           "type": "object",
                                           "properties": {
                                             "data": {
@@ -33535,7 +33626,7 @@
                                                       "type": "number",
                                                       "format": "float"
                                                     },
-                                                    "NRCfront": {
+                                                    "IDfront": {
                                                       "type": "object",
                                                       "properties": {
                                                         "data": {
@@ -33677,7 +33768,7 @@
                                                         }
                                                       }
                                                     },
-                                                    "NRCback": {
+                                                    "IDback": {
                                                       "type": "object",
                                                       "properties": {
                                                         "data": {
@@ -33898,9 +33989,6 @@
                                       "properties": {
                                         "id": {
                                           "type": "number"
-                                        },
-                                        "salaryAmount": {
-                                          "type": "string"
                                         },
                                         "paySlip": {
                                           "type": "object",
@@ -34186,11 +34274,21 @@
                                             }
                                           }
                                         },
-                                        "employementVerificationNumber": {
-                                          "type": "integer"
-                                        },
                                         "employerName": {
                                           "type": "string"
+                                        },
+                                        "companyName": {
+                                          "type": "string"
+                                        },
+                                        "companyLocation": {
+                                          "type": "string"
+                                        },
+                                        "employementVerificationNumber": {
+                                          "type": "string"
+                                        },
+                                        "salaryAmount": {
+                                          "type": "number",
+                                          "format": "float"
                                         }
                                       }
                                     },
@@ -34497,9 +34595,6 @@
                             "id": {
                               "type": "number"
                             },
-                            "salaryAmount": {
-                              "type": "string"
-                            },
                             "paySlip": {
                               "type": "object",
                               "properties": {
@@ -34784,11 +34879,21 @@
                                 }
                               }
                             },
-                            "employementVerificationNumber": {
-                              "type": "integer"
-                            },
                             "employerName": {
                               "type": "string"
+                            },
+                            "companyName": {
+                              "type": "string"
+                            },
+                            "companyLocation": {
+                              "type": "string"
+                            },
+                            "employementVerificationNumber": {
+                              "type": "string"
+                            },
+                            "salaryAmount": {
+                              "type": "number",
+                              "format": "float"
                             }
                           }
                         },
@@ -34909,6 +35014,406 @@
         "properties": {
           "data": {
             "$ref": "#/components/schemas/TypeResponseDataObject"
+          },
+          "meta": {
+            "type": "object"
+          }
+        }
+      },
+      "VehicleTrackingFeeRequest": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "upfrontTrackingFee": {
+                "type": "number",
+                "format": "float"
+              },
+              "monthlyTrackingFee": {
+                "type": "number",
+                "format": "float"
+              }
+            }
+          }
+        }
+      },
+      "VehicleTrackingFeeListResponseDataItem": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "attributes": {
+            "$ref": "#/components/schemas/VehicleTrackingFee"
+          }
+        }
+      },
+      "VehicleTrackingFeeListResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VehicleTrackingFeeListResponseDataItem"
+            }
+          },
+          "meta": {
+            "type": "object",
+            "properties": {
+              "pagination": {
+                "type": "object",
+                "properties": {
+                  "page": {
+                    "type": "integer"
+                  },
+                  "pageSize": {
+                    "type": "integer",
+                    "minimum": 25
+                  },
+                  "pageCount": {
+                    "type": "integer",
+                    "maximum": 1
+                  },
+                  "total": {
+                    "type": "integer"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "VehicleTrackingFee": {
+        "type": "object",
+        "properties": {
+          "upfrontTrackingFee": {
+            "type": "number",
+            "format": "float"
+          },
+          "monthlyTrackingFee": {
+            "type": "number",
+            "format": "float"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "publishedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdBy": {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "number"
+                  },
+                  "attributes": {
+                    "type": "object",
+                    "properties": {
+                      "firstname": {
+                        "type": "string"
+                      },
+                      "lastname": {
+                        "type": "string"
+                      },
+                      "username": {
+                        "type": "string"
+                      },
+                      "email": {
+                        "type": "string",
+                        "format": "email"
+                      },
+                      "resetPasswordToken": {
+                        "type": "string"
+                      },
+                      "registrationToken": {
+                        "type": "string"
+                      },
+                      "isActive": {
+                        "type": "boolean"
+                      },
+                      "roles": {
+                        "type": "object",
+                        "properties": {
+                          "data": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "number"
+                                },
+                                "attributes": {
+                                  "type": "object",
+                                  "properties": {
+                                    "name": {
+                                      "type": "string"
+                                    },
+                                    "code": {
+                                      "type": "string"
+                                    },
+                                    "description": {
+                                      "type": "string"
+                                    },
+                                    "users": {
+                                      "type": "object",
+                                      "properties": {
+                                        "data": {
+                                          "type": "array",
+                                          "items": {
+                                            "type": "object",
+                                            "properties": {
+                                              "id": {
+                                                "type": "number"
+                                              },
+                                              "attributes": {
+                                                "type": "object",
+                                                "properties": {}
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    },
+                                    "permissions": {
+                                      "type": "object",
+                                      "properties": {
+                                        "data": {
+                                          "type": "array",
+                                          "items": {
+                                            "type": "object",
+                                            "properties": {
+                                              "id": {
+                                                "type": "number"
+                                              },
+                                              "attributes": {
+                                                "type": "object",
+                                                "properties": {
+                                                  "action": {
+                                                    "type": "string"
+                                                  },
+                                                  "actionParameters": {},
+                                                  "subject": {
+                                                    "type": "string"
+                                                  },
+                                                  "properties": {},
+                                                  "conditions": {},
+                                                  "role": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                      "data": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                          "id": {
+                                                            "type": "number"
+                                                          },
+                                                          "attributes": {
+                                                            "type": "object",
+                                                            "properties": {}
+                                                          }
+                                                        }
+                                                      }
+                                                    }
+                                                  },
+                                                  "createdAt": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                  },
+                                                  "updatedAt": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                  },
+                                                  "createdBy": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                      "data": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                          "id": {
+                                                            "type": "number"
+                                                          },
+                                                          "attributes": {
+                                                            "type": "object",
+                                                            "properties": {}
+                                                          }
+                                                        }
+                                                      }
+                                                    }
+                                                  },
+                                                  "updatedBy": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                      "data": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                          "id": {
+                                                            "type": "number"
+                                                          },
+                                                          "attributes": {
+                                                            "type": "object",
+                                                            "properties": {}
+                                                          }
+                                                        }
+                                                      }
+                                                    }
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    },
+                                    "createdAt": {
+                                      "type": "string",
+                                      "format": "date-time"
+                                    },
+                                    "updatedAt": {
+                                      "type": "string",
+                                      "format": "date-time"
+                                    },
+                                    "createdBy": {
+                                      "type": "object",
+                                      "properties": {
+                                        "data": {
+                                          "type": "object",
+                                          "properties": {
+                                            "id": {
+                                              "type": "number"
+                                            },
+                                            "attributes": {
+                                              "type": "object",
+                                              "properties": {}
+                                            }
+                                          }
+                                        }
+                                      }
+                                    },
+                                    "updatedBy": {
+                                      "type": "object",
+                                      "properties": {
+                                        "data": {
+                                          "type": "object",
+                                          "properties": {
+                                            "id": {
+                                              "type": "number"
+                                            },
+                                            "attributes": {
+                                              "type": "object",
+                                              "properties": {}
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "blocked": {
+                        "type": "boolean"
+                      },
+                      "preferedLanguage": {
+                        "type": "string"
+                      },
+                      "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "updatedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "createdBy": {
+                        "type": "object",
+                        "properties": {
+                          "data": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "number"
+                              },
+                              "attributes": {
+                                "type": "object",
+                                "properties": {}
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "updatedBy": {
+                        "type": "object",
+                        "properties": {
+                          "data": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "number"
+                              },
+                              "attributes": {
+                                "type": "object",
+                                "properties": {}
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "updatedBy": {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "number"
+                  },
+                  "attributes": {
+                    "type": "object",
+                    "properties": {}
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "VehicleTrackingFeeResponseDataObject": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "attributes": {
+            "$ref": "#/components/schemas/VehicleTrackingFee"
+          }
+        }
+      },
+      "VehicleTrackingFeeResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/VehicleTrackingFeeResponseDataObject"
           },
           "meta": {
             "type": "object"
@@ -39632,6 +40137,329 @@
           }
         ],
         "operationId": "delete/types/{id}"
+      }
+    },
+    "/vehicle-tracking-fee": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VehicleTrackingFeeResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Vehicle-tracking-fee"
+        ],
+        "parameters": [
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Sort by attributes ascending (asc) or descending (desc)",
+            "deprecated": false,
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pagination[withCount]",
+            "in": "query",
+            "description": "Return page/pageSize (default: true)",
+            "deprecated": false,
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "pagination[page]",
+            "in": "query",
+            "description": "Page number (default: 0)",
+            "deprecated": false,
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "pagination[pageSize]",
+            "in": "query",
+            "description": "Page size (default: 25)",
+            "deprecated": false,
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "pagination[start]",
+            "in": "query",
+            "description": "Offset value (default: 0)",
+            "deprecated": false,
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "pagination[limit]",
+            "in": "query",
+            "description": "Number of entities to return (default: 25)",
+            "deprecated": false,
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "description": "Fields to return (ex: title,author)",
+            "deprecated": false,
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "populate",
+            "in": "query",
+            "description": "Relations to return",
+            "deprecated": false,
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "filters",
+            "in": "query",
+            "description": "Filters to apply",
+            "deprecated": false,
+            "required": false,
+            "schema": {
+              "type": "object",
+              "additionalProperties": true
+            },
+            "style": "deepObject"
+          },
+          {
+            "name": "locale",
+            "in": "query",
+            "description": "Locale to apply",
+            "deprecated": false,
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "operationId": "get/vehicle-tracking-fee"
+      },
+      "put": {
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VehicleTrackingFeeResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Vehicle-tracking-fee"
+        ],
+        "parameters": [],
+        "operationId": "put/vehicle-tracking-fee",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VehicleTrackingFeeRequest"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int64"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Vehicle-tracking-fee"
+        ],
+        "parameters": [],
+        "operationId": "delete/vehicle-tracking-fee"
       }
     },
     "/upload": {

@@ -6,17 +6,12 @@
   },
   "options": {},
   "attributes": {
-    "salaryAmount": {
-      "type": "string"
-    },
     "paySlip": {
       "type": "media",
       "multiple": true,
       "required": false,
       "allowedTypes": [
-        "images",
-        "files",
-        "videos"
+        "files"
       ]
     },
     "verificationVideo": {
@@ -27,11 +22,20 @@
         "videos"
       ]
     },
-    "employementVerificationNumber": {
-      "type": "integer"
-    },
     "employerName": {
       "type": "string"
+    },
+    "companyName": {
+      "type": "string"
+    },
+    "companyLocation": {
+      "type": "string"
+    },
+    "employementVerificationNumber": {
+      "type": "string"
+    },
+    "salaryAmount": {
+      "type": "decimal"
     }
   }
 }

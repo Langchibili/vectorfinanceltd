@@ -5,10 +5,11 @@ backend/build
 backend/.env
 backend-err
 backend-old-stuff
+frontend/Secrets.js
 frontend/mvp-and-mmp-features.txt
 frontend/logic.txt
 yarn-error.log
-frontend/Secrets.js
+
 
 # dependencies
 frontend/node_modules

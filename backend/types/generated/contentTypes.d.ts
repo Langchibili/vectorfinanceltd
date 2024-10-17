@@ -1247,6 +1247,38 @@ export interface ApiTypeType extends Schema.CollectionType {
   };
 }
 
+export interface ApiVehicleTrackingFeeVehicleTrackingFee
+  extends Schema.SingleType {
+  collectionName: 'vehicle_tracking_fees';
+  info: {
+    singularName: 'vehicle-tracking-fee';
+    pluralName: 'vehicle-tracking-fees';
+    displayName: 'vehicleTrackingFee';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    upfrontTrackingFee: Attribute.Decimal;
+    monthlyTrackingFee: Attribute.Decimal;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::vehicle-tracking-fee.vehicle-tracking-fee',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::vehicle-tracking-fee.vehicle-tracking-fee',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
 declare module '@strapi/types' {
   export module Shared {
     export interface ContentTypes {
@@ -1275,6 +1307,7 @@ declare module '@strapi/types' {
       'api::repayment.repayment': ApiRepaymentRepayment;
       'api::transaction-history.transaction-history': ApiTransactionHistoryTransactionHistory;
       'api::type.type': ApiTypeType;
+      'api::vehicle-tracking-fee.vehicle-tracking-fee': ApiVehicleTrackingFeeVehicleTrackingFee;
     }
   }
 }

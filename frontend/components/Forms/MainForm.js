@@ -3,6 +3,7 @@
 import React from "react";
 import UpdateDetailsForm from "./UpdateDetailsForm";
 import UpdateClientDetailsForm from "./UpdateClientDetailsForm";
+import UpdateSalaryDetailsForm from "./UpdateSalaryDetailsForm";
 
 export default class MainForm extends React.Component{
     constructor(props){
@@ -32,7 +33,7 @@ export default class MainForm extends React.Component{
             </div>
             </div>
 
-            <UpdateClientDetailsForm {...this.props}/>
+            <UpdateSalaryDetailsForm {...this.props}/>
         </>)
     }
 }

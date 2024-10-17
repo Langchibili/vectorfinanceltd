@@ -11,8 +11,8 @@ export default class UpdateClientDetailsForm extends React.Component {
     this.state = {
       employementStatus: '',
       monthlyIncome: '',
-      NRCfront: null,
-      NRCback: null,
+      IDfront: null,
+      IDback: null,
       // More fields can be added as necessary
       isFormValid: false,
       saving: false,
@@ -22,7 +22,7 @@ export default class UpdateClientDetailsForm extends React.Component {
   }
 
   getClientDetails =  async()=>{
-    return await fetch(api_url+'/users/me?populate=clientDetails.NRCfront,clientDetails.NRCback,', {
+    return await fetch(api_url+'/users/me?populate=clientDetails.IDfront,clientDetails.IDback,', {
         headers: {
          'Authorization': `Bearer ${getJwt()}`,
          'Content-Type': 'application/json'
@@ -38,8 +38,8 @@ export default class UpdateClientDetailsForm extends React.Component {
         const blankDetailsObject = {
             employementStatus: null,
             monthlyIncome: null,
-            NRCfront: null,
-            NRCback: null
+            IDfront: null,
+            IDback: null
         } // create a blank slate of clientDetails to obtain the component's id
         const updatedUser = await updateUserAccount({clientDetails:blankDetailsObject},this.props.loggedInUser.id)
         if(updatedUser.hasOwnProperty('error')){
@@ -52,8 +52,8 @@ export default class UpdateClientDetailsForm extends React.Component {
     this.setState({
       employementStatus: clientDetails?.employementStatus || '',
       monthlyIncome: clientDetails?.monthlyIncome || '',
-      NRCfront: clientDetails?.NRCfront || '',
-      NRCback: clientDetails?.NRCback || '',
+      IDfront: clientDetails?.IDfront || '',
+      IDback: clientDetails?.IDback || '',
       clientDetailsId: clientDetails?.id || null
     },()=>{
         this.checkFormValidity()
@@ -68,21 +68,21 @@ export default class UpdateClientDetailsForm extends React.Component {
   }
 
   checkFormValidity = () => {
-    const { employementStatus, monthlyIncome, NRCfront, NRCback } = this.state;
+    const { employementStatus, monthlyIncome, IDfront, IDback } = this.state;
 
     // Validate that all fields are filled
     const isFormValid =
       employementStatus.trim() &&
       monthlyIncome &&
-      NRCfront &&
-      NRCback;
+      IDfront &&
+      IDback;
 
     this.setState({ isFormValid });
   }
 
   handleSubmit = async (e)=>{
      e.preventDefault()
-     const { employementStatus, monthlyIncome, clientDetailsId } = this.state;
+     const { employementStatus, monthlyIncome, clientDetailsId, IDfront, IDback } = this.state;
      if(!employementStatus || !monthlyIncome){
         this.setState({
             error: 'Please ensure all fields are filled.',
@@ -94,12 +94,14 @@ export default class UpdateClientDetailsForm extends React.Component {
      delete updateObject.isFormValid
      delete updateObject.saving
      delete updateObject.error
-     delete updateObject.NRCfront
-     delete updateObject.NRCback
+     delete updateObject.IDfront
+     delete updateObject.IDback
      delete updateObject.clientDetailsId
      
      this.setState({
         saving: true,
+        IDfront: IDfront,
+        IDback: IDback,
         clientDetailsId: clientDetailsId
      })
      updateObject.id = clientDetailsId
@@ -109,22 +111,26 @@ export default class UpdateClientDetailsForm extends React.Component {
         this.setState({
             error: 'something went wrong, try again',
             saving: false,
+            IDfront: IDfront,
+            IDback: IDback,
             clientDetailsId: clientDetailsId
         })
         return
      }
      this.setState({
         saving: false,
+        IDfront: IDfront,
+        IDback: IDback,
         clientDetailsId: clientDetailsId
     },()=>{
         console.log(this.state)
     })
   }
 
-  addNRCfront = (files) => {
-    if(!this.state.NRCfront){
+  addIDfront = (files) => {
+    if(!this.state.IDfront){
         this.setState({
-            NRCfront: files,
+            IDfront: files,
             saving: false,
             error: null
         },()=>{
@@ -132,9 +138,9 @@ export default class UpdateClientDetailsForm extends React.Component {
         })
     }
     else{
-        const newFiles = [...this.state.NRCfront,...files]
+        const newFiles = [...this.state.IDfront,...files]
         this.setState({
-            NRCfront: newFiles,
+            IDfront: newFiles,
             saving: false,
             error: null
         },()=>{
@@ -142,10 +148,10 @@ export default class UpdateClientDetailsForm extends React.Component {
         })
     }
   }
-  addNRCback = (files) => {
-    if(!this.state.NRCback){
+  addIDback = (files) => {
+    if(!this.state.IDback){
         this.setState({
-            NRCback: files,
+            IDback: files,
             saving: false,
             error: null
         },()=>{
@@ -153,9 +159,9 @@ export default class UpdateClientDetailsForm extends React.Component {
         })
     }
     else{
-        const newFiles = [...this.state.NRCback,...files]
+        const newFiles = [...this.state.IDback,...files]
         this.setState({
-            NRCback: newFiles,
+            IDback: newFiles,
             saving: false,
             error: null
         },()=>{
@@ -204,7 +210,7 @@ export default class UpdateClientDetailsForm extends React.Component {
         }
         else if(file.mime.startsWith('image/')){
             return (<div id={"#"+file.id} key={file.id}>
-                        <img className="mt-1 mb-1" style={{width:'25%'}} src={getImage(file,"thumbnail")} />
+                        <img className="mt-1 mb-1" style={{width:'35%'}} src={getImage(file,"thumbnail")} />
                         <button className="btn btn-sm btn-danger" onClick={()=>{this.handleRemoveImage(file.id,files,arrName)}}>Remove</button>
                    </div>)
         }
@@ -221,7 +227,7 @@ export default class UpdateClientDetailsForm extends React.Component {
   renderFile
 
   render() {
-    const { employementStatus, monthlyIncome, NRCfront, NRCback, isFormValid } = this.state;
+    const { employementStatus, monthlyIncome, isFormValid } = this.state;
 
     return (
       <>
@@ -274,30 +280,32 @@ export default class UpdateClientDetailsForm extends React.Component {
                   {this.state.clientDetailsId? <><h4 style={{marginTop:'20px'}} className="card-title mb-0 flex-grow-1">Identity Details </h4>
                   <hr style={{color:'lightgray'}}/>
                   <div style={{marginTop:'20px'}}>
-                        <h5>NRC Front <small  style={{color:'lightgray'}}>(image or document)</small></h5>
+                        <h5>Valid ID<small  style={{color:'gray'}}> (Front Side)</small></h5><small  style={{color:'lightgray'}}>(NRC or Passport or Driving Licence)</small>
                         <Uploader 
-                            addFiles={this.addNRCfront}
+                            addFiles={this.addIDfront}
                             displayType="circular"
                             refId={this.state.clientDetailsId}
                             refName="user-profile.client-details"
-                            fieldName="NRCfront"
+                            fieldName="IDfront"
                             allowMultiple={false}
                             allowedTypes={['image/*', 'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain', 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']}
                         />
-                        {this.renderFiles(this.state.NRCfront,"NRCfront")}
+                        <small  style={{color:'lightgray'}}>(image or document)</small>
+                        {this.renderFiles(this.state.IDfront,"IDfront")}
                   </div>
                   <div style={{marginTop:'10px'}}>
-                        <h5>NRC Back <small style={{color:'lightgray'}}>(image or document)</small></h5>
+                        <h5>Valid ID<small  style={{color:'gray'}}> (Back Side)</small></h5> <small  style={{color:'lightgray'}}>(NRC or Passport or Driving Licence)</small>
                         <Uploader 
-                            addFiles={this.addNRCback}
+                            addFiles={this.addIDback}
                             displayType="circular"
                             refId={this.state.clientDetailsId}
                             refName="user-profile.client-details"
-                            fieldName="NRCback"
+                            fieldName="IDback"
                             allowMultiple={false}
                             allowedTypes={['image/*', 'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain', 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']}
                         />
-                        {this.renderFiles(this.state.NRCback,"NRCback")}
+                        <small  style={{color:'lightgray'}}>(image or document)</small>
+                        {this.renderFiles(this.state.IDback,"IDback")}
                   </div></> : <></>}
                   {/* Save and Next Buttons */}
                   <div style={{ width: "100%", display: "flex", justifyContent: "space-between" }}>
@@ -325,7 +333,7 @@ export default class UpdateClientDetailsForm extends React.Component {
                     </div>
                   </div>
                  {this.state.error? <p className="text text-danger">{this.state.error}</p> : <></>}
-                 <p className="text text-warning mt-2">Note that all the information provided by you is kept confidential</p>
+                 <p className="text text-warning mt-2">Note that all the information you provide here is kept strictly confidential, and it's solely meant for verification and loan eligibility determination purposes</p>
                 </div>
               </div>
             </div>
@@ -335,3 +343,5 @@ export default class UpdateClientDetailsForm extends React.Component {
     );
   }
 }
+//  id
+//  sign a letter of sale

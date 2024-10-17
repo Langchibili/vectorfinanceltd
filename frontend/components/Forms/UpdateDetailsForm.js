@@ -215,6 +215,7 @@ export default class UpdateDetailsForm extends React.Component {
                     </div>
                   </div>
                  {this.state.error? <p className="text text-danger">{this.state.error}</p> : <></>}
+                 <p className="text text-warning mt-2">Note that all the information you provide here is kept strictly confidential, and it's solely meant for verification and loan eligibility determination purposes</p>
                 </div>
               </div>
             </div>

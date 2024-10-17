@@ -7,11 +7,13 @@ export interface ClientDetailsSalary extends Schema.Component {
     description: '';
   };
   attributes: {
-    salaryAmount: Attribute.String;
     paySlip: Attribute.Media;
     verificationVideo: Attribute.Media;
-    employementVerificationNumber: Attribute.Integer;
     employerName: Attribute.String;
+    companyName: Attribute.String;
+    companyLocation: Attribute.String;
+    employementVerificationNumber: Attribute.String;
+    salaryAmount: Attribute.Decimal;
   };
 }
 
@@ -86,8 +88,8 @@ export interface UserProfileClientDetails extends Schema.Component {
     monthlyIncome: Attribute.Decimal;
     KYCverificationStatus: Attribute.Boolean & Attribute.DefaultTo<false>;
     outstandingLoansBalance: Attribute.Decimal;
-    NRCfront: Attribute.Media;
-    NRCback: Attribute.Media;
+    IDfront: Attribute.Media;
+    IDback: Attribute.Media;
   };
 }
 

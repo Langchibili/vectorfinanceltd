@@ -5,6 +5,7 @@ import MainHeader from "@/components/Parts/Header/MainHeader";
 import MainFooter from "@/components/Parts/Footer/MainFooter";
 import MainMenu from '@/components/Parts/Menus/MainMenu';
 import { UserProvider, useUser } from "@/Contexts/UserContext";
+import BottomNav from "@/components/Includes/BottomNavigation/BottomNavigation";
 
 export default function RootLayout({ children }) {
   return (
@@ -51,6 +52,7 @@ export default function RootLayout({ children }) {
               {children}
               <FooterPart/>
             </div>
+            {/* <BottomNav/> */}
       </UserProvider>
       </div>
         {/* <!-- JAVASCRIPT --> */}
