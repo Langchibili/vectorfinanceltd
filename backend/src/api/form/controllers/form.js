@@ -1,9 +1,9 @@
 'use strict';
 
 /**
- * loan-form controller
+ * form controller
  */
 
 const { createCoreController } = require('@strapi/strapi').factories;
 
-module.exports = createCoreController('api::loan-form.loan-form');
+module.exports = createCoreController('api::form.form');

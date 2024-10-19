@@ -726,9 +726,9 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
     profilePicture: Attribute.Media;
     details: Attribute.Component<'user-profile.details'>;
     clientDetails: Attribute.Component<'user-profile.client-details'>;
-    pendingLoans: Attribute.Relation<
+    currentLoan: Attribute.Relation<
       'plugin::users-permissions.user',
-      'oneToMany',
+      'oneToOne',
       'api::loan.loan'
     >;
     fulfilledLoans: Attribute.Relation<
@@ -763,6 +763,15 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
     >;
     fullnames: Attribute.String;
     salary: Attribute.Component<'client-details.salary'>;
+    loanApplicationForms: Attribute.Component<
+      'application-forms.loan-application-forms',
+      true
+    >;
+    forms: Attribute.Relation<
+      'plugin::users-permissions.user',
+      'manyToMany',
+      'api::form.form'
+    >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
@@ -905,6 +914,41 @@ export interface ApiFinanceFinance extends Schema.SingleType {
   };
 }
 
+export interface ApiFormForm extends Schema.CollectionType {
+  collectionName: 'forms';
+  info: {
+    singularName: 'form';
+    pluralName: 'forms';
+    displayName: 'form';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    formName: Attribute.String;
+    form: Attribute.Media;
+    clientsWhoCanFill: Attribute.Relation<
+      'api::form.form',
+      'manyToMany',
+      'plugin::users-permissions.user'
+    >;
+    requiredForSalaryClients: Attribute.Boolean & Attribute.DefaultTo<false>;
+    requiredForVehicleClients: Attribute.Boolean & Attribute.DefaultTo<false>;
+    requiredForHouseClients: Attribute.Boolean & Attribute.DefaultTo<false>;
+    requiredForLandClients: Attribute.Boolean & Attribute.DefaultTo<false>;
+    requiredForBussinessClients: Attribute.Boolean & Attribute.DefaultTo<false>;
+    requiredForCompanyClients: Attribute.Boolean & Attribute.DefaultTo<false>;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<'api::form.form', 'oneToOne', 'admin::user'> &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<'api::form.form', 'oneToOne', 'admin::user'> &
+      Attribute.Private;
+  };
+}
+
 export interface ApiKyCverificationKyCverification
   extends Schema.CollectionType {
   collectionName: 'ky_cverifications';
@@ -960,7 +1004,8 @@ export interface ApiLoanLoan extends Schema.CollectionType {
     interestRate: Attribute.Decimal;
     loanStatus: Attribute.Enumeration<
       [
-        'pending ',
+        'initiated',
+        'pending-approval',
         'approved',
         'rejected',
         'disbursed',
@@ -968,7 +1013,7 @@ export interface ApiLoanLoan extends Schema.CollectionType {
         'defaulted'
       ]
     > &
-      Attribute.DefaultTo<'pending '>;
+      Attribute.DefaultTo<'initiated'>;
     repaymentSchedule: Attribute.JSON;
     loanTerm: Attribute.Integer;
     loanType: Attribute.Enumeration<
@@ -1011,6 +1056,7 @@ export interface ApiLoanLoan extends Schema.CollectionType {
       'api::loan-category.loan-category'
     >;
     salary: Attribute.Component<'client-details.salary'>;
+    clientAskingAmount: Attribute.Decimal;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -1050,36 +1096,6 @@ export interface ApiLoanCategoryLoanCategory extends Schema.CollectionType {
       Attribute.Private;
     updatedBy: Attribute.Relation<
       'api::loan-category.loan-category',
-      'oneToOne',
-      'admin::user'
-    > &
-      Attribute.Private;
-  };
-}
-
-export interface ApiLoanFormLoanForm extends Schema.SingleType {
-  collectionName: 'loan_forms';
-  info: {
-    singularName: 'loan-form';
-    pluralName: 'loan-forms';
-    displayName: 'LoanForm';
-  };
-  options: {
-    draftAndPublish: true;
-  };
-  attributes: {
-    loanAgreementForm: Attribute.Media;
-    createdAt: Attribute.DateTime;
-    updatedAt: Attribute.DateTime;
-    publishedAt: Attribute.DateTime;
-    createdBy: Attribute.Relation<
-      'api::loan-form.loan-form',
-      'oneToOne',
-      'admin::user'
-    > &
-      Attribute.Private;
-    updatedBy: Attribute.Relation<
-      'api::loan-form.loan-form',
       'oneToOne',
       'admin::user'
     > &
@@ -1299,10 +1315,10 @@ declare module '@strapi/types' {
       'plugin::i18n.locale': PluginI18NLocale;
       'api::approval.approval': ApiApprovalApproval;
       'api::finance.finance': ApiFinanceFinance;
+      'api::form.form': ApiFormForm;
       'api::ky-cverification.ky-cverification': ApiKyCverificationKyCverification;
       'api::loan.loan': ApiLoanLoan;
       'api::loan-category.loan-category': ApiLoanCategoryLoanCategory;
-      'api::loan-form.loan-form': ApiLoanFormLoanForm;
       'api::loans-information.loans-information': ApiLoansInformationLoansInformation;
       'api::repayment.repayment': ApiRepaymentRepayment;
       'api::transaction-history.transaction-history': ApiTransactionHistoryTransactionHistory;

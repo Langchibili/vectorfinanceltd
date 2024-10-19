@@ -1,9 +1,9 @@
 'use strict';
 
 /**
- * loan-form service
+ * form service
  */
 
 const { createCoreService } = require('@strapi/strapi').factories;
 
-module.exports = createCoreService('api::loan-form.loan-form');
+module.exports = createCoreService('api::form.form');

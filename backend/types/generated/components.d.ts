@@ -1,5 +1,26 @@
 import type { Schema, Attribute } from '@strapi/strapi';
 
+export interface ApplicationFormsLoanAgreementForm extends Schema.Component {
+  collectionName: 'components_application_forms_loan_agreement_forms';
+  info: {
+    displayName: 'loanAgreementForm';
+  };
+  attributes: {};
+}
+
+export interface ApplicationFormsLoanApplicationForms extends Schema.Component {
+  collectionName: 'components_application_forms_loan_application_forms';
+  info: {
+    displayName: 'loanApplicationForms';
+    description: '';
+  };
+  attributes: {
+    formName: Attribute.String;
+    form: Attribute.Media;
+    signedForm: Attribute.Media;
+  };
+}
+
 export interface ClientDetailsSalary extends Schema.Component {
   collectionName: 'components_client_details_salaries';
   info: {
@@ -112,6 +133,8 @@ export interface UserProfileDetails extends Schema.Component {
 declare module '@strapi/types' {
   export module Shared {
     export interface Components {
+      'application-forms.loan-agreement-form': ApplicationFormsLoanAgreementForm;
+      'application-forms.loan-application-forms': ApplicationFormsLoanApplicationForms;
       'client-details.salary': ClientDetailsSalary;
       'media-and-documents.collateral': MediaAndDocumentsCollateral;
       'media-and-documents.house': MediaAndDocumentsHouse;

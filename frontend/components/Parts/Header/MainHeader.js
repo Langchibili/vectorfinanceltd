@@ -267,7 +267,7 @@ export default class MainHeader extends React.Component{
                         onClick={(e) => e.preventDefault()}
                         className="dropdown-item notify-item language py-2"
                         data-lang="en"
-                        title="English"
+                        title="Zambia"
                         >
                         <img
                             src="/zambia-logo.jpg"
@@ -276,7 +276,7 @@ export default class MainHeader extends React.Component{
                             height={18}
                             style={{width:'40.4px',height:'40.4px'}}
                         />
-                        <span className="align-middle">English</span>
+                        <span className="align-middle">Zambia</span>
                         </a>
                        
                     </div>

@@ -1,9 +1,9 @@
 'use strict';
 
 /**
- * loan-form router
+ * form router
  */
 
 const { createCoreRouter } = require('@strapi/strapi').factories;
 
-module.exports = createCoreRouter('api::loan-form.loan-form');
+module.exports = createCoreRouter('api::form.form');

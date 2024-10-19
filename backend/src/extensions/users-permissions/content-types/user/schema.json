@@ -88,9 +88,9 @@
       "repeatable": false,
       "component": "user-profile.client-details"
     },
-    "pendingLoans": {
+    "currentLoan": {
       "type": "relation",
-      "relation": "oneToMany",
+      "relation": "oneToOne",
       "target": "api::loan.loan"
     },
     "fulfilledLoans": {
@@ -135,6 +135,18 @@
       "type": "component",
       "repeatable": false,
       "component": "client-details.salary"
+    },
+    "loanApplicationForms": {
+      "displayName": "loanApplicationForms",
+      "type": "component",
+      "repeatable": true,
+      "component": "application-forms.loan-application-forms"
+    },
+    "forms": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::form.form",
+      "mappedBy": "clientsWhoCanFill"
     }
   }
 }

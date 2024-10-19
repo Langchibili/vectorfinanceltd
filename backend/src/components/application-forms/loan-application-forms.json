@@ -1,0 +1,31 @@
+{
+  "collectionName": "components_application_forms_loan_application_forms",
+  "info": {
+    "displayName": "loanApplicationForms",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "formName": {
+      "type": "string"
+    },
+    "form": {
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos"
+      ],
+      "type": "media",
+      "multiple": true
+    },
+    "signedForm": {
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos"
+      ],
+      "type": "media",
+      "multiple": true
+    }
+  }
+}

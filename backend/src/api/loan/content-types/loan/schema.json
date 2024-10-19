@@ -21,14 +21,15 @@
     "loanStatus": {
       "type": "enumeration",
       "enum": [
-        "pending ",
+        "initiated",
+        "pending-approval",
         "approved",
         "rejected",
         "disbursed",
         "completed",
         "defaulted"
       ],
-      "default": "pending "
+      "default": "initiated"
     },
     "repaymentSchedule": {
       "type": "json"
@@ -128,6 +129,9 @@
       "type": "component",
       "repeatable": false,
       "component": "client-details.salary"
+    },
+    "clientAskingAmount": {
+      "type": "decimal"
     }
   }
 }

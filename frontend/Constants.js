@@ -35,13 +35,13 @@ let apiurl, backendUrl, clienturl
   /*localhost: */  backendUrl = apiurl.replace('http://localhost:1350/api','http://localhost:1350')
  }
  else if(environment === 'live'){
-  /*liveserver: */ backendUrl =  apiurl.replace('https://api.vectorfinancelimited.com/api','vectorfinancelimited.com') // for production's sake
+  /*liveserver: */ backendUrl =  apiurl.replace('api.vectorfinancelimited.com/api','vectorfinancelimited.com') // for production's sake
  }
  else if(environment === 'live2'){
-  /*liveserver: */ backendUrl =  apiurl.replace('https://api.vectorfinancelimited.app/api','vectorfinancelimited.app') // for production's sake
+  /*liveserver: */ backendUrl =  apiurl.replace('aapi.vectorfinancelimited.app/api','vectorfinancelimited.app') // for production's sake
  }
  else{ // if environment is default, it means it's a test server
-  /*testserver: */ backendUrl =  apiurl.replace('https://testapi.vectorfinancelimitedap.com/api','vectorfinancelimitedapi.com') // the api to be used when deployed to the test site
+  /*testserver: */ backendUrl =  apiurl.replace('testapi.vectorfinancelimitedap.com/api','vectorfinancelimitedapi.com') // the api to be used when deployed to the test site
  }
  
 
