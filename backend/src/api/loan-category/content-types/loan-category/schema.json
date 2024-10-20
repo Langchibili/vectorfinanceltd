@@ -4,7 +4,8 @@
   "info": {
     "singularName": "loan-category",
     "pluralName": "loan-categories",
-    "displayName": "loanCategory"
+    "displayName": "loanCategory",
+    "description": ""
   },
   "options": {
     "draftAndPublish": true
@@ -17,11 +18,17 @@
     "description": {
       "type": "blocks"
     },
+    "loanTypes": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::type.type",
+      "mappedBy": "category"
+    },
     "loans": {
       "type": "relation",
-      "relation": "manyToMany",
+      "relation": "oneToMany",
       "target": "api::loan.loan",
-      "inversedBy": "loan_categories"
+      "mappedBy": "loanCategory"
     }
   }
 }

@@ -1,26 +1,5 @@
 import type { Schema, Attribute } from '@strapi/strapi';
 
-export interface ApplicationFormsLoanAgreementForm extends Schema.Component {
-  collectionName: 'components_application_forms_loan_agreement_forms';
-  info: {
-    displayName: 'loanAgreementForm';
-  };
-  attributes: {};
-}
-
-export interface ApplicationFormsLoanApplicationForms extends Schema.Component {
-  collectionName: 'components_application_forms_loan_application_forms';
-  info: {
-    displayName: 'loanApplicationForms';
-    description: '';
-  };
-  attributes: {
-    formName: Attribute.String;
-    form: Attribute.Media;
-    signedForm: Attribute.Media;
-  };
-}
-
 export interface ClientDetailsSalary extends Schema.Component {
   collectionName: 'components_client_details_salaries';
   info: {
@@ -35,6 +14,22 @@ export interface ClientDetailsSalary extends Schema.Component {
     companyLocation: Attribute.String;
     employementVerificationNumber: Attribute.String;
     salaryAmount: Attribute.Decimal;
+  };
+}
+
+export interface FormsApplicationForms extends Schema.Component {
+  collectionName: 'components_forms_application_forms';
+  info: {
+    displayName: 'application-forms';
+  };
+  attributes: {
+    formName: Attribute.String;
+    signedForm: Attribute.Media;
+    form: Attribute.Relation<
+      'forms.application-forms',
+      'oneToOne',
+      'api::form.form'
+    >;
   };
 }
 
@@ -133,9 +128,8 @@ export interface UserProfileDetails extends Schema.Component {
 declare module '@strapi/types' {
   export module Shared {
     export interface Components {
-      'application-forms.loan-agreement-form': ApplicationFormsLoanAgreementForm;
-      'application-forms.loan-application-forms': ApplicationFormsLoanApplicationForms;
       'client-details.salary': ClientDetailsSalary;
+      'forms.application-forms': FormsApplicationForms;
       'media-and-documents.collateral': MediaAndDocumentsCollateral;
       'media-and-documents.house': MediaAndDocumentsHouse;
       'media-and-documents.land': MediaAndDocumentsLand;

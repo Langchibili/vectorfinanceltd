@@ -23,6 +23,7 @@
       "enum": [
         "initiated",
         "pending-approval",
+        "accepted",
         "approved",
         "rejected",
         "disbursed",
@@ -36,21 +37,6 @@
     },
     "loanTerm": {
       "type": "integer"
-    },
-    "loanType": {
-      "type": "enumeration",
-      "enum": [
-        "personal Loan",
-        "business Loan",
-        "auto loan"
-      ]
-    },
-    "loanCategory": {
-      "type": "enumeration",
-      "enum": [
-        "collateral-based",
-        "salary-based"
-      ]
     },
     "loanPurpose": {
       "type": "blocks"
@@ -106,7 +92,7 @@
       "target": "api::approval.approval",
       "inversedBy": "loan"
     },
-    "type": {
+    "loanType": {
       "type": "relation",
       "relation": "manyToOne",
       "target": "api::type.type",
@@ -118,11 +104,11 @@
       "target": "api::transaction-history.transaction-history",
       "mappedBy": "loan"
     },
-    "loan_categories": {
+    "loanCategory": {
       "type": "relation",
-      "relation": "manyToMany",
+      "relation": "manyToOne",
       "target": "api::loan-category.loan-category",
-      "mappedBy": "loans"
+      "inversedBy": "loans"
     },
     "salary": {
       "displayName": "salary",

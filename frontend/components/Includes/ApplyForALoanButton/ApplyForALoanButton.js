@@ -25,6 +25,11 @@ export default function ApplyForALoanButton(props) {
   const handleClose = (e) => {
     setOpen(false);
   }
+   // create a blank loan with status as initiated
+   // set the blank loan to the user's currentLoan
+   // when the loan is created, load the forms
+   // and start feeling them up
+   
   if(typeof window !== "undefined"){
     return (
         <div>

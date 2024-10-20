@@ -136,17 +136,17 @@
       "repeatable": false,
       "component": "client-details.salary"
     },
-    "loanApplicationForms": {
-      "displayName": "loanApplicationForms",
+    "applicationForms": {
+      "displayName": "application-forms",
       "type": "component",
       "repeatable": true,
-      "component": "application-forms.loan-application-forms"
+      "component": "forms.application-forms"
     },
-    "forms": {
+    "formsToFill": {
       "type": "relation",
       "relation": "manyToMany",
       "target": "api::form.form",
-      "mappedBy": "clientsWhoCanFill"
+      "inversedBy": "clientsWhoCanFill"
     }
   }
 }

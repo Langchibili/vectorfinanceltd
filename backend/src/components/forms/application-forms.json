@@ -1,0 +1,24 @@
+{
+  "collectionName": "components_forms_application_forms",
+  "info": {
+    "displayName": "application-forms"
+  },
+  "options": {},
+  "attributes": {
+    "formName": {
+      "type": "string"
+    },
+    "signedForm": {
+      "allowedTypes": [
+        "files"
+      ],
+      "type": "media",
+      "multiple": true
+    },
+    "form": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::form.form"
+    }
+  }
+}

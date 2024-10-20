@@ -763,11 +763,8 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
     >;
     fullnames: Attribute.String;
     salary: Attribute.Component<'client-details.salary'>;
-    loanApplicationForms: Attribute.Component<
-      'application-forms.loan-application-forms',
-      true
-    >;
-    forms: Attribute.Relation<
+    applicationForms: Attribute.Component<'forms.application-forms', true>;
+    formsToFill: Attribute.Relation<
       'plugin::users-permissions.user',
       'manyToMany',
       'api::form.form'
@@ -928,17 +925,19 @@ export interface ApiFormForm extends Schema.CollectionType {
   attributes: {
     formName: Attribute.String;
     form: Attribute.Media;
-    clientsWhoCanFill: Attribute.Relation<
-      'api::form.form',
-      'manyToMany',
-      'plugin::users-permissions.user'
-    >;
     requiredForSalaryClients: Attribute.Boolean & Attribute.DefaultTo<false>;
     requiredForVehicleClients: Attribute.Boolean & Attribute.DefaultTo<false>;
     requiredForHouseClients: Attribute.Boolean & Attribute.DefaultTo<false>;
     requiredForLandClients: Attribute.Boolean & Attribute.DefaultTo<false>;
     requiredForBussinessClients: Attribute.Boolean & Attribute.DefaultTo<false>;
     requiredForCompanyClients: Attribute.Boolean & Attribute.DefaultTo<false>;
+    formSigningDemo: Attribute.Media;
+    formSigningGuidelines: Attribute.Blocks;
+    clientsWhoCanFill: Attribute.Relation<
+      'api::form.form',
+      'manyToMany',
+      'plugin::users-permissions.user'
+    >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -1006,6 +1005,7 @@ export interface ApiLoanLoan extends Schema.CollectionType {
       [
         'initiated',
         'pending-approval',
+        'accepted',
         'approved',
         'rejected',
         'disbursed',
@@ -1016,10 +1016,6 @@ export interface ApiLoanLoan extends Schema.CollectionType {
       Attribute.DefaultTo<'initiated'>;
     repaymentSchedule: Attribute.JSON;
     loanTerm: Attribute.Integer;
-    loanType: Attribute.Enumeration<
-      ['personal Loan', 'business Loan', 'auto loan']
-    >;
-    loanCategory: Attribute.Enumeration<['collateral-based', 'salary-based']>;
     loanPurpose: Attribute.Blocks;
     applicationDate: Attribute.DateTime;
     approvalDate: Attribute.DateTime;
@@ -1044,15 +1040,19 @@ export interface ApiLoanLoan extends Schema.CollectionType {
       'oneToOne',
       'api::approval.approval'
     >;
-    type: Attribute.Relation<'api::loan.loan', 'manyToOne', 'api::type.type'>;
+    loanType: Attribute.Relation<
+      'api::loan.loan',
+      'manyToOne',
+      'api::type.type'
+    >;
     transactionHstories: Attribute.Relation<
       'api::loan.loan',
       'oneToMany',
       'api::transaction-history.transaction-history'
     >;
-    loan_categories: Attribute.Relation<
+    loanCategory: Attribute.Relation<
       'api::loan.loan',
-      'manyToMany',
+      'manyToOne',
       'api::loan-category.loan-category'
     >;
     salary: Attribute.Component<'client-details.salary'>;
@@ -1073,6 +1073,7 @@ export interface ApiLoanCategoryLoanCategory extends Schema.CollectionType {
     singularName: 'loan-category';
     pluralName: 'loan-categories';
     displayName: 'loanCategory';
+    description: '';
   };
   options: {
     draftAndPublish: true;
@@ -1080,9 +1081,14 @@ export interface ApiLoanCategoryLoanCategory extends Schema.CollectionType {
   attributes: {
     categoryName: Attribute.String;
     description: Attribute.Blocks;
+    loanTypes: Attribute.Relation<
+      'api::loan-category.loan-category',
+      'oneToMany',
+      'api::type.type'
+    >;
     loans: Attribute.Relation<
       'api::loan-category.loan-category',
-      'manyToMany',
+      'oneToMany',
       'api::loan.loan'
     >;
     createdAt: Attribute.DateTime;
@@ -1252,6 +1258,11 @@ export interface ApiTypeType extends Schema.CollectionType {
     maximumAmount: Attribute.Decimal;
     defaultInterestRate: Attribute.Decimal;
     loanTermOptions: Attribute.JSON;
+    category: Attribute.Relation<
+      'api::type.type',
+      'manyToOne',
+      'api::loan-category.loan-category'
+    >;
     loans: Attribute.Relation<'api::type.type', 'oneToMany', 'api::loan.loan'>;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;

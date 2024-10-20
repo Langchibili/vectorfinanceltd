@@ -23,12 +23,6 @@
         "files"
       ]
     },
-    "clientsWhoCanFill": {
-      "type": "relation",
-      "relation": "manyToMany",
-      "target": "plugin::users-permissions.user",
-      "inversedBy": "forms"
-    },
     "requiredForSalaryClients": {
       "type": "boolean",
       "default": false
@@ -52,6 +46,23 @@
     "requiredForCompanyClients": {
       "type": "boolean",
       "default": false
+    },
+    "formSigningDemo": {
+      "type": "media",
+      "multiple": true,
+      "required": false,
+      "allowedTypes": [
+        "videos"
+      ]
+    },
+    "formSigningGuidelines": {
+      "type": "blocks"
+    },
+    "clientsWhoCanFill": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "plugin::users-permissions.user",
+      "mappedBy": "formsToFill"
     }
   }
 }
