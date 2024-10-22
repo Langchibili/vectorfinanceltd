@@ -1,9 +1,10 @@
 "use client";
 
-import { api_url, getJwt } from "@/Constants";
+import { api_url, backEndUrl, getJwt } from "@/Constants";
 import { getImage, updateUserAccount } from "@/Functions";
 import React from "react";
 import Uploader from "../Includes/Uploader/Uploader";
+import { Download } from "@mui/icons-material";
 
 export default class FilledForms extends React.Component {
   constructor(props) {
@@ -17,12 +18,16 @@ export default class FilledForms extends React.Component {
       isFormValid: false,
       saving: false,
       clientDetailsId: null,
-      error:null
+      error:null,
+      signedForms: [],
+      applicationForms: [],
+      toSignApplicationForms: [],
+      forms: []
     };
   }
 
   getFormsToFill = async()=>{
-    return await fetch(api_url+'/users/me?populate=formsToFill', {
+    return await fetch(api_url+'/users/me?populate=formsToFill.form', {
         headers: {
          'Authorization': `Bearer ${getJwt()}`,
          'Content-Type': 'application/json'
@@ -31,9 +36,10 @@ export default class FilledForms extends React.Component {
       .then(response => response.json())
       .then(data => data)
   }
+ 
 
- getLoanCategory = async (option)=>{
-    const user = await fetch(api_url+'/users/me?populate=currentLoan.loanCategory,currentLoan.loanType', {
+  getApplicationForms= async()=>{
+     const userWithUpdatedForms = await fetch(api_url+'/users/me?populate=applicationForms.signedForm', {
         headers: {
          'Authorization': `Bearer ${getJwt()}`,
          'Content-Type': 'application/json'
@@ -41,115 +47,159 @@ export default class FilledForms extends React.Component {
       })
       .then(response => response.json())
       .then(data => data)
-     if(option === "category"){
-        return user.currentLoan.loanCategory.categoryName
-     } 
-     else{
-        return user.currentLoan.loanType.typeName
-     }
- } 
 
- async componentDidMount(){
-    const { formsToFill } =  this.props.loggedInUser
-    if(formsToFill && formsToFill.length > 0){
-        console.log(await this.getLoanCategory("category")) 
-        console.log(await this.getLoanCategory("type"))
-        console.log('the forms to fill',formsToFill)
+      const toSignApplicationForms = userWithUpdatedForms.applicationForms.map((applicationForm)=>{
+        return {formName: applicationForm.formName,id: applicationForm.id}
+      })
+
+      this.setState({
+        toSignApplicationForms: toSignApplicationForms
+      },()=>{
+        console.log(this.state)
+      })
+      return userWithUpdatedForms.applicationForms
+  }
+ 
+  createApplicationForms = async (forms)=>{
+    if(this.props.loggedInUser.applicationForms.length > 0){
+      if(this.props.loggedInUser.applicationForms.length !== forms.length){
+          const newFormsToFill = this.props.loggedInUser.applicationForms.map((form)=>{
+            return {
+              formName: form.formName,
+              id: form.id
+            }
+          })
+          forms.forEach((form) => {
+            if (!newFormsToFill.some((formToFill) => formToFill.formName === form.formName)) {
+              newFormsToFill.push({
+                formName: form.formName
+              });
+            }
+          });
+          
+          console.log(newFormsToFill)
+          const updatedUser = await updateUserAccount({applicationForms:newFormsToFill},this.props.loggedInUser.id)
+          return
+      }
+      return
+    } // means you have already created the forms to be signed list
+    //applicationForms 
+    const applicationFormsObject = forms.map((form)=>{
+      return {
+        formName: form.formName
+      }
+    })
+    console.log(applicationFormsObject)
+  //  user.applicationForms[0].id
+    const updatedUser = await updateUserAccount({applicationForms:applicationFormsObject},this.props.loggedInUser.id)
+    if(!updatedUser.hasOwnProperty('error')){
+       this.getApplicationForms()
     }
- } 
-
-//   async componentDidMount() {
-//     let { clientDetails } =  this.props.loggedInUser; // because the user object has the client details, though no nrc
-//     if(!clientDetails){
-//         const blankDetailsObject = {
-//             employementStatus: null,
-//             monthlyIncome: null,
-//             IDfront: null,
-//             IDback: null
-//         } // create a blank slate of clientDetails to obtain the component's id
-//         const updatedUser = await updateUserAccount({clientDetails:blankDetailsObject},this.props.loggedInUser.id)
-//         if(updatedUser.hasOwnProperty('error')){
-//             return
-//         }
-//     }
-//     const user =  await this.getClientDetails();
-//     clientDetails = user.clientDetails
-//     // Set default values, ensure nulls are handled
-//     this.setState({
-//       employementStatus: clientDetails?.employementStatus || '',
-//       monthlyIncome: clientDetails?.monthlyIncome || '',
-//       IDfront: clientDetails?.IDfront || '',
-//       IDback: clientDetails?.IDback || '',
-//       clientDetailsId: clientDetails?.id || null
-//     },()=>{
-//         this.checkFormValidity()
-//     })
-//   }
-
-  handleInputChange = (e) => {
-    //new Date(details.dateOfBirth).toLocaleDateString('en-US')
-    const { name, value } = e.target;
-    // Update state based on field name
-    this.setState({ [name]: name === "monthlyIncome"? parseFloat(value) : value }, this.checkFormValidity);
   }
 
-  checkFormValidity = () => {
-    const { employementStatus, monthlyIncome, IDfront, IDback } = this.state;
+  checkIfFormExistInApplicationForms = (formName,applicationForms) =>{
+    console.log(formName)
+    console.log(applicationForms)
+    const applicationForm = applicationForms.filter((applicationForm)=>{
+          if(applicationForm.formName === formName){
+            return true
+          }
+    })
+    return applicationForm
+  }
 
-    // Validate that all fields are filled
-    const isFormValid =
-      employementStatus.trim() &&
-      monthlyIncome &&
-      IDfront &&
-      IDback;
+  async componentDidMount() {
+    const forms = await this.getFormsToFill() 
+    this.createApplicationForms(forms.formsToFill)
+    const applicationForms = await this.getApplicationForms()
+    this.checkFormValidity() // in case a user already uploaded the scanned documents
+    this.getApplicationForms() // get the appplication form ids in which we shall upload the files to
+    
+    const signedForms = forms.formsToFill.map((formToFill)=>{
+      return {
+           formName: formToFill.formName,
+           filled: formToFill.form? true : false, // if the form is already set, then it's set
+           file: null
+      }
+    })
+    
+    this.setState({
+      forms: forms.formsToFill,
+      applicationForms: applicationForms,
+      signedForms: signedForms
+    }, ()=>{ 
+      if(applicationForms.length > 0){
+        signedForms.map((signedForm)=>{
+          console.log(signedForm.formName,applicationForms)
+          const formExists = this.checkIfFormExistInApplicationForms(signedForm.formName,applicationForms)
+          if(formExists.length > 0){
+            signedForm.file = formExists // add the file then
+          }
+          return signedForm
+        })
+        this.setState({
+          signedForms: signedForms
+        },()=>{
+          console.log(this.state)
+        })
+      }
+    })
+  }
 
+  renderDownloadFormsButtons = (forms) => {
+    return forms.map((formItem) => {
+      if(!formItem.form){
+        return <></>
+      }
+      return formItem.form.map((file) => {
+        return (
+          <div>
+               <a 
+                key={file.id} 
+                href={backEndUrl + file.url} 
+                download={file.name} 
+                className="btn btn-danger mb-2" 
+              >
+                <Download/>
+                Download {file.name}
+              </a>
+          </div>
+        )
+      });
+    });
+  };
+  
+
+  checkFormValidity = async () => {
+    const { signedForms } = this.state;
+   
+    const applicationForms = await this.getApplicationForms()
+    const { formsToFill } = this.props.loggedInUser
+    const signedFormsCheck = applicationForms.map((form)=>{
+        return form.signedForm
+    })
+    const isFormValid = !signedFormsCheck.includes(null) // check if signed form includes only signed forms
     this.setState({ isFormValid });
   }
 
-  addIDfront = (files) => {
-    if(!this.state.IDfront){
+  addSignedForm = async (formName,file) => {
+        const applicationForms = await this.getApplicationForms()
+        const newSignedForms = this.state.signedForms.map((signedForm)=>{
+            if(signedForm.formName === formName){
+                signedForm.filled = true,
+                signedForm.file = file
+            }
+            return signedForm
+        })
         this.setState({
-            IDfront: files,
-            saving: false,
-            error: null
+            signedForms: newSignedForms,
+            applicationForms: applicationForms
         },()=>{
             this.checkFormValidity()
         })
-    }
-    else{
-        const newFiles = [...this.state.IDfront,...files]
-        this.setState({
-            IDfront: newFiles,
-            saving: false,
-            error: null
-        },()=>{
-            this.checkFormValidity()
-        })
-    }
-  }
-  addIDback = (files) => {
-    if(!this.state.IDback){
-        this.setState({
-            IDback: files,
-            saving: false,
-            error: null
-        },()=>{
-            this.checkFormValidity()
-        })
-    }
-    else{
-        const newFiles = [...this.state.IDback,...files]
-        this.setState({
-            IDback: newFiles,
-            saving: false,
-            error: null
-        },()=>{
-            this.checkFormValidity()
-        })
-    }
-  }
+  } 
 
-  handleRemoveImage = async (uploadid,filesArr,arrName)=>{
+  handleRemoveImage = async (uploadid,formName)=>{
     const removed = await fetch(api_url+'/upload/files/'+uploadid,{
       method: 'DELETE',
       headers: {
@@ -161,11 +211,15 @@ export default class FilledForms extends React.Component {
       .catch(error => console.error(error))
      if(removed){
        // remove from state
-       const newArray = filesArr.filter((file)=>{
-           return file.id !== uploadid
+       const newSignedFormsArray = this.state.signedForms.filter((signedForm)=>{
+           return signedForm.formName !== formName
+       })
+       const newApplicationFormsArray = this.state.applicationForms.filter((applicationForm)=>{
+           return applicationForm.formName !== formName
        })
        this.setState({
-        [arrName]: newArray.length < 1? null : newArray
+           signedForms: newSignedFormsArray,
+           applicationForms: newApplicationFormsArray
        },()=>{
         this.checkFormValidity()
        })
@@ -176,143 +230,108 @@ export default class FilledForms extends React.Component {
      } 
 }
 
-  renderFiles = (files,arrName)=>{
+  renderFiles = (signedForms,formName)=>{
+    if(signedForms.length < 1){
+      return <></>
+    }
+    const form = signedForms.filter((signedForm)=>{
+      return signedForm.formName === formName
+    })
+    if(form.length < 1){
+      return <></>
+    }
+    const files = form[0].signedForm
+    console.log(files)
     if(!files){
         return <></>
     }
     return files.map((file)=>{
         if(file.mime.startsWith('application/')){
-            return (<div id={"#"+file.id} key={file.id}>
-                        <p>File: <strong>{file.name}</strong></p>
-                        <button className="btn btn-sm btn-danger" onClick={()=>{this.handleRemoveImage(file.id,files,arrName)}}>Remove</button>
+            return (<div className="mb-2" id={"#"+file.id} key={file.id}>
+                        <div>File: <strong>{file.name}</strong></div>
+                        <button className="btn btn-sm btn-danger" onClick={()=>{this.handleRemoveImage(file.id,formName)}}>Remove</button>
+                        <hr style={{color:'lightgray'}}/>
                    </div>)
         }
         else if(file.mime.startsWith('image/')){
-            return (<div id={"#"+file.id} key={file.id}>
+            return (<div className="mb-2" id={"#"+file.id} key={file.id}>
                         <img className="mt-1 mb-1" style={{width:'35%'}} src={getImage(file,"thumbnail")} />
-                        <button className="btn btn-sm btn-danger" onClick={()=>{this.handleRemoveImage(file.id,files,arrName)}}>Remove</button>
+                        <button className="btn btn-sm btn-danger" onClick={()=>{this.handleRemoveImage(file.id,formName)}}>Remove</button>
+                        <hr style={{color:'lightgray'}}/>
                    </div>)
         }
         else{
-            return (<div id={"#"+file.id} key={file.id}>
+            return (<div className="mb-2" id={"#"+file.id} key={file.id}>
                       <p className="text text-warning">File failed to be displayed</p>
-                      <button className="btn btn-sm btn-danger" onClick={()=>{this.handleRemoveImage(file.id,files,arrName)}}>Remove</button>
+                      <button className="btn btn-sm btn-danger" onClick={()=>{this.handleRemoveImage(file.id,formName)}}>Remove</button>
+                      <hr style={{color:'lightgray'}}/>
                    </div>)
         }
     })
   }
  
-
-  renderFile
+  renderApplicationForms = (toSignApplicationForms,signedForms)=>{
+    return toSignApplicationForms.map((toSignApplicationForm)=>{
+      return <div key={toSignApplicationForm.id}>
+              <p>Signed <span style={{textTransform:'capitalize',fontWeight:'bold'}}>{toSignApplicationForm.formName}</span></p>
+              <Uploader 
+                    handleSignedForm={this.addSignedForm}
+                    formName={toSignApplicationForm.formName}
+                    displayType="circular"
+                    refId={toSignApplicationForm.id}
+                    refName="forms.application-forms"
+                    fieldName="signedForm"
+                    allowMultiple={false}
+                    allowedTypes={['image/*', 'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain', 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']}
+                />
+                <small  style={{color:'lightgray'}}>(image or document)</small>
+                {this.renderFiles(this.state.applicationForms,toSignApplicationForm.formName)}
+      </div>
+    })
+  }
 
   render() {
-    const { employementStatus, monthlyIncome, isFormValid } = this.state;
-
     return (
       <>
         <div className="row">
           <div className="col-lg-12">
             <div className="card">
               <div className="card-header align-items-center d-flex">
-                <h4 className="card-title mb-0 flex-grow-1">Employement Details </h4>
+                <h4 className="card-title mb-0 flex-grow-1">Final Documents Signings </h4>
               </div>
               <div className="card-body">
                 <div className="live-preview">
-                  <div className="row gy-4">
-                    <div className="col-lg-12">
-                        <div className="input-group">
-                            <label className="input-group-text" htmlFor="inputGroupSelect02">
-                            Employement Status
-                            </label>
-                            <select 
-                                className="form-select" 
-                                id="inputGroupSelect01"
-                                name="employementStatus"
-                                autoComplete="off"
-                                value={employementStatus}
-                                onChange={this.handleInputChange}
-                            >
-                            <option value="">Choose...</option>
-                            <option value="employed">Employed</option>
-                            <option value="self-employed">Self-Employed</option>
-                            <option value="unemployed">UnEmployed</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div className="col-lg-12">
-                    <div className="input-group">
-                        <span className="input-group-text">K</span>
-                        <input
-                        name="monthlyIncome"
-                        value={monthlyIncome}
-                        onChange={this.handleInputChange}
-                        type="text"
-                        className="form-control"
-                        aria-label="Amount (to the nearest dollar)"
-                        />
-                        <span className="input-group-text">.00</span>
-                    </div>
-                    </div>
-                  </div>
-                
-                  {this.state.clientDetailsId? <><h4 style={{marginTop:'20px'}} className="card-title mb-0 flex-grow-1">Identity Details </h4>
-                  <hr style={{color:'lightgray'}}/>
-                  <div style={{marginTop:'20px'}}>
-                        <h5>Valid ID<small  style={{color:'gray'}}> (Front Side)</small></h5><small  style={{color:'lightgray'}}>(NRC or Passport or Driving Licence)</small>
-                        <Uploader 
-                            addFiles={this.addIDfront}
-                            displayType="circular"
-                            refId={this.state.clientDetailsId}
-                            refName="user-profile.client-details"
-                            fieldName="IDfront"
-                            allowMultiple={false}
-                            allowedTypes={['image/*', 'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain', 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']}
-                        />
-                        <small  style={{color:'lightgray'}}>(image or document)</small>
-                        {this.renderFiles(this.state.IDfront,"IDfront")}
-                  </div>
-                  <div style={{marginTop:'10px'}}>
-                        <h5>Valid ID<small  style={{color:'gray'}}> (Back Side)</small></h5> <small  style={{color:'lightgray'}}>(NRC or Passport or Driving Licence)</small>
-                        <Uploader 
-                            addFiles={this.addIDback}
-                            displayType="circular"
-                            refId={this.state.clientDetailsId}
-                            refName="user-profile.client-details"
-                            fieldName="IDback"
-                            allowMultiple={false}
-                            allowedTypes={['image/*', 'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain', 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']}
-                        />
-                        <small  style={{color:'lightgray'}}>(image or document)</small>
-                        {this.renderFiles(this.state.IDback,"IDback")}
-                  </div></> : <></>}
-                  {/* Save and Next Buttons */}
-                  <div style={{ width: "100%", display: "flex", justifyContent: "space-between" }}>
-                    <div style={{ width: "100%" }}>
-                      <button
-                        disabled={this.state.saving}
-                        onClick={this.handleSubmit}
-                        type="button"
-                        className="btn btn-success w-50 mt-3"
-                        id="confirm-btn"
-                        // Submit button logic to be handled separately
-                      >
-                        Save
-                      </button>
-                    </div>
-                    <div style={{ width: "100%", textAlign: "right" }}>
-                      <button
-                        type="button"
-                        className="btn btn-danger w-50 mt-3"
-                        id="next-btn"
-                        disabled={!isFormValid}
-                      >
-                        Next
-                      </button>
-                    </div>
-                  </div>
+                  <div className="mb-3">{this.renderDownloadFormsButtons(this.state.forms)}</div>
+                  {
+                    this.state.toSignApplicationForms.length > 0? this.renderApplicationForms(this.state.toSignApplicationForms,this.state.signedForms) : <></>
+                  }
                  {this.state.error? <p className="text text-danger">{this.state.error}</p> : <></>}
                  <p className="text text-warning mt-2">Note that all the information you provide here is kept strictly confidential, and it's solely meant for verification and loan eligibility determination purposes</p>
+                  {/* Save and Next Buttons */}
+                  <div style={{ width: "100%", display: "flex", justifyContent: "space-between" }}>
+                      <div style={{ width: "100%" }}>
+                        <button
+                          disabled={this.state.saving}
+                          onClick={this.handleSubmit}
+                          type="button"
+                          className="btn btn-success w-50 mt-3"
+                          id="confirm-btn"
+                          // Submit button logic to be handled separately
+                        >
+                          Save
+                        </button>
+                      </div>
+                      <div style={{ width: "100%", textAlign: "right" }}>
+                        <button
+                          type="button"
+                          className="btn btn-danger w-50 mt-3"
+                          id="next-btn"
+                          disabled={!this.state.isFormValid}
+                        >
+                          Next
+                        </button>
+                      </div>
+                  </div>
                 </div>
               </div>
             </div>

@@ -10,6 +10,23 @@ export default class SubmitApplicationButton extends React.Component {
     }
   }
 
+  getLoanCategory = async (option)=>{
+    const user = await fetch(api_url+'/users/me?populate=currentLoan.loanCategory,currentLoan.loanType', {
+        headers: {
+         'Authorization': `Bearer ${getJwt()}`,
+         'Content-Type': 'application/json'
+        }
+      })
+      .then(response => response.json())
+      .then(data => data)
+     if(option === "category"){
+        return user.currentLoan.loanCategory.categoryName
+     } 
+     else{
+        return user.currentLoan.loanType.typeName
+     }
+ } 
+
  async componentDidMount(){
     const { formsToFill } =  this.props.loggedInUser
     if(formsToFill && formsToFill.length > 0){
@@ -18,7 +35,6 @@ export default class SubmitApplicationButton extends React.Component {
         console.log('the forms to fill',formsToFill)
     }
  } 
-
   handleSubmit = ()=>{
     
          // set the currentLoan status to pending-approval

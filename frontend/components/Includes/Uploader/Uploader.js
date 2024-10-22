@@ -42,7 +42,12 @@ export default function Uploader(props) {
           load(request.responseText)
           return
         }
-
+        if(props.refName === "forms.application-forms"){
+          if(props.handleSignedForm){
+            const responseData = await JSON.parse(request.responseText)
+            props.handleSignedForm(props.formName,responseData)
+          }
+        }
         // if (props.addMediaOnUpload) {
         //   props.addMediaOnUpload();
         // }
