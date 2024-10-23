@@ -2,7 +2,7 @@
 
 import React from "react";
 
-export default class LoanInformationDisplay extends React.Component {
+export default class LoanTransactionHistory extends React.Component {
   constructor(props) {
     super(props);
     this.state = {

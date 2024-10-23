@@ -2,28 +2,33 @@
 
 import { Slide } from "@mui/material";
 import React from "react";
-import PersonalLoanApplicationForm from "./PersonalLoanApplicationForm";
-import BusinessLoanApplicationForm from "./BusinessLoanApplicationForm";
-import CompanyLoanApplicationForm from "./CompanyLoanApplicationForm";
 
-export default class LoanApplicationForm extends React.Component{
+export default class BusinessLoanApplicationForm extends React.Component{
     constructor(props){
         super(props)
+        this.state = {
+          loanCategory: this.props.loanCategory,
+
+        }
+    }
+
+    componentDidMount(){
+        
     }
 
     renderApplicationForm = ()=>{
       const loanCategory = this.props.loanCategory
       if(loanCategory === "personal"){
-        return <PersonalLoanApplicationForm {...this.props}/>
+        return <>personal loan form</>
       }
       else if(loanCategory === "business"){
-        return <BusinessLoanApplicationForm {...this.props}/>
+        return <>personal business form</>
       }
       else if(loanCategory === "company"){
-        return <CompanyLoanApplicationForm {...this.props}/>
+        return <>personal company form</>
       }
       else{
-        return <PersonalLoanApplicationForm {...this.props}/>
+        return <>personal loan form</>
       }
     }
 

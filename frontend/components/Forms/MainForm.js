@@ -33,7 +33,7 @@ export default class MainForm extends React.Component{
             </div>
             </div>
 
-            <UpdateSalaryDetailsForm {...this.props}/>
+            <UpdateClientDetailsForm {...this.props}/>
         </>)
     }
 }

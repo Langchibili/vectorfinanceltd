@@ -769,6 +769,17 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
       'manyToMany',
       'api::form.form'
     >;
+    activities: Attribute.Relation<
+      'plugin::users-permissions.user',
+      'oneToMany',
+      'api::notification.notification'
+    >;
+    notifications: Attribute.Relation<
+      'plugin::users-permissions.user',
+      'manyToMany',
+      'api::notification.notification'
+    >;
+    business: Attribute.Component<'client-details.business'>;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
@@ -871,6 +882,38 @@ export interface ApiApprovalApproval extends Schema.CollectionType {
       Attribute.Private;
     updatedBy: Attribute.Relation<
       'api::approval.approval',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiEmailAddressesListEmailAddressesList
+  extends Schema.SingleType {
+  collectionName: 'email_addresses_lists';
+  info: {
+    singularName: 'email-addresses-list';
+    pluralName: 'email-addresses-lists';
+    displayName: 'emailAddressesList';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    clientEmailAddresses: Attribute.JSON;
+    adminEmailAddresses: Attribute.JSON;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::email-addresses-list.email-addresses-list',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::email-addresses-list.email-addresses-list',
       'oneToOne',
       'admin::user'
     > &
@@ -1139,6 +1182,79 @@ export interface ApiLoansInformationLoansInformation extends Schema.SingleType {
   };
 }
 
+export interface ApiNotificationNotification extends Schema.CollectionType {
+  collectionName: 'notifications';
+  info: {
+    singularName: 'notification';
+    pluralName: 'notifications';
+    displayName: 'notification';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    title: Attribute.String;
+    type: Attribute.Enumeration<['message', 'alert']> &
+      Attribute.DefaultTo<'message'>;
+    notifier: Attribute.Relation<
+      'api::notification.notification',
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+    notifiedUsers: Attribute.Relation<
+      'api::notification.notification',
+      'manyToMany',
+      'plugin::users-permissions.user'
+    >;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::notification.notification',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::notification.notification',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiPhoneNumbersListPhoneNumbersList extends Schema.SingleType {
+  collectionName: 'phone_numbers_lists';
+  info: {
+    singularName: 'phone-numbers-list';
+    pluralName: 'phone-numbers-lists';
+    displayName: 'phoneNumbersList';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    clientNumbers: Attribute.JSON;
+    adminNumbers: Attribute.JSON;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::phone-numbers-list.phone-numbers-list',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::phone-numbers-list.phone-numbers-list',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
 export interface ApiRepaymentRepayment extends Schema.CollectionType {
   collectionName: 'repayments';
   info: {
@@ -1325,12 +1441,15 @@ declare module '@strapi/types' {
       'plugin::users-permissions.user': PluginUsersPermissionsUser;
       'plugin::i18n.locale': PluginI18NLocale;
       'api::approval.approval': ApiApprovalApproval;
+      'api::email-addresses-list.email-addresses-list': ApiEmailAddressesListEmailAddressesList;
       'api::finance.finance': ApiFinanceFinance;
       'api::form.form': ApiFormForm;
       'api::ky-cverification.ky-cverification': ApiKyCverificationKyCverification;
       'api::loan.loan': ApiLoanLoan;
       'api::loan-category.loan-category': ApiLoanCategoryLoanCategory;
       'api::loans-information.loans-information': ApiLoansInformationLoansInformation;
+      'api::notification.notification': ApiNotificationNotification;
+      'api::phone-numbers-list.phone-numbers-list': ApiPhoneNumbersListPhoneNumbersList;
       'api::repayment.repayment': ApiRepaymentRepayment;
       'api::transaction-history.transaction-history': ApiTransactionHistoryTransactionHistory;
       'api::type.type': ApiTypeType;

@@ -147,6 +147,24 @@
       "relation": "manyToMany",
       "target": "api::form.form",
       "inversedBy": "clientsWhoCanFill"
+    },
+    "activities": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::notification.notification",
+      "mappedBy": "notifier"
+    },
+    "notifications": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::notification.notification",
+      "mappedBy": "notifiedUsers"
+    },
+    "business": {
+      "displayName": "business",
+      "type": "component",
+      "repeatable": false,
+      "component": "client-details.business"
     }
   }
 }

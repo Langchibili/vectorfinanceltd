@@ -33,6 +33,8 @@ export default class UpdateDetailsForm extends React.Component {
       dateOfBirth: details?.dateOfBirth
         ? details.dateOfBirth // format MM/DD/YYYY
         : '',
+    },()=>{
+      this.checkFormValidity()
     });
   }
 
@@ -61,13 +63,23 @@ export default class UpdateDetailsForm extends React.Component {
 
   handleSubmit = async (e)=>{
      e.preventDefault()
-     delete this.state.isFormValid
-     delete this.state.saving
-     delete this.state.error
+     const updateObject = this.state
+     delete updateObject.isFormValid
+     delete updateObject.saving
+     delete updateObject.error
+     if(!updateObject.age){
+      delete updateObject.age
+     }
+     if(!updateObject.gender){
+      delete updateObject.gender
+     }
+     if(!updateObject.dateOfBirth){
+      delete updateObject.dateOfBirth
+     }
      this.setState({
         saving: true
      })
-     const updatedUser = await updateUserAccount({details:this.state},this.props.loggedInUser.id)
+     const updatedUser = await updateUserAccount({details:updateObject},this.props.loggedInUser.id)
      console.log(updatedUser)
      if(updatedUser.hasOwnProperty('error')){
         this.setState({
@@ -76,6 +88,7 @@ export default class UpdateDetailsForm extends React.Component {
         })
         return
      }
+     this.checkFormValidity()
      this.setState({
         saving: false
     })
@@ -209,6 +222,7 @@ export default class UpdateDetailsForm extends React.Component {
                         className="btn btn-danger w-50 mt-3"
                         id="next-btn"
                         disabled={!isFormValid}
+                        onClick={()=>{this.props.handleOpenUpdateClientDetailsForm()}}
                       >
                         Next
                       </button>

@@ -1,5 +1,34 @@
 import type { Schema, Attribute } from '@strapi/strapi';
 
+export interface ClientDetailsBusiness extends Schema.Component {
+  collectionName: 'components_client_details_businesses';
+  info: {
+    displayName: 'business';
+    description: '';
+  };
+  attributes: {
+    businessName: Attribute.String;
+    businessType: Attribute.Enumeration<
+      [
+        'sole-proprietorship',
+        'partnership',
+        'limited-company',
+        'corporation',
+        'non-profit'
+      ]
+    >;
+    ownershipType: Attribute.Enumeration<['sole-owner', 'co-owner']>;
+    isBusinessRegistered: Attribute.Enumeration<['yes', 'no']>;
+    yearsInBusiness: Attribute.Integer;
+    annualRevenue: Attribute.Decimal;
+    percentageOfOwnership: Attribute.Integer;
+    netProfit: Attribute.Decimal;
+    existingLoanDetails: Attribute.Text;
+    isClientAShareHolder: Attribute.Enumeration<['yes', 'no']>;
+    businessHasDebt: Attribute.Enumeration<['yes', 'no']>;
+  };
+}
+
 export interface ClientDetailsSalary extends Schema.Component {
   collectionName: 'components_client_details_salaries';
   info: {
@@ -128,6 +157,7 @@ export interface UserProfileDetails extends Schema.Component {
 declare module '@strapi/types' {
   export module Shared {
     export interface Components {
+      'client-details.business': ClientDetailsBusiness;
       'client-details.salary': ClientDetailsSalary;
       'forms.application-forms': FormsApplicationForms;
       'media-and-documents.collateral': MediaAndDocumentsCollateral;

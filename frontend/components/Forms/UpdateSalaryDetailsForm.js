@@ -141,6 +141,7 @@ export default class UpdateSalaryDetailsForm extends React.Component {
         verificationVideo: verificationVideo,
         salaryDetailsId: salaryDetailsId
     },()=>{
+        this.checkFormValidity()
         console.log(this.state)
     })
   }
@@ -322,7 +323,6 @@ export default class UpdateSalaryDetailsForm extends React.Component {
                             onChange={this.handleInputChange}
                             type="text"
                             className="form-control"
-                            aria-label="Amount (to the nearest dollar)"
                             />
                             <span className="input-group-text">.00</span>
                         </div>

@@ -1,6 +1,7 @@
 "use client"
 
 import FilledForms from "@/components/Forms/FilledForms";
+import LoanApplicationForm from "@/components/Forms/LoanApplicationForm";
 import MainForm from "@/components/Forms/MainForm";
 import ApplyForALoanButton from "@/components/Includes/ApplyForALoanButton/ApplyForALoanButton";
 import LoanInformationDisplay from "@/components/Includes/LoanInformationDisplay/LoanInformationDisplay";
@@ -8,7 +9,9 @@ import { useUser } from "@/Contexts/UserContext";
 import { useState } from "react";
 
 export default function Home() {
-  const [showLoanForms, setShowLoanForms] = useState(false)
+  const [showLoanApplicationForms, setShowLoanApplicationForms] = useState(false)
+  const [selectedloanCategory, setSelectedloanCategory] = useState(null)
+  
   const loggedInUser = useUser()
   if(!loggedInUser.status){
      if(typeof window !== "undefined"){
@@ -37,11 +40,32 @@ export default function Home() {
       
       else if(currentLoan.loanStatus === "rejected"){
         // show the user that "they are not eligible for a loan at the moment, but they can apply again. Or contact us."
-         return (<>
+         return (showLoanApplicationForms? <LoanApplicationForm 
+                                                   setShowLoanApplicationForms={setShowLoanApplicationForms} 
+                                                   loanCategory={selectedloanCategory}
+                                                   loggedInUser={loggedInUser.user}
+                                                   /> : <>
                   <p className="text text-warning">Sorry but we cannot grant you a loan at the moment, apply again if you feel that your eligibility has to be reassessed.</p>
-                  <ApplyForALoanButton loanType="personal" color="blue" text="APPLY FOR A PERSONAL LOAN"/> 
-                  <ApplyForALoanButton loanType="business" color="forestgreen" text="APPLY FOR A BUSINESS LOAN"/> 
-                  <ApplyForALoanButton loanType="company" text="APPLY FOR A COMPANY LOAN"/> 
+                  <ApplyForALoanButton 
+                         loanType="personal"
+                         color="blue" 
+                         text="APPLY FOR A PERSONAL LOAN" 
+                         loggedInUser={loggedInUser.user} 
+                         setShowLoanApplicationForms={setShowLoanApplicationForms}
+                         setSelectedloanCategory={setSelectedloanCategory}/> 
+                  <ApplyForALoanButton 
+                         loanType="business" 
+                         color="forestgreen" 
+                         text="APPLY FOR A BUSINESS LOAN" 
+                         loggedInUser={loggedInUser.user} 
+                         setShowLoanApplicationForms={setShowLoanApplicationForms}
+                         setSelectedloanCategory={setSelectedloanCategory}/>
+                  <ApplyForALoanButton 
+                         loanType="company" 
+                         text="APPLY FOR A COMPANY LOAN" 
+                         loggedInUser={loggedInUser.user} 
+                         setShowLoanApplicationForms={setShowLoanApplicationForms}
+                         setSelectedloanCategory={setSelectedloanCategory}/>
                 </>
          )
       }
@@ -58,32 +82,93 @@ export default function Home() {
      }
       else if(currentLoan.loanStatus === "completed"){ // means a user has completed paying to the loan
          return (
-              <>
-                <p className="text text-success">Thank you for completing payment of your loan, you can now apply for another one.</p>
-                <ApplyForALoanButton  loanType="personal" color="blue" text="APPLY FOR A PERSONAL LOAN"/> 
-                <ApplyForALoanButton loanType="business" color="forestgreen" text="APPLY FOR A BUSINESS LOAN"/> 
-                <ApplyForALoanButton loanType="company" text="APPLY FOR A COMPANY LOAN"/> 
-              </>
+            showLoanApplicationForms? <LoanApplicationForm 
+                                          setShowLoanApplicationForms={setShowLoanApplicationForms} 
+                                          loanCategory={selectedloanCategory}
+                                          loggedInUser={loggedInUser.user}
+                                          /> : <>
+                  <p className="text text-success">Thank you for completing payment of your loan, you can now apply for another one.</p>
+                  <ApplyForALoanButton 
+                         loanType="personal"
+                         color="blue" 
+                         text="APPLY FOR A PERSONAL LOAN" 
+                         loggedInUser={loggedInUser.user} 
+                         setShowLoanApplicationForms={setShowLoanApplicationForms}
+                         setSelectedloanCategory={setSelectedloanCategory}/> 
+                  <ApplyForALoanButton 
+                         loanType="business" 
+                         color="forestgreen" 
+                         text="APPLY FOR A BUSINESS LOAN" 
+                         loggedInUser={loggedInUser.user} 
+                         setShowLoanApplicationForms={setShowLoanApplicationForms}
+                         setSelectedloanCategory={setSelectedloanCategory}/>
+                  <ApplyForALoanButton 
+                         loanType="company" 
+                         text="APPLY FOR A COMPANY LOAN" 
+                         loggedInUser={loggedInUser.user} 
+                         setShowLoanApplicationForms={setShowLoanApplicationForms}
+                         setSelectedloanCategory={setSelectedloanCategory}/>
+                  </>
             )// can apply again though
       }
       else{
-         return (
-              <>
-                  <ApplyForALoanButton  loanType="personal" color="blue" text="APPLY FOR A PERSONAL LOAN"/> 
-                  <ApplyForALoanButton loanType="business" color="forestgreen" text="APPLY FOR A BUSINESS LOAN"/> 
-                  <ApplyForALoanButton loanType="company" text="APPLY FOR A COMPANY LOAN"/> 
-              </>
+        return (showLoanApplicationForms? <LoanApplicationForm 
+                        setShowLoanApplicationForms={setShowLoanApplicationForms} 
+                        loanCategory={selectedloanCategory}
+                        loggedInUser={loggedInUser.user}/> : <>
+                  <ApplyForALoanButton 
+                         loanType="personal"
+                         color="blue" 
+                         text="APPLY FOR A PERSONAL LOAN" 
+                         loggedInUser={loggedInUser.user} 
+                         setShowLoanApplicationForms={setShowLoanApplicationForms}
+                         setSelectedloanCategory={setSelectedloanCategory}/> 
+                  <ApplyForALoanButton 
+                         loanType="business" 
+                         color="forestgreen" 
+                         text="APPLY FOR A BUSINESS LOAN" 
+                         loggedInUser={loggedInUser.user} 
+                         setShowLoanApplicationForms={setShowLoanApplicationForms}
+                         setSelectedloanCategory={setSelectedloanCategory}/>
+                  <ApplyForALoanButton 
+                         loanType="company" 
+                         text="APPLY FOR A COMPANY LOAN" 
+                         loggedInUser={loggedInUser.user} 
+                         setShowLoanApplicationForms={setShowLoanApplicationForms}
+                         setSelectedloanCategory={setSelectedloanCategory}/>   
+               </>
          )
       }
       
     }
     else{ // means you can apply to a new loan
-      return (
-        <>
-              <ApplyForALoanButton loanType="personal" color="blue" text="APPLY FOR A PERSONAL LOAN"/> 
-              <ApplyForALoanButton loanType="business" color="forestgreen" text="APPLY FOR A BUSINESS LOAN"/> 
-              <ApplyForALoanButton loanType="company" text="APPLY FOR A COMPANY LOAN"/> 
-        </>
+      
+      return (showLoanApplicationForms? <LoanApplicationForm 
+                  setShowLoanApplicationForms={setShowLoanApplicationForms} 
+                  loanCategory={selectedloanCategory}
+                  loggedInUser={loggedInUser.user}
+                  /> : <>
+                <ApplyForALoanButton 
+                         loanType="personal"
+                         color="blue" 
+                         text="APPLY FOR A PERSONAL LOAN" 
+                         loggedInUser={loggedInUser.user} 
+                         setShowLoanApplicationForms={setShowLoanApplicationForms}
+                         setSelectedloanCategory={setSelectedloanCategory}/> 
+                  <ApplyForALoanButton 
+                         loanType="business" 
+                         color="forestgreen" 
+                         text="APPLY FOR A BUSINESS LOAN" 
+                         loggedInUser={loggedInUser.user} 
+                         setShowLoanApplicationForms={setShowLoanApplicationForms}
+                         setSelectedloanCategory={setSelectedloanCategory}/>
+                  <ApplyForALoanButton 
+                         loanType="company" 
+                         text="APPLY FOR A COMPANY LOAN" 
+                         loggedInUser={loggedInUser.user} 
+                         setShowLoanApplicationForms={setShowLoanApplicationForms}
+                         setSelectedloanCategory={setSelectedloanCategory}/>  
+            </>
    )
     }
   }

@@ -1,0 +1,66 @@
+{
+  "collectionName": "components_client_details_businesses",
+  "info": {
+    "displayName": "business",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "businessName": {
+      "type": "string"
+    },
+    "businessType": {
+      "type": "enumeration",
+      "enum": [
+        "sole-proprietorship",
+        "partnership",
+        "limited-company",
+        "corporation",
+        "non-profit"
+      ]
+    },
+    "ownershipType": {
+      "type": "enumeration",
+      "enum": [
+        "sole-owner",
+        "co-owner"
+      ]
+    },
+    "isBusinessRegistered": {
+      "type": "enumeration",
+      "enum": [
+        "yes",
+        "no"
+      ]
+    },
+    "yearsInBusiness": {
+      "type": "integer"
+    },
+    "annualRevenue": {
+      "type": "decimal"
+    },
+    "percentageOfOwnership": {
+      "type": "integer"
+    },
+    "netProfit": {
+      "type": "decimal"
+    },
+    "existingLoanDetails": {
+      "type": "text"
+    },
+    "isClientAShareHolder": {
+      "type": "enumeration",
+      "enum": [
+        "yes",
+        "no"
+      ]
+    },
+    "businessHasDebt": {
+      "type": "enumeration",
+      "enum": [
+        "yes",
+        "no"
+      ]
+    }
+  }
+}

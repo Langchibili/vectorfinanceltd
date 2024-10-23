@@ -97,7 +97,10 @@ export default class UpdateClientDetailsForm extends React.Component {
      delete updateObject.IDfront
      delete updateObject.IDback
      delete updateObject.clientDetailsId
-     
+
+     if(!updateObject.employementStatus){
+      delete updateObject.employementStatus
+     }
      this.setState({
         saving: true,
         IDfront: IDfront,
@@ -123,6 +126,7 @@ export default class UpdateClientDetailsForm extends React.Component {
         IDback: IDback,
         clientDetailsId: clientDetailsId
     },()=>{
+        this.checkFormValidity()
         console.log(this.state)
     })
   }
@@ -268,9 +272,9 @@ export default class UpdateClientDetailsForm extends React.Component {
                         name="monthlyIncome"
                         value={monthlyIncome}
                         onChange={this.handleInputChange}
-                        type="text"
+                        type="number"
+                        autoComplete="off"
                         className="form-control"
-                        aria-label="Amount (to the nearest dollar)"
                         />
                         <span className="input-group-text">.00</span>
                     </div>
@@ -314,7 +318,7 @@ export default class UpdateClientDetailsForm extends React.Component {
                         disabled={this.state.saving}
                         onClick={this.handleSubmit}
                         type="button"
-                        className="btn btn-success w-50 mt-3"
+                        className="btn btn-success w-90 mt-3"
                         id="confirm-btn"
                         // Submit button logic to be handled separately
                       >
@@ -324,13 +328,25 @@ export default class UpdateClientDetailsForm extends React.Component {
                     <div style={{ width: "100%", textAlign: "right" }}>
                       <button
                         type="button"
-                        className="btn btn-danger w-50 mt-3"
+                        className="btn btn-info w-90 mt-3"
+                        id="next-btn"
+                        onClick={()=>{this.props.handleOpenUpdateDetailsForm()}}
+                      >
+                        Previous
+                      </button>
+                    </div>
+                    <div style={{ width: "100%", textAlign: "right" }}>
+                      <button
+                        type="button"
+                        className="btn btn-danger w-90 mt-3"
                         id="next-btn"
                         disabled={!isFormValid}
+                        onClick={()=>{this.props.handleOpenAddLoanAmountForm()}}
                       >
                         Next
                       </button>
                     </div>
+                    
                   </div>
                  {this.state.error? <p className="text text-danger">{this.state.error}</p> : <></>}
                  <p className="text text-warning mt-2">Note that all the information you provide here is kept strictly confidential, and it's solely meant for verification and loan eligibility determination purposes</p>
