@@ -115,6 +115,33 @@ export const handleCountsDisplay = (counts) => { // formating counts like: likes
     return text;
 }
 
+export const loanCalculator = (loanAmount, annualInterestRate, loanTerm) => {
+  const calculateMonthlyPayment = (amount, annualInterest, months) => {
+    const monthlyInterest = annualInterest / 100 / 12;
+    return (
+      (amount * monthlyInterest * Math.pow(1 + monthlyInterest, months)) /
+      (Math.pow(1 + monthlyInterest, months) - 1)
+    );
+  };
+
+  const calculateTotalPayment = (monthlyPayment, months) => {
+    return monthlyPayment * months;
+  };
+
+  const calculateProfit = (totalPayment, loanAmount) => {
+    return totalPayment - loanAmount;
+  };
+
+  const monthlyPayment = calculateMonthlyPayment(loanAmount, annualInterestRate, loanTerm);
+  const totalPayment = calculateTotalPayment(monthlyPayment, loanTerm);
+  const totalProfit = calculateProfit(totalPayment, loanAmount);
+
+  return {
+    monthlyPayment: monthlyPayment.toFixed(2),
+    totalProfit: totalProfit.toFixed(2)
+  };
+};
+
 export const getImage = (image, size = "normal", use = "normal") => {
     // Default URLs for profile pictures and cover photos
     const defaultProfilePicture = "/default-profile.png"

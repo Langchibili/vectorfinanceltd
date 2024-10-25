@@ -1059,7 +1059,6 @@ export interface ApiLoanLoan extends Schema.CollectionType {
       Attribute.DefaultTo<'initiated'>;
     repaymentSchedule: Attribute.JSON;
     loanTerm: Attribute.Integer;
-    loanPurpose: Attribute.Blocks;
     applicationDate: Attribute.DateTime;
     approvalDate: Attribute.DateTime;
     disbursementDate: Attribute.DateTime;
@@ -1100,6 +1099,18 @@ export interface ApiLoanLoan extends Schema.CollectionType {
     >;
     salary: Attribute.Component<'client-details.salary'>;
     clientAskingAmount: Attribute.Decimal;
+    loanPurpose: Attribute.Enumeration<
+      [
+        'Business Expansion',
+        'Home Renovation',
+        'Education',
+        'Medical Expenses',
+        'Debt Consolidation',
+        'Vehicle Purchase',
+        'Others'
+      ]
+    >;
+    loanPurposeDetails: Attribute.Text;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;

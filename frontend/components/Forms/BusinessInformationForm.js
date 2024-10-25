@@ -365,7 +365,6 @@ export default class BusinessInformationForm extends React.Component {
                       type="button"
                       className="btn btn-danger w-90 mt-3"
                       id="next-btn"
-                      disabled={!isFormValid}
                       onClick={()=>{this.props.handleOpenAddLoanAmountForm()}}
                     >
                       Previous
@@ -375,6 +374,7 @@ export default class BusinessInformationForm extends React.Component {
                       className="btn btn-danger w-90 mt-3"
                       id="next-btn"
                       disabled={!isFormValid}
+                      onClick={()=>{this.props.handleCreateBlankLoan()}}
                     >
                       Next
                     </button>

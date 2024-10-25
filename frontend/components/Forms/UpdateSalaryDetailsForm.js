@@ -378,28 +378,34 @@ export default class UpdateSalaryDetailsForm extends React.Component {
                   </div></> : <></>}
                   {/* Save and Next Buttons */}
                   <div style={{ width: "100%", display: "flex", justifyContent: "space-between" }}>
-                    <div style={{ width: "100%" }}>
-                      <button
-                        disabled={this.state.saving}
-                        onClick={this.handleSubmit}
-                        type="button"
-                        className="btn btn-success w-50 mt-3"
-                        id="confirm-btn"
-                        // Submit button logic to be handled separately
-                      >
-                        Save
-                      </button>
-                    </div>
-                    <div style={{ width: "100%", textAlign: "right" }}>
-                      <button
-                        type="button"
-                        className="btn btn-danger w-50 mt-3"
-                        id="next-btn"
-                        disabled={!isFormValid}
-                      >
-                        Next
-                      </button>
-                    </div>
+                    <button
+                      disabled={this.state.saving}
+                      onClick={this.handleSubmit}
+                      type="button"
+                      className="btn btn-success w-90 mt-3"
+                      id="confirm-btn"
+                    >
+                      Save
+                    </button>
+
+                    <button
+                      type="button"
+                      className="btn btn-danger w-90 mt-3"
+                      id="next-btn"
+                      onClick={()=>{this.props.handleOpenAddLoanAmountForm()}}
+                    >
+                      Previous
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-danger w-90 mt-3"
+                      id="next-btn"
+                      disabled={!isFormValid}
+                      onClick={()=>{this.props.handleCreateBlankLoan()}}
+                    >
+                      Next
+                    </button>
+                    
                   </div>
                  {this.state.error? <p className="text text-danger">{this.state.error}</p> : <></>}
                  <p className="text text-warning mt-2">Note that all the information you provide here is kept strictly confidential, and it's solely meant for verification and loan eligibility determination purposes</p>

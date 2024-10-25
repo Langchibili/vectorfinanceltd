@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2024-10-23T03:15:19.284Z"
+    "x-generation-date": "2024-10-24T01:39:01.966Z"
   },
   "x-strapi-config": {
     "path": "/documentation",
@@ -1562,7 +1562,6 @@
                                   "loanTerm": {
                                     "type": "integer"
                                   },
-                                  "loanPurpose": {},
                                   "applicationDate": {
                                     "type": "string",
                                     "format": "date-time"
@@ -3731,6 +3730,21 @@
                                   "clientAskingAmount": {
                                     "type": "number",
                                     "format": "float"
+                                  },
+                                  "loanPurpose": {
+                                    "type": "string",
+                                    "enum": [
+                                      "Business Expansion",
+                                      "Home Renovation",
+                                      "Education",
+                                      "Medical Expenses",
+                                      "Debt Consolidation",
+                                      "Vehicle Purchase",
+                                      "Others"
+                                    ]
+                                  },
+                                  "loanPurposeDetails": {
+                                    "type": "string"
                                   },
                                   "createdAt": {
                                     "type": "string",
@@ -7941,7 +7955,6 @@
                                     "loanTerm": {
                                       "type": "integer"
                                     },
-                                    "loanPurpose": {},
                                     "applicationDate": {
                                       "type": "string",
                                       "format": "date-time"
@@ -10110,6 +10123,21 @@
                                     "clientAskingAmount": {
                                       "type": "number",
                                       "format": "float"
+                                    },
+                                    "loanPurpose": {
+                                      "type": "string",
+                                      "enum": [
+                                        "Business Expansion",
+                                        "Home Renovation",
+                                        "Education",
+                                        "Medical Expenses",
+                                        "Debt Consolidation",
+                                        "Vehicle Purchase",
+                                        "Others"
+                                      ]
+                                    },
+                                    "loanPurposeDetails": {
+                                      "type": "string"
                                     },
                                     "createdAt": {
                                       "type": "string",
@@ -12678,7 +12706,6 @@
                                   "loanTerm": {
                                     "type": "integer"
                                   },
-                                  "loanPurpose": {},
                                   "applicationDate": {
                                     "type": "string",
                                     "format": "date-time"
@@ -14847,6 +14874,21 @@
                                   "clientAskingAmount": {
                                     "type": "number",
                                     "format": "float"
+                                  },
+                                  "loanPurpose": {
+                                    "type": "string",
+                                    "enum": [
+                                      "Business Expansion",
+                                      "Home Renovation",
+                                      "Education",
+                                      "Medical Expenses",
+                                      "Debt Consolidation",
+                                      "Vehicle Purchase",
+                                      "Others"
+                                    ]
+                                  },
+                                  "loanPurposeDetails": {
+                                    "type": "string"
                                   },
                                   "createdAt": {
                                     "type": "string",
@@ -17420,7 +17462,6 @@
               "loanTerm": {
                 "type": "integer"
               },
-              "loanPurpose": {},
               "applicationDate": {
                 "type": "string",
                 "format": "date-time"
@@ -17540,6 +17581,21 @@
               "clientAskingAmount": {
                 "type": "number",
                 "format": "float"
+              },
+              "loanPurpose": {
+                "type": "string",
+                "enum": [
+                  "Business Expansion",
+                  "Home Renovation",
+                  "Education",
+                  "Medical Expenses",
+                  "Debt Consolidation",
+                  "Vehicle Purchase",
+                  "Others"
+                ]
+              },
+              "loanPurposeDetails": {
+                "type": "string"
               }
             }
           }
@@ -17619,7 +17675,6 @@
           "loanTerm": {
             "type": "integer"
           },
-          "loanPurpose": {},
           "applicationDate": {
             "type": "string",
             "format": "date-time"
@@ -18516,7 +18571,6 @@
                                   "loanTerm": {
                                     "type": "integer"
                                   },
-                                  "loanPurpose": {},
                                   "applicationDate": {
                                     "type": "string",
                                     "format": "date-time"
@@ -20686,6 +20740,21 @@
                                     "type": "number",
                                     "format": "float"
                                   },
+                                  "loanPurpose": {
+                                    "type": "string",
+                                    "enum": [
+                                      "Business Expansion",
+                                      "Home Renovation",
+                                      "Education",
+                                      "Medical Expenses",
+                                      "Debt Consolidation",
+                                      "Vehicle Purchase",
+                                      "Others"
+                                    ]
+                                  },
+                                  "loanPurposeDetails": {
+                                    "type": "string"
+                                  },
                                   "createdAt": {
                                     "type": "string",
                                     "format": "date-time"
@@ -22458,6 +22527,21 @@
             "type": "number",
             "format": "float"
           },
+          "loanPurpose": {
+            "type": "string",
+            "enum": [
+              "Business Expansion",
+              "Home Renovation",
+              "Education",
+              "Medical Expenses",
+              "Debt Consolidation",
+              "Vehicle Purchase",
+              "Others"
+            ]
+          },
+          "loanPurposeDetails": {
+            "type": "string"
+          },
           "createdAt": {
             "type": "string",
             "format": "date-time"
@@ -24174,7 +24258,6 @@
                                                   "loanTerm": {
                                                     "type": "integer"
                                                   },
-                                                  "loanPurpose": {},
                                                   "applicationDate": {
                                                     "type": "string",
                                                     "format": "date-time"
@@ -28947,6 +29030,21 @@
                                                     "type": "number",
                                                     "format": "float"
                                                   },
+                                                  "loanPurpose": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                      "Business Expansion",
+                                                      "Home Renovation",
+                                                      "Education",
+                                                      "Medical Expenses",
+                                                      "Debt Consolidation",
+                                                      "Vehicle Purchase",
+                                                      "Others"
+                                                    ]
+                                                  },
+                                                  "loanPurposeDetails": {
+                                                    "type": "string"
+                                                  },
                                                   "createdAt": {
                                                     "type": "string",
                                                     "format": "date-time"
@@ -30924,7 +31022,6 @@
                                   "loanTerm": {
                                     "type": "integer"
                                   },
-                                  "loanPurpose": {},
                                   "applicationDate": {
                                     "type": "string",
                                     "format": "date-time"
@@ -33093,6 +33190,21 @@
                                   "clientAskingAmount": {
                                     "type": "number",
                                     "format": "float"
+                                  },
+                                  "loanPurpose": {
+                                    "type": "string",
+                                    "enum": [
+                                      "Business Expansion",
+                                      "Home Renovation",
+                                      "Education",
+                                      "Medical Expenses",
+                                      "Debt Consolidation",
+                                      "Vehicle Purchase",
+                                      "Others"
+                                    ]
+                                  },
+                                  "loanPurposeDetails": {
+                                    "type": "string"
                                   },
                                   "createdAt": {
                                     "type": "string",
@@ -36086,7 +36198,6 @@
                       "loanTerm": {
                         "type": "integer"
                       },
-                      "loanPurpose": {},
                       "applicationDate": {
                         "type": "string",
                         "format": "date-time"
@@ -40568,6 +40679,21 @@
                         "type": "number",
                         "format": "float"
                       },
+                      "loanPurpose": {
+                        "type": "string",
+                        "enum": [
+                          "Business Expansion",
+                          "Home Renovation",
+                          "Education",
+                          "Medical Expenses",
+                          "Debt Consolidation",
+                          "Vehicle Purchase",
+                          "Others"
+                        ]
+                      },
+                      "loanPurposeDetails": {
+                        "type": "string"
+                      },
                       "createdAt": {
                         "type": "string",
                         "format": "date-time"
@@ -42193,7 +42319,6 @@
                                   "loanTerm": {
                                     "type": "integer"
                                   },
-                                  "loanPurpose": {},
                                   "applicationDate": {
                                     "type": "string",
                                     "format": "date-time"
@@ -44363,6 +44488,21 @@
                                     "type": "number",
                                     "format": "float"
                                   },
+                                  "loanPurpose": {
+                                    "type": "string",
+                                    "enum": [
+                                      "Business Expansion",
+                                      "Home Renovation",
+                                      "Education",
+                                      "Medical Expenses",
+                                      "Debt Consolidation",
+                                      "Vehicle Purchase",
+                                      "Others"
+                                    ]
+                                  },
+                                  "loanPurposeDetails": {
+                                    "type": "string"
+                                  },
                                   "createdAt": {
                                     "type": "string",
                                     "format": "date-time"
@@ -46348,7 +46488,6 @@
                                                   "loanTerm": {
                                                     "type": "integer"
                                                   },
-                                                  "loanPurpose": {},
                                                   "applicationDate": {
                                                     "type": "string",
                                                     "format": "date-time"
@@ -51120,6 +51259,21 @@
                                                   "clientAskingAmount": {
                                                     "type": "number",
                                                     "format": "float"
+                                                  },
+                                                  "loanPurpose": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                      "Business Expansion",
+                                                      "Home Renovation",
+                                                      "Education",
+                                                      "Medical Expenses",
+                                                      "Debt Consolidation",
+                                                      "Vehicle Purchase",
+                                                      "Others"
+                                                    ]
+                                                  },
+                                                  "loanPurposeDetails": {
+                                                    "type": "string"
                                                   },
                                                   "createdAt": {
                                                     "type": "string",

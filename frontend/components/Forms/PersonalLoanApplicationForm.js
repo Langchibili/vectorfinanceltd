@@ -1,11 +1,11 @@
 "use client"
 
-import { Slide } from "@mui/material";
 import React from "react";
 import UpdateClientDetailsForm from "./UpdateClientDetailsForm";
 import UpdateDetailsForm from "./UpdateDetailsForm";
 import AddLoanAmountForm from "./AddLoanAmmoutForm";
 import BusinessInformationForm from "./BusinessInformationForm";
+import UpdateSalaryDetailsForm from "./UpdateSalaryDetailsForm";
 
 export default class PersonalLoanApplicationForm extends React.Component{
     constructor(props){
@@ -54,6 +54,10 @@ export default class PersonalLoanApplicationForm extends React.Component{
         })
     }
    
+    handleCreateBlankLoan = async ()=>{
+       console.log(this.state)
+    }
+
     renderForm = ()=>{
         if(this.state.openUpdateDetailsForm){
             return <UpdateDetailsForm 
@@ -70,14 +74,22 @@ export default class PersonalLoanApplicationForm extends React.Component{
             return <AddLoanAmountForm 
                         {...this.props} 
                         setLoanInformation={this.setLoanInformation} 
-                        handleOpenBusinessInformationForm={this.handleOpenBusinessInformationForm}
-                        handleOpenUpdateClientDetailsForm={this.handleOpenUpdateClientDetailsForm}/>
+                        handleOpenUpdateClientDetailsForm={this.handleOpenUpdateClientDetailsForm}
+                        handleOpenBusinessInformationForm={this.handleOpenBusinessInformationForm}/>
         }
         else if(this.state.openBusinessInformationForm){
+            if(this.state.loanType === "salaryBased"){
+                return <UpdateSalaryDetailsForm 
+                        {...this.props} 
+                        handleCreateBlankLoan={this.handleCreateBlankLoan}
+                        setLoanInformation={this.setLoanInformation} 
+                        handleOpenAddLoanAmountForm={this.handleOpenAddLoanAmountForm}/>
+            }
             return <BusinessInformationForm 
                         {...this.props} 
+                        handleCreateBlankLoan={this.handleCreateBlankLoan}
                         setLoanInformation={this.setLoanInformation} 
-                        handleOpenUpdateClientDetailsForm={this.handleOpenUpdateClientDetailsForm}/>
+                        handleOpenAddLoanAmountForm={this.handleOpenAddLoanAmountForm}/>
         }
         else{
             return <UpdateDetailsForm 

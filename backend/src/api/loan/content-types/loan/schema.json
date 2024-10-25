@@ -38,9 +38,6 @@
     "loanTerm": {
       "type": "integer"
     },
-    "loanPurpose": {
-      "type": "blocks"
-    },
     "applicationDate": {
       "type": "datetime"
     },
@@ -118,6 +115,21 @@
     },
     "clientAskingAmount": {
       "type": "decimal"
+    },
+    "loanPurpose": {
+      "type": "enumeration",
+      "enum": [
+        "Business Expansion",
+        "Home Renovation",
+        "Education",
+        "Medical Expenses",
+        "Debt Consolidation",
+        "Vehicle Purchase",
+        "Others"
+      ]
+    },
+    "loanPurposeDetails": {
+      "type": "text"
     }
   }
 }
