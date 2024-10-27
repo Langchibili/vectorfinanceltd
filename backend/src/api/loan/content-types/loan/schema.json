@@ -130,6 +130,9 @@
     },
     "loanPurposeDetails": {
       "type": "text"
+    },
+    "salaryPercentage": {
+      "type": "decimal"
     }
   }
 }

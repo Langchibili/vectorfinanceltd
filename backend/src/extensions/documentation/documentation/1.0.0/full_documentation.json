@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2024-10-24T01:39:01.966Z"
+    "x-generation-date": "2024-10-25T18:14:45.919Z"
   },
   "x-strapi-config": {
     "path": "/documentation",
@@ -3745,6 +3745,10 @@
                                   },
                                   "loanPurposeDetails": {
                                     "type": "string"
+                                  },
+                                  "salaryPercentage": {
+                                    "type": "number",
+                                    "format": "float"
                                   },
                                   "createdAt": {
                                     "type": "string",
@@ -10139,6 +10143,10 @@
                                     "loanPurposeDetails": {
                                       "type": "string"
                                     },
+                                    "salaryPercentage": {
+                                      "type": "number",
+                                      "format": "float"
+                                    },
                                     "createdAt": {
                                       "type": "string",
                                       "format": "date-time"
@@ -14890,6 +14898,10 @@
                                   "loanPurposeDetails": {
                                     "type": "string"
                                   },
+                                  "salaryPercentage": {
+                                    "type": "number",
+                                    "format": "float"
+                                  },
                                   "createdAt": {
                                     "type": "string",
                                     "format": "date-time"
@@ -17596,6 +17608,10 @@
               },
               "loanPurposeDetails": {
                 "type": "string"
+              },
+              "salaryPercentage": {
+                "type": "number",
+                "format": "float"
               }
             }
           }
@@ -20755,6 +20771,10 @@
                                   "loanPurposeDetails": {
                                     "type": "string"
                                   },
+                                  "salaryPercentage": {
+                                    "type": "number",
+                                    "format": "float"
+                                  },
                                   "createdAt": {
                                     "type": "string",
                                     "format": "date-time"
@@ -22541,6 +22561,10 @@
           },
           "loanPurposeDetails": {
             "type": "string"
+          },
+          "salaryPercentage": {
+            "type": "number",
+            "format": "float"
           },
           "createdAt": {
             "type": "string",
@@ -29045,6 +29069,10 @@
                                                   "loanPurposeDetails": {
                                                     "type": "string"
                                                   },
+                                                  "salaryPercentage": {
+                                                    "type": "number",
+                                                    "format": "float"
+                                                  },
                                                   "createdAt": {
                                                     "type": "string",
                                                     "format": "date-time"
@@ -33205,6 +33233,10 @@
                                   },
                                   "loanPurposeDetails": {
                                     "type": "string"
+                                  },
+                                  "salaryPercentage": {
+                                    "type": "number",
+                                    "format": "float"
                                   },
                                   "createdAt": {
                                     "type": "string",
@@ -40694,6 +40726,10 @@
                       "loanPurposeDetails": {
                         "type": "string"
                       },
+                      "salaryPercentage": {
+                        "type": "number",
+                        "format": "float"
+                      },
                       "createdAt": {
                         "type": "string",
                         "format": "date-time"
@@ -44502,6 +44538,10 @@
                                   },
                                   "loanPurposeDetails": {
                                     "type": "string"
+                                  },
+                                  "salaryPercentage": {
+                                    "type": "number",
+                                    "format": "float"
                                   },
                                   "createdAt": {
                                     "type": "string",
@@ -51274,6 +51314,10 @@
                                                   },
                                                   "loanPurposeDetails": {
                                                     "type": "string"
+                                                  },
+                                                  "salaryPercentage": {
+                                                    "type": "number",
+                                                    "format": "float"
                                                   },
                                                   "createdAt": {
                                                     "type": "string",

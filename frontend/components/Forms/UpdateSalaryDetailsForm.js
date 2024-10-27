@@ -315,6 +315,9 @@ export default class UpdateSalaryDetailsForm extends React.Component {
                       </div>
                     </div>
                     <div className="col-lg-12">
+                    <label htmlFor="employementVerificationNumber" className="form-label">
+                           Salary
+                        </label>
                         <div className="input-group">
                             <span className="input-group-text">K</span>
                             <input
@@ -349,7 +352,7 @@ export default class UpdateSalaryDetailsForm extends React.Component {
                   {this.state.salaryDetailsId? <><h4 style={{marginTop:'20px'}} className="card-title mb-0 flex-grow-1">Identity Details </h4>
                   <hr style={{color:'lightgray'}}/>
                   <div style={{marginTop:'20px'}}>
-                        <h5>PaySlip<small  style={{color:'gray'}}> (Of Past 3 months)</small></h5><small  style={{color:'lightgray'}}>(can even be past 6 or a year)</small>
+                        <h5>PaySlip/Bank Statement<small  style={{color:'gray'}}> (Of Past 3 months)</small></h5><small  style={{color:'lightgray'}}>(can even be past 6 or a year)</small>
                         <Uploader 
                             addFiles={this.addPaySlip}
                             displayType="circular"

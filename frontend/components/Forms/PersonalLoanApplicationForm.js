@@ -6,6 +6,7 @@ import UpdateDetailsForm from "./UpdateDetailsForm";
 import AddLoanAmountForm from "./AddLoanAmmoutForm";
 import BusinessInformationForm from "./BusinessInformationForm";
 import UpdateSalaryDetailsForm from "./UpdateSalaryDetailsForm";
+import { createNewLoan, dateAndTimeNow, updateUserAccount } from "@/Functions";
 
 export default class PersonalLoanApplicationForm extends React.Component{
     constructor(props){
@@ -55,7 +56,41 @@ export default class PersonalLoanApplicationForm extends React.Component{
     }
    
     handleCreateBlankLoan = async ()=>{
-       console.log(this.state)
+        // create new loan 
+        // add new loan to client's currentLoan relation
+        const createLoanObject = this.state
+        delete createLoanObject.openUpdateDetailsForm
+        delete createLoanObject.openUpdateClientDetailsForm
+        delete createLoanObject.openAddLoanAmountForm
+        delete createLoanObject.openBusinessInformationForm
+        delete createLoanObject.stateSaved
+        delete createLoanObject.monthlyPayment
+        delete createLoanObject.totalProfit
+        delete createLoanObject.approvedLoanAmount
+        delete createLoanObject.isProceed
+        delete createLoanObject.maxLoanTerm
+        delete createLoanObject.salary
+        
+        
+        createLoanObject.applicationDate = dateAndTimeNow()
+        createLoanObject.loanAmount = parseFloat(parseFloat(createLoanObject.loanAmount).toFixed(2))
+        createLoanObject.salaryPercentage = parseFloat(parseFloat(createLoanObject.salaryPercentage).toFixed(2))
+        createLoanObject.loanTerm = parseInt(createLoanObject.loanTerm)
+        if(this.state.loanType === "salaryBased"){
+            createLoanObject.loanCategory = { connect: [1] }
+            createLoanObject.loanType = { connect: [1] }
+        }
+        else{
+            createLoanObject.loanCategory = { connect: [2] }
+        }
+        const newLoan = await createNewLoan({data:createLoanObject})
+        console.log(createLoanObject)
+        console.log(newLoan)
+        const userUpdateObject = {
+            currentLoan: {connect: [newLoan.id]}
+        }
+        const updateUserAccount = updateUserAccount(userUpdateObject,this.props.loggedInUser.id)
+        console.log(updateUserAccount)
     }
 
     renderForm = ()=>{

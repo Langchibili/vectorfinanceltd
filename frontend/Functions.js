@@ -14,11 +14,29 @@ export const returnNineDigitNumber = (phoneNumber) =>{
 }
 
 export const textHasPhoneNumber = (text)=>{
-// Regular expression to match sequences of digits that are 8 characters or longer
-const phoneNumberRegex = /[0-9]{9,}/;
-// Use the test method to check if the text contains a phone number
-return phoneNumberRegex.test(text);
+  // Regular expression to match sequences of digits that are 8 characters or longer
+  const phoneNumberRegex = /[0-9]{9,}/;
+  // Use the test method to check if the text contains a phone number
+  return phoneNumberRegex.test(text);
 } 
+
+const formatDate = (date) => {
+  const month = date.getMonth() + 1; // Months are zero-indexed
+  const day = date.getDate();
+  const year = date.getFullYear();
+  const hours = date.getHours().toString().padStart(2, '0'); // Ensure 2 digits
+  const minutes = date.getMinutes().toString().padStart(2, '0'); // Ensure 2 digits
+  
+  return `${month}/${day}/${year} ${hours}:${minutes}`;
+}
+
+export const dateAndTimeNow = ()=>{
+   //  const now = new Date().toISOString();
+   //const now = new Date();
+   //return formatDate(now).replace('/','-').replace('/','-');
+   return Date.now()
+   //return formatDate(now);
+}
 
 // export const createYouTubeEmbedLink = (url)=>{
 //   // Regular expression to match different YouTube URL formats
@@ -203,8 +221,8 @@ export const getImage = (image, size = "normal", use = "normal") => {
 
 // POSTS FUNCTIONS
 
-export const createNewPost = async (data)=>{
-    const post =  await fetch(api_url+'/posts', {
+export const createNewLoan = async (data)=>{
+    const loan =  await fetch(api_url+'/loans', {
         method: 'POST',
         headers: {
          'Authorization': `Bearer ${getJwt()}`,
@@ -214,9 +232,10 @@ export const createNewPost = async (data)=>{
       })
       .then(response => response.json())
       .then(data => data)
-    if(post && post.data && post.data.attributes){
-        post.data.attributes.id = post.data.id
-        return post.data.attributes
+      console.log(loan)
+    if(loan && loan.data && loan.data.attributes){
+        loan.data.attributes.id = loan.data.id
+        return loan.data.attributes
      }
     return null
 }

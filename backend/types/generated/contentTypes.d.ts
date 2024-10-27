@@ -1111,6 +1111,7 @@ export interface ApiLoanLoan extends Schema.CollectionType {
       ]
     >;
     loanPurposeDetails: Attribute.Text;
+    salaryPercentage: Attribute.Decimal;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
