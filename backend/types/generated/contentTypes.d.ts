@@ -1170,12 +1170,14 @@ export interface ApiLoansInformationLoansInformation extends Schema.SingleType {
     singularName: 'loans-information';
     pluralName: 'loans-informations';
     displayName: 'loansInformation';
+    description: '';
   };
   options: {
     draftAndPublish: true;
   };
   attributes: {
-    defaultLoanInterestRate: Attribute.Decimal;
+    defaultSalaryLoanInterestRate: Attribute.Decimal;
+    defaultCollaterallLoanInterestRate: Attribute.Decimal;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -1338,7 +1340,6 @@ export interface ApiTransactionHistoryTransactionHistory
     >;
     transactionDate: Attribute.DateTime;
     amount: Attribute.Decimal;
-    description: Attribute.Blocks;
     documents: Attribute.Media;
     client: Attribute.Relation<
       'api::transaction-history.transaction-history',
@@ -1350,6 +1351,7 @@ export interface ApiTransactionHistoryTransactionHistory
       'manyToOne',
       'api::loan.loan'
     >;
+    description: Attribute.Text;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;

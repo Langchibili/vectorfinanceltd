@@ -5,6 +5,7 @@ import LoanApplicationForm from "@/components/Forms/LoanApplicationForm";
 import MainForm from "@/components/Forms/MainForm";
 import ApplyForALoanButton from "@/components/Includes/ApplyForALoanButton/ApplyForALoanButton";
 import LoanInformationDisplay from "@/components/Includes/LoanInformationDisplay/LoanInformationDisplay";
+import LoanInitiatedDisplay from "@/components/Includes/LoanInitiatedDisplay/LoanInitiatedDisplay";
 import { useUser } from "@/Contexts/UserContext";
 import { useState } from "react";
 
@@ -22,7 +23,7 @@ export default function Home() {
     const currentLoan = loggedInUser.user.currentLoan
     if(currentLoan){
       if(currentLoan.loanStatus === "initiated"){
-         return <MainForm loggedInUser={loggedInUser.user}/> 
+         return <LoanInitiatedDisplay/> 
       }
       else if(currentLoan.loanStatus === "pending-approval"){
         return <p className="text text-info">Thank you for applying for a loan with us, we are currently processing the loan, an agent will call you.</p>

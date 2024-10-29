@@ -1,45 +1,154 @@
 "use client"
 
-import { Slide } from "@mui/material";
 import React from "react";
+import UpdateClientDetailsForm from "./UpdateClientDetailsForm";
+import UpdateDetailsForm from "./UpdateDetailsForm";
+import AddLoanAmountForm from "./AddLoanAmmoutForm";
+import BusinessInformationForm from "./BusinessInformationForm";
+import UpdateSalaryDetailsForm from "./UpdateSalaryDetailsForm";
+import { createNewLoan, dateAndTimeNow, updateUserAccount } from "@/Functions";
 
 export default class BusinessLoanApplicationForm extends React.Component{
     constructor(props){
         super(props)
         this.state = {
-          loanCategory: this.props.loanCategory,
+          loanCategory: null,
+          loanAmount: null,
+          loanType: null,
+          openUpdateDetailsForm: false,
+          openUpdateClientDetailsForm: false,
+          openAddLoanAmountForm: false,
+          openBusinessInformationForm: false
+        }
+    }
+     
+    handleOpenUpdateDetailsForm = ()=>{
+        this.setState({
+            openUpdateDetailsForm: true,
+            openUpdateClientDetailsForm: false,
+            openAddLoanAmountForm: false,
+            openBusinessInformationForm: false
+        })
+    }
+    handleOpenUpdateClientDetailsForm = ()=>{
+        this.setState({
+            openUpdateDetailsForm: false,
+            openUpdateClientDetailsForm: true,
+            openAddLoanAmountForm: false,
+            openBusinessInformationForm: false
+        })
+    }
+    handleOpenAddLoanAmountForm = ()=>{
+        this.setState({
+            openUpdateDetailsForm: false,
+            openUpdateClientDetailsForm: false,
+            openAddLoanAmountForm: true,
+            openBusinessInformationForm: false
+        })
+    }
+    handleOpenBusinessInformationForm = ()=>{
+        this.setState({
+            openUpdateDetailsForm: false,
+            openUpdateClientDetailsForm: false,
+            openAddLoanAmountForm: false,
+            openBusinessInformationForm: true
+        })
+    }
+   
+    handleCreateBlankLoan = async ()=>{
+        // create new loan 
+        // add new loan to client's currentLoan relation
+        const createLoanObject = this.state
+        delete createLoanObject.openUpdateDetailsForm
+        delete createLoanObject.openUpdateClientDetailsForm
+        delete createLoanObject.openAddLoanAmountForm
+        delete createLoanObject.openBusinessInformationForm
+        delete createLoanObject.stateSaved
+        delete createLoanObject.monthlyPayment
+        delete createLoanObject.totalProfit
+        delete createLoanObject.approvedLoanAmount
+        delete createLoanObject.isProceed
+        delete createLoanObject.maxLoanTerm
+        delete createLoanObject.salary
+        
+        
+        createLoanObject.applicationDate = dateAndTimeNow()
+        createLoanObject.loanAmount = parseFloat(parseFloat(createLoanObject.loanAmount).toFixed(2))
+        createLoanObject.salaryPercentage = parseFloat(parseFloat(createLoanObject.salaryPercentage).toFixed(2))
+        createLoanObject.loanTerm = parseInt(createLoanObject.loanTerm)
 
+        if(this.state.loanType === "salaryBased"){
+            createLoanObject.loanCategory = { connect: [1] }
+            createLoanObject.loanType = { connect: [1] }
+        }
+        else{
+            createLoanObject.loanCategory = { connect: [2] }
+        }
+
+        const newLoan = await createNewLoan({data:createLoanObject})
+        console.log(createLoanObject)
+        console.log(newLoan)
+        if(!newLoan.hasOwnProperty('error')){
+            const userUpdateObject = {
+                currentLoan: {connect: [newLoan.id]},
+                loans: {connect: [newLoan.id]}
+            }
+            const updatedUserAccount = await updateUserAccount(userUpdateObject,this.props.loggedInUser.id)
+            if(!updatedUserAccount.hasOwnProperty('error')){
+                window.location = "/"
+            }
         }
     }
 
-    componentDidMount(){
-        
+    renderForm = ()=>{
+        if(this.state.openUpdateDetailsForm){
+            return <UpdateDetailsForm 
+                        {...this.props} 
+                        handleOpenUpdateClientDetailsForm={this.handleOpenUpdateClientDetailsForm}/>
+        }
+        else if(this.state.openUpdateClientDetailsForm){
+            return <UpdateClientDetailsForm 
+                        {...this.props} 
+                        handleOpenUpdateDetailsForm={this.handleOpenUpdateDetailsForm} 
+                        handleOpenAddLoanAmountForm={this.handleOpenAddLoanAmountForm}/>
+        }
+        else if(this.state.openAddLoanAmountForm){
+            return <AddLoanAmountForm 
+                        {...this.props} 
+                        setLoanInformation={this.setLoanInformation} 
+                        handleOpenUpdateClientDetailsForm={this.handleOpenUpdateClientDetailsForm}
+                        handleOpenBusinessInformationForm={this.handleOpenBusinessInformationForm}/>
+        }
+        else if(this.state.openBusinessInformationForm){
+            if(this.state.loanType === "salaryBased"){
+                return <UpdateSalaryDetailsForm 
+                        {...this.props} 
+                        handleCreateBlankLoan={this.handleCreateBlankLoan}
+                        setLoanInformation={this.setLoanInformation} 
+                        handleOpenAddLoanAmountForm={this.handleOpenAddLoanAmountForm}/>
+            }
+            return <BusinessInformationForm 
+                        {...this.props} 
+                        handleCreateBlankLoan={this.handleCreateBlankLoan}
+                        setLoanInformation={this.setLoanInformation} 
+                        handleOpenAddLoanAmountForm={this.handleOpenAddLoanAmountForm}/>
+        }
+        else{
+            return <UpdateDetailsForm 
+                        {...this.props}
+                        handleOpenUpdateClientDetailsForm={this.handleOpenUpdateClientDetailsForm}/>
+        }              
     }
 
-    renderApplicationForm = ()=>{
-      const loanCategory = this.props.loanCategory
-      if(loanCategory === "personal"){
-        return <>personal loan form</>
-      }
-      else if(loanCategory === "business"){
-        return <>personal business form</>
-      }
-      else if(loanCategory === "company"){
-        return <>personal company form</>
-      }
-      else{
-        return <>personal loan form</>
-      }
-    }
-
-    handleGoBackToLoanCategorySelect = ()=>{
-      this.props.setShowLoanApplicationForms(false)
+    setLoanInformation = (information)=>{
+        this.setState({
+            ...information
+        },()=>{
+            console.log(this.state)
+        })
     }
 
     render(){
-        return (<>
-                <button onClick={this.handleGoBackToLoanCategorySelect} className="btn btn-sm">Back</button>
-                {this.renderApplicationForm()}
-              </>)
+        return this.renderForm()
     }
 }

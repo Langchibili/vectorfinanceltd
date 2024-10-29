@@ -38,6 +38,8 @@ export default class BusinessInformationForm extends React.Component {
       netProfit: business?.netProfit || '',
       currentBusinessDebt: business?.businessHasDebt || '',
       existingLoanDetails: business?.existingLoanDetails || ''
+    },()=>{
+        this.checkFormValidity()
     });
   }
 
@@ -54,17 +56,25 @@ export default class BusinessInformationForm extends React.Component {
 
     const isFormValid = businessName && businessType && ownershipType && registrationStatus &&
       yearsInBusiness && annualRevenue && shareholderStatus && netProfit && 
-      (shareholderStatus === 'yes' ? percentageOwnership : true) &&
       currentBusinessDebt;
-      if(currentBusinessDebt === 'yes'){
-        if(!existingLoanDetails){
-            this.setState({ isFormValid:!isFormValid });
-            return
+      if(isFormValid){
+        if(shareholderStatus === 'no'){
+            this.setState({ isFormValid:true})
+        }
+        else if(shareholderStatus === 'yes'){
+            if(!percentageOwnership){
+                this.setState({isFormValid:false})
+            }
+        }
+        if(currentBusinessDebt === 'yes'){
+            if(!existingLoanDetails){
+                this.setState({ isFormValid:!isFormValid });
+                return
+            }
         }
       }
-
-    this.setState({ isFormValid });
-  };
+      this.setState({ isFormValid });
+  }
 
   handleSubmit = async (e) => {
     const updateObject = this.state

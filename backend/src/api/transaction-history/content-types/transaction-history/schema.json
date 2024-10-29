@@ -27,9 +27,6 @@
     "amount": {
       "type": "decimal"
     },
-    "description": {
-      "type": "blocks"
-    },
     "documents": {
       "type": "media",
       "multiple": true,
@@ -51,6 +48,9 @@
       "relation": "manyToOne",
       "target": "api::loan.loan",
       "inversedBy": "transactionHstories"
+    },
+    "description": {
+      "type": "text"
     }
   }
 }

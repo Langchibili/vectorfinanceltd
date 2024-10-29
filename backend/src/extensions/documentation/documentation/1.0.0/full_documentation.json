@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2024-10-25T18:14:45.919Z"
+    "x-generation-date": "2024-10-29T02:52:17.907Z"
   },
   "x-strapi-config": {
     "path": "/documentation",
@@ -3172,7 +3172,6 @@
                                                   "type": "number",
                                                   "format": "float"
                                                 },
-                                                "description": {},
                                                 "documents": {
                                                   "type": "object",
                                                   "properties": {
@@ -3348,6 +3347,9 @@
                                                       }
                                                     }
                                                   }
+                                                },
+                                                "description": {
+                                                  "type": "string"
                                                 },
                                                 "createdAt": {
                                                   "type": "string",
@@ -9569,7 +9571,6 @@
                                                     "type": "number",
                                                     "format": "float"
                                                   },
-                                                  "description": {},
                                                   "documents": {
                                                     "type": "object",
                                                     "properties": {
@@ -9745,6 +9746,9 @@
                                                         }
                                                       }
                                                     }
+                                                  },
+                                                  "description": {
+                                                    "type": "string"
                                                   },
                                                   "createdAt": {
                                                     "type": "string",
@@ -14324,7 +14328,6 @@
                                                   "type": "number",
                                                   "format": "float"
                                                 },
-                                                "description": {},
                                                 "documents": {
                                                   "type": "object",
                                                   "properties": {
@@ -14500,6 +14503,9 @@
                                                       }
                                                     }
                                                   }
+                                                },
+                                                "description": {
+                                                  "type": "string"
                                                 },
                                                 "createdAt": {
                                                   "type": "string",
@@ -20197,7 +20203,6 @@
                                                   "type": "number",
                                                   "format": "float"
                                                 },
-                                                "description": {},
                                                 "documents": {
                                                   "type": "object",
                                                   "properties": {
@@ -20373,6 +20378,9 @@
                                                       }
                                                     }
                                                   }
+                                                },
+                                                "description": {
+                                                  "type": "string"
                                                 },
                                                 "createdAt": {
                                                   "type": "string",
@@ -26896,7 +26904,6 @@
                                                                               "type": "number",
                                                                               "format": "float"
                                                                             },
-                                                                            "description": {},
                                                                             "documents": {
                                                                               "type": "object",
                                                                               "properties": {
@@ -27072,6 +27079,9 @@
                                                                                   }
                                                                                 }
                                                                               }
+                                                                            },
+                                                                            "description": {
+                                                                              "type": "string"
                                                                             },
                                                                             "createdAt": {
                                                                               "type": "string",
@@ -29350,7 +29360,11 @@
           "data": {
             "type": "object",
             "properties": {
-              "defaultLoanInterestRate": {
+              "defaultSalaryLoanInterestRate": {
+                "type": "number",
+                "format": "float"
+              },
+              "defaultCollaterallLoanInterestRate": {
                 "type": "number",
                 "format": "float"
               }
@@ -29407,7 +29421,11 @@
       "LoansInformation": {
         "type": "object",
         "properties": {
-          "defaultLoanInterestRate": {
+          "defaultSalaryLoanInterestRate": {
+            "type": "number",
+            "format": "float"
+          },
+          "defaultCollaterallLoanInterestRate": {
             "type": "number",
             "format": "float"
           },
@@ -32660,7 +32678,6 @@
                                                   "type": "number",
                                                   "format": "float"
                                                 },
-                                                "description": {},
                                                 "documents": {
                                                   "type": "object",
                                                   "properties": {
@@ -32836,6 +32853,9 @@
                                                       }
                                                     }
                                                   }
+                                                },
+                                                "description": {
+                                                  "type": "string"
                                                 },
                                                 "createdAt": {
                                                   "type": "string",
@@ -38361,7 +38381,6 @@
                                                   "type": "number",
                                                   "format": "float"
                                                 },
-                                                "description": {},
                                                 "documents": {
                                                   "type": "object",
                                                   "properties": {
@@ -38537,6 +38556,9 @@
                                                       }
                                                     }
                                                   }
+                                                },
+                                                "description": {
+                                                  "type": "string"
                                                 },
                                                 "createdAt": {
                                                   "type": "string",
@@ -40895,7 +40917,6 @@
                 "type": "number",
                 "format": "float"
               },
-              "description": {},
               "documents": {
                 "type": "array",
                 "items": {
@@ -40931,6 +40952,9 @@
                   }
                 ],
                 "example": "string or id"
+              },
+              "description": {
+                "type": "string"
               }
             }
           }
@@ -41002,7 +41026,6 @@
             "type": "number",
             "format": "float"
           },
-          "description": {},
           "documents": {
             "type": "object",
             "properties": {
@@ -43965,7 +43988,6 @@
                                                   "type": "number",
                                                   "format": "float"
                                                 },
-                                                "description": {},
                                                 "documents": {
                                                   "type": "object",
                                                   "properties": {
@@ -44141,6 +44163,9 @@
                                                       }
                                                     }
                                                   }
+                                                },
+                                                "description": {
+                                                  "type": "string"
                                                 },
                                                 "createdAt": {
                                                   "type": "string",
@@ -46233,6 +46258,9 @@
                 }
               }
             }
+          },
+          "description": {
+            "type": "string"
           },
           "createdAt": {
             "type": "string",
@@ -49142,7 +49170,6 @@
                                                                               "type": "number",
                                                                               "format": "float"
                                                                             },
-                                                                            "description": {},
                                                                             "documents": {
                                                                               "type": "object",
                                                                               "properties": {
@@ -49318,6 +49345,9 @@
                                                                                   }
                                                                                 }
                                                                               }
+                                                                            },
+                                                                            "description": {
+                                                                              "type": "string"
                                                                             },
                                                                             "createdAt": {
                                                                               "type": "string",

@@ -4,14 +4,18 @@
   "info": {
     "singularName": "loans-information",
     "pluralName": "loans-informations",
-    "displayName": "loansInformation"
+    "displayName": "loansInformation",
+    "description": ""
   },
   "options": {
     "draftAndPublish": true
   },
   "pluginOptions": {},
   "attributes": {
-    "defaultLoanInterestRate": {
+    "defaultSalaryLoanInterestRate": {
+      "type": "decimal"
+    },
+    "defaultCollaterallLoanInterestRate": {
       "type": "decimal"
     }
   }

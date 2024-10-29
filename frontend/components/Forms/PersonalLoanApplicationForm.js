@@ -6,7 +6,7 @@ import UpdateDetailsForm from "./UpdateDetailsForm";
 import AddLoanAmountForm from "./AddLoanAmmoutForm";
 import BusinessInformationForm from "./BusinessInformationForm";
 import UpdateSalaryDetailsForm from "./UpdateSalaryDetailsForm";
-import { createNewLoan, dateAndTimeNow, updateUserAccount } from "@/Functions";
+import { createNewLoan, dateAndTimeNow, logNewNotification, logNewTransactionHistory, updateUserAccount } from "@/Functions";
 
 export default class PersonalLoanApplicationForm extends React.Component{
     constructor(props){
@@ -71,11 +71,12 @@ export default class PersonalLoanApplicationForm extends React.Component{
         delete createLoanObject.maxLoanTerm
         delete createLoanObject.salary
         
-        
-        createLoanObject.applicationDate = dateAndTimeNow()
+        const applicationDate =  dateAndTimeNow()
+        createLoanObject.applicationDate =  applicationDate
         createLoanObject.loanAmount = parseFloat(parseFloat(createLoanObject.loanAmount).toFixed(2))
         createLoanObject.salaryPercentage = parseFloat(parseFloat(createLoanObject.salaryPercentage).toFixed(2))
         createLoanObject.loanTerm = parseInt(createLoanObject.loanTerm)
+
         if(this.state.loanType === "salaryBased"){
             createLoanObject.loanCategory = { connect: [1] }
             createLoanObject.loanType = { connect: [1] }
@@ -83,14 +84,36 @@ export default class PersonalLoanApplicationForm extends React.Component{
         else{
             createLoanObject.loanCategory = { connect: [2] }
         }
+
         const newLoan = await createNewLoan({data:createLoanObject})
-        console.log(createLoanObject)
-        console.log(newLoan)
-        const userUpdateObject = {
-            currentLoan: {connect: [newLoan.id]}
+        if(!newLoan.hasOwnProperty('error')){
+            const transactionHistoryObject = {
+                transactionType: "loan-application",
+                transactionDate: applicationDate,
+                amount: createLoanObject.loanAmount,
+                description: "Initiation of the loan, with id: "+newLoan.id,
+                loan: {connect: [newLoan.id]}
+            }
+            const notificationObject = {
+                title: "A new loan, with id: "+newLoan.id+" has been Initiation",
+                type: "alert"
+            }
+            const transactionHistory = await logNewTransactionHistory({data:transactionHistoryObject})
+            const newNotitifcation = await logNewNotification({data:notificationObject})
+            if(!transactionHistory.hasOwnProperty('error')){
+                const userUpdateObject = {
+                    currentLoan: {connect: [newLoan.id]},
+                    loans: {connect: [newLoan.id]},
+                    transactionHistories: {connect: [transactionHistory.id]},
+                    activities: {connect: [newNotitifcation.id]}
+                }
+                const updatedUserAccount = await updateUserAccount(userUpdateObject,this.props.loggedInUser.id)
+                if(!updatedUserAccount.hasOwnProperty('error')){
+                    window.location = "/"
+                }
+            }
+            
         }
-        const updateUserAccount = updateUserAccount(userUpdateObject,this.props.loggedInUser.id)
-        console.log(updateUserAccount)
     }
 
     renderForm = ()=>{

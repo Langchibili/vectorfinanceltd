@@ -232,12 +232,47 @@ export const createNewLoan = async (data)=>{
       })
       .then(response => response.json())
       .then(data => data)
-      console.log(loan)
     if(loan && loan.data && loan.data.attributes){
         loan.data.attributes.id = loan.data.id
         return loan.data.attributes
      }
     return null
+}
+
+export const logNewTransactionHistory = async (data)=>{
+  const transactionHistory =  await fetch(api_url+'/transaction-histories', {
+      method: 'POST',
+      headers: {
+       'Authorization': `Bearer ${getJwt()}`,
+       'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data),
+    })
+    .then(response => response.json())
+    .then(data => data)
+  if(transactionHistory && transactionHistory.data && transactionHistory.data.attributes){
+      transactionHistory.data.attributes.id = transactionHistory.data.id
+      return transactionHistory.data.attributes
+   }
+  return null
+}
+
+export const logNewNotification = async (data)=>{
+  const notification =  await fetch(api_url+'/notifications', {
+      method: 'POST',
+      headers: {
+       'Authorization': `Bearer ${getJwt()}`,
+       'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data),
+    })
+    .then(response => response.json())
+    .then(data => data)
+  if(notification && notification.data && notification.data.attributes){
+      notification.data.attributes.id = notification.data.id
+      return notification.data.attributes
+   }
+  return null
 }
 
 export const updatePost = async (data,postId)=>{
@@ -734,7 +769,7 @@ export const getUserFromDashedId = async (dashedId,populateString)=>{
             notifier: {connect: [parseInt(userId)]},
             notifiedUsers: { connect: notifiedUserIds},
             type: contentType
-          }
+          } 
        }
        console.log('inside notifications object',notificationObject)
        if(contentType === "post"){
