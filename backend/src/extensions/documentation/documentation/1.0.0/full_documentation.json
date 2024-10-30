@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2024-10-29T02:52:17.907Z"
+    "x-generation-date": "2024-10-30T04:01:42.507Z"
   },
   "x-strapi-config": {
     "path": "/documentation",
@@ -1228,10 +1228,6 @@
                               "unemployed"
                             ]
                           },
-                          "monthlyIncome": {
-                            "type": "number",
-                            "format": "float"
-                          },
                           "KYCverificationStatus": {
                             "type": "boolean"
                           },
@@ -1522,6 +1518,14 @@
                                 }
                               }
                             }
+                          },
+                          "idType": {
+                            "type": "string",
+                            "enum": [
+                              "nrc",
+                              "passport",
+                              "driving-license"
+                            ]
                           }
                         }
                       },
@@ -1903,6 +1907,9 @@
                                           "packingFeePaid": {
                                             "type": "number",
                                             "format": "float"
+                                          },
+                                          "numberPlate": {
+                                            "type": "string"
                                           }
                                         }
                                       },
@@ -2058,6 +2065,9 @@
                                             "type": "string"
                                           },
                                           "location": {
+                                            "type": "string"
+                                          },
+                                          "plotNumber": {
                                             "type": "string"
                                           }
                                         }
@@ -2227,6 +2237,9 @@
                                             "type": "string"
                                           },
                                           "location": {
+                                            "type": "string"
+                                          },
+                                          "plotNumber": {
                                             "type": "string"
                                           }
                                         }
@@ -3742,6 +3755,20 @@
                                       "Medical Expenses",
                                       "Debt Consolidation",
                                       "Vehicle Purchase",
+                                      "Equipment Purchase,",
+                                      "Inventory Purchase,",
+                                      "Working Capital,",
+                                      "Marketing and Advertising,",
+                                      "Product Development,",
+                                      "Debt Refinancing,",
+                                      "Hiring and Training,",
+                                      "Property Acquisition or Lease,",
+                                      "Emergency Funds,",
+                                      "Technology Upgrades,",
+                                      "Project Funding,",
+                                      "Seasonal Demand Preparation,",
+                                      "Legal and Regulatory Compliance,",
+                                      "Research and Development",
                                       "Others"
                                     ]
                                   },
@@ -3934,10 +3961,6 @@
                                           "self-employed",
                                           "unemployed"
                                         ]
-                                      },
-                                      "monthlyIncome": {
-                                        "type": "number",
-                                        "format": "float"
                                       },
                                       "KYCverificationStatus": {
                                         "type": "boolean"
@@ -4229,6 +4252,14 @@
                                             }
                                           }
                                         }
+                                      },
+                                      "idType": {
+                                        "type": "string",
+                                        "enum": [
+                                          "nrc",
+                                          "passport",
+                                          "driving-license"
+                                        ]
                                       }
                                     }
                                   },
@@ -5335,7 +5366,8 @@
                             "type": "string",
                             "enum": [
                               "sole-owner",
-                              "co-owner"
+                              "co-owner",
+                              "neither"
                             ]
                           },
                           "isBusinessRegistered": {
@@ -5375,6 +5407,151 @@
                               "yes",
                               "no"
                             ]
+                          },
+                          "companyRegistrationNumber": {
+                            "type": "integer"
+                          },
+                          "pacraPrintOut": {
+                            "type": "object",
+                            "properties": {
+                              "data": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "id": {
+                                      "type": "number"
+                                    },
+                                    "attributes": {
+                                      "type": "object",
+                                      "properties": {
+                                        "name": {
+                                          "type": "string"
+                                        },
+                                        "alternativeText": {
+                                          "type": "string"
+                                        },
+                                        "caption": {
+                                          "type": "string"
+                                        },
+                                        "width": {
+                                          "type": "integer"
+                                        },
+                                        "height": {
+                                          "type": "integer"
+                                        },
+                                        "formats": {},
+                                        "hash": {
+                                          "type": "string"
+                                        },
+                                        "ext": {
+                                          "type": "string"
+                                        },
+                                        "mime": {
+                                          "type": "string"
+                                        },
+                                        "size": {
+                                          "type": "number",
+                                          "format": "float"
+                                        },
+                                        "url": {
+                                          "type": "string"
+                                        },
+                                        "previewUrl": {
+                                          "type": "string"
+                                        },
+                                        "provider": {
+                                          "type": "string"
+                                        },
+                                        "provider_metadata": {},
+                                        "related": {
+                                          "type": "object",
+                                          "properties": {
+                                            "data": {
+                                              "type": "array",
+                                              "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                  "id": {
+                                                    "type": "number"
+                                                  },
+                                                  "attributes": {
+                                                    "type": "object",
+                                                    "properties": {}
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          }
+                                        },
+                                        "folder": {
+                                          "type": "object",
+                                          "properties": {
+                                            "data": {
+                                              "type": "object",
+                                              "properties": {
+                                                "id": {
+                                                  "type": "number"
+                                                },
+                                                "attributes": {
+                                                  "type": "object",
+                                                  "properties": {}
+                                                }
+                                              }
+                                            }
+                                          }
+                                        },
+                                        "folderPath": {
+                                          "type": "string"
+                                        },
+                                        "createdAt": {
+                                          "type": "string",
+                                          "format": "date-time"
+                                        },
+                                        "updatedAt": {
+                                          "type": "string",
+                                          "format": "date-time"
+                                        },
+                                        "createdBy": {
+                                          "type": "object",
+                                          "properties": {
+                                            "data": {
+                                              "type": "object",
+                                              "properties": {
+                                                "id": {
+                                                  "type": "number"
+                                                },
+                                                "attributes": {
+                                                  "type": "object",
+                                                  "properties": {}
+                                                }
+                                              }
+                                            }
+                                          }
+                                        },
+                                        "updatedBy": {
+                                          "type": "object",
+                                          "properties": {
+                                            "data": {
+                                              "type": "object",
+                                              "properties": {
+                                                "id": {
+                                                  "type": "number"
+                                                },
+                                                "attributes": {
+                                                  "type": "object",
+                                                  "properties": {}
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
                           }
                         }
                       },
@@ -7627,10 +7804,6 @@
                                 "unemployed"
                               ]
                             },
-                            "monthlyIncome": {
-                              "type": "number",
-                              "format": "float"
-                            },
                             "KYCverificationStatus": {
                               "type": "boolean"
                             },
@@ -7921,6 +8094,14 @@
                                   }
                                 }
                               }
+                            },
+                            "idType": {
+                              "type": "string",
+                              "enum": [
+                                "nrc",
+                                "passport",
+                                "driving-license"
+                              ]
                             }
                           }
                         },
@@ -8302,6 +8483,9 @@
                                             "packingFeePaid": {
                                               "type": "number",
                                               "format": "float"
+                                            },
+                                            "numberPlate": {
+                                              "type": "string"
                                             }
                                           }
                                         },
@@ -8457,6 +8641,9 @@
                                               "type": "string"
                                             },
                                             "location": {
+                                              "type": "string"
+                                            },
+                                            "plotNumber": {
                                               "type": "string"
                                             }
                                           }
@@ -8626,6 +8813,9 @@
                                               "type": "string"
                                             },
                                             "location": {
+                                              "type": "string"
+                                            },
+                                            "plotNumber": {
                                               "type": "string"
                                             }
                                           }
@@ -10141,6 +10331,20 @@
                                         "Medical Expenses",
                                         "Debt Consolidation",
                                         "Vehicle Purchase",
+                                        "Equipment Purchase,",
+                                        "Inventory Purchase,",
+                                        "Working Capital,",
+                                        "Marketing and Advertising,",
+                                        "Product Development,",
+                                        "Debt Refinancing,",
+                                        "Hiring and Training,",
+                                        "Property Acquisition or Lease,",
+                                        "Emergency Funds,",
+                                        "Technology Upgrades,",
+                                        "Project Funding,",
+                                        "Seasonal Demand Preparation,",
+                                        "Legal and Regulatory Compliance,",
+                                        "Research and Development",
                                         "Others"
                                       ]
                                     },
@@ -10333,10 +10537,6 @@
                                             "self-employed",
                                             "unemployed"
                                           ]
-                                        },
-                                        "monthlyIncome": {
-                                          "type": "number",
-                                          "format": "float"
                                         },
                                         "KYCverificationStatus": {
                                           "type": "boolean"
@@ -10628,6 +10828,14 @@
                                               }
                                             }
                                           }
+                                        },
+                                        "idType": {
+                                          "type": "string",
+                                          "enum": [
+                                            "nrc",
+                                            "passport",
+                                            "driving-license"
+                                          ]
                                         }
                                       }
                                     },
@@ -11734,7 +11942,8 @@
                               "type": "string",
                               "enum": [
                                 "sole-owner",
-                                "co-owner"
+                                "co-owner",
+                                "neither"
                               ]
                             },
                             "isBusinessRegistered": {
@@ -11774,6 +11983,151 @@
                                 "yes",
                                 "no"
                               ]
+                            },
+                            "companyRegistrationNumber": {
+                              "type": "integer"
+                            },
+                            "pacraPrintOut": {
+                              "type": "object",
+                              "properties": {
+                                "data": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "id": {
+                                        "type": "number"
+                                      },
+                                      "attributes": {
+                                        "type": "object",
+                                        "properties": {
+                                          "name": {
+                                            "type": "string"
+                                          },
+                                          "alternativeText": {
+                                            "type": "string"
+                                          },
+                                          "caption": {
+                                            "type": "string"
+                                          },
+                                          "width": {
+                                            "type": "integer"
+                                          },
+                                          "height": {
+                                            "type": "integer"
+                                          },
+                                          "formats": {},
+                                          "hash": {
+                                            "type": "string"
+                                          },
+                                          "ext": {
+                                            "type": "string"
+                                          },
+                                          "mime": {
+                                            "type": "string"
+                                          },
+                                          "size": {
+                                            "type": "number",
+                                            "format": "float"
+                                          },
+                                          "url": {
+                                            "type": "string"
+                                          },
+                                          "previewUrl": {
+                                            "type": "string"
+                                          },
+                                          "provider": {
+                                            "type": "string"
+                                          },
+                                          "provider_metadata": {},
+                                          "related": {
+                                            "type": "object",
+                                            "properties": {
+                                              "data": {
+                                                "type": "array",
+                                                "items": {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "id": {
+                                                      "type": "number"
+                                                    },
+                                                    "attributes": {
+                                                      "type": "object",
+                                                      "properties": {}
+                                                    }
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          },
+                                          "folder": {
+                                            "type": "object",
+                                            "properties": {
+                                              "data": {
+                                                "type": "object",
+                                                "properties": {
+                                                  "id": {
+                                                    "type": "number"
+                                                  },
+                                                  "attributes": {
+                                                    "type": "object",
+                                                    "properties": {}
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          },
+                                          "folderPath": {
+                                            "type": "string"
+                                          },
+                                          "createdAt": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                          },
+                                          "updatedAt": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                          },
+                                          "createdBy": {
+                                            "type": "object",
+                                            "properties": {
+                                              "data": {
+                                                "type": "object",
+                                                "properties": {
+                                                  "id": {
+                                                    "type": "number"
+                                                  },
+                                                  "attributes": {
+                                                    "type": "object",
+                                                    "properties": {}
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          },
+                                          "updatedBy": {
+                                            "type": "object",
+                                            "properties": {
+                                              "data": {
+                                                "type": "object",
+                                                "properties": {
+                                                  "id": {
+                                                    "type": "number"
+                                                  },
+                                                  "attributes": {
+                                                    "type": "object",
+                                                    "properties": {}
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
                             }
                           }
                         },
@@ -12384,10 +12738,6 @@
                               "unemployed"
                             ]
                           },
-                          "monthlyIncome": {
-                            "type": "number",
-                            "format": "float"
-                          },
                           "KYCverificationStatus": {
                             "type": "boolean"
                           },
@@ -12678,6 +13028,14 @@
                                 }
                               }
                             }
+                          },
+                          "idType": {
+                            "type": "string",
+                            "enum": [
+                              "nrc",
+                              "passport",
+                              "driving-license"
+                            ]
                           }
                         }
                       },
@@ -13059,6 +13417,9 @@
                                           "packingFeePaid": {
                                             "type": "number",
                                             "format": "float"
+                                          },
+                                          "numberPlate": {
+                                            "type": "string"
                                           }
                                         }
                                       },
@@ -13214,6 +13575,9 @@
                                             "type": "string"
                                           },
                                           "location": {
+                                            "type": "string"
+                                          },
+                                          "plotNumber": {
                                             "type": "string"
                                           }
                                         }
@@ -13383,6 +13747,9 @@
                                             "type": "string"
                                           },
                                           "location": {
+                                            "type": "string"
+                                          },
+                                          "plotNumber": {
                                             "type": "string"
                                           }
                                         }
@@ -14898,6 +15265,20 @@
                                       "Medical Expenses",
                                       "Debt Consolidation",
                                       "Vehicle Purchase",
+                                      "Equipment Purchase,",
+                                      "Inventory Purchase,",
+                                      "Working Capital,",
+                                      "Marketing and Advertising,",
+                                      "Product Development,",
+                                      "Debt Refinancing,",
+                                      "Hiring and Training,",
+                                      "Property Acquisition or Lease,",
+                                      "Emergency Funds,",
+                                      "Technology Upgrades,",
+                                      "Project Funding,",
+                                      "Seasonal Demand Preparation,",
+                                      "Legal and Regulatory Compliance,",
+                                      "Research and Development",
                                       "Others"
                                     ]
                                   },
@@ -15090,10 +15471,6 @@
                                           "self-employed",
                                           "unemployed"
                                         ]
-                                      },
-                                      "monthlyIncome": {
-                                        "type": "number",
-                                        "format": "float"
                                       },
                                       "KYCverificationStatus": {
                                         "type": "boolean"
@@ -15385,6 +15762,14 @@
                                             }
                                           }
                                         }
+                                      },
+                                      "idType": {
+                                        "type": "string",
+                                        "enum": [
+                                          "nrc",
+                                          "passport",
+                                          "driving-license"
+                                        ]
                                       }
                                     }
                                   },
@@ -16491,7 +16876,8 @@
                             "type": "string",
                             "enum": [
                               "sole-owner",
-                              "co-owner"
+                              "co-owner",
+                              "neither"
                             ]
                           },
                           "isBusinessRegistered": {
@@ -16531,6 +16917,151 @@
                               "yes",
                               "no"
                             ]
+                          },
+                          "companyRegistrationNumber": {
+                            "type": "integer"
+                          },
+                          "pacraPrintOut": {
+                            "type": "object",
+                            "properties": {
+                              "data": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "id": {
+                                      "type": "number"
+                                    },
+                                    "attributes": {
+                                      "type": "object",
+                                      "properties": {
+                                        "name": {
+                                          "type": "string"
+                                        },
+                                        "alternativeText": {
+                                          "type": "string"
+                                        },
+                                        "caption": {
+                                          "type": "string"
+                                        },
+                                        "width": {
+                                          "type": "integer"
+                                        },
+                                        "height": {
+                                          "type": "integer"
+                                        },
+                                        "formats": {},
+                                        "hash": {
+                                          "type": "string"
+                                        },
+                                        "ext": {
+                                          "type": "string"
+                                        },
+                                        "mime": {
+                                          "type": "string"
+                                        },
+                                        "size": {
+                                          "type": "number",
+                                          "format": "float"
+                                        },
+                                        "url": {
+                                          "type": "string"
+                                        },
+                                        "previewUrl": {
+                                          "type": "string"
+                                        },
+                                        "provider": {
+                                          "type": "string"
+                                        },
+                                        "provider_metadata": {},
+                                        "related": {
+                                          "type": "object",
+                                          "properties": {
+                                            "data": {
+                                              "type": "array",
+                                              "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                  "id": {
+                                                    "type": "number"
+                                                  },
+                                                  "attributes": {
+                                                    "type": "object",
+                                                    "properties": {}
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          }
+                                        },
+                                        "folder": {
+                                          "type": "object",
+                                          "properties": {
+                                            "data": {
+                                              "type": "object",
+                                              "properties": {
+                                                "id": {
+                                                  "type": "number"
+                                                },
+                                                "attributes": {
+                                                  "type": "object",
+                                                  "properties": {}
+                                                }
+                                              }
+                                            }
+                                          }
+                                        },
+                                        "folderPath": {
+                                          "type": "string"
+                                        },
+                                        "createdAt": {
+                                          "type": "string",
+                                          "format": "date-time"
+                                        },
+                                        "updatedAt": {
+                                          "type": "string",
+                                          "format": "date-time"
+                                        },
+                                        "createdBy": {
+                                          "type": "object",
+                                          "properties": {
+                                            "data": {
+                                              "type": "object",
+                                              "properties": {
+                                                "id": {
+                                                  "type": "number"
+                                                },
+                                                "attributes": {
+                                                  "type": "object",
+                                                  "properties": {}
+                                                }
+                                              }
+                                            }
+                                          }
+                                        },
+                                        "updatedBy": {
+                                          "type": "object",
+                                          "properties": {
+                                            "data": {
+                                              "type": "object",
+                                              "properties": {
+                                                "id": {
+                                                  "type": "number"
+                                                },
+                                                "attributes": {
+                                                  "type": "object",
+                                                  "properties": {}
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
                           }
                         }
                       },
@@ -16665,10 +17196,6 @@
               "self-employed",
               "unemployed"
             ]
-          },
-          "monthlyIncome": {
-            "type": "number",
-            "format": "float"
           },
           "KYCverificationStatus": {
             "type": "boolean"
@@ -17443,6 +17970,14 @@
                 }
               }
             }
+          },
+          "idType": {
+            "type": "string",
+            "enum": [
+              "nrc",
+              "passport",
+              "driving-license"
+            ]
           }
         }
       },
@@ -17609,6 +18144,20 @@
                   "Medical Expenses",
                   "Debt Consolidation",
                   "Vehicle Purchase",
+                  "Equipment Purchase,",
+                  "Inventory Purchase,",
+                  "Working Capital,",
+                  "Marketing and Advertising,",
+                  "Product Development,",
+                  "Debt Refinancing,",
+                  "Hiring and Training,",
+                  "Property Acquisition or Lease,",
+                  "Emergency Funds,",
+                  "Technology Upgrades,",
+                  "Project Funding,",
+                  "Seasonal Demand Preparation,",
+                  "Legal and Regulatory Compliance,",
+                  "Research and Development",
                   "Others"
                 ]
               },
@@ -18259,10 +18808,6 @@
                               "unemployed"
                             ]
                           },
-                          "monthlyIncome": {
-                            "type": "number",
-                            "format": "float"
-                          },
                           "KYCverificationStatus": {
                             "type": "boolean"
                           },
@@ -18553,6 +19098,14 @@
                                 }
                               }
                             }
+                          },
+                          "idType": {
+                            "type": "string",
+                            "enum": [
+                              "nrc",
+                              "passport",
+                              "driving-license"
+                            ]
                           }
                         }
                       },
@@ -18934,6 +19487,9 @@
                                           "packingFeePaid": {
                                             "type": "number",
                                             "format": "float"
+                                          },
+                                          "numberPlate": {
+                                            "type": "string"
                                           }
                                         }
                                       },
@@ -19089,6 +19645,9 @@
                                             "type": "string"
                                           },
                                           "location": {
+                                            "type": "string"
+                                          },
+                                          "plotNumber": {
                                             "type": "string"
                                           }
                                         }
@@ -19258,6 +19817,9 @@
                                             "type": "string"
                                           },
                                           "location": {
+                                            "type": "string"
+                                          },
+                                          "plotNumber": {
                                             "type": "string"
                                           }
                                         }
@@ -20773,6 +21335,20 @@
                                       "Medical Expenses",
                                       "Debt Consolidation",
                                       "Vehicle Purchase",
+                                      "Equipment Purchase,",
+                                      "Inventory Purchase,",
+                                      "Working Capital,",
+                                      "Marketing and Advertising,",
+                                      "Product Development,",
+                                      "Debt Refinancing,",
+                                      "Hiring and Training,",
+                                      "Property Acquisition or Lease,",
+                                      "Emergency Funds,",
+                                      "Technology Upgrades,",
+                                      "Project Funding,",
+                                      "Seasonal Demand Preparation,",
+                                      "Legal and Regulatory Compliance,",
+                                      "Research and Development",
                                       "Others"
                                     ]
                                   },
@@ -20965,10 +21541,6 @@
                                           "self-employed",
                                           "unemployed"
                                         ]
-                                      },
-                                      "monthlyIncome": {
-                                        "type": "number",
-                                        "format": "float"
                                       },
                                       "KYCverificationStatus": {
                                         "type": "boolean"
@@ -21260,6 +21832,14 @@
                                             }
                                           }
                                         }
+                                      },
+                                      "idType": {
+                                        "type": "string",
+                                        "enum": [
+                                          "nrc",
+                                          "passport",
+                                          "driving-license"
+                                        ]
                                       }
                                     }
                                   },
@@ -22366,7 +22946,8 @@
                             "type": "string",
                             "enum": [
                               "sole-owner",
-                              "co-owner"
+                              "co-owner",
+                              "neither"
                             ]
                           },
                           "isBusinessRegistered": {
@@ -22406,6 +22987,151 @@
                               "yes",
                               "no"
                             ]
+                          },
+                          "companyRegistrationNumber": {
+                            "type": "integer"
+                          },
+                          "pacraPrintOut": {
+                            "type": "object",
+                            "properties": {
+                              "data": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "id": {
+                                      "type": "number"
+                                    },
+                                    "attributes": {
+                                      "type": "object",
+                                      "properties": {
+                                        "name": {
+                                          "type": "string"
+                                        },
+                                        "alternativeText": {
+                                          "type": "string"
+                                        },
+                                        "caption": {
+                                          "type": "string"
+                                        },
+                                        "width": {
+                                          "type": "integer"
+                                        },
+                                        "height": {
+                                          "type": "integer"
+                                        },
+                                        "formats": {},
+                                        "hash": {
+                                          "type": "string"
+                                        },
+                                        "ext": {
+                                          "type": "string"
+                                        },
+                                        "mime": {
+                                          "type": "string"
+                                        },
+                                        "size": {
+                                          "type": "number",
+                                          "format": "float"
+                                        },
+                                        "url": {
+                                          "type": "string"
+                                        },
+                                        "previewUrl": {
+                                          "type": "string"
+                                        },
+                                        "provider": {
+                                          "type": "string"
+                                        },
+                                        "provider_metadata": {},
+                                        "related": {
+                                          "type": "object",
+                                          "properties": {
+                                            "data": {
+                                              "type": "array",
+                                              "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                  "id": {
+                                                    "type": "number"
+                                                  },
+                                                  "attributes": {
+                                                    "type": "object",
+                                                    "properties": {}
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          }
+                                        },
+                                        "folder": {
+                                          "type": "object",
+                                          "properties": {
+                                            "data": {
+                                              "type": "object",
+                                              "properties": {
+                                                "id": {
+                                                  "type": "number"
+                                                },
+                                                "attributes": {
+                                                  "type": "object",
+                                                  "properties": {}
+                                                }
+                                              }
+                                            }
+                                          }
+                                        },
+                                        "folderPath": {
+                                          "type": "string"
+                                        },
+                                        "createdAt": {
+                                          "type": "string",
+                                          "format": "date-time"
+                                        },
+                                        "updatedAt": {
+                                          "type": "string",
+                                          "format": "date-time"
+                                        },
+                                        "createdBy": {
+                                          "type": "object",
+                                          "properties": {
+                                            "data": {
+                                              "type": "object",
+                                              "properties": {
+                                                "id": {
+                                                  "type": "number"
+                                                },
+                                                "attributes": {
+                                                  "type": "object",
+                                                  "properties": {}
+                                                }
+                                              }
+                                            }
+                                          }
+                                        },
+                                        "updatedBy": {
+                                          "type": "object",
+                                          "properties": {
+                                            "data": {
+                                              "type": "object",
+                                              "properties": {
+                                                "id": {
+                                                  "type": "number"
+                                                },
+                                                "attributes": {
+                                                  "type": "object",
+                                                  "properties": {}
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
                           }
                         }
                       },
@@ -22564,6 +23290,20 @@
               "Medical Expenses",
               "Debt Consolidation",
               "Vehicle Purchase",
+              "Equipment Purchase,",
+              "Inventory Purchase,",
+              "Working Capital,",
+              "Marketing and Advertising,",
+              "Product Development,",
+              "Debt Refinancing,",
+              "Hiring and Training,",
+              "Property Acquisition or Lease,",
+              "Emergency Funds,",
+              "Technology Upgrades,",
+              "Project Funding,",
+              "Seasonal Demand Preparation,",
+              "Legal and Regulatory Compliance,",
+              "Research and Development",
               "Others"
             ]
           },
@@ -23448,6 +24188,9 @@
               "packingFeePaid": {
                 "type": "number",
                 "format": "float"
+              },
+              "numberPlate": {
+                "type": "string"
               }
             }
           },
@@ -23603,6 +24346,9 @@
                 "type": "string"
               },
               "location": {
+                "type": "string"
+              },
+              "plotNumber": {
                 "type": "string"
               }
             }
@@ -23772,6 +24518,9 @@
                 "type": "string"
               },
               "location": {
+                "type": "string"
+              },
+              "plotNumber": {
                 "type": "string"
               }
             }
@@ -25114,6 +25863,9 @@
                                                           "packingFeePaid": {
                                                             "type": "number",
                                                             "format": "float"
+                                                          },
+                                                          "numberPlate": {
+                                                            "type": "string"
                                                           }
                                                         }
                                                       },
@@ -25269,6 +26021,9 @@
                                                             "type": "string"
                                                           },
                                                           "location": {
+                                                            "type": "string"
+                                                          },
+                                                          "plotNumber": {
                                                             "type": "string"
                                                           }
                                                         }
@@ -25438,6 +26193,9 @@
                                                             "type": "string"
                                                           },
                                                           "location": {
+                                                            "type": "string"
+                                                          },
+                                                          "plotNumber": {
                                                             "type": "string"
                                                           }
                                                         }
@@ -25983,10 +26741,6 @@
                                                                       "unemployed"
                                                                     ]
                                                                   },
-                                                                  "monthlyIncome": {
-                                                                    "type": "number",
-                                                                    "format": "float"
-                                                                  },
                                                                   "KYCverificationStatus": {
                                                                     "type": "boolean"
                                                                   },
@@ -26277,6 +27031,14 @@
                                                                         }
                                                                       }
                                                                     }
+                                                                  },
+                                                                  "idType": {
+                                                                    "type": "string",
+                                                                    "enum": [
+                                                                      "nrc",
+                                                                      "passport",
+                                                                      "driving-license"
+                                                                    ]
                                                                   }
                                                                 }
                                                               },
@@ -27170,10 +27932,6 @@
                                                                                   "unemployed"
                                                                                 ]
                                                                               },
-                                                                              "monthlyIncome": {
-                                                                                "type": "number",
-                                                                                "format": "float"
-                                                                              },
                                                                               "KYCverificationStatus": {
                                                                                 "type": "boolean"
                                                                               },
@@ -27464,6 +28222,14 @@
                                                                                     }
                                                                                   }
                                                                                 }
+                                                                              },
+                                                                              "idType": {
+                                                                                "type": "string",
+                                                                                "enum": [
+                                                                                  "nrc",
+                                                                                  "passport",
+                                                                                  "driving-license"
+                                                                                ]
                                                                               }
                                                                             }
                                                                           },
@@ -28570,7 +29336,8 @@
                                                                     "type": "string",
                                                                     "enum": [
                                                                       "sole-owner",
-                                                                      "co-owner"
+                                                                      "co-owner",
+                                                                      "neither"
                                                                     ]
                                                                   },
                                                                   "isBusinessRegistered": {
@@ -28610,6 +29377,151 @@
                                                                       "yes",
                                                                       "no"
                                                                     ]
+                                                                  },
+                                                                  "companyRegistrationNumber": {
+                                                                    "type": "integer"
+                                                                  },
+                                                                  "pacraPrintOut": {
+                                                                    "type": "object",
+                                                                    "properties": {
+                                                                      "data": {
+                                                                        "type": "array",
+                                                                        "items": {
+                                                                          "type": "object",
+                                                                          "properties": {
+                                                                            "id": {
+                                                                              "type": "number"
+                                                                            },
+                                                                            "attributes": {
+                                                                              "type": "object",
+                                                                              "properties": {
+                                                                                "name": {
+                                                                                  "type": "string"
+                                                                                },
+                                                                                "alternativeText": {
+                                                                                  "type": "string"
+                                                                                },
+                                                                                "caption": {
+                                                                                  "type": "string"
+                                                                                },
+                                                                                "width": {
+                                                                                  "type": "integer"
+                                                                                },
+                                                                                "height": {
+                                                                                  "type": "integer"
+                                                                                },
+                                                                                "formats": {},
+                                                                                "hash": {
+                                                                                  "type": "string"
+                                                                                },
+                                                                                "ext": {
+                                                                                  "type": "string"
+                                                                                },
+                                                                                "mime": {
+                                                                                  "type": "string"
+                                                                                },
+                                                                                "size": {
+                                                                                  "type": "number",
+                                                                                  "format": "float"
+                                                                                },
+                                                                                "url": {
+                                                                                  "type": "string"
+                                                                                },
+                                                                                "previewUrl": {
+                                                                                  "type": "string"
+                                                                                },
+                                                                                "provider": {
+                                                                                  "type": "string"
+                                                                                },
+                                                                                "provider_metadata": {},
+                                                                                "related": {
+                                                                                  "type": "object",
+                                                                                  "properties": {
+                                                                                    "data": {
+                                                                                      "type": "array",
+                                                                                      "items": {
+                                                                                        "type": "object",
+                                                                                        "properties": {
+                                                                                          "id": {
+                                                                                            "type": "number"
+                                                                                          },
+                                                                                          "attributes": {
+                                                                                            "type": "object",
+                                                                                            "properties": {}
+                                                                                          }
+                                                                                        }
+                                                                                      }
+                                                                                    }
+                                                                                  }
+                                                                                },
+                                                                                "folder": {
+                                                                                  "type": "object",
+                                                                                  "properties": {
+                                                                                    "data": {
+                                                                                      "type": "object",
+                                                                                      "properties": {
+                                                                                        "id": {
+                                                                                          "type": "number"
+                                                                                        },
+                                                                                        "attributes": {
+                                                                                          "type": "object",
+                                                                                          "properties": {}
+                                                                                        }
+                                                                                      }
+                                                                                    }
+                                                                                  }
+                                                                                },
+                                                                                "folderPath": {
+                                                                                  "type": "string"
+                                                                                },
+                                                                                "createdAt": {
+                                                                                  "type": "string",
+                                                                                  "format": "date-time"
+                                                                                },
+                                                                                "updatedAt": {
+                                                                                  "type": "string",
+                                                                                  "format": "date-time"
+                                                                                },
+                                                                                "createdBy": {
+                                                                                  "type": "object",
+                                                                                  "properties": {
+                                                                                    "data": {
+                                                                                      "type": "object",
+                                                                                      "properties": {
+                                                                                        "id": {
+                                                                                          "type": "number"
+                                                                                        },
+                                                                                        "attributes": {
+                                                                                          "type": "object",
+                                                                                          "properties": {}
+                                                                                        }
+                                                                                      }
+                                                                                    }
+                                                                                  }
+                                                                                },
+                                                                                "updatedBy": {
+                                                                                  "type": "object",
+                                                                                  "properties": {
+                                                                                    "data": {
+                                                                                      "type": "object",
+                                                                                      "properties": {
+                                                                                        "id": {
+                                                                                          "type": "number"
+                                                                                        },
+                                                                                        "attributes": {
+                                                                                          "type": "object",
+                                                                                          "properties": {}
+                                                                                        }
+                                                                                      }
+                                                                                    }
+                                                                                  }
+                                                                                }
+                                                                              }
+                                                                            }
+                                                                          }
+                                                                        }
+                                                                      }
+                                                                    }
                                                                   }
                                                                 }
                                                               },
@@ -29073,6 +29985,20 @@
                                                       "Medical Expenses",
                                                       "Debt Consolidation",
                                                       "Vehicle Purchase",
+                                                      "Equipment Purchase,",
+                                                      "Inventory Purchase,",
+                                                      "Working Capital,",
+                                                      "Marketing and Advertising,",
+                                                      "Product Development,",
+                                                      "Debt Refinancing,",
+                                                      "Hiring and Training,",
+                                                      "Property Acquisition or Lease,",
+                                                      "Emergency Funds,",
+                                                      "Technology Upgrades,",
+                                                      "Project Funding,",
+                                                      "Seasonal Demand Preparation,",
+                                                      "Legal and Regulatory Compliance,",
+                                                      "Research and Development",
                                                       "Others"
                                                     ]
                                                   },
@@ -30734,10 +31660,6 @@
                               "unemployed"
                             ]
                           },
-                          "monthlyIncome": {
-                            "type": "number",
-                            "format": "float"
-                          },
                           "KYCverificationStatus": {
                             "type": "boolean"
                           },
@@ -31028,6 +31950,14 @@
                                 }
                               }
                             }
+                          },
+                          "idType": {
+                            "type": "string",
+                            "enum": [
+                              "nrc",
+                              "passport",
+                              "driving-license"
+                            ]
                           }
                         }
                       },
@@ -31409,6 +32339,9 @@
                                           "packingFeePaid": {
                                             "type": "number",
                                             "format": "float"
+                                          },
+                                          "numberPlate": {
+                                            "type": "string"
                                           }
                                         }
                                       },
@@ -31564,6 +32497,9 @@
                                             "type": "string"
                                           },
                                           "location": {
+                                            "type": "string"
+                                          },
+                                          "plotNumber": {
                                             "type": "string"
                                           }
                                         }
@@ -31733,6 +32669,9 @@
                                             "type": "string"
                                           },
                                           "location": {
+                                            "type": "string"
+                                          },
+                                          "plotNumber": {
                                             "type": "string"
                                           }
                                         }
@@ -33248,6 +34187,20 @@
                                       "Medical Expenses",
                                       "Debt Consolidation",
                                       "Vehicle Purchase",
+                                      "Equipment Purchase,",
+                                      "Inventory Purchase,",
+                                      "Working Capital,",
+                                      "Marketing and Advertising,",
+                                      "Product Development,",
+                                      "Debt Refinancing,",
+                                      "Hiring and Training,",
+                                      "Property Acquisition or Lease,",
+                                      "Emergency Funds,",
+                                      "Technology Upgrades,",
+                                      "Project Funding,",
+                                      "Seasonal Demand Preparation,",
+                                      "Legal and Regulatory Compliance,",
+                                      "Research and Development",
                                       "Others"
                                     ]
                                   },
@@ -33440,10 +34393,6 @@
                                           "self-employed",
                                           "unemployed"
                                         ]
-                                      },
-                                      "monthlyIncome": {
-                                        "type": "number",
-                                        "format": "float"
                                       },
                                       "KYCverificationStatus": {
                                         "type": "boolean"
@@ -33735,6 +34684,14 @@
                                             }
                                           }
                                         }
+                                      },
+                                      "idType": {
+                                        "type": "string",
+                                        "enum": [
+                                          "nrc",
+                                          "passport",
+                                          "driving-license"
+                                        ]
                                       }
                                     }
                                   },
@@ -34841,7 +35798,8 @@
                             "type": "string",
                             "enum": [
                               "sole-owner",
-                              "co-owner"
+                              "co-owner",
+                              "neither"
                             ]
                           },
                           "isBusinessRegistered": {
@@ -34881,6 +35839,151 @@
                               "yes",
                               "no"
                             ]
+                          },
+                          "companyRegistrationNumber": {
+                            "type": "integer"
+                          },
+                          "pacraPrintOut": {
+                            "type": "object",
+                            "properties": {
+                              "data": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "id": {
+                                      "type": "number"
+                                    },
+                                    "attributes": {
+                                      "type": "object",
+                                      "properties": {
+                                        "name": {
+                                          "type": "string"
+                                        },
+                                        "alternativeText": {
+                                          "type": "string"
+                                        },
+                                        "caption": {
+                                          "type": "string"
+                                        },
+                                        "width": {
+                                          "type": "integer"
+                                        },
+                                        "height": {
+                                          "type": "integer"
+                                        },
+                                        "formats": {},
+                                        "hash": {
+                                          "type": "string"
+                                        },
+                                        "ext": {
+                                          "type": "string"
+                                        },
+                                        "mime": {
+                                          "type": "string"
+                                        },
+                                        "size": {
+                                          "type": "number",
+                                          "format": "float"
+                                        },
+                                        "url": {
+                                          "type": "string"
+                                        },
+                                        "previewUrl": {
+                                          "type": "string"
+                                        },
+                                        "provider": {
+                                          "type": "string"
+                                        },
+                                        "provider_metadata": {},
+                                        "related": {
+                                          "type": "object",
+                                          "properties": {
+                                            "data": {
+                                              "type": "array",
+                                              "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                  "id": {
+                                                    "type": "number"
+                                                  },
+                                                  "attributes": {
+                                                    "type": "object",
+                                                    "properties": {}
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          }
+                                        },
+                                        "folder": {
+                                          "type": "object",
+                                          "properties": {
+                                            "data": {
+                                              "type": "object",
+                                              "properties": {
+                                                "id": {
+                                                  "type": "number"
+                                                },
+                                                "attributes": {
+                                                  "type": "object",
+                                                  "properties": {}
+                                                }
+                                              }
+                                            }
+                                          }
+                                        },
+                                        "folderPath": {
+                                          "type": "string"
+                                        },
+                                        "createdAt": {
+                                          "type": "string",
+                                          "format": "date-time"
+                                        },
+                                        "updatedAt": {
+                                          "type": "string",
+                                          "format": "date-time"
+                                        },
+                                        "createdBy": {
+                                          "type": "object",
+                                          "properties": {
+                                            "data": {
+                                              "type": "object",
+                                              "properties": {
+                                                "id": {
+                                                  "type": "number"
+                                                },
+                                                "attributes": {
+                                                  "type": "object",
+                                                  "properties": {}
+                                                }
+                                              }
+                                            }
+                                          }
+                                        },
+                                        "updatedBy": {
+                                          "type": "object",
+                                          "properties": {
+                                            "data": {
+                                              "type": "object",
+                                              "properties": {
+                                                "id": {
+                                                  "type": "number"
+                                                },
+                                                "attributes": {
+                                                  "type": "object",
+                                                  "properties": {}
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
                           }
                         }
                       },
@@ -36591,6 +37694,9 @@
                               "packingFeePaid": {
                                 "type": "number",
                                 "format": "float"
+                              },
+                              "numberPlate": {
+                                "type": "string"
                               }
                             }
                           },
@@ -36746,6 +37852,9 @@
                                 "type": "string"
                               },
                               "location": {
+                                "type": "string"
+                              },
+                              "plotNumber": {
                                 "type": "string"
                               }
                             }
@@ -36915,6 +38024,9 @@
                                 "type": "string"
                               },
                               "location": {
+                                "type": "string"
+                              },
+                              "plotNumber": {
                                 "type": "string"
                               }
                             }
@@ -37460,10 +38572,6 @@
                                           "unemployed"
                                         ]
                                       },
-                                      "monthlyIncome": {
-                                        "type": "number",
-                                        "format": "float"
-                                      },
                                       "KYCverificationStatus": {
                                         "type": "boolean"
                                       },
@@ -37754,6 +38862,14 @@
                                             }
                                           }
                                         }
+                                      },
+                                      "idType": {
+                                        "type": "string",
+                                        "enum": [
+                                          "nrc",
+                                          "passport",
+                                          "driving-license"
+                                        ]
                                       }
                                     }
                                   },
@@ -38647,10 +39763,6 @@
                                                       "unemployed"
                                                     ]
                                                   },
-                                                  "monthlyIncome": {
-                                                    "type": "number",
-                                                    "format": "float"
-                                                  },
                                                   "KYCverificationStatus": {
                                                     "type": "boolean"
                                                   },
@@ -38941,6 +40053,14 @@
                                                         }
                                                       }
                                                     }
+                                                  },
+                                                  "idType": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                      "nrc",
+                                                      "passport",
+                                                      "driving-license"
+                                                    ]
                                                   }
                                                 }
                                               },
@@ -40047,7 +41167,8 @@
                                         "type": "string",
                                         "enum": [
                                           "sole-owner",
-                                          "co-owner"
+                                          "co-owner",
+                                          "neither"
                                         ]
                                       },
                                       "isBusinessRegistered": {
@@ -40087,6 +41208,151 @@
                                           "yes",
                                           "no"
                                         ]
+                                      },
+                                      "companyRegistrationNumber": {
+                                        "type": "integer"
+                                      },
+                                      "pacraPrintOut": {
+                                        "type": "object",
+                                        "properties": {
+                                          "data": {
+                                            "type": "array",
+                                            "items": {
+                                              "type": "object",
+                                              "properties": {
+                                                "id": {
+                                                  "type": "number"
+                                                },
+                                                "attributes": {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "name": {
+                                                      "type": "string"
+                                                    },
+                                                    "alternativeText": {
+                                                      "type": "string"
+                                                    },
+                                                    "caption": {
+                                                      "type": "string"
+                                                    },
+                                                    "width": {
+                                                      "type": "integer"
+                                                    },
+                                                    "height": {
+                                                      "type": "integer"
+                                                    },
+                                                    "formats": {},
+                                                    "hash": {
+                                                      "type": "string"
+                                                    },
+                                                    "ext": {
+                                                      "type": "string"
+                                                    },
+                                                    "mime": {
+                                                      "type": "string"
+                                                    },
+                                                    "size": {
+                                                      "type": "number",
+                                                      "format": "float"
+                                                    },
+                                                    "url": {
+                                                      "type": "string"
+                                                    },
+                                                    "previewUrl": {
+                                                      "type": "string"
+                                                    },
+                                                    "provider": {
+                                                      "type": "string"
+                                                    },
+                                                    "provider_metadata": {},
+                                                    "related": {
+                                                      "type": "object",
+                                                      "properties": {
+                                                        "data": {
+                                                          "type": "array",
+                                                          "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                              "id": {
+                                                                "type": "number"
+                                                              },
+                                                              "attributes": {
+                                                                "type": "object",
+                                                                "properties": {}
+                                                              }
+                                                            }
+                                                          }
+                                                        }
+                                                      }
+                                                    },
+                                                    "folder": {
+                                                      "type": "object",
+                                                      "properties": {
+                                                        "data": {
+                                                          "type": "object",
+                                                          "properties": {
+                                                            "id": {
+                                                              "type": "number"
+                                                            },
+                                                            "attributes": {
+                                                              "type": "object",
+                                                              "properties": {}
+                                                            }
+                                                          }
+                                                        }
+                                                      }
+                                                    },
+                                                    "folderPath": {
+                                                      "type": "string"
+                                                    },
+                                                    "createdAt": {
+                                                      "type": "string",
+                                                      "format": "date-time"
+                                                    },
+                                                    "updatedAt": {
+                                                      "type": "string",
+                                                      "format": "date-time"
+                                                    },
+                                                    "createdBy": {
+                                                      "type": "object",
+                                                      "properties": {
+                                                        "data": {
+                                                          "type": "object",
+                                                          "properties": {
+                                                            "id": {
+                                                              "type": "number"
+                                                            },
+                                                            "attributes": {
+                                                              "type": "object",
+                                                              "properties": {}
+                                                            }
+                                                          }
+                                                        }
+                                                      }
+                                                    },
+                                                    "updatedBy": {
+                                                      "type": "object",
+                                                      "properties": {
+                                                        "data": {
+                                                          "type": "object",
+                                                          "properties": {
+                                                            "id": {
+                                                              "type": "number"
+                                                            },
+                                                            "attributes": {
+                                                              "type": "object",
+                                                              "properties": {}
+                                                            }
+                                                          }
+                                                        }
+                                                      }
+                                                    }
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
                                       }
                                     }
                                   },
@@ -40742,6 +42008,20 @@
                           "Medical Expenses",
                           "Debt Consolidation",
                           "Vehicle Purchase",
+                          "Equipment Purchase,",
+                          "Inventory Purchase,",
+                          "Working Capital,",
+                          "Marketing and Advertising,",
+                          "Product Development,",
+                          "Debt Refinancing,",
+                          "Hiring and Training,",
+                          "Property Acquisition or Lease,",
+                          "Emergency Funds,",
+                          "Technology Upgrades,",
+                          "Project Funding,",
+                          "Seasonal Demand Preparation,",
+                          "Legal and Regulatory Compliance,",
+                          "Research and Development",
                           "Others"
                         ]
                       },
@@ -42044,10 +43324,6 @@
                               "unemployed"
                             ]
                           },
-                          "monthlyIncome": {
-                            "type": "number",
-                            "format": "float"
-                          },
                           "KYCverificationStatus": {
                             "type": "boolean"
                           },
@@ -42338,6 +43614,14 @@
                                 }
                               }
                             }
+                          },
+                          "idType": {
+                            "type": "string",
+                            "enum": [
+                              "nrc",
+                              "passport",
+                              "driving-license"
+                            ]
                           }
                         }
                       },
@@ -42719,6 +44003,9 @@
                                           "packingFeePaid": {
                                             "type": "number",
                                             "format": "float"
+                                          },
+                                          "numberPlate": {
+                                            "type": "string"
                                           }
                                         }
                                       },
@@ -42874,6 +44161,9 @@
                                             "type": "string"
                                           },
                                           "location": {
+                                            "type": "string"
+                                          },
+                                          "plotNumber": {
                                             "type": "string"
                                           }
                                         }
@@ -43043,6 +44333,9 @@
                                             "type": "string"
                                           },
                                           "location": {
+                                            "type": "string"
+                                          },
+                                          "plotNumber": {
                                             "type": "string"
                                           }
                                         }
@@ -44558,6 +45851,20 @@
                                       "Medical Expenses",
                                       "Debt Consolidation",
                                       "Vehicle Purchase",
+                                      "Equipment Purchase,",
+                                      "Inventory Purchase,",
+                                      "Working Capital,",
+                                      "Marketing and Advertising,",
+                                      "Product Development,",
+                                      "Debt Refinancing,",
+                                      "Hiring and Training,",
+                                      "Property Acquisition or Lease,",
+                                      "Emergency Funds,",
+                                      "Technology Upgrades,",
+                                      "Project Funding,",
+                                      "Seasonal Demand Preparation,",
+                                      "Legal and Regulatory Compliance,",
+                                      "Research and Development",
                                       "Others"
                                     ]
                                   },
@@ -44750,10 +46057,6 @@
                                           "self-employed",
                                           "unemployed"
                                         ]
-                                      },
-                                      "monthlyIncome": {
-                                        "type": "number",
-                                        "format": "float"
                                       },
                                       "KYCverificationStatus": {
                                         "type": "boolean"
@@ -45045,6 +46348,14 @@
                                             }
                                           }
                                         }
+                                      },
+                                      "idType": {
+                                        "type": "string",
+                                        "enum": [
+                                          "nrc",
+                                          "passport",
+                                          "driving-license"
+                                        ]
                                       }
                                     }
                                   },
@@ -46151,7 +47462,8 @@
                             "type": "string",
                             "enum": [
                               "sole-owner",
-                              "co-owner"
+                              "co-owner",
+                              "neither"
                             ]
                           },
                           "isBusinessRegistered": {
@@ -46191,6 +47503,151 @@
                               "yes",
                               "no"
                             ]
+                          },
+                          "companyRegistrationNumber": {
+                            "type": "integer"
+                          },
+                          "pacraPrintOut": {
+                            "type": "object",
+                            "properties": {
+                              "data": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "id": {
+                                      "type": "number"
+                                    },
+                                    "attributes": {
+                                      "type": "object",
+                                      "properties": {
+                                        "name": {
+                                          "type": "string"
+                                        },
+                                        "alternativeText": {
+                                          "type": "string"
+                                        },
+                                        "caption": {
+                                          "type": "string"
+                                        },
+                                        "width": {
+                                          "type": "integer"
+                                        },
+                                        "height": {
+                                          "type": "integer"
+                                        },
+                                        "formats": {},
+                                        "hash": {
+                                          "type": "string"
+                                        },
+                                        "ext": {
+                                          "type": "string"
+                                        },
+                                        "mime": {
+                                          "type": "string"
+                                        },
+                                        "size": {
+                                          "type": "number",
+                                          "format": "float"
+                                        },
+                                        "url": {
+                                          "type": "string"
+                                        },
+                                        "previewUrl": {
+                                          "type": "string"
+                                        },
+                                        "provider": {
+                                          "type": "string"
+                                        },
+                                        "provider_metadata": {},
+                                        "related": {
+                                          "type": "object",
+                                          "properties": {
+                                            "data": {
+                                              "type": "array",
+                                              "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                  "id": {
+                                                    "type": "number"
+                                                  },
+                                                  "attributes": {
+                                                    "type": "object",
+                                                    "properties": {}
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          }
+                                        },
+                                        "folder": {
+                                          "type": "object",
+                                          "properties": {
+                                            "data": {
+                                              "type": "object",
+                                              "properties": {
+                                                "id": {
+                                                  "type": "number"
+                                                },
+                                                "attributes": {
+                                                  "type": "object",
+                                                  "properties": {}
+                                                }
+                                              }
+                                            }
+                                          }
+                                        },
+                                        "folderPath": {
+                                          "type": "string"
+                                        },
+                                        "createdAt": {
+                                          "type": "string",
+                                          "format": "date-time"
+                                        },
+                                        "updatedAt": {
+                                          "type": "string",
+                                          "format": "date-time"
+                                        },
+                                        "createdBy": {
+                                          "type": "object",
+                                          "properties": {
+                                            "data": {
+                                              "type": "object",
+                                              "properties": {
+                                                "id": {
+                                                  "type": "number"
+                                                },
+                                                "attributes": {
+                                                  "type": "object",
+                                                  "properties": {}
+                                                }
+                                              }
+                                            }
+                                          }
+                                        },
+                                        "updatedBy": {
+                                          "type": "object",
+                                          "properties": {
+                                            "data": {
+                                              "type": "object",
+                                              "properties": {
+                                                "id": {
+                                                  "type": "number"
+                                                },
+                                                "attributes": {
+                                                  "type": "object",
+                                                  "properties": {}
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
                           }
                         }
                       },
@@ -47380,6 +48837,9 @@
                                                           "packingFeePaid": {
                                                             "type": "number",
                                                             "format": "float"
+                                                          },
+                                                          "numberPlate": {
+                                                            "type": "string"
                                                           }
                                                         }
                                                       },
@@ -47535,6 +48995,9 @@
                                                             "type": "string"
                                                           },
                                                           "location": {
+                                                            "type": "string"
+                                                          },
+                                                          "plotNumber": {
                                                             "type": "string"
                                                           }
                                                         }
@@ -47704,6 +49167,9 @@
                                                             "type": "string"
                                                           },
                                                           "location": {
+                                                            "type": "string"
+                                                          },
+                                                          "plotNumber": {
                                                             "type": "string"
                                                           }
                                                         }
@@ -48249,10 +49715,6 @@
                                                                       "unemployed"
                                                                     ]
                                                                   },
-                                                                  "monthlyIncome": {
-                                                                    "type": "number",
-                                                                    "format": "float"
-                                                                  },
                                                                   "KYCverificationStatus": {
                                                                     "type": "boolean"
                                                                   },
@@ -48543,6 +50005,14 @@
                                                                         }
                                                                       }
                                                                     }
+                                                                  },
+                                                                  "idType": {
+                                                                    "type": "string",
+                                                                    "enum": [
+                                                                      "nrc",
+                                                                      "passport",
+                                                                      "driving-license"
+                                                                    ]
                                                                   }
                                                                 }
                                                               },
@@ -49436,10 +50906,6 @@
                                                                                   "unemployed"
                                                                                 ]
                                                                               },
-                                                                              "monthlyIncome": {
-                                                                                "type": "number",
-                                                                                "format": "float"
-                                                                              },
                                                                               "KYCverificationStatus": {
                                                                                 "type": "boolean"
                                                                               },
@@ -49730,6 +51196,14 @@
                                                                                     }
                                                                                   }
                                                                                 }
+                                                                              },
+                                                                              "idType": {
+                                                                                "type": "string",
+                                                                                "enum": [
+                                                                                  "nrc",
+                                                                                  "passport",
+                                                                                  "driving-license"
+                                                                                ]
                                                                               }
                                                                             }
                                                                           },
@@ -50836,7 +52310,8 @@
                                                                     "type": "string",
                                                                     "enum": [
                                                                       "sole-owner",
-                                                                      "co-owner"
+                                                                      "co-owner",
+                                                                      "neither"
                                                                     ]
                                                                   },
                                                                   "isBusinessRegistered": {
@@ -50876,6 +52351,151 @@
                                                                       "yes",
                                                                       "no"
                                                                     ]
+                                                                  },
+                                                                  "companyRegistrationNumber": {
+                                                                    "type": "integer"
+                                                                  },
+                                                                  "pacraPrintOut": {
+                                                                    "type": "object",
+                                                                    "properties": {
+                                                                      "data": {
+                                                                        "type": "array",
+                                                                        "items": {
+                                                                          "type": "object",
+                                                                          "properties": {
+                                                                            "id": {
+                                                                              "type": "number"
+                                                                            },
+                                                                            "attributes": {
+                                                                              "type": "object",
+                                                                              "properties": {
+                                                                                "name": {
+                                                                                  "type": "string"
+                                                                                },
+                                                                                "alternativeText": {
+                                                                                  "type": "string"
+                                                                                },
+                                                                                "caption": {
+                                                                                  "type": "string"
+                                                                                },
+                                                                                "width": {
+                                                                                  "type": "integer"
+                                                                                },
+                                                                                "height": {
+                                                                                  "type": "integer"
+                                                                                },
+                                                                                "formats": {},
+                                                                                "hash": {
+                                                                                  "type": "string"
+                                                                                },
+                                                                                "ext": {
+                                                                                  "type": "string"
+                                                                                },
+                                                                                "mime": {
+                                                                                  "type": "string"
+                                                                                },
+                                                                                "size": {
+                                                                                  "type": "number",
+                                                                                  "format": "float"
+                                                                                },
+                                                                                "url": {
+                                                                                  "type": "string"
+                                                                                },
+                                                                                "previewUrl": {
+                                                                                  "type": "string"
+                                                                                },
+                                                                                "provider": {
+                                                                                  "type": "string"
+                                                                                },
+                                                                                "provider_metadata": {},
+                                                                                "related": {
+                                                                                  "type": "object",
+                                                                                  "properties": {
+                                                                                    "data": {
+                                                                                      "type": "array",
+                                                                                      "items": {
+                                                                                        "type": "object",
+                                                                                        "properties": {
+                                                                                          "id": {
+                                                                                            "type": "number"
+                                                                                          },
+                                                                                          "attributes": {
+                                                                                            "type": "object",
+                                                                                            "properties": {}
+                                                                                          }
+                                                                                        }
+                                                                                      }
+                                                                                    }
+                                                                                  }
+                                                                                },
+                                                                                "folder": {
+                                                                                  "type": "object",
+                                                                                  "properties": {
+                                                                                    "data": {
+                                                                                      "type": "object",
+                                                                                      "properties": {
+                                                                                        "id": {
+                                                                                          "type": "number"
+                                                                                        },
+                                                                                        "attributes": {
+                                                                                          "type": "object",
+                                                                                          "properties": {}
+                                                                                        }
+                                                                                      }
+                                                                                    }
+                                                                                  }
+                                                                                },
+                                                                                "folderPath": {
+                                                                                  "type": "string"
+                                                                                },
+                                                                                "createdAt": {
+                                                                                  "type": "string",
+                                                                                  "format": "date-time"
+                                                                                },
+                                                                                "updatedAt": {
+                                                                                  "type": "string",
+                                                                                  "format": "date-time"
+                                                                                },
+                                                                                "createdBy": {
+                                                                                  "type": "object",
+                                                                                  "properties": {
+                                                                                    "data": {
+                                                                                      "type": "object",
+                                                                                      "properties": {
+                                                                                        "id": {
+                                                                                          "type": "number"
+                                                                                        },
+                                                                                        "attributes": {
+                                                                                          "type": "object",
+                                                                                          "properties": {}
+                                                                                        }
+                                                                                      }
+                                                                                    }
+                                                                                  }
+                                                                                },
+                                                                                "updatedBy": {
+                                                                                  "type": "object",
+                                                                                  "properties": {
+                                                                                    "data": {
+                                                                                      "type": "object",
+                                                                                      "properties": {
+                                                                                        "id": {
+                                                                                          "type": "number"
+                                                                                        },
+                                                                                        "attributes": {
+                                                                                          "type": "object",
+                                                                                          "properties": {}
+                                                                                        }
+                                                                                      }
+                                                                                    }
+                                                                                  }
+                                                                                }
+                                                                              }
+                                                                            }
+                                                                          }
+                                                                        }
+                                                                      }
+                                                                    }
                                                                   }
                                                                 }
                                                               },
@@ -51339,6 +52959,20 @@
                                                       "Medical Expenses",
                                                       "Debt Consolidation",
                                                       "Vehicle Purchase",
+                                                      "Equipment Purchase,",
+                                                      "Inventory Purchase,",
+                                                      "Working Capital,",
+                                                      "Marketing and Advertising,",
+                                                      "Product Development,",
+                                                      "Debt Refinancing,",
+                                                      "Hiring and Training,",
+                                                      "Property Acquisition or Lease,",
+                                                      "Emergency Funds,",
+                                                      "Technology Upgrades,",
+                                                      "Project Funding,",
+                                                      "Seasonal Demand Preparation,",
+                                                      "Legal and Regulatory Compliance,",
+                                                      "Research and Development",
                                                       "Others"
                                                     ]
                                                   },

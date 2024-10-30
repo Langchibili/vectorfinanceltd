@@ -14,9 +14,6 @@
         "unemployed"
       ]
     },
-    "monthlyIncome": {
-      "type": "decimal"
-    },
     "KYCverificationStatus": {
       "type": "boolean",
       "default": false
@@ -40,6 +37,14 @@
       "allowedTypes": [
         "images",
         "files"
+      ]
+    },
+    "idType": {
+      "type": "enumeration",
+      "enum": [
+        "nrc",
+        "passport",
+        "driving-license"
       ]
     }
   }

@@ -7,6 +7,7 @@ import AddLoanAmountForm from "./AddLoanAmmoutForm";
 import BusinessInformationForm from "./BusinessInformationForm";
 import UpdateSalaryDetailsForm from "./UpdateSalaryDetailsForm";
 import { createNewLoan, dateAndTimeNow, updateUserAccount } from "@/Functions";
+import UpdateLandCollateralForm from "./UpdateLandCollateralForm";
 
 export default class BusinessLoanApplicationForm extends React.Component{
     constructor(props){
@@ -101,6 +102,8 @@ export default class BusinessLoanApplicationForm extends React.Component{
     }
 
     renderForm = ()=>{
+        return <UpdateLandCollateralForm 
+                        {...this.props}/>
         if(this.state.openUpdateDetailsForm){
             return <UpdateDetailsForm 
                         {...this.props} 

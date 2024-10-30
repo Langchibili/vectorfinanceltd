@@ -103,8 +103,10 @@ export default class UpdateDetailsForm extends React.Component {
           <div className="col-lg-12">
             <div className="card">
               <div className="card-header align-items-center d-flex">
-                <h4 className="card-title mb-0 flex-grow-1">Basic Details </h4>
+                {this.props.loanCategory !== "personal"? <h4 className="card-title mb-0 flex-grow-1">Basic Details Of Either</h4> : <h4 className="card-title mb-0 flex-grow-1">Your Basic Details </h4>}
+                
               </div>
+              {this.props.loanCategory !== "personal"? <h6 style={{paddingLeft:'16px', marginTop:'10px'}}><small  style={{color:'gray'}}> (Owner/Representative/Board Member)</small></h6> : <></>}
               <div className="card-body">
                 <div className="live-preview">
                   <div className="row gy-4">

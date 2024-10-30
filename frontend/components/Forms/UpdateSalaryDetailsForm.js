@@ -84,7 +84,7 @@ export default class UpdateSalaryDetailsForm extends React.Component {
       salaryAmount &&
       companyLocation &&
       paySlip &&
-      verificationVideo;
+      !verificationVideo; // no verification video since we do not intend to use the feature yet
 
     this.setState({ isFormValid });
   }
@@ -223,7 +223,7 @@ export default class UpdateSalaryDetailsForm extends React.Component {
     return files.map((file)=>{
         if(file.mime.startsWith('application/')){
             return (<div id={"#"+file.id} key={file.id}>
-                        <p>Video: <strong>{file.name}</strong></p>
+                        <p>File: <strong>{file.name}</strong></p>
                         <button className="btn btn-sm btn-danger" onClick={()=>{this.handleRemoveImage(file.id,files,arrName)}}>Remove</button>
                    </div>)
         }
@@ -247,9 +247,7 @@ export default class UpdateSalaryDetailsForm extends React.Component {
         }
     })
   }
- 
 
-  renderFile
 
   render() {
     const { companyName, employerName, salaryAmount, employementVerificationNumber, companyLocation, isFormValid } = this.state;
@@ -365,7 +363,7 @@ export default class UpdateSalaryDetailsForm extends React.Component {
                         <small  style={{color:'lightgray'}}>(document(PDF,WORD))</small>
                         {this.renderFiles(this.state.paySlip,"paySlip")}
                   </div>
-                  <div style={{marginTop:'10px'}}>
+                  {/* <div style={{marginTop:'10px'}}>
                         <h5>Verification Video <small  style={{color:'gray'}}> (Instructions Below)</small></h5> <small  style={{color:'lightgray'}}>(Take a video holding your ID(NRC,Passport or Driving Licence) and state today's date)</small>
                         <Uploader 
                             addFiles={this.addVericationVideo}
@@ -378,7 +376,8 @@ export default class UpdateSalaryDetailsForm extends React.Component {
                         />
                         <small  style={{color:'lightgray'}}>(Video(MP4,MKV,AVL))</small>
                         {this.renderFiles(this.state.verificationVideo,"verificationVideo")}
-                  </div></> : <></>}
+                  </div> */}
+                  </> : <></>}
                   {/* Save and Next Buttons */}
                   <div style={{ width: "100%", display: "flex", justifyContent: "space-between" }}>
                     <button

@@ -9,7 +9,7 @@ export default class AddLoanAmountForm extends React.Component {
     super(props);
     this.state = {
       loanAmount: '',
-      onPayroll: '',
+      onPayroll: this.props.loanCategory !== "personal"? 'no' : '',
       salaryDeduction: '',
       loanCategory: '',
       loanType: '',
@@ -228,7 +228,7 @@ export default class AddLoanAmountForm extends React.Component {
 
   render() {
     const { loanAmount, onPayroll, salaryDeduction, loanPurpose, loanPurposeDetails, loanTerm, isFormValid, monthlyPayment, approvedLoanAmount, maxLoanTerm, salary, salaryPercentage, isProceed } = this.state;
-    const loanPurposes = [
+    const loanPurposes = this.props.loanCategory === "personal"? [
       'Business Expansion',
       'Home Renovation',
       'Education',
@@ -236,7 +236,24 @@ export default class AddLoanAmountForm extends React.Component {
       'Debt Consolidation',
       'Vehicle Purchase',
       'Others'
-    ]; // Predefined list of loan purposes
+    ] : [
+        'Business Expansion',
+        'Equipment Purchase',
+        'Inventory Purchase',
+        'Working Capital',
+        'Marketing and Advertising',
+        'Product Development',
+        'Debt Refinancing',
+        'Hiring and Training',
+        'Property Acquisition or Lease',
+        'Emergency Funds',
+        'Technology Upgrades',
+        'Project Funding',
+        'Seasonal Demand Preparation',
+        'Legal and Regulatory Compliance',
+        'Research and Development'
+    ]
+     // Predefined list of loan purposes
 
     return (
       <>
@@ -250,7 +267,7 @@ export default class AddLoanAmountForm extends React.Component {
                 <div className="live-preview">
                   <div className="row gy-4">
                     {/* Payroll Question */}
-                    <div className="col-lg-12">
+                    {this.props.loanCategory !== "personal"? <></> : <div className="col-lg-12">
                       <div className="input-group">
                         <label className="form-label mr-2">Are you on payroll (Government or Company)?</label>
                         <select
@@ -265,7 +282,7 @@ export default class AddLoanAmountForm extends React.Component {
                           <option value="no">No I own a business</option>
                         </select>
                       </div>
-                    </div>
+                    </div>}
 
                     {/* Salary Deduction Question (Visible only if onPayroll is 'yes') */}
                     {onPayroll === 'yes' && (

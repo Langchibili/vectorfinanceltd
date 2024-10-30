@@ -17,7 +17,7 @@ export interface ClientDetailsBusiness extends Schema.Component {
         'non-profit'
       ]
     >;
-    ownershipType: Attribute.Enumeration<['sole-owner', 'co-owner']>;
+    ownershipType: Attribute.Enumeration<['sole-owner', 'co-owner', 'neither']>;
     isBusinessRegistered: Attribute.Enumeration<['yes', 'no']>;
     yearsInBusiness: Attribute.Integer;
     annualRevenue: Attribute.Decimal;
@@ -26,6 +26,8 @@ export interface ClientDetailsBusiness extends Schema.Component {
     existingLoanDetails: Attribute.Text;
     isClientAShareHolder: Attribute.Enumeration<['yes', 'no']>;
     businessHasDebt: Attribute.Enumeration<['yes', 'no']>;
+    companyRegistrationNumber: Attribute.Integer;
+    pacraPrintOut: Attribute.Media;
   };
 }
 
@@ -88,11 +90,13 @@ export interface MediaAndDocumentsHouse extends Schema.Component {
   collectionName: 'components_media_and_documents_houses';
   info: {
     displayName: 'house';
+    description: '';
   };
   attributes: {
     titleDeed: Attribute.Media;
     dimensions: Attribute.String;
     location: Attribute.String;
+    plotNumber: Attribute.String;
   };
 }
 
@@ -100,11 +104,13 @@ export interface MediaAndDocumentsLand extends Schema.Component {
   collectionName: 'components_media_and_documents_lands';
   info: {
     displayName: 'land';
+    description: '';
   };
   attributes: {
     titleDeed: Attribute.Media;
     hectors: Attribute.String;
     location: Attribute.String;
+    plotNumber: Attribute.String;
   };
 }
 
@@ -112,11 +118,13 @@ export interface MediaAndDocumentsVehicle extends Schema.Component {
   collectionName: 'components_media_and_documents_vehicles';
   info: {
     displayName: 'vehicle';
+    description: '';
   };
   attributes: {
     packed: Attribute.Boolean;
     insurance: Attribute.Media;
     packingFeePaid: Attribute.Decimal;
+    numberPlate: Attribute.String;
   };
 }
 
@@ -130,11 +138,11 @@ export interface UserProfileClientDetails extends Schema.Component {
     employementStatus: Attribute.Enumeration<
       ['employed', 'self-employed', 'unemployed']
     >;
-    monthlyIncome: Attribute.Decimal;
     KYCverificationStatus: Attribute.Boolean & Attribute.DefaultTo<false>;
     outstandingLoansBalance: Attribute.Decimal;
     IDfront: Attribute.Media;
     IDback: Attribute.Media;
+    idType: Attribute.Enumeration<['nrc', 'passport', 'driving-license']>;
   };
 }
 

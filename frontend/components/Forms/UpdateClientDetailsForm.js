@@ -9,8 +9,8 @@ export default class UpdateClientDetailsForm extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      employementStatus: '',
-      monthlyIncome: '',
+      employementStatus: this.props.loanCategory !== "personal"? 'self-employed' : '',
+      idType: '',
       IDfront: null,
       IDback: null,
       // More fields can be added as necessary
@@ -33,11 +33,12 @@ export default class UpdateClientDetailsForm extends React.Component {
   }
 
   async componentDidMount() {
+    console.log(this.props)
     let { clientDetails } =  this.props.loggedInUser; // because the user object has the client details, though no nrc
     if(!clientDetails){
         const blankDetailsObject = {
             employementStatus: null,
-            monthlyIncome: null,
+            idType: null,
             IDfront: null,
             IDback: null
         } // create a blank slate of clientDetails to obtain the component's id
@@ -51,7 +52,7 @@ export default class UpdateClientDetailsForm extends React.Component {
     // Set default values, ensure nulls are handled
     this.setState({
       employementStatus: clientDetails?.employementStatus || '',
-      monthlyIncome: clientDetails?.monthlyIncome || '',
+      idType: clientDetails?.idType || '',
       IDfront: clientDetails?.IDfront || '',
       IDback: clientDetails?.IDback || '',
       clientDetailsId: clientDetails?.id || null
@@ -64,16 +65,16 @@ export default class UpdateClientDetailsForm extends React.Component {
     //new Date(details.dateOfBirth).toLocaleDateString('en-US')
     const { name, value } = e.target;
     // Update state based on field name
-    this.setState({ [name]: name === "monthlyIncome"? parseFloat(value) : value }, this.checkFormValidity);
+    this.setState({ [name]: value }, this.checkFormValidity);
   }
 
   checkFormValidity = () => {
-    const { employementStatus, monthlyIncome, IDfront, IDback } = this.state;
+    const { employementStatus, idType, IDfront, IDback } = this.state;
 
     // Validate that all fields are filled
     const isFormValid =
       employementStatus.trim() &&
-      monthlyIncome &&
+      idType.trim() &&
       IDfront &&
       IDback;
 
@@ -82,8 +83,8 @@ export default class UpdateClientDetailsForm extends React.Component {
 
   handleSubmit = async (e)=>{
      e.preventDefault()
-     const { employementStatus, monthlyIncome, clientDetailsId, IDfront, IDback } = this.state;
-     if(!employementStatus || !monthlyIncome){
+     const { employementStatus, idType, clientDetailsId, IDfront, IDback } = this.state;
+     if(!employementStatus || !idType){
         this.setState({
             error: 'Please ensure all fields are filled.',
             saving: false
@@ -231,7 +232,7 @@ export default class UpdateClientDetailsForm extends React.Component {
   renderFile
 
   render() {
-    const { employementStatus, monthlyIncome, isFormValid } = this.state;
+    const { employementStatus, idType, isFormValid } = this.state;
 
     return (
       <>
@@ -239,12 +240,13 @@ export default class UpdateClientDetailsForm extends React.Component {
           <div className="col-lg-12">
             <div className="card">
               <div className="card-header align-items-center d-flex">
-                <h4 className="card-title mb-0 flex-grow-1">Employement Details </h4>
+                <h5 className="card-title mb-0 flex-grow-1">{this.props.loanCategory === "personal"? "Employement Status & Id" : "Identity Details Of"} </h5>
               </div>
+              {this.props.loanCategory !== "personal"? <h6 style={{paddingLeft:'16px', marginTop:'10px'}}><small  style={{color:'gray'}}> (Owner/Representative/Board Member)</small></h6> : <></>}
               <div className="card-body">
                 <div className="live-preview">
                   <div className="row gy-4">
-                    <div className="col-lg-12">
+                    {this.props.loanCategory === "personal"? <div className="col-lg-12">
                         <div className="input-group">
                             <label className="input-group-text" htmlFor="inputGroupSelect02">
                             Employement Status
@@ -263,9 +265,12 @@ export default class UpdateClientDetailsForm extends React.Component {
                             <option value="unemployed">UnEmployed</option>
                             </select>
                         </div>
-                    </div>
-
-                    <div className="col-lg-12">
+                    </div> : <></>
+                    }
+                    {/* <div className="col-lg-12">
+                    <label htmlFor="inputGroupSelect02">
+                            Monthly {this.props.loanCategory !== "personal"? "Income" : "Salary"}
+                            </label>
                     <div className="input-group">
                         <span className="input-group-text">K</span>
                         <input
@@ -278,11 +283,34 @@ export default class UpdateClientDetailsForm extends React.Component {
                         />
                         <span className="input-group-text">.00</span>
                     </div>
-                    </div>
+                    </div> */}
                   </div>
+                  <div className="col-lg-12 mt-4">
+                        <div className="input-group">
+                            <label className="input-group-text" htmlFor="inputGroupSelect02">
+                            Select Id Type
+                            </label>
+                            <select 
+                                className="form-select" 
+                                id="inputGroupSelect01"
+                                name="idType"
+                                autoComplete="off"
+                                value={idType}
+                                onChange={this.handleInputChange}
+                            >
+                            <option value="">Choose...</option>
+                            <option value="nrc">Nrc</option>
+                            <option value="passport">Passport</option>
+                            <option value="driving-license">Driving License</option>
+                            </select>
+                        </div>
+                    </div>
+                  
+
+
                 
-                  {this.state.clientDetailsId? <><h4 style={{marginTop:'20px'}} className="card-title mb-0 flex-grow-1">Identity Details </h4>
-                  <hr style={{color:'lightgray'}}/>
+                   {this.state.clientDetailsId? <>{/*<h4 style={{marginTop:'20px'}} className="card-title mb-0 flex-grow-1">Identity Details </h4>
+                  <hr style={{color:'lightgray'}}/> */}
                   <div style={{marginTop:'20px'}}>
                         <h5>Valid ID<small  style={{color:'gray'}}> (Front Side)</small></h5><small  style={{color:'lightgray'}}>(NRC or Passport or Driving Licence)</small>
                         <Uploader 

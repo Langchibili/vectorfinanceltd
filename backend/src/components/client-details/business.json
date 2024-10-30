@@ -23,7 +23,8 @@
       "type": "enumeration",
       "enum": [
         "sole-owner",
-        "co-owner"
+        "co-owner",
+        "neither"
       ]
     },
     "isBusinessRegistered": {
@@ -60,6 +61,18 @@
       "enum": [
         "yes",
         "no"
+      ]
+    },
+    "companyRegistrationNumber": {
+      "type": "integer"
+    },
+    "pacraPrintOut": {
+      "type": "media",
+      "multiple": true,
+      "required": false,
+      "allowedTypes": [
+        "images",
+        "files"
       ]
     }
   }

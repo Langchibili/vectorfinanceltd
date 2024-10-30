@@ -1107,6 +1107,20 @@ export interface ApiLoanLoan extends Schema.CollectionType {
         'Medical Expenses',
         'Debt Consolidation',
         'Vehicle Purchase',
+        'Equipment Purchase,',
+        'Inventory Purchase,',
+        'Working Capital,',
+        'Marketing and Advertising,',
+        'Product Development,',
+        'Debt Refinancing,',
+        'Hiring and Training,',
+        'Property Acquisition or Lease,',
+        'Emergency Funds,',
+        'Technology Upgrades,',
+        'Project Funding,',
+        'Seasonal Demand Preparation,',
+        'Legal and Regulatory Compliance,',
+        'Research and Development',
         'Others'
       ]
     >;

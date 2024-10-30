@@ -1,23 +1,28 @@
 {
   "collectionName": "components_media_and_documents_lands",
   "info": {
-    "displayName": "land"
+    "displayName": "land",
+    "description": ""
   },
   "options": {},
   "attributes": {
     "titleDeed": {
+      "type": "media",
+      "multiple": true,
+      "required": false,
       "allowedTypes": [
         "images",
         "files",
         "videos"
-      ],
-      "type": "media",
-      "multiple": true
+      ]
     },
     "hectors": {
       "type": "string"
     },
     "location": {
+      "type": "string"
+    },
+    "plotNumber": {
       "type": "string"
     }
   }

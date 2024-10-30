@@ -2,6 +2,8 @@
 
 import { updateUserAccount } from "@/Functions";
 import React from "react";
+import Uploader from "../Includes/Uploader/Uploader";
+import { api_url, getJwt } from "@/Constants";
 
 export default class BusinessInformationForm extends React.Component {
   constructor(props) {
@@ -11,6 +13,7 @@ export default class BusinessInformationForm extends React.Component {
       businessType: '',
       ownershipType: '',
       registrationStatus: '',
+      companyRegistrationNumber: '',
       yearsInBusiness: '',
       annualRevenue: '',
       shareholderStatus: '',
@@ -18,19 +21,33 @@ export default class BusinessInformationForm extends React.Component {
       netProfit: '',
       currentBusinessDebt: '',
       existingLoanDetails: '',
+      pacraPrintOut: null,
+      pacraPrintOutId: null,
       isFormValid: false,
       error: null,
     };
   }
 
-  componentDidMount() {
-    const { business } = this.props.loggedInUser;
+  getBusinessDetails =  async()=>{
+    return await fetch(api_url+'/users/me?populate=business.pacraPrintOut', {
+        headers: {
+         'Authorization': `Bearer ${getJwt()}`,
+         'Content-Type': 'application/json'
+        }
+      })
+      .then(response => response.json())
+      .then(data => data)
+  }
+
+   componentDidMount() {
+    const { business } = this.props.loggedInUser
     // Set default values, ensure nulls are handled
     this.setState({
       businessName: business?.businessName || '',
       businessType: business?.businessType || '',
       ownershipType: business?.ownershipType || '',
       registrationStatus: business?.isBusinessRegistered || '',
+      companyRegistrationNumber: business?.companyRegistrationNumber || '',
       yearsInBusiness: business?.yearsInBusiness || '',
       annualRevenue: business?.annualRevenue || '',
       shareholderStatus: business?.isClientAShareHolder || '',
@@ -38,8 +55,16 @@ export default class BusinessInformationForm extends React.Component {
       netProfit: business?.netProfit || '',
       currentBusinessDebt: business?.businessHasDebt || '',
       existingLoanDetails: business?.existingLoanDetails || ''
-    },()=>{
-        this.checkFormValidity()
+    },async ()=>{
+        const pacraPrint = await this.getBusinessDetails();
+        const { business } = pacraPrint
+        console.log(business?.id)
+        this.setState({
+            pacraPrintOut: business?.pacraPrintOut || '',
+            pacraPrintOutId: business?.id || null
+        },()=>{
+            this.checkFormValidity()
+        })
     });
   }
 
@@ -49,36 +74,53 @@ export default class BusinessInformationForm extends React.Component {
   };
 
   checkFormValidity = () => {
+    let companyRegistrationNumber = this.state.companyRegistrationNumber
+    let percentageOwnership = this.state.percentageOwnership
+    let existingLoanDetails = this.state.existingLoanDetails
+
+    if(this.state.shareholderStatus){
+        if(this.state.shareholderStatus === "no"){
+            percentageOwnership = '0'
+        }
+        else{
+            percentageOwnership = this.state.percentageOwnership
+        }
+    }
+    if(this.state.registrationStatus){
+        if(this.state.registrationStatus === "no"){
+            companyRegistrationNumber = '0'
+        }
+        else{
+            companyRegistrationNumber = this.state.companyRegistrationNumber
+        }
+    }
+
+    if(this.state.currentBusinessDebt){
+        if(this.state.currentBusinessDebt === "no"){
+            existingLoanDetails = 'valid'
+        }
+        else{
+            existingLoanDetails = this.state.existingLoanDetails
+        }
+    }
+    
     const {
       businessName, businessType, ownershipType, registrationStatus, yearsInBusiness,
-      annualRevenue, shareholderStatus, netProfit, percentageOwnership, currentBusinessDebt, existingLoanDetails
+      annualRevenue, shareholderStatus, netProfit, currentBusinessDebt, pacraPrintOut
     } = this.state;
 
-    const isFormValid = businessName && businessType && ownershipType && registrationStatus &&
-      yearsInBusiness && annualRevenue && shareholderStatus && netProfit && 
-      currentBusinessDebt;
-      if(isFormValid){
-        if(shareholderStatus === 'no'){
-            this.setState({ isFormValid:true})
-        }
-        else if(shareholderStatus === 'yes'){
-            if(!percentageOwnership){
-                this.setState({isFormValid:false})
-            }
-        }
-        if(currentBusinessDebt === 'yes'){
-            if(!existingLoanDetails){
-                this.setState({ isFormValid:!isFormValid });
-                return
-            }
-        }
-      }
+    const isFormValid = businessName && businessType && ownershipType && registrationStatus && companyRegistrationNumber &&
+      yearsInBusiness && annualRevenue && shareholderStatus && percentageOwnership && netProfit && existingLoanDetails &&
+      currentBusinessDebt && pacraPrintOut;
       this.setState({ isFormValid });
   }
 
   handleSubmit = async (e) => {
     const updateObject = this.state
     const shareholderStatus = this.state.shareholderStatus
+    const registrationStatus = this.state.registrationStatus
+    const pacraPrintOut = this.state.pacraPrintOut
+    const pacraPrintOutId = this.state.pacraPrintOutId
     updateObject.isBusinessRegistered = this.state.registrationStatus
     updateObject.isClientAShareHolder = this.state.shareholderStatus
     updateObject.percentageOfOwnership = this.state.percentageOwnership
@@ -91,6 +133,8 @@ export default class BusinessInformationForm extends React.Component {
     delete updateObject.shareholderStatus
     delete updateObject.percentageOwnership
     delete updateObject.currentBusinessDebt
+    delete updateObject.pacraPrintOutId
+    delete updateObject.pacraPrintOut
     
     if(!updateObject.businessType){
         delete updateObject.businessType
@@ -110,6 +154,9 @@ export default class BusinessInformationForm extends React.Component {
     if(!updateObject.percentageOfOwnership){
         delete updateObject.percentageOfOwnership
     }
+    if(!updateObject.companyRegistrationNumber){
+        delete updateObject.companyRegistrationNumber
+    }
     if(!updateObject.businessHasDebt){
         delete updateObject.businessHasDebt
     }
@@ -125,7 +172,10 @@ export default class BusinessInformationForm extends React.Component {
     
      this.setState({
         saving: true,
-        shareholderStatus: shareholderStatus
+        pacraPrintOut: pacraPrintOut,
+        pacraPrintOutId: pacraPrintOutId,
+        shareholderStatus: shareholderStatus,
+        registrationStatus: registrationStatus
      })
      const updatedUser = await updateUserAccount({business:updateObject},this.props.loggedInUser.id)
      console.log(updatedUser)
@@ -134,6 +184,8 @@ export default class BusinessInformationForm extends React.Component {
         this.setState({
             error: 'something went wrong, try again',
             shareholderStatus: shareholderStatus,
+            pacraPrintOut: pacraPrintOut,
+            pacraPrintOutId: pacraPrintOutId,
             saving: false
         })
         return
@@ -141,17 +193,98 @@ export default class BusinessInformationForm extends React.Component {
      this.checkFormValidity()
      this.setState({
         shareholderStatus: shareholderStatus,
+        pacraPrintOut: pacraPrintOut,
+        pacraPrintOutId: pacraPrintOutId,
         saving: false
      })
   }
 
+  addPacraPrintOut = (files) => {
+    if(!this.state.pacraPrintOut){
+        this.setState({
+            pacraPrintOut: files,
+            saving: false,
+            error: null
+        },()=>{
+            this.checkFormValidity()
+        })
+    }
+    else{
+        const newFiles = [...this.state.pacraPrintOut,...files]
+        this.setState({
+            pacraPrintOut: newFiles,
+            saving: false,
+            error: null
+        },()=>{
+            this.checkFormValidity()
+        })
+    }
+  }
 
+  handleRemoveImage = async (uploadid,filesArr,arrName)=>{
+    const removed = await fetch(api_url+'/upload/files/'+uploadid,{
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${getJwt()}`,
+        'Content-Type': 'application/json'
+      }
+    }).then(response => response.json())
+      .then(data => data)
+      .catch(error => console.error(error))
+     if(removed){
+       // remove from state
+       const newArray = filesArr.filter((file)=>{
+           return file.id !== uploadid
+       })
+       this.setState({
+        [arrName]: newArray.length < 1? null : newArray
+       },()=>{
+        this.checkFormValidity()
+       })
+       // remove from the dom
+       if(typeof document !== 'undefined'){
+         document.getElementById("#"+uploadid).style.display = "none"
+       }
+     } 
+  }
+
+  renderFiles = (files,arrName)=>{
+    if(!files){
+        return <></>
+    }
+    return files.map((file)=>{
+        if(file.mime.startsWith('application/')){
+            return (<div id={"#"+file.id} key={file.id}>
+                        <p>File: <strong>{file.name}</strong></p>
+                        <button className="btn btn-sm btn-danger" onClick={()=>{this.handleRemoveImage(file.id,files,arrName)}}>Remove</button>
+                   </div>)
+        }
+        else if(file.mime.startsWith('video/')){
+            return (<div id={"#"+file.id} key={file.id}>
+                        <div style={{width:'50%', backgroundColor:'lightgray'}}>
+                            <video className="mb-1" style={{width:'100%'}}>
+                                <source src={backEndUrl + file.url} type={file.mime} />
+                                Sorry we are unable to show this video
+                            </video>
+                        </div>
+                        <button className="btn btn-sm btn-danger" onClick={()=>{this.handleRemoveImage(file.id,files,arrName)}}>Remove</button>
+                   </div>)
+                   
+        }
+        else{
+            return (<div id={"#"+file.id} key={file.id}>
+                      <p className="text text-warning">File failed to be displayed</p>
+                      <button className="btn btn-sm btn-danger" onClick={()=>{this.handleRemoveImage(file.id,files,arrName)}}>Remove</button>
+                   </div>)
+        }
+    })
+  }
   
   render() {
     const {
-      businessName, businessType, ownershipType, registrationStatus, yearsInBusiness,
+      businessName, businessType, ownershipType, registrationStatus, companyRegistrationNumber, yearsInBusiness,
       annualRevenue, shareholderStatus, percentageOwnership, netProfit, currentBusinessDebt,
-      existingLoanDetails, isFormValid
+      existingLoanDetails,isFormValid
     } = this.state;
 
     return (
@@ -214,6 +347,7 @@ export default class BusinessInformationForm extends React.Component {
                           <option value="">Choose...</option>
                           <option value="sole-owner">Sole Owner</option>
                           <option value="co-owner">Co-Owner</option>
+                          <option value="neither">Neither</option>
                         </select>
                       </div>
                     </div>
@@ -358,6 +492,39 @@ export default class BusinessInformationForm extends React.Component {
                       </div>
                     </div>
                   </div>
+                  
+                  {/*  companyRegistrationNumber */}
+                  {registrationStatus === 'yes' && <div className="col-lg-12 mt-4">
+                    <h6>Enter the Company Registration Number?</h6>
+                    <div className="input-group">
+                        <input
+                            type="number"
+                            name="companyRegistrationNumber"
+                            value={companyRegistrationNumber}
+                            autoComplete="off"
+                            onChange={this.handleInputChange}
+                            className="form-control"
+                            aria-label="Net profit input"
+                        />
+                    </div>
+                 </div>}
+                 
+                 {this.state.pacraPrintOutId?  <div style={{marginTop:'20px'}}>
+                        <h5>Pacra Print or Certification Of Incorperation<small  style={{color:'gray'}}> (Of Past 3 months)</small></h5>
+                        <small  style={{color:'lightgray'}}>(can even be past 6 or a year)</small>
+                        <Uploader 
+                            addFiles={this.addPacraPrintOut}
+                            displayType="circular"
+                            refId={this.state.pacraPrintOutId}
+                            refName="client-details.business"
+                            fieldName="pacraPrintOut"
+                            allowMultiple={false}
+                            allowedTypes={['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain', 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']}
+                        />
+                        <small  style={{color:'lightgray'}}>(document(PDF,WORD))</small>
+                        {this.renderFiles(this.state.pacraPrintOut,"pacraPrintOut")}
+                    </div> : <></>
+                  }
 
                   {/* Save and Next Buttons */}
                   <div style={{ width: "100%", display: "flex", justifyContent: "space-between" }}>
