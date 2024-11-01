@@ -89,12 +89,6 @@ export default class UpdateVehicleCollateralForm extends React.Component {
                     packed: vehicle?.packed || ''
                 },()=>{
                     this.checkFormValidity(true)
-                },()=>{
-                  if(this.state.isFormValid){
-                    this.setState({
-                        saved: true
-                    })
-                  }
                 })
             }
     }
@@ -104,23 +98,27 @@ export default class UpdateVehicleCollateralForm extends React.Component {
     //new Date(details.dateOfBirth).toLocaleDateString('en-US')
     const { name, value } = e.target;
     // Update state based on field name
-    this.setState({ [name]: value }, this.checkFormValidity);
+    this.setState({ [name]: value, saved: false }, this.checkFormValidity);
   }
 
   checkFormValidity = (initialCheck=false) => {
     const { numberPlate, packed, whitebook } = this.state;
-
+   
     // Validate that all fields are filled
-    const isFormValid =
-      numberPlate.trim() &&
-      packed &&
-      whitebook 
-    if(!initialCheck){
-        this.setState({ isFormValid });
-    }
-    else{
-        this.setState({ isFormValid:isFormValid});
-    }
+    const isFormValid = !!(numberPlate.trim() && packed && whitebook )
+
+      console.log('here',isFormValid)
+      if(!initialCheck){
+          this.setState({ isFormValid })
+      }
+      else{
+          if(isFormValid){
+            this.setState({ isFormValid:isFormValid, saved: true})
+          }
+          else{
+            this.setState({ isFormValid})
+          }
+      }
   }
 
   handleSubmit = async (e)=>{
@@ -180,29 +178,19 @@ export default class UpdateVehicleCollateralForm extends React.Component {
         error: null,
         saving: false,
         whitebook: whitebook,
-        collateralId: collateralId
+        collateralId: collateralId,
+        saved: true
     },()=>{
-      if(this.state.isFormValid){
-            this.setState({
-                saved: true
-            })
-        }
         this.checkFormValidity()
     })
   }
 
   addWhiteBook = (files) => {
-    if(this.state.isFormValid){
-      if(files){
-        this.setState({
-          saved:true
-        })
-      }
-    }
     if(!this.state.whitebook){
         this.setState({
             whitebook: files,
             saving: false,
+            saved: true,
             error: null
         },()=>{
             this.checkFormValidity()
@@ -213,6 +201,7 @@ export default class UpdateVehicleCollateralForm extends React.Component {
         this.setState({
             whitebook: newFiles,
             saving: false,
+            saved: true,
             error: null
         },()=>{
             this.checkFormValidity()
@@ -246,11 +235,6 @@ export default class UpdateVehicleCollateralForm extends React.Component {
       .then(data => data)
       .catch(error => console.error(error))
      if(removed){
-       if(!filesArr){
-          this.setState({
-            saved:false
-          })
-       }
        // remove from state
        const newArray = filesArr.filter((file)=>{
            return file.id !== uploadid
@@ -324,7 +308,7 @@ export default class UpdateVehicleCollateralForm extends React.Component {
   }
 
   render() {
-    const { numberPlate, packed, saved, isFormValid } = this.state;
+    const { numberPlate, packed, isFormValid, saved } = this.state;
 
     return (
       <>
@@ -406,7 +390,7 @@ export default class UpdateVehicleCollateralForm extends React.Component {
                       type="button"
                       className="btn btn-danger w-90 mt-3"
                       id="next-btn"
-                      disabled={!saved}
+                      disabled={!isFormValid || !saved}
                       onClick={()=>{this.handleFinishLoanApplication()}}
                     >
                       Complete

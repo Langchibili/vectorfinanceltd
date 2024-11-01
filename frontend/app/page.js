@@ -35,7 +35,7 @@ export default function Home() {
          return <CollateralForm loggedInUser={loggedInUser.user}/> 
       }
       else if(currentLoan.loanStatus === "pending-collateral-inspection"){
-        return <Alert  severity="info">Thank you for applying for a loan with us, we are currently processing the loan, an agent will call you to proceed with inspection of your collateral.</Alert>
+        return <Alert  severity="info">Thank you for applying for a loan with us, we are currently processing the loan, and agent will call you to proceed with inspection of your collateral.</Alert>
       }
       else if(currentLoan.loanStatus === "accepted"){
         return (<>

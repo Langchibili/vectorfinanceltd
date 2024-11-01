@@ -103,7 +103,7 @@ export default class UpdateHouseCollateralForm extends React.Component {
     //new Date(details.dateOfBirth).toLocaleDateString('en-US')
     const { name, value } = e.target;
     // Update state based on field name
-    this.setState({ [name]: value }, this.checkFormValidity);
+    this.setState({ [name]: value, saved: false }, this.checkFormValidity);
   }
 
   checkFormValidity = (initialCheck=false) => {
@@ -115,11 +115,16 @@ export default class UpdateHouseCollateralForm extends React.Component {
       plotNumber.trim() &&
       location &&
       titleDeed 
-    if(!initialCheck){
+      if(!initialCheck){
         this.setState({ isFormValid });
-    }
-    else{
-        this.setState({ isFormValid:isFormValid, saved: true });
+      }
+      else{
+        if(isFormValid){
+          this.setState({ isFormValid:isFormValid, saved: true})
+        }
+        else{
+          this.setState({ isFormValid})
+        }
     }
   }
 
@@ -129,7 +134,6 @@ export default class UpdateHouseCollateralForm extends React.Component {
      if(!dimensions || !plotNumber || !location){
         this.setState({
             error: 'Please ensure all fields are filled.',
-            saved: false,
             saving: false
         })
         return
@@ -163,7 +167,6 @@ export default class UpdateHouseCollateralForm extends React.Component {
      
      this.setState({
         saving: true,
-        saved: false,
         titleDeed: titleDeed,
         collateralId: collateralId,
         houseId: houseId
@@ -174,7 +177,6 @@ export default class UpdateHouseCollateralForm extends React.Component {
         this.setState({
             error: 'something went wrong, try again',
             saving: false,
-            saved: false,
             titleDeed: titleDeed,
             collateralId: collateralId
         })
@@ -399,7 +401,7 @@ export default class UpdateHouseCollateralForm extends React.Component {
                       type="button"
                       className="btn btn-danger w-90 mt-3"
                       id="next-btn"
-                      disabled={!saved || !isFormValid}
+                      disabled={!isFormValid || !saved}
                       onClick={()=>{this.handleFinishLoanApplication()}}
                     >
                       Complete
