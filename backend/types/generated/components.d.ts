@@ -121,10 +121,10 @@ export interface MediaAndDocumentsVehicle extends Schema.Component {
     description: '';
   };
   attributes: {
-    packed: Attribute.Boolean;
-    insurance: Attribute.Media;
+    whitebook: Attribute.Media;
     packingFeePaid: Attribute.Decimal;
     numberPlate: Attribute.String;
+    packed: Attribute.Enumeration<['yes', 'no']>;
   };
 }
 

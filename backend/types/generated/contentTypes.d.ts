@@ -1047,6 +1047,8 @@ export interface ApiLoanLoan extends Schema.CollectionType {
     loanStatus: Attribute.Enumeration<
       [
         'initiated',
+        'pending-collateral-addition',
+        'pending-collateral-inspection',
         'pending-approval',
         'accepted',
         'approved',
@@ -1064,7 +1066,7 @@ export interface ApiLoanLoan extends Schema.CollectionType {
     disbursementDate: Attribute.DateTime;
     dueDate: Attribute.DateTime;
     outstandingAmount: Attribute.Decimal;
-    Collateral: Attribute.Component<'media-and-documents.collateral'>;
+    collateral: Attribute.Component<'media-and-documents.collateral'>;
     latePaymentPenalty: Attribute.Decimal;
     loanAgreementDocuments: Attribute.Media;
     client: Attribute.Relation<
@@ -1097,7 +1099,6 @@ export interface ApiLoanLoan extends Schema.CollectionType {
       'manyToOne',
       'api::loan-category.loan-category'
     >;
-    salary: Attribute.Component<'client-details.salary'>;
     clientAskingAmount: Attribute.Decimal;
     loanPurpose: Attribute.Enumeration<
       [
@@ -1107,19 +1108,19 @@ export interface ApiLoanLoan extends Schema.CollectionType {
         'Medical Expenses',
         'Debt Consolidation',
         'Vehicle Purchase',
-        'Equipment Purchase,',
-        'Inventory Purchase,',
-        'Working Capital,',
-        'Marketing and Advertising,',
-        'Product Development,',
-        'Debt Refinancing,',
-        'Hiring and Training,',
-        'Property Acquisition or Lease,',
-        'Emergency Funds,',
-        'Technology Upgrades,',
-        'Project Funding,',
-        'Seasonal Demand Preparation,',
-        'Legal and Regulatory Compliance,',
+        'Equipment Purchase',
+        'Inventory Purchase',
+        'Working Capital',
+        'Marketing and Advertising',
+        'Product Development',
+        'Debt Refinancing',
+        'Hiring and Training',
+        'Property Acquisition or Lease',
+        'Emergency Funds',
+        'Technology Upgrades',
+        'Project Funding',
+        'Seasonal Demand Preparation',
+        'Legal and Regulatory Compliance',
         'Research and Development',
         'Others'
       ]

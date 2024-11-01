@@ -1,7 +1,7 @@
 "use client";
 
-import { api_url, getJwt } from "@/Constants";
-import { getImage, updateUserAccount } from "@/Functions";
+import { api_url, backEndUrl, getJwt } from "@/Constants";
+import { getImage, getLoanFromId, textHasPhoneNumber, updateLoan, updateUserAccount } from "@/Functions";
 import React from "react";
 import Uploader from "../Includes/Uploader/Uploader";
 
@@ -9,56 +9,94 @@ export default class UpdateHouseCollateralForm extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      employementStatus: this.props.loanCategory !== "personal"? 'self-employed' : '',
-      idType: '',
-      IDfront: null,
-      IDback: null,
+      collateralType: '',
       // More fields can be added as necessary
       isFormValid: false,
       saving: false,
-      clientDetailsId: null,
-      error:null
-    };
+      collateralId: null,
+      houseId: null,
+      error:null,
+      titleDeed: null,
+      dimensions: '',
+      plotNumber: '',
+      location: '',
+      saved: false
+    }
   }
 
-  getClientDetails =  async()=>{
-    return await fetch(api_url+'/users/me?populate=clientDetails.IDfront,clientDetails.IDback,', {
-        headers: {
-         'Authorization': `Bearer ${getJwt()}`,
-         'Content-Type': 'application/json'
-        }
-      })
-      .then(response => response.json())
-      .then(data => data)
-  }
 
   async componentDidMount() {
-    console.log(this.props)
-    let { clientDetails } =  this.props.loggedInUser; // because the user object has the client details, though no nrc
-    if(!clientDetails){
-        const blankDetailsObject = {
-            employementStatus: null,
-            idType: null,
-            IDfront: null,
-            IDback: null
-        } // create a blank slate of clientDetails to obtain the component's id
-        const updatedUser = await updateUserAccount({clientDetails:blankDetailsObject},this.props.loggedInUser.id)
-        if(updatedUser.hasOwnProperty('error')){
+    const { collateral } = await getLoanFromId(this.props.loggedInUser.currentLoan.id,"collateral.house.titleDeed"); 
+    const newLandObject = {
+           house:{
+                dimensions: null,
+                plotNumber: null,
+                location: null
+           }
+    }
+    const newCollaterallObject = {
+        data:{
+            collateral: {
+                collateralType: "house",
+                house: newLandObject
+            }
+        }
+    }
+    if(!collateral){
+        // create a blank slate of collateral to obtain the component's id
+        const updatedLoan = await updateLoan(newCollaterallObject,this.props.loggedInUser.currentLoan.id)
+        if(!updatedLoan.hasOwnProperty('error')){
+            const { collateral } = await getLoanFromId(this.props.loggedInUser.currentLoan.id,"collateral.house.titleDeed"); 
+            const {house} = collateral // get the vehicle component from the collateral component
+            this.setState({
+                collateralId: collateral?.id,
+                houseId: collateral?.house.id,
+                collateralType: collateral?.collateralType || '',
+                titleDeed: house?.titleDeed.data || '',
+                dimensions: house?.dimensions || '',
+                plotNumber: house?.plotNumber || '',
+                location: house?.location || ''
+            })
             return
         }
     }
-    const user =  await this.getClientDetails();
-    clientDetails = user.clientDetails
-    // Set default values, ensure nulls are handled
-    this.setState({
-      employementStatus: clientDetails?.employementStatus || '',
-      idType: clientDetails?.idType || '',
-      IDfront: clientDetails?.IDfront || '',
-      IDback: clientDetails?.IDback || '',
-      clientDetailsId: clientDetails?.id || null
-    },()=>{
-        this.checkFormValidity()
-    })
+    else{
+            const {house} = collateral // get the house component from the collateral component
+            if(!house){
+                console.log(collateral)
+                newCollaterallObject.data.collateral.id = collateral.id // update only the existing collateral object
+                newCollaterallObject.data.collateral.collateralType = collateral.collateralType // return the existing value
+                
+                const updatedLoan = await updateLoan(newCollaterallObject,this.props.loggedInUser.currentLoan.id)
+                if(!updatedLoan.hasOwnProperty('error')){
+                   const { collateral } = await getLoanFromId(this.props.loggedInUser.currentLoan.id,"collateral.house.titleDeed"); 
+                   console.log(collateral)
+                    this.setState({
+                        collateralId: collateral?.id,
+                        houseId: collateral?.house.id,
+                        collateralType: collateral?.collateralType || '',
+                        titleDeed: house?.titleDeed.data || '',
+                        dimensions: house?.dimensions || '',
+                        plotNumber: house?.plotNumber || '',
+                        location: house?.location || ''
+                    })
+                    return
+                }
+            }
+            else{ // if they all exist, then just put the pre-exising object their
+                this.setState({
+                    collateralId: collateral?.id,
+                    houseId: collateral?.house.id,
+                    collateralType: collateral?.collateralType || '',
+                    titleDeed: house?.titleDeed.data || '',
+                    dimensions: house?.dimensions || '',
+                    plotNumber: house?.plotNumber || '',
+                    location: house?.location || ''
+                },()=>{
+                    this.checkFormValidity(true)
+                })
+            }
+    }
   }
 
   handleInputChange = (e) => {
@@ -68,112 +106,129 @@ export default class UpdateHouseCollateralForm extends React.Component {
     this.setState({ [name]: value }, this.checkFormValidity);
   }
 
-  checkFormValidity = () => {
-    const { employementStatus, idType, IDfront, IDback } = this.state;
+  checkFormValidity = (initialCheck=false) => {
+    const { dimensions, plotNumber, location, titleDeed} = this.state;
 
     // Validate that all fields are filled
     const isFormValid =
-      employementStatus.trim() &&
-      idType.trim() &&
-      IDfront &&
-      IDback;
-
-    this.setState({ isFormValid });
+      dimensions.trim() &&
+      plotNumber.trim() &&
+      location &&
+      titleDeed 
+    if(!initialCheck){
+        this.setState({ isFormValid });
+    }
+    else{
+        this.setState({ isFormValid:isFormValid, saved: true });
+    }
   }
 
   handleSubmit = async (e)=>{
      e.preventDefault()
-     const { employementStatus, idType, clientDetailsId, IDfront, IDback } = this.state;
-     if(!employementStatus || !idType){
+     const { dimensions, plotNumber, location, titleDeed, collateralId, houseId } = this.state;
+     if(!dimensions || !plotNumber || !location){
         this.setState({
             error: 'Please ensure all fields are filled.',
+            saved: false,
             saving: false
         })
         return
      }
-     const updateObject = this.state
+    //  if(!textHasPhoneNumber(plotNumber)){
+    //     this.setState({
+    //         error: 'Please enter a valid plot number.',
+    //         saving: false
+    //     })
+    //     return
+    //  }
+    const updateObject = {
+        data:{
+            collateral: {
+                id: this.state.collateralId,
+                house: {
+                    id: this.state.houseId,
+                    dimensions: this.state.dimensions,
+                    plotNumber: this.state.plotNumber,
+                    location: this.state.location
+                }
+            }
+        }
+    }
      delete updateObject.isFormValid
      delete updateObject.saving
      delete updateObject.error
-     delete updateObject.IDfront
-     delete updateObject.IDback
-     delete updateObject.clientDetailsId
-
-     if(!updateObject.employementStatus){
-      delete updateObject.employementStatus
-     }
+     delete updateObject.titleDeed
+     delete updateObject.collateralId
+     delete updateObject.houseId
+     
      this.setState({
         saving: true,
-        IDfront: IDfront,
-        IDback: IDback,
-        clientDetailsId: clientDetailsId
+        saved: false,
+        titleDeed: titleDeed,
+        collateralId: collateralId,
+        houseId: houseId
      })
-     updateObject.id = clientDetailsId
-     const updatedUser = await updateUserAccount({clientDetails:updateObject},this.props.loggedInUser.id)
+     const updatedLoan = await updateLoan(updateObject,this.props.loggedInUser.currentLoan.id)
    
-     if(updatedUser.hasOwnProperty('error')){
+     if(updatedLoan.hasOwnProperty('error')){
         this.setState({
             error: 'something went wrong, try again',
             saving: false,
-            IDfront: IDfront,
-            IDback: IDback,
-            clientDetailsId: clientDetailsId
+            saved: false,
+            titleDeed: titleDeed,
+            collateralId: collateralId
         })
         return
      }
      this.setState({
+        error: null,
         saving: false,
-        IDfront: IDfront,
-        IDback: IDback,
-        clientDetailsId: clientDetailsId
+        saved: true,
+        titleDeed: titleDeed,
+        collateralId: collateralId
     },()=>{
         this.checkFormValidity()
-        console.log(this.state)
     })
   }
 
-  addIDfront = (files) => {
-    if(!this.state.IDfront){
+  addTitleDeed = (files) => {
+    if(!this.state.titleDeed){
         this.setState({
-            IDfront: files,
+            titleDeed: files,
             saving: false,
+            saved: true,
             error: null
         },()=>{
             this.checkFormValidity()
         })
     }
     else{
-        const newFiles = [...this.state.IDfront,...files]
+        const newFiles = [...this.state.titleDeed,...files]
         this.setState({
-            IDfront: newFiles,
+            titleDeed: newFiles,
             saving: false,
+            saved: true,
             error: null
         },()=>{
             this.checkFormValidity()
         })
     }
   }
-  addIDback = (files) => {
-    if(!this.state.IDback){
+  
+  handleFinishLoanApplication = async ()=>{
+      const updatedLoan = await updateLoan({data: {loanStatus: 'pending-collateral-inspection'}},this.props.loggedInUser.currentLoan.id)
+      if(updatedLoan.hasOwnProperty('error')){
         this.setState({
-            IDback: files,
-            saving: false,
-            error: null
-        },()=>{
-            this.checkFormValidity()
+            error: 'something went wrong, try again',
+            saving: false
         })
-    }
-    else{
-        const newFiles = [...this.state.IDback,...files]
-        this.setState({
-            IDback: newFiles,
-            saving: false,
-            error: null
-        },()=>{
-            this.checkFormValidity()
-        })
-    }
+     }
+     else{
+        // send a notification then redirect user
+        window.location = "/"
+     }
   }
+
 
   handleRemoveImage = async (uploadid,filesArr,arrName)=>{
     const removed = await fetch(api_url+'/upload/files/'+uploadid,{
@@ -207,6 +262,10 @@ export default class UpdateHouseCollateralForm extends React.Component {
         return <></>
     }
     return files.map((file)=>{
+        if(file.hasOwnProperty("attributes")){
+            file.attributes.id = file.id
+            file = file.attributes
+        }
         if(file.mime.startsWith('application/')){
             return (<div id={"#"+file.id} key={file.id}>
                         <p>File: <strong>{file.name}</strong></p>
@@ -219,6 +278,18 @@ export default class UpdateHouseCollateralForm extends React.Component {
                         <button className="btn btn-sm btn-danger" onClick={()=>{this.handleRemoveImage(file.id,files,arrName)}}>Remove</button>
                    </div>)
         }
+        else if(file.mime.startsWith('video/')){
+            return (<div id={"#"+file.id} key={file.id}>
+                        <div style={{width:'50%', backgroundColor:'lightgray'}}>
+                            <video className="mb-1" style={{width:'100%'}}>
+                                <source src={backEndUrl + file.url} type={file.mime} />
+                                Sorry we are unable to show this video
+                            </video>
+                        </div>
+                        <button className="btn btn-sm btn-danger" onClick={()=>{this.handleRemoveImage(file.id,files,arrName)}}>Remove</button>
+                   </div>)
+                   
+        }
         else{
             return (<div id={"#"+file.id} key={file.id}>
                       <p className="text text-warning">File failed to be displayed</p>
@@ -227,12 +298,10 @@ export default class UpdateHouseCollateralForm extends React.Component {
         }
     })
   }
- 
 
-  renderFile
 
   render() {
-    const { employementStatus, idType, isFormValid } = this.state;
+    const { dimensions, plotNumber, location, saved, isFormValid } = this.state;
 
     return (
       <>
@@ -240,140 +309,101 @@ export default class UpdateHouseCollateralForm extends React.Component {
           <div className="col-lg-12">
             <div className="card">
               <div className="card-header align-items-center d-flex">
-                <h5 className="card-title mb-0 flex-grow-1">{this.props.loanCategory === "personal"? "Employement Status & Id" : "Identity Details Of"} </h5>
+                <h4 className="card-title mb-0 flex-grow-1">house Details </h4>
               </div>
-              {this.props.loanCategory !== "personal"? <h6 style={{paddingLeft:'16px', marginTop:'10px'}}><small  style={{color:'gray'}}> (Owner/Representative/Board Member)</small></h6> : <></>}
               <div className="card-body">
                 <div className="live-preview">
                   <div className="row gy-4">
-                    {this.props.loanCategory === "personal"? <div className="col-lg-12">
-                        <div className="input-group">
-                            <label className="input-group-text" htmlFor="inputGroupSelect02">
-                            Employement Status
-                            </label>
-                            <select 
-                                className="form-select" 
-                                id="inputGroupSelect01"
-                                name="employementStatus"
-                                autoComplete="off"
-                                value={employementStatus}
-                                onChange={this.handleInputChange}
-                            >
-                            <option value="">Choose...</option>
-                            <option value="employed">Employed</option>
-                            <option value="self-employed">Self-Employed</option>
-                            <option value="unemployed">UnEmployed</option>
-                            </select>
-                        </div>
-                    </div> : <></>
-                    }
-                    {/* <div className="col-lg-12">
-                    <label htmlFor="inputGroupSelect02">
-                            Monthly {this.props.loanCategory !== "personal"? "Income" : "Salary"}
-                            </label>
-                    <div className="input-group">
-                        <span className="input-group-text">K</span>
+                  <div className="col-xxl-3 col-md-6 col-lg-12">
+                      <div>
+                        <label htmlFor="dimensions" className="form-label">
+                         house dimensions
+                        </label>
                         <input
-                        name="monthlyIncome"
-                        value={monthlyIncome}
-                        onChange={this.handleInputChange}
-                        type="number"
-                        autoComplete="off"
-                        className="form-control"
+                          className="form-control"
+                          id="dimensions"
+                          name="dimensions"
+                          type="text"
+                          autoComplete="off"
+                          value={dimensions}
+                          onChange={this.handleInputChange}
                         />
-                        <span className="input-group-text">.00</span>
+                      </div>
                     </div>
-                    </div> */}
+                    <div className="col-xxl-3 col-md-6 col-lg-12">
+                      <div>
+                        <label htmlFor="plotNumber" className="form-label">
+                        Plot Number
+                        </label>
+                        <input
+                          className="form-control"
+                          id="plotNumber"
+                          name="plotNumber"
+                          type="text"
+                          autoComplete="off"
+                          value={plotNumber}
+                          onChange={this.handleInputChange}
+                        />
+                      </div>
+                    </div>
+                    <div className="col-xxl-3 col-md-6 col-lg-12">
+                      <div>
+                        <label htmlFor="lastnameInput" className="form-label">
+                          Location
+                        </label>
+                        <p><small  style={{color:'lightgray'}}>(Plot No. Area City Province)</small></p>
+                        <input
+                          className="form-control"
+                          id="lastnameInput"
+                          name="location"
+                          type="text"
+                          autoComplete="off"
+                          value={location}
+                          onChange={this.handleInputChange}
+                        />
+                      </div>
+                    </div>
                   </div>
-                  <div className="col-lg-12 mt-4">
-                        <div className="input-group">
-                            <label className="input-group-text" htmlFor="inputGroupSelect02">
-                            Select Id Type
-                            </label>
-                            <select 
-                                className="form-select" 
-                                id="inputGroupSelect01"
-                                name="idType"
-                                autoComplete="off"
-                                value={idType}
-                                onChange={this.handleInputChange}
-                            >
-                            <option value="">Choose...</option>
-                            <option value="nrc">Nrc</option>
-                            <option value="passport">Passport</option>
-                            <option value="driving-license">Driving License</option>
-                            </select>
-                        </div>
-                    </div>
-                  
-
-
                 
-                   {this.state.clientDetailsId? <>{/*<h4 style={{marginTop:'20px'}} className="card-title mb-0 flex-grow-1">Identity Details </h4>
-                  <hr style={{color:'lightgray'}}/> */}
+                  {this.state.houseId? <>
+                  <hr style={{color:'lightgray'}}/>
                   <div style={{marginTop:'20px'}}>
-                        <h5>Valid ID<small  style={{color:'gray'}}> (Front Side)</small></h5><small  style={{color:'lightgray'}}>(NRC or Passport or Driving Licence)</small>
+                        <h5>Copy Of TitleDeed<small  style={{color:'gray'}}> </small></h5><small  style={{color:'lightgray'}}></small>
                         <Uploader 
-                            addFiles={this.addIDfront}
+                            addFiles={this.addTitleDeed}
                             displayType="circular"
-                            refId={this.state.clientDetailsId}
-                            refName="user-profile.client-details"
-                            fieldName="IDfront"
+                            refId={this.state.houseId}
+                            refName="media-and-documents.house"
+                            fieldName="titleDeed"
                             allowMultiple={false}
                             allowedTypes={['image/*', 'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain', 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']}
                         />
-                        <small  style={{color:'lightgray'}}>(image or document)</small>
-                        {this.renderFiles(this.state.IDfront,"IDfront")}
+                        <small  style={{color:'lightgray'}}>(document(PDF,IMAGE,WORD))</small>
+                        {this.renderFiles(this.state.titleDeed,"titleDeed")}
                   </div>
-                  <div style={{marginTop:'10px'}}>
-                        <h5>Valid ID<small  style={{color:'gray'}}> (Back Side)</small></h5> <small  style={{color:'lightgray'}}>(NRC or Passport or Driving Licence)</small>
-                        <Uploader 
-                            addFiles={this.addIDback}
-                            displayType="circular"
-                            refId={this.state.clientDetailsId}
-                            refName="user-profile.client-details"
-                            fieldName="IDback"
-                            allowMultiple={false}
-                            allowedTypes={['image/*', 'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain', 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']}
-                        />
-                        <small  style={{color:'lightgray'}}>(image or document)</small>
-                        {this.renderFiles(this.state.IDback,"IDback")}
-                  </div></> : <></>}
+                  </> : <></>}
                   {/* Save and Next Buttons */}
                   <div style={{ width: "100%", display: "flex", justifyContent: "space-between" }}>
-                    <div style={{ width: "100%" }}>
-                      <button
-                        disabled={this.state.saving}
-                        onClick={this.handleSubmit}
-                        type="button"
-                        className="btn btn-success w-90 mt-3"
-                        id="confirm-btn"
-                        // Submit button logic to be handled separately
-                      >
-                        Save
-                      </button>
-                    </div>
-                    <div style={{ width: "100%", textAlign: "right" }}>
-                      <button
-                        type="button"
-                        className="btn btn-info w-90 mt-3"
-                        id="next-btn"
-                        onClick={()=>{this.props.handleOpenUpdateDetailsForm()}}
-                      >
-                        Previous
-                      </button>
-                    </div>
-                    <div style={{ width: "100%", textAlign: "right" }}>
-                      <button
-                        type="button"
-                        className="btn btn-danger w-90 mt-3"
-                        id="next-btn"
-                        disabled={!isFormValid}
-                        onClick={()=>{this.props.handleOpenAddLoanAmountForm()}}
-                      >
-                        Next
-                      </button>
-                    </div>
+                    <button
+                      disabled={this.state.saving}
+                      onClick={this.handleSubmit}
+                      type="button"
+                      className="btn btn-success w-90 mt-3"
+                      id="confirm-btn"
+                    >
+                      Save
+                    </button>
+
+                    
+                    <button
+                      type="button"
+                      className="btn btn-danger w-90 mt-3"
+                      id="next-btn"
+                      disabled={!saved || !isFormValid}
+                      onClick={()=>{this.handleFinishLoanApplication()}}
+                    >
+                      Complete
+                    </button>
                     
                   </div>
                  {this.state.error? <p className="text text-danger">{this.state.error}</p> : <></>}

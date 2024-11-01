@@ -219,7 +219,8 @@ export const getImage = (image, size = "normal", use = "normal") => {
     .then(data => data)
   }
 
-// POSTS FUNCTIONS
+
+// LOAN FUNCTIONS
 
 export const createNewLoan = async (data)=>{
     const loan =  await fetch(api_url+'/loans', {
@@ -275,8 +276,8 @@ export const logNewNotification = async (data)=>{
   return null
 }
 
-export const updatePost = async (data,postId)=>{
-  const post =  await fetch(api_url+'/posts/'+postId, {
+export const updateLoan = async (data,loanId)=>{
+  const loan =  await fetch(api_url+'/loans/'+loanId, {
       method: 'PUT',
       headers: {
        'Authorization': `Bearer ${getJwt()}`,
@@ -286,9 +287,9 @@ export const updatePost = async (data,postId)=>{
     })
     .then(response => response.json())
     .then(data => data)
-  if(post && post.data && post.data.attributes){
-      post.data.attributes.id = post.data.id
-      return post.data.attributes
+  if(loan && loan.data && loan.data.attributes){
+      loan.data.attributes.id = loan.data.id
+      return loan.data.attributes
    }
   return null
 }
@@ -323,41 +324,23 @@ export const getPosts = async (customUri=null,getMeta=false)=>{
   return posts.data
  }
 
-export const getPost = async (title)=>{
-    const postid = getIDFromDashedString(title)
-    const post = await fetch(api_url+'/posts/'+postid,{
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    }).then(response => response.json())
-      .then(data => data)
-      .catch(error => console.error(error))
-      log('this is a post',post)
-      
-      if(post && post.data && post.data.attributes){
-         post.data.attributes.id = post.data.id
-         return post.data.attributes
-      }
-      return null
-  }
-
-  export const getPostFromId = async (postid,populateString="")=>{
+  export const getLoanFromId = async (loanid,populateString="")=>{
     let populate = '?populate='+populateString
     if(populateString.length === 0){
        populate = "" // it means populate nothing
     }
-    const post = await fetch(api_url+'/posts/'+postid+populate,{
+    const loan = await fetch(api_url+'/loans/'+loanid+populate,{
         headers: {
+          'Authorization': `Bearer ${getJwt()}`,
           'Content-Type': 'application/json'
         }
       }).then(response => response.json())
         .then(data => data)
         .catch(error => console.error(error))
-        log('this is a post',post)
          
-        if(post && post.data && post.data.attributes){
-           post.data.attributes.id = post.data.id
-           return post.data.attributes
+        if(loan && loan.data && loan.data.attributes){
+           loan.data.attributes.id = loan.data.id
+           return loan.data.attributes
         }
         return null
   }

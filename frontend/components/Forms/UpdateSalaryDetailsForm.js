@@ -221,6 +221,10 @@ export default class UpdateSalaryDetailsForm extends React.Component {
         return <></>
     }
     return files.map((file)=>{
+        if(file.hasOwnProperty("attributes")){
+            file.attributes.id = file.id
+            file = file.attributes
+        }
         if(file.mime.startsWith('application/')){
             return (<div id={"#"+file.id} key={file.id}>
                         <p>File: <strong>{file.name}</strong></p>
@@ -405,7 +409,7 @@ export default class UpdateSalaryDetailsForm extends React.Component {
                       disabled={!isFormValid}
                       onClick={()=>{this.props.handleCreateBlankLoan()}}
                     >
-                      Next
+                      Complete
                     </button>
                     
                   </div>

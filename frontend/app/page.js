@@ -1,5 +1,6 @@
 "use client"
 
+import CollateralForm from "@/components/Forms/CollateralForm";
 import FilledForms from "@/components/Forms/FilledForms";
 import LoanApplicationForm from "@/components/Forms/LoanApplicationForm";
 import MainForm from "@/components/Forms/MainForm";
@@ -7,6 +8,7 @@ import ApplyForALoanButton from "@/components/Includes/ApplyForALoanButton/Apply
 import LoanInformationDisplay from "@/components/Includes/LoanInformationDisplay/LoanInformationDisplay";
 import LoanInitiatedDisplay from "@/components/Includes/LoanInitiatedDisplay/LoanInitiatedDisplay";
 import { useUser } from "@/Contexts/UserContext";
+import { Alert } from "@mui/material";
 import { useState } from "react";
 
 export default function Home() {
@@ -28,6 +30,12 @@ export default function Home() {
       else if(currentLoan.loanStatus === "pending-approval"){
         return <p className="text text-info">Thank you for applying for a loan with us, we are currently processing the loan, an agent will call you.</p>
         // show the info on how we are checking the eligibility of the loan
+      }
+      else if(currentLoan.loanStatus === "pending-collateral-addition"){
+         return <CollateralForm loggedInUser={loggedInUser.user}/> 
+      }
+      else if(currentLoan.loanStatus === "pending-collateral-inspection"){
+        return <Alert  severity="info">Thank you for applying for a loan with us, we are currently processing the loan, an agent will call you to proceed with inspection of your collateral.</Alert>
       }
       else if(currentLoan.loanStatus === "accepted"){
         return (<>

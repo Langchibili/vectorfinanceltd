@@ -76,14 +76,20 @@ export default class PersonalLoanApplicationForm extends React.Component{
         createLoanObject.loanAmount = parseFloat(parseFloat(createLoanObject.loanAmount).toFixed(2))
         createLoanObject.salaryPercentage = parseFloat(parseFloat(createLoanObject.salaryPercentage).toFixed(2))
         createLoanObject.loanTerm = parseInt(createLoanObject.loanTerm)
-
+        createLoanObject.clientAskingAmount = createLoanObject.loanAmount 
         if(this.state.loanType === "salaryBased"){
             createLoanObject.loanCategory = { connect: [1] }
             createLoanObject.loanType = { connect: [1] }
         }
         else{
+            createLoanObject.loanStatus = "pending-collateral-addition"
             createLoanObject.loanCategory = { connect: [2] }
+            delete createLoanObject.loanType
         }
+        // if(this.props.loggedInUser.salary){
+        //     createLoanObject.salary = { id: this.props.loggedInUser.salary.id}
+        // }
+        console.log(createLoanObject)
 
         const newLoan = await createNewLoan({data:createLoanObject})
         if(!newLoan.hasOwnProperty('error')){
@@ -112,7 +118,8 @@ export default class PersonalLoanApplicationForm extends React.Component{
                     window.location = "/"
                 }
             }
-            
+            // send a notification
+            // if it's a business loan or company loan, do not send an sms or email notification here first
         }
     }
 

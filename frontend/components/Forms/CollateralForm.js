@@ -8,8 +8,9 @@ import BusinessInformationForm from "./BusinessInformationForm";
 import UpdateSalaryDetailsForm from "./UpdateSalaryDetailsForm";
 import { createNewLoan, dateAndTimeNow, updateUserAccount } from "@/Functions";
 import UpdateLandCollateralForm from "./UpdateLandCollateralForm";
+import UpdateVehicleCollateralForm from "./UpdateVehicleCollateralForm";
 
-export default class BusinessLoanApplicationForm extends React.Component{
+export default class CollateralForm extends React.Component{
     constructor(props){
         super(props)
         this.state = {
@@ -77,8 +78,7 @@ export default class BusinessLoanApplicationForm extends React.Component{
         createLoanObject.loanAmount = parseFloat(parseFloat(createLoanObject.loanAmount).toFixed(2))
         createLoanObject.salaryPercentage = parseFloat(parseFloat(createLoanObject.salaryPercentage).toFixed(2))
         createLoanObject.loanTerm = parseInt(createLoanObject.loanTerm)
-        createLoanObject.clientAskingAmount = createLoanObject.loanAmount 
-        
+
         if(this.state.loanType === "salaryBased"){
             createLoanObject.loanCategory = { connect: [1] }
             createLoanObject.loanType = { connect: [1] }
@@ -103,6 +103,8 @@ export default class BusinessLoanApplicationForm extends React.Component{
     }
 
     renderForm = ()=>{
+        return <UpdateVehicleCollateralForm 
+                        {...this.props}/>
         if(this.state.openUpdateDetailsForm){
             return <UpdateDetailsForm 
                         {...this.props} 

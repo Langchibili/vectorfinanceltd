@@ -226,17 +226,9 @@ export default class AddLoanAmountForm extends React.Component {
             </>
   }
 
-  render() {
-    const { loanAmount, onPayroll, salaryDeduction, loanPurpose, loanPurposeDetails, loanTerm, isFormValid, monthlyPayment, approvedLoanAmount, maxLoanTerm, salary, salaryPercentage, isProceed } = this.state;
-    const loanPurposes = this.props.loanCategory === "personal"? [
-      'Business Expansion',
-      'Home Renovation',
-      'Education',
-      'Medical Expenses',
-      'Debt Consolidation',
-      'Vehicle Purchase',
-      'Others'
-    ] : [
+  getLoanPurposes = ()=>{
+    if(this.state.onPayroll === "no"){
+       return [
         'Business Expansion',
         'Equipment Purchase',
         'Inventory Purchase',
@@ -251,9 +243,27 @@ export default class AddLoanAmountForm extends React.Component {
         'Project Funding',
         'Seasonal Demand Preparation',
         'Legal and Regulatory Compliance',
-        'Research and Development'
-    ]
-     // Predefined list of loan purposes
+        'Research and Development',
+        'Others'
+     ]
+    }
+    else{
+         return [
+            'Business Expansion',
+            'Home Renovation',
+            'Education',
+            'Medical Expenses',
+            'Debt Consolidation',
+            'Vehicle Purchase',
+            'Others'
+          ] 
+    }
+  }
+
+  render() {
+    const { loanAmount, onPayroll, salaryDeduction, loanPurpose, loanPurposeDetails, loanTerm, isFormValid, monthlyPayment, approvedLoanAmount, maxLoanTerm, salary, salaryPercentage, isProceed } = this.state;
+    const loanPurposes = this.getLoanPurposes()
+    // Predefined list of loan purposes
 
     return (
       <>

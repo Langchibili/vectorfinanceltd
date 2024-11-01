@@ -253,6 +253,10 @@ export default class BusinessInformationForm extends React.Component {
         return <></>
     }
     return files.map((file)=>{
+        if(file.hasOwnProperty("attributes")){
+            file.attributes.id = file.id
+            file = file.attributes
+        }
         if(file.mime.startsWith('application/')){
             return (<div id={"#"+file.id} key={file.id}>
                         <p>File: <strong>{file.name}</strong></p>
@@ -510,7 +514,7 @@ export default class BusinessInformationForm extends React.Component {
                  </div>}
                  
                  {this.state.pacraPrintOutId?  <div style={{marginTop:'20px'}}>
-                        <h5>Pacra Print or Certification Of Incorperation<small  style={{color:'gray'}}> (Of Past 3 months)</small></h5>
+                        <h5>Pacra Print or Certification Of Incorperation<small  style={{color:'gray'}}></small></h5>
                         <small  style={{color:'lightgray'}}>(can even be past 6 or a year)</small>
                         <Uploader 
                             addFiles={this.addPacraPrintOut}

@@ -22,6 +22,8 @@
       "type": "enumeration",
       "enum": [
         "initiated",
+        "pending-collateral-addition",
+        "pending-collateral-inspection",
         "pending-approval",
         "accepted",
         "approved",
@@ -53,7 +55,7 @@
     "outstandingAmount": {
       "type": "decimal"
     },
-    "Collateral": {
+    "collateral": {
       "displayName": "Collateral",
       "type": "component",
       "repeatable": false,
@@ -107,12 +109,6 @@
       "target": "api::loan-category.loan-category",
       "inversedBy": "loans"
     },
-    "salary": {
-      "displayName": "salary",
-      "type": "component",
-      "repeatable": false,
-      "component": "client-details.salary"
-    },
     "clientAskingAmount": {
       "type": "decimal"
     },
@@ -125,19 +121,19 @@
         "Medical Expenses",
         "Debt Consolidation",
         "Vehicle Purchase",
-        "Equipment Purchase,",
-        "Inventory Purchase,",
-        "Working Capital,",
-        "Marketing and Advertising,",
-        "Product Development,",
-        "Debt Refinancing,",
-        "Hiring and Training,",
-        "Property Acquisition or Lease,",
-        "Emergency Funds,",
-        "Technology Upgrades,",
-        "Project Funding,",
-        "Seasonal Demand Preparation,",
-        "Legal and Regulatory Compliance,",
+        "Equipment Purchase",
+        "Inventory Purchase",
+        "Working Capital",
+        "Marketing and Advertising",
+        "Product Development",
+        "Debt Refinancing",
+        "Hiring and Training",
+        "Property Acquisition or Lease",
+        "Emergency Funds",
+        "Technology Upgrades",
+        "Project Funding",
+        "Seasonal Demand Preparation",
+        "Legal and Regulatory Compliance",
         "Research and Development",
         "Others"
       ]
