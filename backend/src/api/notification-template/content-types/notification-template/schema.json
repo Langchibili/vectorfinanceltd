@@ -1,0 +1,23 @@
+{
+  "kind": "collectionType",
+  "collectionName": "notification_templates",
+  "info": {
+    "singularName": "notification-template",
+    "pluralName": "notification-templates",
+    "displayName": "notificationTemplate",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "unique": true
+    },
+    "body": {
+      "type": "text"
+    }
+  }
+}

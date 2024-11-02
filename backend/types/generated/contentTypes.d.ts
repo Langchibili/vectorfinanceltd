@@ -362,615 +362,6 @@ export interface AdminTransferTokenPermission extends Schema.CollectionType {
   };
 }
 
-export interface ApiApprovalApproval extends Schema.CollectionType {
-  collectionName: 'approvals';
-  info: {
-    singularName: 'approval';
-    pluralName: 'approvals';
-    displayName: 'Approval';
-    description: '';
-  };
-  options: {
-    draftAndPublish: true;
-  };
-  attributes: {
-    approvalDate: Attribute.DateTime;
-    approvalStatus: Attribute.Enumeration<['Approved', 'Rejected', 'Pending']> &
-      Attribute.DefaultTo<'Pending'>;
-    comments: Attribute.Blocks;
-    approvalDocuments: Attribute.Media;
-    client: Attribute.Relation<
-      'api::approval.approval',
-      'manyToOne',
-      'plugin::users-permissions.user'
-    >;
-    loan: Attribute.Relation<
-      'api::approval.approval',
-      'oneToOne',
-      'api::loan.loan'
-    >;
-    createdAt: Attribute.DateTime;
-    updatedAt: Attribute.DateTime;
-    publishedAt: Attribute.DateTime;
-    createdBy: Attribute.Relation<
-      'api::approval.approval',
-      'oneToOne',
-      'admin::user'
-    > &
-      Attribute.Private;
-    updatedBy: Attribute.Relation<
-      'api::approval.approval',
-      'oneToOne',
-      'admin::user'
-    > &
-      Attribute.Private;
-  };
-}
-
-export interface ApiEmailAddressesListEmailAddressesList
-  extends Schema.SingleType {
-  collectionName: 'email_addresses_lists';
-  info: {
-    singularName: 'email-addresses-list';
-    pluralName: 'email-addresses-lists';
-    displayName: 'emailAddressesList';
-  };
-  options: {
-    draftAndPublish: true;
-  };
-  attributes: {
-    clientEmailAddresses: Attribute.JSON;
-    adminEmailAddresses: Attribute.JSON;
-    createdAt: Attribute.DateTime;
-    updatedAt: Attribute.DateTime;
-    publishedAt: Attribute.DateTime;
-    createdBy: Attribute.Relation<
-      'api::email-addresses-list.email-addresses-list',
-      'oneToOne',
-      'admin::user'
-    > &
-      Attribute.Private;
-    updatedBy: Attribute.Relation<
-      'api::email-addresses-list.email-addresses-list',
-      'oneToOne',
-      'admin::user'
-    > &
-      Attribute.Private;
-  };
-}
-
-export interface ApiFinanceFinance extends Schema.SingleType {
-  collectionName: 'finances';
-  info: {
-    singularName: 'finance';
-    pluralName: 'finances';
-    displayName: 'finance';
-  };
-  options: {
-    draftAndPublish: true;
-  };
-  attributes: {
-    totalAmountLoanedOut: Attribute.Decimal;
-    totalAmountPaid: Attribute.Decimal;
-    netProfitLoss: Attribute.Decimal;
-    totalAmountUnpaid: Attribute.Decimal;
-    createdAt: Attribute.DateTime;
-    updatedAt: Attribute.DateTime;
-    publishedAt: Attribute.DateTime;
-    createdBy: Attribute.Relation<
-      'api::finance.finance',
-      'oneToOne',
-      'admin::user'
-    > &
-      Attribute.Private;
-    updatedBy: Attribute.Relation<
-      'api::finance.finance',
-      'oneToOne',
-      'admin::user'
-    > &
-      Attribute.Private;
-  };
-}
-
-export interface ApiFormForm extends Schema.CollectionType {
-  collectionName: 'forms';
-  info: {
-    singularName: 'form';
-    pluralName: 'forms';
-    displayName: 'form';
-    description: '';
-  };
-  options: {
-    draftAndPublish: true;
-  };
-  attributes: {
-    formName: Attribute.String;
-    form: Attribute.Media;
-    requiredForSalaryClients: Attribute.Boolean & Attribute.DefaultTo<false>;
-    requiredForVehicleClients: Attribute.Boolean & Attribute.DefaultTo<false>;
-    requiredForHouseClients: Attribute.Boolean & Attribute.DefaultTo<false>;
-    requiredForLandClients: Attribute.Boolean & Attribute.DefaultTo<false>;
-    requiredForBussinessClients: Attribute.Boolean & Attribute.DefaultTo<false>;
-    requiredForCompanyClients: Attribute.Boolean & Attribute.DefaultTo<false>;
-    formSigningDemo: Attribute.Media;
-    formSigningGuidelines: Attribute.Blocks;
-    clientsWhoCanFill: Attribute.Relation<
-      'api::form.form',
-      'manyToMany',
-      'plugin::users-permissions.user'
-    >;
-    createdAt: Attribute.DateTime;
-    updatedAt: Attribute.DateTime;
-    publishedAt: Attribute.DateTime;
-    createdBy: Attribute.Relation<'api::form.form', 'oneToOne', 'admin::user'> &
-      Attribute.Private;
-    updatedBy: Attribute.Relation<'api::form.form', 'oneToOne', 'admin::user'> &
-      Attribute.Private;
-  };
-}
-
-export interface ApiKyCverificationKyCverification
-  extends Schema.CollectionType {
-  collectionName: 'ky_cverifications';
-  info: {
-    singularName: 'ky-cverification';
-    pluralName: 'ky-cverifications';
-    displayName: ' KYCverification';
-    description: '';
-  };
-  options: {
-    draftAndPublish: true;
-  };
-  attributes: {
-    KYCstatus: Attribute.Enumeration<['Pending', 'Verified', 'Rejected']> &
-      Attribute.DefaultTo<'Pending'>;
-    KYCdetails: Attribute.Component<'user-profile.client-details'>;
-    client: Attribute.Relation<
-      'api::ky-cverification.ky-cverification',
-      'oneToOne',
-      'plugin::users-permissions.user'
-    >;
-    createdAt: Attribute.DateTime;
-    updatedAt: Attribute.DateTime;
-    publishedAt: Attribute.DateTime;
-    createdBy: Attribute.Relation<
-      'api::ky-cverification.ky-cverification',
-      'oneToOne',
-      'admin::user'
-    > &
-      Attribute.Private;
-    updatedBy: Attribute.Relation<
-      'api::ky-cverification.ky-cverification',
-      'oneToOne',
-      'admin::user'
-    > &
-      Attribute.Private;
-  };
-}
-
-export interface ApiLoanLoan extends Schema.CollectionType {
-  collectionName: 'loans';
-  info: {
-    singularName: 'loan';
-    pluralName: 'loans';
-    displayName: 'Loan';
-    description: '';
-  };
-  options: {
-    draftAndPublish: true;
-  };
-  attributes: {
-    loanAmount: Attribute.Decimal;
-    interestRate: Attribute.Decimal;
-    loanStatus: Attribute.Enumeration<
-      [
-        'initiated',
-        'pending-collateral-addition',
-        'pending-collateral-inspection',
-        'pending-approval',
-        'accepted',
-        'approved',
-        'rejected',
-        'disbursed',
-        'completed',
-        'defaulted'
-      ]
-    > &
-      Attribute.DefaultTo<'initiated'>;
-    repaymentSchedule: Attribute.JSON;
-    loanTerm: Attribute.Integer;
-    applicationDate: Attribute.DateTime;
-    approvalDate: Attribute.DateTime;
-    disbursementDate: Attribute.DateTime;
-    dueDate: Attribute.DateTime;
-    outstandingAmount: Attribute.Decimal;
-    collateral: Attribute.Component<'media-and-documents.collateral'>;
-    latePaymentPenalty: Attribute.Decimal;
-    loanAgreementDocuments: Attribute.Media;
-    client: Attribute.Relation<
-      'api::loan.loan',
-      'manyToOne',
-      'plugin::users-permissions.user'
-    >;
-    repayments: Attribute.Relation<
-      'api::loan.loan',
-      'oneToMany',
-      'api::repayment.repayment'
-    >;
-    approval: Attribute.Relation<
-      'api::loan.loan',
-      'oneToOne',
-      'api::approval.approval'
-    >;
-    loanType: Attribute.Relation<
-      'api::loan.loan',
-      'manyToOne',
-      'api::type.type'
-    >;
-    transactionHstories: Attribute.Relation<
-      'api::loan.loan',
-      'oneToMany',
-      'api::transaction-history.transaction-history'
-    >;
-    loanCategory: Attribute.Relation<
-      'api::loan.loan',
-      'manyToOne',
-      'api::loan-category.loan-category'
-    >;
-    clientAskingAmount: Attribute.Decimal;
-    loanPurpose: Attribute.Enumeration<
-      [
-        'Business Expansion',
-        'Home Renovation',
-        'Education',
-        'Medical Expenses',
-        'Debt Consolidation',
-        'Vehicle Purchase',
-        'Equipment Purchase',
-        'Inventory Purchase',
-        'Working Capital',
-        'Marketing and Advertising',
-        'Product Development',
-        'Debt Refinancing',
-        'Hiring and Training',
-        'Property Acquisition or Lease',
-        'Emergency Funds',
-        'Technology Upgrades',
-        'Project Funding',
-        'Seasonal Demand Preparation',
-        'Legal and Regulatory Compliance',
-        'Research and Development',
-        'Others'
-      ]
-    >;
-    loanPurposeDetails: Attribute.Text;
-    salaryPercentage: Attribute.Decimal;
-    createdAt: Attribute.DateTime;
-    updatedAt: Attribute.DateTime;
-    publishedAt: Attribute.DateTime;
-    createdBy: Attribute.Relation<'api::loan.loan', 'oneToOne', 'admin::user'> &
-      Attribute.Private;
-    updatedBy: Attribute.Relation<'api::loan.loan', 'oneToOne', 'admin::user'> &
-      Attribute.Private;
-  };
-}
-
-export interface ApiLoanCategoryLoanCategory extends Schema.CollectionType {
-  collectionName: 'loan_categories';
-  info: {
-    singularName: 'loan-category';
-    pluralName: 'loan-categories';
-    displayName: 'loanCategory';
-    description: '';
-  };
-  options: {
-    draftAndPublish: true;
-  };
-  attributes: {
-    categoryName: Attribute.String;
-    description: Attribute.Blocks;
-    loanTypes: Attribute.Relation<
-      'api::loan-category.loan-category',
-      'oneToMany',
-      'api::type.type'
-    >;
-    loans: Attribute.Relation<
-      'api::loan-category.loan-category',
-      'oneToMany',
-      'api::loan.loan'
-    >;
-    createdAt: Attribute.DateTime;
-    updatedAt: Attribute.DateTime;
-    publishedAt: Attribute.DateTime;
-    createdBy: Attribute.Relation<
-      'api::loan-category.loan-category',
-      'oneToOne',
-      'admin::user'
-    > &
-      Attribute.Private;
-    updatedBy: Attribute.Relation<
-      'api::loan-category.loan-category',
-      'oneToOne',
-      'admin::user'
-    > &
-      Attribute.Private;
-  };
-}
-
-export interface ApiLoansInformationLoansInformation extends Schema.SingleType {
-  collectionName: 'loans_informations';
-  info: {
-    singularName: 'loans-information';
-    pluralName: 'loans-informations';
-    displayName: 'loansInformation';
-    description: '';
-  };
-  options: {
-    draftAndPublish: true;
-  };
-  attributes: {
-    defaultSalaryLoanInterestRate: Attribute.Decimal;
-    defaultCollaterallLoanInterestRate: Attribute.Decimal;
-    defaultCollaterallLoanTerm: Attribute.Decimal;
-    defaultSalaryLoanTerm: Attribute.Decimal;
-    createdAt: Attribute.DateTime;
-    updatedAt: Attribute.DateTime;
-    publishedAt: Attribute.DateTime;
-    createdBy: Attribute.Relation<
-      'api::loans-information.loans-information',
-      'oneToOne',
-      'admin::user'
-    > &
-      Attribute.Private;
-    updatedBy: Attribute.Relation<
-      'api::loans-information.loans-information',
-      'oneToOne',
-      'admin::user'
-    > &
-      Attribute.Private;
-  };
-}
-
-export interface ApiNotificationNotification extends Schema.CollectionType {
-  collectionName: 'notifications';
-  info: {
-    singularName: 'notification';
-    pluralName: 'notifications';
-    displayName: 'notification';
-  };
-  options: {
-    draftAndPublish: true;
-  };
-  attributes: {
-    title: Attribute.String;
-    type: Attribute.Enumeration<['message', 'alert']> &
-      Attribute.DefaultTo<'message'>;
-    notifier: Attribute.Relation<
-      'api::notification.notification',
-      'manyToOne',
-      'plugin::users-permissions.user'
-    >;
-    notifiedUsers: Attribute.Relation<
-      'api::notification.notification',
-      'manyToMany',
-      'plugin::users-permissions.user'
-    >;
-    createdAt: Attribute.DateTime;
-    updatedAt: Attribute.DateTime;
-    publishedAt: Attribute.DateTime;
-    createdBy: Attribute.Relation<
-      'api::notification.notification',
-      'oneToOne',
-      'admin::user'
-    > &
-      Attribute.Private;
-    updatedBy: Attribute.Relation<
-      'api::notification.notification',
-      'oneToOne',
-      'admin::user'
-    > &
-      Attribute.Private;
-  };
-}
-
-export interface ApiPhoneNumbersListPhoneNumbersList extends Schema.SingleType {
-  collectionName: 'phone_numbers_lists';
-  info: {
-    singularName: 'phone-numbers-list';
-    pluralName: 'phone-numbers-lists';
-    displayName: 'phoneNumbersList';
-  };
-  options: {
-    draftAndPublish: true;
-  };
-  attributes: {
-    clientNumbers: Attribute.JSON;
-    adminNumbers: Attribute.JSON;
-    createdAt: Attribute.DateTime;
-    updatedAt: Attribute.DateTime;
-    publishedAt: Attribute.DateTime;
-    createdBy: Attribute.Relation<
-      'api::phone-numbers-list.phone-numbers-list',
-      'oneToOne',
-      'admin::user'
-    > &
-      Attribute.Private;
-    updatedBy: Attribute.Relation<
-      'api::phone-numbers-list.phone-numbers-list',
-      'oneToOne',
-      'admin::user'
-    > &
-      Attribute.Private;
-  };
-}
-
-export interface ApiRepaymentRepayment extends Schema.CollectionType {
-  collectionName: 'repayments';
-  info: {
-    singularName: 'repayment';
-    pluralName: 'repayments';
-    displayName: 'Repayment';
-    description: '';
-  };
-  options: {
-    draftAndPublish: true;
-  };
-  attributes: {
-    repaymentAmount: Attribute.Decimal;
-    paymentDate: Attribute.DateTime;
-    paymentMethod: Attribute.Enumeration<
-      ['cash', 'bank', 'airtel-money', 'mtn-money']
-    >;
-    latePaymentPenalty: Attribute.Decimal;
-    transactionID: Attribute.String;
-    receipt: Attribute.Media;
-    repaymentType: Attribute.Enumeration<
-      ['partial-payment', 'full-payment', 'late-payment']
-    >;
-    paymentStatus: Attribute.Enumeration<['Paid', 'Failed', 'Pending']> &
-      Attribute.DefaultTo<'Pending'>;
-    loan: Attribute.Relation<
-      'api::repayment.repayment',
-      'manyToOne',
-      'api::loan.loan'
-    >;
-    client: Attribute.Relation<
-      'api::repayment.repayment',
-      'oneToOne',
-      'plugin::users-permissions.user'
-    >;
-    createdAt: Attribute.DateTime;
-    updatedAt: Attribute.DateTime;
-    publishedAt: Attribute.DateTime;
-    createdBy: Attribute.Relation<
-      'api::repayment.repayment',
-      'oneToOne',
-      'admin::user'
-    > &
-      Attribute.Private;
-    updatedBy: Attribute.Relation<
-      'api::repayment.repayment',
-      'oneToOne',
-      'admin::user'
-    > &
-      Attribute.Private;
-  };
-}
-
-export interface ApiTransactionHistoryTransactionHistory
-  extends Schema.CollectionType {
-  collectionName: 'transaction_histories';
-  info: {
-    singularName: 'transaction-history';
-    pluralName: 'transaction-histories';
-    displayName: 'TransactionHistory';
-    description: '';
-  };
-  options: {
-    draftAndPublish: true;
-  };
-  attributes: {
-    transactionType: Attribute.Enumeration<
-      ['loan-application', 'loan-approval', 'loan-disbursement', 'repayment']
-    >;
-    transactionDate: Attribute.DateTime;
-    amount: Attribute.Decimal;
-    documents: Attribute.Media;
-    client: Attribute.Relation<
-      'api::transaction-history.transaction-history',
-      'manyToOne',
-      'plugin::users-permissions.user'
-    >;
-    loan: Attribute.Relation<
-      'api::transaction-history.transaction-history',
-      'manyToOne',
-      'api::loan.loan'
-    >;
-    description: Attribute.Text;
-    createdAt: Attribute.DateTime;
-    updatedAt: Attribute.DateTime;
-    publishedAt: Attribute.DateTime;
-    createdBy: Attribute.Relation<
-      'api::transaction-history.transaction-history',
-      'oneToOne',
-      'admin::user'
-    > &
-      Attribute.Private;
-    updatedBy: Attribute.Relation<
-      'api::transaction-history.transaction-history',
-      'oneToOne',
-      'admin::user'
-    > &
-      Attribute.Private;
-  };
-}
-
-export interface ApiTypeType extends Schema.CollectionType {
-  collectionName: 'types';
-  info: {
-    singularName: 'type';
-    pluralName: 'types';
-    displayName: 'Type';
-    description: '';
-  };
-  options: {
-    draftAndPublish: true;
-  };
-  attributes: {
-    typeName: Attribute.String;
-    description: Attribute.Blocks;
-    minimumAmount: Attribute.Decimal;
-    maximumAmount: Attribute.Decimal;
-    defaultInterestRate: Attribute.Decimal;
-    loanTermOptions: Attribute.JSON;
-    category: Attribute.Relation<
-      'api::type.type',
-      'manyToOne',
-      'api::loan-category.loan-category'
-    >;
-    loans: Attribute.Relation<'api::type.type', 'oneToMany', 'api::loan.loan'>;
-    createdAt: Attribute.DateTime;
-    updatedAt: Attribute.DateTime;
-    publishedAt: Attribute.DateTime;
-    createdBy: Attribute.Relation<'api::type.type', 'oneToOne', 'admin::user'> &
-      Attribute.Private;
-    updatedBy: Attribute.Relation<'api::type.type', 'oneToOne', 'admin::user'> &
-      Attribute.Private;
-  };
-}
-
-export interface ApiVehicleTrackingFeeVehicleTrackingFee
-  extends Schema.SingleType {
-  collectionName: 'vehicle_tracking_fees';
-  info: {
-    singularName: 'vehicle-tracking-fee';
-    pluralName: 'vehicle-tracking-fees';
-    displayName: 'vehicleTrackingFee';
-  };
-  options: {
-    draftAndPublish: true;
-  };
-  attributes: {
-    upfrontTrackingFee: Attribute.Decimal;
-    monthlyTrackingFee: Attribute.Decimal;
-    createdAt: Attribute.DateTime;
-    updatedAt: Attribute.DateTime;
-    publishedAt: Attribute.DateTime;
-    createdBy: Attribute.Relation<
-      'api::vehicle-tracking-fee.vehicle-tracking-fee',
-      'oneToOne',
-      'admin::user'
-    > &
-      Attribute.Private;
-    updatedBy: Attribute.Relation<
-      'api::vehicle-tracking-fee.vehicle-tracking-fee',
-      'oneToOne',
-      'admin::user'
-    > &
-      Attribute.Private;
-  };
-}
-
 export interface PluginUploadFile extends Schema.CollectionType {
   collectionName: 'files';
   info: {
@@ -1453,6 +844,702 @@ export interface PluginI18NLocale extends Schema.CollectionType {
   };
 }
 
+export interface ApiApprovalApproval extends Schema.CollectionType {
+  collectionName: 'approvals';
+  info: {
+    singularName: 'approval';
+    pluralName: 'approvals';
+    displayName: 'Approval';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    approvalDate: Attribute.DateTime;
+    approvalStatus: Attribute.Enumeration<['Approved', 'Rejected', 'Pending']> &
+      Attribute.DefaultTo<'Pending'>;
+    comments: Attribute.Blocks;
+    approvalDocuments: Attribute.Media;
+    client: Attribute.Relation<
+      'api::approval.approval',
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+    loan: Attribute.Relation<
+      'api::approval.approval',
+      'oneToOne',
+      'api::loan.loan'
+    >;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::approval.approval',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::approval.approval',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiEmailAddressesListEmailAddressesList
+  extends Schema.SingleType {
+  collectionName: 'email_addresses_lists';
+  info: {
+    singularName: 'email-addresses-list';
+    pluralName: 'email-addresses-lists';
+    displayName: 'emailAddressesList';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    clientEmailAddresses: Attribute.JSON;
+    adminEmailAddresses: Attribute.JSON;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::email-addresses-list.email-addresses-list',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::email-addresses-list.email-addresses-list',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiFinanceFinance extends Schema.SingleType {
+  collectionName: 'finances';
+  info: {
+    singularName: 'finance';
+    pluralName: 'finances';
+    displayName: 'finance';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    totalAmountLoanedOut: Attribute.Decimal;
+    totalAmountPaid: Attribute.Decimal;
+    netProfitLoss: Attribute.Decimal;
+    totalAmountUnpaid: Attribute.Decimal;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::finance.finance',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::finance.finance',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiFormForm extends Schema.CollectionType {
+  collectionName: 'forms';
+  info: {
+    singularName: 'form';
+    pluralName: 'forms';
+    displayName: 'form';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    formName: Attribute.String;
+    form: Attribute.Media;
+    requiredForSalaryClients: Attribute.Boolean & Attribute.DefaultTo<false>;
+    requiredForVehicleClients: Attribute.Boolean & Attribute.DefaultTo<false>;
+    requiredForHouseClients: Attribute.Boolean & Attribute.DefaultTo<false>;
+    requiredForLandClients: Attribute.Boolean & Attribute.DefaultTo<false>;
+    requiredForBussinessClients: Attribute.Boolean & Attribute.DefaultTo<false>;
+    requiredForCompanyClients: Attribute.Boolean & Attribute.DefaultTo<false>;
+    formSigningDemo: Attribute.Media;
+    formSigningGuidelines: Attribute.Blocks;
+    clientsWhoCanFill: Attribute.Relation<
+      'api::form.form',
+      'manyToMany',
+      'plugin::users-permissions.user'
+    >;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<'api::form.form', 'oneToOne', 'admin::user'> &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<'api::form.form', 'oneToOne', 'admin::user'> &
+      Attribute.Private;
+  };
+}
+
+export interface ApiKyCverificationKyCverification
+  extends Schema.CollectionType {
+  collectionName: 'ky_cverifications';
+  info: {
+    singularName: 'ky-cverification';
+    pluralName: 'ky-cverifications';
+    displayName: ' KYCverification';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    KYCstatus: Attribute.Enumeration<['Pending', 'Verified', 'Rejected']> &
+      Attribute.DefaultTo<'Pending'>;
+    KYCdetails: Attribute.Component<'user-profile.client-details'>;
+    client: Attribute.Relation<
+      'api::ky-cverification.ky-cverification',
+      'oneToOne',
+      'plugin::users-permissions.user'
+    >;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::ky-cverification.ky-cverification',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::ky-cverification.ky-cverification',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiLoanLoan extends Schema.CollectionType {
+  collectionName: 'loans';
+  info: {
+    singularName: 'loan';
+    pluralName: 'loans';
+    displayName: 'Loan';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    loanAmount: Attribute.Decimal;
+    interestRate: Attribute.Decimal;
+    loanStatus: Attribute.Enumeration<
+      [
+        'initiated',
+        'pending-collateral-addition',
+        'pending-collateral-inspection',
+        'pending-approval',
+        'accepted',
+        'approved',
+        'rejected',
+        'disbursed',
+        'completed',
+        'defaulted'
+      ]
+    > &
+      Attribute.DefaultTo<'initiated'>;
+    repaymentSchedule: Attribute.JSON;
+    loanTerm: Attribute.Integer;
+    applicationDate: Attribute.DateTime;
+    approvalDate: Attribute.DateTime;
+    disbursementDate: Attribute.DateTime;
+    dueDate: Attribute.DateTime;
+    outstandingAmount: Attribute.Decimal;
+    collateral: Attribute.Component<'media-and-documents.collateral'>;
+    latePaymentPenalty: Attribute.Decimal;
+    loanAgreementDocuments: Attribute.Media;
+    client: Attribute.Relation<
+      'api::loan.loan',
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+    repayments: Attribute.Relation<
+      'api::loan.loan',
+      'oneToMany',
+      'api::repayment.repayment'
+    >;
+    approval: Attribute.Relation<
+      'api::loan.loan',
+      'oneToOne',
+      'api::approval.approval'
+    >;
+    loanType: Attribute.Relation<
+      'api::loan.loan',
+      'manyToOne',
+      'api::type.type'
+    >;
+    transactionHstories: Attribute.Relation<
+      'api::loan.loan',
+      'oneToMany',
+      'api::transaction-history.transaction-history'
+    >;
+    loanCategory: Attribute.Relation<
+      'api::loan.loan',
+      'manyToOne',
+      'api::loan-category.loan-category'
+    >;
+    clientAskingAmount: Attribute.Decimal;
+    loanPurpose: Attribute.Enumeration<
+      [
+        'Business Expansion',
+        'Home Renovation',
+        'Education',
+        'Medical Expenses',
+        'Debt Consolidation',
+        'Vehicle Purchase',
+        'Equipment Purchase',
+        'Inventory Purchase',
+        'Working Capital',
+        'Marketing and Advertising',
+        'Product Development',
+        'Debt Refinancing',
+        'Hiring and Training',
+        'Property Acquisition or Lease',
+        'Emergency Funds',
+        'Technology Upgrades',
+        'Project Funding',
+        'Seasonal Demand Preparation',
+        'Legal and Regulatory Compliance',
+        'Research and Development',
+        'Others'
+      ]
+    >;
+    loanPurposeDetails: Attribute.Text;
+    salaryPercentage: Attribute.Decimal;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<'api::loan.loan', 'oneToOne', 'admin::user'> &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<'api::loan.loan', 'oneToOne', 'admin::user'> &
+      Attribute.Private;
+  };
+}
+
+export interface ApiLoanCategoryLoanCategory extends Schema.CollectionType {
+  collectionName: 'loan_categories';
+  info: {
+    singularName: 'loan-category';
+    pluralName: 'loan-categories';
+    displayName: 'loanCategory';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    categoryName: Attribute.String;
+    description: Attribute.Blocks;
+    loanTypes: Attribute.Relation<
+      'api::loan-category.loan-category',
+      'oneToMany',
+      'api::type.type'
+    >;
+    loans: Attribute.Relation<
+      'api::loan-category.loan-category',
+      'oneToMany',
+      'api::loan.loan'
+    >;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::loan-category.loan-category',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::loan-category.loan-category',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiLoansInformationLoansInformation extends Schema.SingleType {
+  collectionName: 'loans_informations';
+  info: {
+    singularName: 'loans-information';
+    pluralName: 'loans-informations';
+    displayName: 'loansInformation';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    defaultSalaryLoanInterestRate: Attribute.Decimal;
+    defaultCollaterallLoanInterestRate: Attribute.Decimal;
+    defaultCollaterallLoanTerm: Attribute.Decimal;
+    defaultSalaryLoanTerm: Attribute.Decimal;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::loans-information.loans-information',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::loans-information.loans-information',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiNotificationNotification extends Schema.CollectionType {
+  collectionName: 'notifications';
+  info: {
+    singularName: 'notification';
+    pluralName: 'notifications';
+    displayName: 'notification';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    title: Attribute.String;
+    type: Attribute.Enumeration<['message', 'alert']> &
+      Attribute.DefaultTo<'message'>;
+    notifier: Attribute.Relation<
+      'api::notification.notification',
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+    notifiedUsers: Attribute.Relation<
+      'api::notification.notification',
+      'manyToMany',
+      'plugin::users-permissions.user'
+    >;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::notification.notification',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::notification.notification',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiNotificationTemplateNotificationTemplate
+  extends Schema.CollectionType {
+  collectionName: 'notification_templates';
+  info: {
+    singularName: 'notification-template';
+    pluralName: 'notification-templates';
+    displayName: 'notificationTemplate';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    name: Attribute.String & Attribute.Unique;
+    body: Attribute.Text;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::notification-template.notification-template',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::notification-template.notification-template',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiPhoneNumbersListPhoneNumbersList extends Schema.SingleType {
+  collectionName: 'phone_numbers_lists';
+  info: {
+    singularName: 'phone-numbers-list';
+    pluralName: 'phone-numbers-lists';
+    displayName: 'phoneNumbersList';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    clientNumbers: Attribute.JSON;
+    adminNumbers: Attribute.JSON;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::phone-numbers-list.phone-numbers-list',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::phone-numbers-list.phone-numbers-list',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiRepaymentRepayment extends Schema.CollectionType {
+  collectionName: 'repayments';
+  info: {
+    singularName: 'repayment';
+    pluralName: 'repayments';
+    displayName: 'Repayment';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    repaymentAmount: Attribute.Decimal;
+    paymentDate: Attribute.DateTime;
+    paymentMethod: Attribute.Enumeration<
+      ['cash', 'bank', 'airtel-money', 'mtn-money']
+    >;
+    latePaymentPenalty: Attribute.Decimal;
+    transactionID: Attribute.String;
+    receipt: Attribute.Media;
+    repaymentType: Attribute.Enumeration<
+      ['partial-payment', 'full-payment', 'late-payment']
+    >;
+    paymentStatus: Attribute.Enumeration<['Paid', 'Failed', 'Pending']> &
+      Attribute.DefaultTo<'Pending'>;
+    loan: Attribute.Relation<
+      'api::repayment.repayment',
+      'manyToOne',
+      'api::loan.loan'
+    >;
+    client: Attribute.Relation<
+      'api::repayment.repayment',
+      'oneToOne',
+      'plugin::users-permissions.user'
+    >;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::repayment.repayment',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::repayment.repayment',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiSendNotificationSendNotification
+  extends Schema.CollectionType {
+  collectionName: 'send_notifications';
+  info: {
+    singularName: 'send-notification';
+    pluralName: 'send-notifications';
+    displayName: 'sendNotification';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    clientsToNotify: Attribute.Relation<
+      'api::send-notification.send-notification',
+      'oneToMany',
+      'plugin::users-permissions.user'
+    >;
+    notificationTemplate: Attribute.Enumeration<
+      [
+        'loan-approved',
+        'loan-accepted',
+        'loan-funds-disbursed',
+        'loan-rejected',
+        'loan-defaulted',
+        'loan-overdue',
+        'sign-documents',
+        'information-update',
+        'fixed-technical-fault',
+        'experiencing-technical-fault',
+        'other'
+      ]
+    >;
+    customNotificationBody: Attribute.Text;
+    sendVia: Attribute.Enumeration<['sms', 'email', 'both']> &
+      Attribute.DefaultTo<'both'>;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::send-notification.send-notification',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::send-notification.send-notification',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiTransactionHistoryTransactionHistory
+  extends Schema.CollectionType {
+  collectionName: 'transaction_histories';
+  info: {
+    singularName: 'transaction-history';
+    pluralName: 'transaction-histories';
+    displayName: 'TransactionHistory';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    transactionType: Attribute.Enumeration<
+      ['loan-application', 'loan-approval', 'loan-disbursement', 'repayment']
+    >;
+    transactionDate: Attribute.DateTime;
+    amount: Attribute.Decimal;
+    documents: Attribute.Media;
+    client: Attribute.Relation<
+      'api::transaction-history.transaction-history',
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+    loan: Attribute.Relation<
+      'api::transaction-history.transaction-history',
+      'manyToOne',
+      'api::loan.loan'
+    >;
+    description: Attribute.Text;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::transaction-history.transaction-history',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::transaction-history.transaction-history',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiTypeType extends Schema.CollectionType {
+  collectionName: 'types';
+  info: {
+    singularName: 'type';
+    pluralName: 'types';
+    displayName: 'Type';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    typeName: Attribute.String;
+    description: Attribute.Blocks;
+    minimumAmount: Attribute.Decimal;
+    maximumAmount: Attribute.Decimal;
+    defaultInterestRate: Attribute.Decimal;
+    loanTermOptions: Attribute.JSON;
+    category: Attribute.Relation<
+      'api::type.type',
+      'manyToOne',
+      'api::loan-category.loan-category'
+    >;
+    loans: Attribute.Relation<'api::type.type', 'oneToMany', 'api::loan.loan'>;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<'api::type.type', 'oneToOne', 'admin::user'> &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<'api::type.type', 'oneToOne', 'admin::user'> &
+      Attribute.Private;
+  };
+}
+
+export interface ApiVehicleTrackingFeeVehicleTrackingFee
+  extends Schema.SingleType {
+  collectionName: 'vehicle_tracking_fees';
+  info: {
+    singularName: 'vehicle-tracking-fee';
+    pluralName: 'vehicle-tracking-fees';
+    displayName: 'vehicleTrackingFee';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    upfrontTrackingFee: Attribute.Decimal;
+    monthlyTrackingFee: Attribute.Decimal;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::vehicle-tracking-fee.vehicle-tracking-fee',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::vehicle-tracking-fee.vehicle-tracking-fee',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
 declare module '@strapi/types' {
   export module Shared {
     export interface ContentTypes {
@@ -1463,6 +1550,14 @@ declare module '@strapi/types' {
       'admin::api-token-permission': AdminApiTokenPermission;
       'admin::transfer-token': AdminTransferToken;
       'admin::transfer-token-permission': AdminTransferTokenPermission;
+      'plugin::upload.file': PluginUploadFile;
+      'plugin::upload.folder': PluginUploadFolder;
+      'plugin::content-releases.release': PluginContentReleasesRelease;
+      'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;
+      'plugin::users-permissions.permission': PluginUsersPermissionsPermission;
+      'plugin::users-permissions.role': PluginUsersPermissionsRole;
+      'plugin::users-permissions.user': PluginUsersPermissionsUser;
+      'plugin::i18n.locale': PluginI18NLocale;
       'api::approval.approval': ApiApprovalApproval;
       'api::email-addresses-list.email-addresses-list': ApiEmailAddressesListEmailAddressesList;
       'api::finance.finance': ApiFinanceFinance;
@@ -1472,19 +1567,13 @@ declare module '@strapi/types' {
       'api::loan-category.loan-category': ApiLoanCategoryLoanCategory;
       'api::loans-information.loans-information': ApiLoansInformationLoansInformation;
       'api::notification.notification': ApiNotificationNotification;
+      'api::notification-template.notification-template': ApiNotificationTemplateNotificationTemplate;
       'api::phone-numbers-list.phone-numbers-list': ApiPhoneNumbersListPhoneNumbersList;
       'api::repayment.repayment': ApiRepaymentRepayment;
+      'api::send-notification.send-notification': ApiSendNotificationSendNotification;
       'api::transaction-history.transaction-history': ApiTransactionHistoryTransactionHistory;
       'api::type.type': ApiTypeType;
       'api::vehicle-tracking-fee.vehicle-tracking-fee': ApiVehicleTrackingFeeVehicleTrackingFee;
-      'plugin::upload.file': PluginUploadFile;
-      'plugin::upload.folder': PluginUploadFolder;
-      'plugin::content-releases.release': PluginContentReleasesRelease;
-      'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;
-      'plugin::users-permissions.permission': PluginUsersPermissionsPermission;
-      'plugin::users-permissions.role': PluginUsersPermissionsRole;
-      'plugin::users-permissions.user': PluginUsersPermissionsUser;
-      'plugin::i18n.locale': PluginI18NLocale;
     }
   }
 }

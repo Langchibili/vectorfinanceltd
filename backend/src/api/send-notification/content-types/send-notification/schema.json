@@ -1,0 +1,49 @@
+{
+  "kind": "collectionType",
+  "collectionName": "send_notifications",
+  "info": {
+    "singularName": "send-notification",
+    "pluralName": "send-notifications",
+    "displayName": "sendNotification",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "clientsToNotify": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "plugin::users-permissions.user"
+    },
+    "notificationTemplate": {
+      "type": "enumeration",
+      "enum": [
+        "loan-approved",
+        "loan-accepted",
+        "loan-funds-disbursed",
+        "loan-rejected",
+        "loan-defaulted",
+        "loan-overdue",
+        "sign-documents",
+        "information-update",
+        "fixed-technical-fault",
+        "experiencing-technical-fault",
+        "other"
+      ]
+    },
+    "customNotificationBody": {
+      "type": "text"
+    },
+    "sendVia": {
+      "type": "enumeration",
+      "enum": [
+        "sms",
+        "email",
+        "both"
+      ],
+      "default": "both"
+    }
+  }
+}
