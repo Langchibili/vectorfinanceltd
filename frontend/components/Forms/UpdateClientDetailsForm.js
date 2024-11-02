@@ -261,6 +261,7 @@ export default class UpdateClientDetailsForm extends React.Component {
                                 name="employementStatus"
                                 autoComplete="off"
                                 value={employementStatus}
+                                disabled={!this.state.clientDetailsId}
                                 onChange={this.handleInputChange}
                             >
                             <option value="">Choose...</option>
@@ -300,6 +301,7 @@ export default class UpdateClientDetailsForm extends React.Component {
                                 name="idType"
                                 autoComplete="off"
                                 value={idType}
+                                disabled={!this.state.clientDetailsId}
                                 onChange={this.handleInputChange}
                             >
                             <option value="">Choose...</option>

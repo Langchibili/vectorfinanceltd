@@ -113,7 +113,7 @@ export default class UpdateVehicleCollateralForm extends React.Component {
       }
       else{
           if(isFormValid){
-            this.setState({ isFormValid:isFormValid, saved: true})
+            this.setState({ isFormValid:true, saved: true})
           }
           else{
             this.setState({ isFormValid})
@@ -190,7 +190,6 @@ export default class UpdateVehicleCollateralForm extends React.Component {
         this.setState({
             whitebook: files,
             saving: false,
-            saved: true,
             error: null
         },()=>{
             this.checkFormValidity()
@@ -201,7 +200,6 @@ export default class UpdateVehicleCollateralForm extends React.Component {
         this.setState({
             whitebook: newFiles,
             saving: false,
-            saved: true,
             error: null
         },()=>{
             this.checkFormValidity()
@@ -384,7 +382,7 @@ export default class UpdateVehicleCollateralForm extends React.Component {
                       className="btn btn-success w-90 mt-3"
                       id="confirm-btn"
                     >
-                      Save
+                      {this.state.saving? "saving..." : 'save'}
                     </button>
 
                     
@@ -392,7 +390,7 @@ export default class UpdateVehicleCollateralForm extends React.Component {
                       type="button"
                       className="btn btn-danger w-90 mt-3"
                       id="next-btn"
-                      disabled={!isFormValid || !saved}
+                      disabled={!isFormValid && !saved}
                       onClick={()=>{this.handleFinishLoanApplication()}}
                     >
                       Complete

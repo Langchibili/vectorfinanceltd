@@ -198,7 +198,6 @@ export default class UpdateLandCollateralForm extends React.Component {
         this.setState({
             titleDeed: files,
             saving: false,
-            saved: true,
             error: null
         },()=>{
             this.checkFormValidity()
@@ -209,7 +208,6 @@ export default class UpdateLandCollateralForm extends React.Component {
         this.setState({
             titleDeed: newFiles,
             saving: false,
-            saved: true,
             error: null
         },()=>{
             this.checkFormValidity()
@@ -396,7 +394,7 @@ export default class UpdateLandCollateralForm extends React.Component {
                       className="btn btn-success w-90 mt-3"
                       id="confirm-btn"
                     >
-                      Save
+                      {this.state.saving? "saving..." : 'save'}
                     </button>
 
                     

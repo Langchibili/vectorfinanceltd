@@ -278,6 +278,7 @@ export default class UpdateSalaryDetailsForm extends React.Component {
                           name="companyName"
                           type="text"
                           autoComplete="off"
+                          disabled={!this.state.salaryDetailsId}
                           value={companyName}
                           onChange={this.handleInputChange}
                         />
@@ -295,6 +296,7 @@ export default class UpdateSalaryDetailsForm extends React.Component {
                           type="text"
                           autoComplete="off"
                           value={employerName}
+                          disabled={!this.state.salaryDetailsId}
                           onChange={this.handleInputChange}
                         />
                       </div>
@@ -310,6 +312,7 @@ export default class UpdateSalaryDetailsForm extends React.Component {
                           id="employementVerificationNumber"
                           name="employementVerificationNumber"
                           value={employementVerificationNumber}
+                          disabled={!this.state.salaryDetailsId}
                           type="text"
                           autoComplete="off"
                           onChange={this.handleInputChange}
@@ -325,6 +328,7 @@ export default class UpdateSalaryDetailsForm extends React.Component {
                             <input
                             name="salaryAmount"
                             value={salaryAmount}
+                            disabled={!this.state.salaryDetailsId}
                             onChange={this.handleInputChange}
                             type="text"
                             className="form-control"
@@ -344,6 +348,7 @@ export default class UpdateSalaryDetailsForm extends React.Component {
                           name="companyLocation"
                           type="text"
                           autoComplete="off"
+                          disabled={!this.state.salaryDetailsId}
                           value={companyLocation}
                           onChange={this.handleInputChange}
                         />

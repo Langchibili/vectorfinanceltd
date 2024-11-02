@@ -198,7 +198,6 @@ export default class UpdateHouseCollateralForm extends React.Component {
         this.setState({
             titleDeed: files,
             saving: false,
-            saved: true,
             error: null
         },()=>{
             this.checkFormValidity()
@@ -209,7 +208,6 @@ export default class UpdateHouseCollateralForm extends React.Component {
         this.setState({
             titleDeed: newFiles,
             saving: false,
-            saved: true,
             error: null
         },()=>{
             this.checkFormValidity()
@@ -328,6 +326,7 @@ export default class UpdateHouseCollateralForm extends React.Component {
                           type="text"
                           autoComplete="off"
                           value={dimensions}
+                          disabled={!this.state.houseId}
                           onChange={this.handleInputChange}
                         />
                       </div>
@@ -344,6 +343,7 @@ export default class UpdateHouseCollateralForm extends React.Component {
                           type="text"
                           autoComplete="off"
                           value={plotNumber}
+                          disabled={!this.state.houseId}
                           onChange={this.handleInputChange}
                         />
                       </div>
@@ -361,6 +361,7 @@ export default class UpdateHouseCollateralForm extends React.Component {
                           type="text"
                           autoComplete="off"
                           value={location}
+                          disabled={!this.state.houseId}
                           onChange={this.handleInputChange}
                         />
                       </div>
@@ -393,7 +394,7 @@ export default class UpdateHouseCollateralForm extends React.Component {
                       className="btn btn-success w-90 mt-3"
                       id="confirm-btn"
                     >
-                      Save
+                      {this.state.saving? "saving..." : 'save'}
                     </button>
 
                     
