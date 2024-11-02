@@ -6,6 +6,7 @@ import MainFooter from "@/components/Parts/Footer/MainFooter";
 import MainMenu from '@/components/Parts/Menus/MainMenu';
 import { UserProvider, useUser } from "@/Contexts/UserContext";
 import BottomNav from "@/components/Includes/BottomNavigation/BottomNavigation";
+import { ConstantsProvider } from "@/Contexts/ConstantsContext";
 
 export default function RootLayout({ children }) {
   return (
@@ -46,6 +47,7 @@ export default function RootLayout({ children }) {
       <body>
       <div id="layout-wrapper">
       <UserProvider>
+        <ConstantsProvider>
           <HeaderPart/>
           <div className="vertical-overlay"></div>
             <div className="main-content">
@@ -53,6 +55,7 @@ export default function RootLayout({ children }) {
               <FooterPart/>
             </div>
             {/* <BottomNav/> */}
+        </ConstantsProvider>
       </UserProvider>
       </div>
         {/* <!-- JAVASCRIPT --> */}

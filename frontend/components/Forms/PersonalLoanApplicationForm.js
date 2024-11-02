@@ -78,12 +78,12 @@ export default class PersonalLoanApplicationForm extends React.Component{
         createLoanObject.loanTerm = parseInt(createLoanObject.loanTerm)
         createLoanObject.clientAskingAmount = createLoanObject.loanAmount 
         if(this.state.loanType === "salaryBased"){
-            createLoanObject.loanCategory = { connect: [1] }
-            createLoanObject.loanType = { connect: [1] }
+            createLoanObject.loanCategory = { connect: [this.props.constants.loanCategoriesIds.salaryLoans] }
+            createLoanObject.loanType = { connect: [this.props.constants.loanTypesIds.salaryBased] }
         }
         else{
             createLoanObject.loanStatus = "pending-collateral-addition"
-            createLoanObject.loanCategory = { connect: [2] }
+            createLoanObject.loanCategory = { connect: [this.props.constants.loanCategoriesIds.assetLoans] }
             delete createLoanObject.loanType
         }
         // if(this.props.loggedInUser.salary){

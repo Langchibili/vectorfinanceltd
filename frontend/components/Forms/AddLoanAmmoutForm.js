@@ -15,9 +15,9 @@ export default class AddLoanAmountForm extends React.Component {
       loanType: '',
       loanPurpose: '',
       loanPurposeDetails: '',
-      loanTerm: 12,  // Default term, can be changed
-      interestRate: 11.5,  // Default interest rate
-      maxLoanTerm: 12,  // Default max term
+      loanTerm: this.props.constants.loansInformation.defaultCollaterallLoanTerm,  // Default term, can be changed
+      interestRate: this.props.constants.loansInformation.defaultCollaterallLoanInterestRate,  // Default interest rate
+      maxLoanTerm: this.props.constants.loansInformation.defaultCollaterallLoanTerm,  // Default max term
       isFormValid: false,
       stateSaved: false,
       monthlyPayment: 0,
@@ -37,9 +37,9 @@ export default class AddLoanAmountForm extends React.Component {
     if (name === 'onPayroll') {
       // Update maxLoanTerm based on payroll status
       if (value === 'yes') {
-        this.setState({ loanTerm: 12, maxLoanTerm: 60 }); // Max 60 months for salary-based loans
+        this.setState({ loanTerm: this.props.constants.loansInformation.defaultCollaterallLoanTerm, maxLoanTerm: this.props.constants.loansInformation.defaultCollaterallLoanTerm }); // Max 60 months for salary-based loans
       } else {
-        this.setState({ loanTerm: 12, maxLoanTerm: 12 }); // Max 12 months for non-salary loans
+        this.setState({ loanTerm: this.props.constants.loansInformation.defaultCollaterallLoanTerm, maxLoanTerm: this.props.constants.loansInformation.defaultSalaryLoanTerm }); // Max 12 months for non-salary loans
       }
     }
   }
@@ -76,8 +76,8 @@ export default class AddLoanAmountForm extends React.Component {
     const { loanAmount, loanTerm, interestRate, salary, onPayroll, salaryDeduction } = this.state;
     let annualInterestRate = interestRate
     // Call loanCalculator and update monthly payment and profit
-    if (onPayroll === 'yes' && salaryDeduction === 'yes') {
-        annualInterestRate = 24
+    if (onPayroll === 'yes' && salaryDeduction === 'yes') { // this means this is a salary loan
+        annualInterestRate = this.props.constants.loansInformation.defaultSalaryLoanInterestRate
     }
     const { monthlyPayment, totalProfit } = loanCalculator(loanAmount, annualInterestRate, loanTerm);
     

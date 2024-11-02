@@ -218,7 +218,7 @@ export default class UpdateHouseCollateralForm extends React.Component {
   }
   
   handleFinishLoanApplication = async ()=>{
-      const updatedLoan = await updateLoan({data: {loanStatus: 'pending-collateral-inspection'}},this.props.loggedInUser.currentLoan.id)
+      const updatedLoan = await updateLoan({data: {loanStatus: 'pending-collateral-inspection',loanType : { connect: [this.props.constants.loanTypesIds.houseCollateralLoans] }}},this.props.loggedInUser.currentLoan.id)
       if(updatedLoan.hasOwnProperty('error')){
         this.setState({
             error: 'something went wrong, try again',

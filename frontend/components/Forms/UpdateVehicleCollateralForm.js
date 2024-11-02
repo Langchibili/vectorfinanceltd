@@ -210,18 +210,18 @@ export default class UpdateVehicleCollateralForm extends React.Component {
   }
   
   handleFinishLoanApplication = async ()=>{
-      const updatedLoan = await updateLoan({data: {loanStatus: 'pending-collateral-inspection'}},this.props.loggedInUser.currentLoan.id)
-      if(updatedLoan.hasOwnProperty('error')){
-        this.setState({
-            error: 'something went wrong, try again',
-            saving: false
-        })
-     }
-     else{
-        // send a notification then redirect user
-        window.packed = "/"
-     }
-  }
+    const updatedLoan = await updateLoan({data: {loanStatus: 'pending-collateral-inspection',loanType : { connect: [this.props.constants.loanTypesIds.vehicleCollateralLoans] }}},this.props.loggedInUser.currentLoan.id)
+    if(updatedLoan.hasOwnProperty('error')){
+      this.setState({
+          error: 'something went wrong, try again',
+          saving: false
+      })
+   }
+   else{
+      // send a notification then redirect user
+      window.location = "/"
+   }
+}
 
 
   handleRemoveImage = async (uploadid,filesArr,arrName)=>{
@@ -332,6 +332,7 @@ export default class UpdateVehicleCollateralForm extends React.Component {
                           name="numberPlate"
                           type="text"
                           autoComplete="off"
+                          disabled={!this.state.vehicleId}
                           value={numberPlate}
                           onChange={this.handleInputChange}
                         />
@@ -341,6 +342,7 @@ export default class UpdateVehicleCollateralForm extends React.Component {
                         <div className="input-group">
                           <label className="form-label mr-2">Do you want to pack the vehicle with us or keep it?</label>
                           <select
+                            disabled={!this.state.vehicleId}
                             className="form-select"
                             name="packed"
                             autoComplete="off"

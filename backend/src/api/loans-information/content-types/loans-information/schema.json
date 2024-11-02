@@ -17,6 +17,12 @@
     },
     "defaultCollaterallLoanInterestRate": {
       "type": "decimal"
+    },
+    "defaultCollaterallLoanTerm": {
+      "type": "decimal"
+    },
+    "defaultSalaryLoanTerm": {
+      "type": "decimal"
     }
   }
 }

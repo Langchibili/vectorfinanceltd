@@ -6,8 +6,7 @@ import UpdateDetailsForm from "./UpdateDetailsForm";
 import AddLoanAmountForm from "./AddLoanAmmoutForm";
 import BusinessInformationForm from "./BusinessInformationForm";
 import UpdateSalaryDetailsForm from "./UpdateSalaryDetailsForm";
-import { createNewLoan, dateAndTimeNow, updateUserAccount } from "@/Functions";
-import UpdateLandCollateralForm from "./UpdateLandCollateralForm";
+import { createNewLoan, dateAndTimeNow, logNewNotification, logNewTransactionHistory, updateUserAccount } from "@/Functions";
 
 export default class BusinessLoanApplicationForm extends React.Component{
     constructor(props){
@@ -55,7 +54,7 @@ export default class BusinessLoanApplicationForm extends React.Component{
             openBusinessInformationForm: true
         })
     }
-   
+
     handleCreateBlankLoan = async ()=>{
         // create new loan 
         // add new loan to client's currentLoan relation
@@ -72,35 +71,58 @@ export default class BusinessLoanApplicationForm extends React.Component{
         delete createLoanObject.maxLoanTerm
         delete createLoanObject.salary
         
-        
-        createLoanObject.applicationDate = dateAndTimeNow()
+        const applicationDate =  dateAndTimeNow()
+        createLoanObject.applicationDate =  applicationDate
         createLoanObject.loanAmount = parseFloat(parseFloat(createLoanObject.loanAmount).toFixed(2))
         createLoanObject.salaryPercentage = parseFloat(parseFloat(createLoanObject.salaryPercentage).toFixed(2))
         createLoanObject.loanTerm = parseInt(createLoanObject.loanTerm)
         createLoanObject.clientAskingAmount = createLoanObject.loanAmount 
-        
         if(this.state.loanType === "salaryBased"){
-            createLoanObject.loanCategory = { connect: [1] }
-            createLoanObject.loanType = { connect: [1] }
+            createLoanObject.loanCategory = { connect: [this.props.constants.loanCategoriesIds.salaryLoans] }
+            createLoanObject.loanType = { connect: [this.props.constants.loanTypesIds.salaryBased] }
         }
         else{
-            createLoanObject.loanCategory = { connect: [2] }
+            createLoanObject.loanStatus = "pending-collateral-addition"
+            createLoanObject.loanCategory = { connect: [this.props.constants.loanCategoriesIds.assetLoans] }
+            delete createLoanObject.loanType
         }
+        // if(this.props.loggedInUser.salary){
+        //     createLoanObject.salary = { id: this.props.loggedInUser.salary.id}
+        // }
+        console.log(createLoanObject)
 
         const newLoan = await createNewLoan({data:createLoanObject})
-        console.log(createLoanObject)
-        console.log(newLoan)
         if(!newLoan.hasOwnProperty('error')){
-            const userUpdateObject = {
-                currentLoan: {connect: [newLoan.id]},
-                loans: {connect: [newLoan.id]}
+            const transactionHistoryObject = {
+                transactionType: "loan-application",
+                transactionDate: applicationDate,
+                amount: createLoanObject.loanAmount,
+                description: "Initiation of the loan, with id: "+newLoan.id,
+                loan: {connect: [newLoan.id]}
             }
-            const updatedUserAccount = await updateUserAccount(userUpdateObject,this.props.loggedInUser.id)
-            if(!updatedUserAccount.hasOwnProperty('error')){
-                window.location = "/"
+            const notificationObject = {
+                title: "A new loan, with id: "+newLoan.id+" has been Initiated",
+                type: "alert"
             }
+            const transactionHistory = await logNewTransactionHistory({data:transactionHistoryObject})
+            const newNotitifcation = await logNewNotification({data:notificationObject})
+            if(!transactionHistory.hasOwnProperty('error')){
+                const userUpdateObject = {
+                    currentLoan: {connect: [newLoan.id]},
+                    loans: {connect: [newLoan.id]},
+                    transactionHistories: {connect: [transactionHistory.id]},
+                    activities: {connect: [newNotitifcation.id]}
+                }
+                const updatedUserAccount = await updateUserAccount(userUpdateObject,this.props.loggedInUser.id)
+                if(!updatedUserAccount.hasOwnProperty('error')){
+                    window.location = "/"
+                }
+            }
+            // send a notification
+            // if it's a business loan or company loan, do not send an sms or email notification here first
         }
     }
+
 
     renderForm = ()=>{
         if(this.state.openUpdateDetailsForm){

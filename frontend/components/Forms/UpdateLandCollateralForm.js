@@ -218,18 +218,18 @@ export default class UpdateLandCollateralForm extends React.Component {
   }
   
   handleFinishLoanApplication = async ()=>{
-      const updatedLoan = await updateLoan({data: {loanStatus: 'pending-collateral-inspection'}},this.props.loggedInUser.currentLoan.id)
-      if(updatedLoan.hasOwnProperty('error')){
-        this.setState({
-            error: 'something went wrong, try again',
-            saving: false
-        })
-     }
-     else{
-        // send a notification then redirect user
-        window.location = "/"
-     }
-  }
+    const updatedLoan = await updateLoan({data: {loanStatus: 'pending-collateral-inspection',loanType : { connect: [this.props.constants.loanTypesIds.landCollateralLoans] }}},this.props.loggedInUser.currentLoan.id)
+    if(updatedLoan.hasOwnProperty('error')){
+      this.setState({
+          error: 'something went wrong, try again',
+          saving: false
+      })
+   }
+   else{
+      // send a notification then redirect user
+      window.location = "/"
+   }
+}
 
 
   handleRemoveImage = async (uploadid,filesArr,arrName)=>{
@@ -328,6 +328,7 @@ export default class UpdateLandCollateralForm extends React.Component {
                           type="text"
                           autoComplete="off"
                           value={hectors}
+                          disabled={!this.state.landId}
                           onChange={this.handleInputChange}
                         />
                       </div>
@@ -344,6 +345,7 @@ export default class UpdateLandCollateralForm extends React.Component {
                           type="text"
                           autoComplete="off"
                           value={plotNumber}
+                          disabled={!this.state.landId}
                           onChange={this.handleInputChange}
                         />
                       </div>
@@ -355,6 +357,7 @@ export default class UpdateLandCollateralForm extends React.Component {
                         </label>
                         <p><small  style={{color:'lightgray'}}>(Plot No. Area City Province)</small></p>
                         <input
+                          disabled={!this.state.landId}
                           className="form-control"
                           id="lastnameInput"
                           name="location"

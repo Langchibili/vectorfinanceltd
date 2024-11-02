@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2024-10-31T23:32:10.751Z"
+    "x-generation-date": "2024-11-02T00:55:52.050Z"
   },
   "x-strapi-config": {
     "path": "/documentation",
@@ -28477,6 +28477,14 @@
               "defaultCollaterallLoanInterestRate": {
                 "type": "number",
                 "format": "float"
+              },
+              "defaultCollaterallLoanTerm": {
+                "type": "number",
+                "format": "float"
+              },
+              "defaultSalaryLoanTerm": {
+                "type": "number",
+                "format": "float"
               }
             }
           }
@@ -28536,6 +28544,14 @@
             "format": "float"
           },
           "defaultCollaterallLoanInterestRate": {
+            "type": "number",
+            "format": "float"
+          },
+          "defaultCollaterallLoanTerm": {
+            "type": "number",
+            "format": "float"
+          },
+          "defaultSalaryLoanTerm": {
             "type": "number",
             "format": "float"
           },

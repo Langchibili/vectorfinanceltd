@@ -294,6 +294,60 @@ export const updateLoan = async (data,loanId)=>{
   return null
 }
 
+
+export const getLoanCategoryIds = async ()=>{
+  const loanCategories = await fetch(api_url+'/loan-categories',{
+    headers: {
+      'Authorization': `Bearer ${getJwt()}`,
+      'Content-Type': 'application/json'
+    }
+  }).then(response => response.json())
+    .then(data => data)
+    .catch(error => console.error(error))
+  let loanCategoryIdsObject = {}  
+  if(loanCategories && loanCategories.data){
+    loanCategories.data.forEach(loanCategory => {
+      loanCategoryIdsObject[loanCategory.attributes.categoryName] = loanCategory.id
+    })
+  }
+  return loanCategoryIdsObject
+ }
+ export const getLoanTypesIds = async ()=>{
+  const loanTypes = await fetch(api_url+'/types',{
+    headers: {
+      'Authorization': `Bearer ${getJwt()}`,
+      'Content-Type': 'application/json'
+    }
+  }).then(response => response.json())
+    .then(data => data)
+    .catch(error => console.error(error))
+  let loanTypesIdsObject = {}  
+  if(loanTypes && loanTypes.data){
+    loanTypes.data.forEach(loanType => {
+      loanTypesIdsObject[loanType.attributes.typeName] = loanType.id
+    })
+  }
+  return loanTypesIdsObject
+ }
+
+
+ export const getLoansInformation = async ()=>{
+  const loansInformation = await fetch(api_url+'/loans-information',{
+    headers: {
+      'Authorization': `Bearer ${getJwt()}`,
+      'Content-Type': 'application/json'
+    }
+  }).then(response => response.json())
+    .then(data => data)
+    .catch(error => console.error(error))
+  if(loansInformation && loansInformation.data){
+    return loansInformation.data.attributes
+  }
+  else{
+    return loansInformation
+  }
+ }
+
 export const getPosts = async (customUri=null,getMeta=false)=>{
   console.log(customUri)
   let posts = null
