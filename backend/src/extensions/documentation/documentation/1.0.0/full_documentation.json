@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2024-11-02T01:52:08.292Z"
+    "x-generation-date": "2024-11-03T02:48:58.288Z"
   },
   "x-strapi-config": {
     "path": "/documentation",
@@ -40186,22 +40186,6 @@
                   "example": "string or id"
                 }
               },
-              "notificationTemplate": {
-                "type": "string",
-                "enum": [
-                  "loan-approved",
-                  "loan-accepted",
-                  "loan-funds-disbursed",
-                  "loan-rejected",
-                  "loan-defaulted",
-                  "loan-overdue",
-                  "sign-documents",
-                  "information-update",
-                  "fixed-technical-fault",
-                  "experiencing-technical-fault",
-                  "other"
-                ]
-              },
               "customNotificationBody": {
                 "type": "string"
               },
@@ -40212,6 +40196,17 @@
                   "email",
                   "both"
                 ]
+              },
+              "notificationTemplate": {
+                "oneOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "string"
+                  }
+                ],
+                "example": "string or id"
               }
             }
           }
@@ -45218,22 +45213,6 @@
               }
             }
           },
-          "notificationTemplate": {
-            "type": "string",
-            "enum": [
-              "loan-approved",
-              "loan-accepted",
-              "loan-funds-disbursed",
-              "loan-rejected",
-              "loan-defaulted",
-              "loan-overdue",
-              "sign-documents",
-              "information-update",
-              "fixed-technical-fault",
-              "experiencing-technical-fault",
-              "other"
-            ]
-          },
           "customNotificationBody": {
             "type": "string"
           },
@@ -45244,6 +45223,76 @@
               "email",
               "both"
             ]
+          },
+          "notificationTemplate": {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "number"
+                  },
+                  "attributes": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "body": {
+                        "type": "string"
+                      },
+                      "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "updatedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "publishedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "createdBy": {
+                        "type": "object",
+                        "properties": {
+                          "data": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "number"
+                              },
+                              "attributes": {
+                                "type": "object",
+                                "properties": {}
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "updatedBy": {
+                        "type": "object",
+                        "properties": {
+                          "data": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "number"
+                              },
+                              "attributes": {
+                                "type": "object",
+                                "properties": {}
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
           },
           "createdAt": {
             "type": "string",

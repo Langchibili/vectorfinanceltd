@@ -1390,24 +1390,14 @@ export interface ApiSendNotificationSendNotification
       'oneToMany',
       'plugin::users-permissions.user'
     >;
-    notificationTemplate: Attribute.Enumeration<
-      [
-        'loan-approved',
-        'loan-accepted',
-        'loan-funds-disbursed',
-        'loan-rejected',
-        'loan-defaulted',
-        'loan-overdue',
-        'sign-documents',
-        'information-update',
-        'fixed-technical-fault',
-        'experiencing-technical-fault',
-        'other'
-      ]
-    >;
     customNotificationBody: Attribute.Text;
     sendVia: Attribute.Enumeration<['sms', 'email', 'both']> &
       Attribute.DefaultTo<'both'>;
+    notificationTemplate: Attribute.Relation<
+      'api::send-notification.send-notification',
+      'oneToOne',
+      'api::notification-template.notification-template'
+    >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;

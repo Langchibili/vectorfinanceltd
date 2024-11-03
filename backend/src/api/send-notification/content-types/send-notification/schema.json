@@ -17,22 +17,6 @@
       "relation": "oneToMany",
       "target": "plugin::users-permissions.user"
     },
-    "notificationTemplate": {
-      "type": "enumeration",
-      "enum": [
-        "loan-approved",
-        "loan-accepted",
-        "loan-funds-disbursed",
-        "loan-rejected",
-        "loan-defaulted",
-        "loan-overdue",
-        "sign-documents",
-        "information-update",
-        "fixed-technical-fault",
-        "experiencing-technical-fault",
-        "other"
-      ]
-    },
     "customNotificationBody": {
       "type": "text"
     },
@@ -44,6 +28,11 @@
         "both"
       ],
       "default": "both"
+    },
+    "notificationTemplate": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::notification-template.notification-template"
     }
   }
 }
