@@ -6,7 +6,7 @@ import UpdateDetailsForm from "./UpdateDetailsForm";
 import AddLoanAmountForm from "./AddLoanAmmoutForm";
 import BusinessInformationForm from "./BusinessInformationForm";
 import UpdateSalaryDetailsForm from "./UpdateSalaryDetailsForm";
-import { createNewLoan, dateAndTimeNow, logNewNotification, logNewTransactionHistory, updateUserAccount } from "@/Functions";
+import { createNewLoan, dateAndTimeNow, logNewAdminNotification, logNewNotification, logNewTransactionHistory, updateUserAccount } from "@/Functions";
 
 export default class PersonalLoanApplicationForm extends React.Component{
     constructor(props){
@@ -115,10 +115,24 @@ export default class PersonalLoanApplicationForm extends React.Component{
                 }
                 const updatedUserAccount = await updateUserAccount(userUpdateObject,this.props.loggedInUser.id)
                 if(!updatedUserAccount.hasOwnProperty('error')){
-                    window.location = "/"
+                    if(this.state.loanType === "salaryBased"){
+                        const AdminNotificationBody = {
+                            loan: {connect: [newLoan.id]},
+                            client: {connect: [this.props.loggedInUser.id]},
+                            notification: {connect: [newNotitifcation.id]}
+                        }
+                        const newAdminNotification = await logNewAdminNotification(AdminNotificationBody)
+                        if(!newAdminNotification.hasOwnProperty('error')){
+                          window.location = "/"
+                        }
+                    }
+                    else{
+                         window.location = "/"
+                    }
                 }
             }
             // send a notification
+           
             // if it's a business loan or company loan, do not send an sms or email notification here first
         }
     }

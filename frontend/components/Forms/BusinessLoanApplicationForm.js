@@ -6,7 +6,7 @@ import UpdateDetailsForm from "./UpdateDetailsForm";
 import AddLoanAmountForm from "./AddLoanAmmoutForm";
 import BusinessInformationForm from "./BusinessInformationForm";
 import UpdateSalaryDetailsForm from "./UpdateSalaryDetailsForm";
-import { createNewLoan, dateAndTimeNow, logNewNotification, logNewTransactionHistory, updateUserAccount } from "@/Functions";
+import { createNewLoan, dateAndTimeNow, logNewAdminNotification, logNewNotification, logNewTransactionHistory, updateUserAccount } from "@/Functions";
 
 export default class BusinessLoanApplicationForm extends React.Component{
     constructor(props){
@@ -115,7 +115,15 @@ export default class BusinessLoanApplicationForm extends React.Component{
                 }
                 const updatedUserAccount = await updateUserAccount(userUpdateObject,this.props.loggedInUser.id)
                 if(!updatedUserAccount.hasOwnProperty('error')){
-                    window.location = "/"
+                    const AdminNotificationBody = {
+                        loan: {connect: [newLoan.id]},
+                        client: {connect: [this.props.loggedInUser.id]},
+                        notification: {connect: [newNotitifcation.id]}
+                    }
+                    const newAdminNotification = await logNewAdminNotification(AdminNotificationBody)
+                    if(!newAdminNotification.hasOwnProperty('error')){
+                      window.location = "/"
+                    }
                 }
             }
             // send a notification

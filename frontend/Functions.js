@@ -275,6 +275,24 @@ export const logNewNotification = async (data)=>{
    }
   return null
 }
+export const logNewAdminNotification = async (data)=>{
+  const notification =  await fetch(api_url+'/admin-notifications', {
+      method: 'POST',
+      headers: {
+       'Authorization': `Bearer ${getJwt()}`,
+       'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data),
+    })
+    .then(response => response.json())
+    .then(data => data)
+  if(notification && notification.data && notification.data.attributes){
+      notification.data.attributes.id = notification.data.id
+      return notification.data.attributes
+   }
+  return null
+}
+
 
 export const updateLoan = async (data,loanId)=>{
   const loan =  await fetch(api_url+'/loans/'+loanId, {

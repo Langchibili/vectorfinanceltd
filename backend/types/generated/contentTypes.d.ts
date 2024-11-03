@@ -844,6 +844,52 @@ export interface PluginI18NLocale extends Schema.CollectionType {
   };
 }
 
+export interface ApiAdminNotificationAdminNotification
+  extends Schema.CollectionType {
+  collectionName: 'admin_notifications';
+  info: {
+    singularName: 'admin-notification';
+    pluralName: 'admin-notifications';
+    displayName: 'adminNotification';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    client: Attribute.Relation<
+      'api::admin-notification.admin-notification',
+      'oneToOne',
+      'plugin::users-permissions.user'
+    >;
+    loan: Attribute.Relation<
+      'api::admin-notification.admin-notification',
+      'oneToOne',
+      'api::loan.loan'
+    >;
+    notification: Attribute.Relation<
+      'api::admin-notification.admin-notification',
+      'oneToOne',
+      'api::notification.notification'
+    >;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::admin-notification.admin-notification',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::admin-notification.admin-notification',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
 export interface ApiApprovalApproval extends Schema.CollectionType {
   collectionName: 'approvals';
   info: {
@@ -1548,6 +1594,7 @@ declare module '@strapi/types' {
       'plugin::users-permissions.role': PluginUsersPermissionsRole;
       'plugin::users-permissions.user': PluginUsersPermissionsUser;
       'plugin::i18n.locale': PluginI18NLocale;
+      'api::admin-notification.admin-notification': ApiAdminNotificationAdminNotification;
       'api::approval.approval': ApiApprovalApproval;
       'api::email-addresses-list.email-addresses-list': ApiEmailAddressesListEmailAddressesList;
       'api::finance.finance': ApiFinanceFinance;

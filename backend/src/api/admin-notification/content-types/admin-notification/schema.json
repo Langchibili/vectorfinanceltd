@@ -1,0 +1,31 @@
+{
+  "kind": "collectionType",
+  "collectionName": "admin_notifications",
+  "info": {
+    "singularName": "admin-notification",
+    "pluralName": "admin-notifications",
+    "displayName": "adminNotification",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "client": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "plugin::users-permissions.user"
+    },
+    "loan": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::loan.loan"
+    },
+    "notification": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::notification.notification"
+    }
+  }
+}
