@@ -1,3 +1,6 @@
+const axios = require('axios');
+const nodemailer = require('nodemailer');
+
 module.exports = {
     async afterCreate(event) {
         const { result, params } = event; // get the required objects
@@ -9,12 +12,54 @@ module.exports = {
                 populate: ['clientsToNotify.details','notificationTemplate']
             })
         }
-        const SendSmsNotification = (phoneNumber,fullnames,notificationBody)=>{
-            console.log('sending sms notification',phoneNumber,fullnames,notificationBody)
+
+        const SendSmsNotification = (phoneNumber,notificationBody)=>{
+            axios.post(process.env.SMSGATEWAYURL+"/send-sms", {
+                apiKey: process.env.SMSGATEWAYAPIKEY,
+                username: process.env.SMSGATEWAYAPIUSERNAME,
+                recipients: [phoneNumber], // array of recipients
+                message: notificationBody,
+                from: process.env.SMSGATEWAYAPICALLERID
+            }, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                console.log('SMS sent successfully:', response.data);
+            })
+            .catch(error => {
+                console.error('Error sending SMS:', error);
+            });
+            console.log('sending sms notification',phoneNumber,notificationBody)
         }
-        const SendEmailNotification = (email,fullnames,notificationBody)=>{
-            console.log('sending email notification',email,fullnames,notificationBody)
+
+        const SendEmailNotification = (email,notificationBody)=>{
+            // Configure transport options
+            const transporter = nodemailer.createTransport({
+                service: process.env.EMAILSERVICENAME, // Or specify an SMTP host
+                auth: {
+                user: process.env.EMAILSERVICEUSERNAME,
+                pass: process.env.EMAILSERVICEPASSWORD
+                }
+            })
+            
+            // Send email
+            transporter.sendMail({
+                from: process.env.EMAILSERVICEUSERNAME,
+                to: email,
+                subject: 'Message from Vector Finance Limited',
+                text: notificationBody
+            }, (error, info) => {
+                if (error) {
+                console.log('Error sending email:', error);
+                } else {
+                console.log('Email sent:', info.response);
+                }
+            });
+            console.log('sending email notification',email,notificationBody)
         }
+
         const returnNineDigitNumber = (phoneNumber) =>{
             return phoneNumber.replace(/\D/g, '').slice(-9)
         }
@@ -35,15 +80,15 @@ module.exports = {
                 finalNotificationBody = notificationBody.replace('customer',fullnames)
             }
             if(sendVia === "both"){
-                SendSmsNotification(phoneNumber,fullnames,finalNotificationBody)
-                SendEmailNotification(email,fullnames,finalNotificationBody)
+                SendSmsNotification(phoneNumber,finalNotificationBody)
+                SendEmailNotification(email,finalNotificationBody)
             }
             else{
                 if(sendVia === "sms"){
-                    SendSmsNotification(phoneNumber,fullnames,finalNotificationBody)
+                    SendSmsNotification(phoneNumber,finalNotificationBody)
                 }
                 else{
-                    SendEmailNotification(email,fullnames,finalNotificationBody)
+                    SendEmailNotification(email,finalNotificationBody)
                 }
             }
         })

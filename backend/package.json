@@ -16,13 +16,14 @@
     "@strapi/plugin-i18n": "4.23.0",
     "@strapi/plugin-users-permissions": "4.23.0",
     "@strapi/strapi": "4.23.0",
+    "axios": "^1.7.7",
     "mysql": "^2.18.1",
+    "nodemailer": "^6.9.16",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "react-router-dom": "5.3.4",
     "styled-components": "5.3.3"
   },
-  "devDependencies": {},
   "engines": {
     "node": ">=18.0.0 <=20.x.x",
     "npm": ">=6.0.0"
@@ -31,4 +32,3 @@
     "uuid": "5391f9bd-a648-4339-8ecb-e20aeac8003d"
   }
 }
-
