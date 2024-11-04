@@ -93,41 +93,14 @@ export default class BusinessLoanApplicationForm extends React.Component{
 
         const newLoan = await createNewLoan({data:createLoanObject})
         if(!newLoan.hasOwnProperty('error')){
-            const transactionHistoryObject = {
-                transactionType: "loan-application",
-                transactionDate: applicationDate,
-                amount: createLoanObject.loanAmount,
-                description: "Initiation of the loan, with id: "+newLoan.id,
-                loan: {connect: [newLoan.id]}
+            const userUpdateObject = {
+                currentLoan: {connect: [newLoan.id]},
+                loans: {connect: [newLoan.id]}
             }
-            const notificationObject = {
-                title: "A new loan, with id: "+newLoan.id+" has been Initiated",
-                type: "alert"
+            const updatedUserAccount = await updateUserAccount(userUpdateObject,this.props.loggedInUser.id)
+            if(!updatedUserAccount.hasOwnProperty('error')){
+                window.location = "/"
             }
-            const transactionHistory = await logNewTransactionHistory({data:transactionHistoryObject})
-            const newNotitifcation = await logNewNotification({data:notificationObject})
-            if(!transactionHistory.hasOwnProperty('error')){
-                const userUpdateObject = {
-                    currentLoan: {connect: [newLoan.id]},
-                    loans: {connect: [newLoan.id]},
-                    transactionHistories: {connect: [transactionHistory.id]},
-                    activities: {connect: [newNotitifcation.id]}
-                }
-                const updatedUserAccount = await updateUserAccount(userUpdateObject,this.props.loggedInUser.id)
-                if(!updatedUserAccount.hasOwnProperty('error')){
-                    const AdminNotificationBody = {
-                        loan: {connect: [newLoan.id]},
-                        client: {connect: [this.props.loggedInUser.id]},
-                        notification: {connect: [newNotitifcation.id]}
-                    }
-                    const newAdminNotification = await logNewAdminNotification(AdminNotificationBody)
-                    if(!newAdminNotification.hasOwnProperty('error')){
-                      window.location = "/"
-                    }
-                }
-            }
-            // send a notification
-            // if it's a business loan or company loan, do not send an sms or email notification here first
         }
     }
 

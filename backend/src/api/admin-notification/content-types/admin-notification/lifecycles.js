@@ -6,10 +6,10 @@ module.exports = {
         const { result, params } = event; // get the required objects
 
         const getNotification = async()=>{
-            return await strapi.db.query("api::send-notification.send-notification").findOne({where: {
+            return await strapi.db.query("api::admin-notification.admin-notification").findOne({where: {
                 id: result.id
             },
-                populate: ['clientsToNotify.details','notificationTemplate']
+                populate: ['notification']
             })
         }
 
@@ -65,52 +65,17 @@ module.exports = {
         }
 
         const notification = await getNotification()
-        const customNotificationBody = notification.customNotificationBody
-        const notificationTitle = notification.notificationTemplate.name
-        const notificationBody = !notification.notificationTemplate || notificationTitle === "other"? customNotificationBody : notification.notificationTemplate.body
-        const sendVia = notification.sendVia
+        const notificationBody = notification.title
 
-        
-        notification.clientsToNotify.forEach(client => {
-            const phoneNumber = "+260"+returnNineDigitNumber(client.username)
-            const email = client.email
-            const fullnames = client.fullnames
-            let finalNotificationBody = notificationBody
-            if(fullnames){
-                finalNotificationBody = notificationBody.replace('customer',fullnames)
-            }
-            if(sendVia === "both"){
-                SendSmsNotification(phoneNumber,finalNotificationBody)
-                SendEmailNotification(email,finalNotificationBody)
-            }
-            else{
-                if(sendVia === "sms"){
-                    SendSmsNotification(phoneNumber,finalNotificationBody)
-                }
-                else{
-                    SendEmailNotification(email,finalNotificationBody)
-                }
-            }
-        })
-        
-        
-        //   console.log(results)
-        //   console.log(results.clientsToNotify)
-        //   console.log(results.notificationTemplate)
+        const numbersArray = await strapi.db.query("api::phone-numbers-list.phone-numbers-list").findOne();
+        const emailsArray = await strapi.db.query("api::email-addresses-list.email-addresses-list").findOne();
+        numbersArray.adminNumbers.forEach(number => {
+            const phoneNumber = "+260"+returnNineDigitNumber(number)
+            SendSmsNotification(phoneNumber,notificationBody)
+         })
+
+        emailsArray.adminEmailAddresses.forEach(email => {
+            SendEmailNotification(email,notificationBody)
+         })
         },
   };
-
-
-
-/* notification templates */
-// loan-approved
-// loan-accepted
-// loan-funds-disbursed
-// loan-rejected
-// loan-defaulted
-// loan-overdue
-// sign-documents
-// information-update
-// fixed-technical-fault
-// experiencing-technical-fault
-// other

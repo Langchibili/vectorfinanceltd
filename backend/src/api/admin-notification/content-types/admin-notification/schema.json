@@ -12,11 +12,6 @@
   },
   "pluginOptions": {},
   "attributes": {
-    "client": {
-      "type": "relation",
-      "relation": "oneToOne",
-      "target": "plugin::users-permissions.user"
-    },
     "loan": {
       "type": "relation",
       "relation": "oneToOne",

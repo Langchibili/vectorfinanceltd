@@ -72,6 +72,7 @@ export default class PersonalLoanApplicationForm extends React.Component{
         delete createLoanObject.salary
         
         const applicationDate =  dateAndTimeNow()
+        const loanType = this.state.loanType
         createLoanObject.applicationDate =  applicationDate
         createLoanObject.loanAmount = parseFloat(parseFloat(createLoanObject.loanAmount).toFixed(2))
         createLoanObject.salaryPercentage = parseFloat(parseFloat(createLoanObject.salaryPercentage).toFixed(2))
@@ -101,7 +102,7 @@ export default class PersonalLoanApplicationForm extends React.Component{
                 loan: {connect: [newLoan.id]}
             }
             const notificationObject = {
-                title: "A new loan, with id: "+newLoan.id+" has been Initiated",
+                title: "A new salary loan, with id "+newLoan.id+" has been Initiated",
                 type: "alert"
             }
             const transactionHistory = await logNewTransactionHistory({data:transactionHistoryObject})
@@ -115,13 +116,12 @@ export default class PersonalLoanApplicationForm extends React.Component{
                 }
                 const updatedUserAccount = await updateUserAccount(userUpdateObject,this.props.loggedInUser.id)
                 if(!updatedUserAccount.hasOwnProperty('error')){
-                    if(this.state.loanType === "salaryBased"){
+                    if(loanType === "salaryBased"){
                         const AdminNotificationBody = {
                             loan: {connect: [newLoan.id]},
-                            client: {connect: [this.props.loggedInUser.id]},
                             notification: {connect: [newNotitifcation.id]}
                         }
-                        const newAdminNotification = await logNewAdminNotification(AdminNotificationBody)
+                        const newAdminNotification = await logNewAdminNotification({data:AdminNotificationBody})
                         if(!newAdminNotification.hasOwnProperty('error')){
                           window.location = "/"
                         }

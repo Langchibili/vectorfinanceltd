@@ -35,12 +35,21 @@ export default class AddLoanAmountForm extends React.Component {
     this.setState({ [name]: value }, this.checkFormValidity);
 
     if (name === 'onPayroll') {
-      // Update maxLoanTerm based on payroll status
-      if (value === 'yes') {
-        this.setState({ loanTerm: this.props.constants.loansInformation.defaultCollaterallLoanTerm, maxLoanTerm: this.props.constants.loansInformation.defaultCollaterallLoanTerm }); // Max 60 months for salary-based loans
+      // Update maxLoanTerm based on payroll status 
+      
+      if (value === 'yes') { 
+        this.setState({ loanTerm: this.props.constants.loansInformation.defaultCollaterallLoanTerm, maxLoanTerm: this.props.constants.loansInformation.defaultSalaryLoanTerm }); // Max 60 months for salary-based loans
       } else {
-        this.setState({ loanTerm: this.props.constants.loansInformation.defaultCollaterallLoanTerm, maxLoanTerm: this.props.constants.loansInformation.defaultSalaryLoanTerm }); // Max 12 months for non-salary loans
+        this.setState({ loanTerm: this.props.constants.loansInformation.defaultCollaterallLoanTerm, maxLoanTerm: this.props.constants.loansInformation.defaultCollaterallLoanTerm }); // Max 12 months for non-salary loans
       }
+    }
+    if (name === 'salaryDeduction') {
+        // Update maxLoanTerm based on payroll status 
+        if (value === 'yes') { 
+          this.setState({ loanTerm: this.props.constants.loansInformation.defaultCollaterallLoanTerm, maxLoanTerm: this.props.constants.loansInformation.defaultSalaryLoanTerm }); // Max 60 months for salary-based loans
+        } else {
+          this.setState({ loanTerm: this.props.constants.loansInformation.defaultCollaterallLoanTerm, maxLoanTerm: this.props.constants.loansInformation.defaultCollaterallLoanTerm }); // Max 12 months for non-salary loans
+        }
     }
   }
 
@@ -227,7 +236,18 @@ export default class AddLoanAmountForm extends React.Component {
   }
 
   getLoanPurposes = ()=>{
-    if(this.state.onPayroll === "no"){
+    if(this.state.onPayroll === 'yes' && this.state.salaryDeduction === 'yes'){
+        return [
+            'Business Expansion',
+            'Home Renovation',
+            'Education',
+            'Medical Expenses',
+            'Debt Consolidation',
+            'Vehicle Purchase',
+            'Others'
+          ] 
+    }
+    else{
        return [
         'Business Expansion',
         'Equipment Purchase',
@@ -244,19 +264,12 @@ export default class AddLoanAmountForm extends React.Component {
         'Seasonal Demand Preparation',
         'Legal and Regulatory Compliance',
         'Research and Development',
+        'Home Renovation',
+        'Education',
+        'Medical Expenses',
+        'Vehicle Purchase',
         'Others'
      ]
-    }
-    else{
-         return [
-            'Business Expansion',
-            'Home Renovation',
-            'Education',
-            'Medical Expenses',
-            'Debt Consolidation',
-            'Vehicle Purchase',
-            'Others'
-          ] 
     }
   }
 

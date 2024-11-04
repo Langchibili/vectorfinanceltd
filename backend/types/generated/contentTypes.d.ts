@@ -857,11 +857,6 @@ export interface ApiAdminNotificationAdminNotification
     draftAndPublish: true;
   };
   attributes: {
-    client: Attribute.Relation<
-      'api::admin-notification.admin-notification',
-      'oneToOne',
-      'plugin::users-permissions.user'
-    >;
     loan: Attribute.Relation<
       'api::admin-notification.admin-notification',
       'oneToOne',
@@ -1095,8 +1090,8 @@ export interface ApiLoanLoan extends Schema.CollectionType {
         'initiated',
         'pending-collateral-addition',
         'pending-collateral-inspection',
-        'pending-approval',
         'accepted',
+        'pending-approval',
         'approved',
         'rejected',
         'disbursed',

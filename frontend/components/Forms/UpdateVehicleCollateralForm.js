@@ -1,7 +1,7 @@
 "use client";
 
 import { api_url, backEndUrl, getJwt } from "@/Constants";
-import { getImage, getLoanFromId, textHasPhoneNumber, updateLoan, updateUserAccount } from "@/Functions";
+import { dateAndTimeNow, getImage, getLoanFromId, logNewAdminNotification, logNewNotification, logNewTransactionHistory, textHasPhoneNumber, updateLoan, updateUserAccount } from "@/Functions";
 import React from "react";
 import Uploader from "../Includes/Uploader/Uploader";
 import { Alert } from "@mui/material";
@@ -209,15 +209,46 @@ export default class UpdateVehicleCollateralForm extends React.Component {
   
   handleFinishLoanApplication = async ()=>{
     const updatedLoan = await updateLoan({data: {loanStatus: 'pending-collateral-inspection',loanType : { connect: [this.props.constants.loanTypesIds.vehicleCollateralLoans] }}},this.props.loggedInUser.currentLoan.id)
-    if(updatedLoan.hasOwnProperty('error')){
-      this.setState({
-          error: 'something went wrong, try again',
-          saving: false
-      })
+    if(!updatedLoan.hasOwnProperty('error')){
+      const applicationDate =  dateAndTimeNow()
+      const transactionHistoryObject = {
+          transactionType: "loan-application",
+          transactionDate: applicationDate,
+          amount: updatedLoan.loanAmount,
+          description: "Initiation of the loan, with id: "+updatedLoan.id,
+          loan: {connect: [updatedLoan.id]}
+      }
+      const notificationObject = {
+          title: "A new asset loan, with id "+updatedLoan.id+" has been Initiated",
+          type: "alert"
+      }
+      const transactionHistory = await logNewTransactionHistory({data:transactionHistoryObject})
+      const newNotitifcation = await logNewNotification({data:notificationObject})
+      if(!transactionHistory.hasOwnProperty('error')){
+        const userUpdateObject = {
+            transactionHistories: {connect: [transactionHistory.id]},
+            activities: {connect: [newNotitifcation.id]}
+        }
+        const updatedUserAccount = await updateUserAccount(userUpdateObject,this.props.loggedInUser.id)
+        if(!updatedUserAccount.hasOwnProperty('error')){
+            const AdminNotificationBody = {
+                loan: {connect: [updatedLoan.id]},
+                notification: {connect: [newNotitifcation.id]}
+            }
+            const newAdminNotification = await logNewAdminNotification({data:AdminNotificationBody})
+            if(!newAdminNotification.hasOwnProperty('error')){
+              window.location = "/"
+            }
+        }
+    }
+      
    }
    else{
       // send a notification then redirect user
-      window.location = "/"
+      this.setState({
+        error: 'something went wrong, try again',
+        saving: false
+       })
    }
 }
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { api_url, backEndUrl, getJwt } from "@/Constants";
-import { getImage, updateUserAccount } from "@/Functions";
+import { dateAndTimeNow, getImage, logNewAdminNotification, logNewNotification, logNewTransactionHistory, updateLoan, updateUserAccount } from "@/Functions";
 import React from "react";
 import Uploader from "../Includes/Uploader/Uploader";
 import { Download } from "@mui/icons-material";
@@ -290,6 +290,52 @@ export default class FilledForms extends React.Component {
     })
   }
 
+
+  handleCompleteLoanApplication = async ()=>{
+    const updatedLoan = await updateLoan({data: {loanStatus: 'pending-approval'}},this.props.loggedInUser.currentLoan.id)
+    if(!updatedLoan.hasOwnProperty('error')){
+        const applicationDate =  dateAndTimeNow()
+        const transactionHistoryObject = {
+            transactionType: "loan-application",
+            transactionDate: applicationDate,
+            amount: updatedLoan.loanAmount,
+            description: "Documents signing completion of the loan, with id: "+updatedLoan.id,
+            loan: {connect: [updatedLoan.id]}
+        }
+        const notificationObject = {
+            title: "A client has signed documents to the loan with id "+updatedLoan.id,
+            type: "alert"
+        }
+        const transactionHistory = await logNewTransactionHistory({data:transactionHistoryObject})
+        const newNotitifcation = await logNewNotification({data:notificationObject})
+        if(!transactionHistory.hasOwnProperty('error')){
+          const userUpdateObject = {
+              transactionHistories: {connect: [transactionHistory.id]},
+              activities: {connect: [newNotitifcation.id]}
+          }
+          const updatedUserAccount = await updateUserAccount(userUpdateObject,this.props.loggedInUser.id)
+          if(!updatedUserAccount.hasOwnProperty('error')){
+              const AdminNotificationBody = {
+                  loan: {connect: [updatedLoan.id]},
+                  notification: {connect: [newNotitifcation.id]}
+              }
+              const newAdminNotification = await logNewAdminNotification({data:AdminNotificationBody})
+              if(!newAdminNotification.hasOwnProperty('error')){
+                window.location = "/"
+              }
+          }
+      }
+        
+     }
+     else{
+        // send a notification then redirect user
+        this.setState({
+          error: 'something went wrong, try again',
+          saving: false
+         })
+     }
+}
+
   render() {
     return (
       <>
@@ -307,32 +353,21 @@ export default class FilledForms extends React.Component {
                   }
                  {this.state.error? <p className="text text-danger">{this.state.error}</p> : <></>}
                  <p className="text text-warning mt-2">Note that all the information you provide here is kept strictly confidential, and it's solely meant for verification and loan eligibility determination purposes</p>
-                  {/* Save and Next Buttons */}
-                  <div style={{ width: "100%", display: "flex", justifyContent: "space-between" }}>
-                      <div style={{ width: "100%" }}>
-                        <button
-                          disabled={this.state.saving}
-                          onClick={this.handleSubmit}
-                          type="button"
-                          className="btn btn-success w-50 mt-3"
-                          id="confirm-btn"
-                          // Submit button logic to be handled separately
-                        >
-                          Save
-                        </button>
-                      </div>
-                      <div style={{ width: "100%", textAlign: "right" }}>
+                  
+                </div>
+                {/* Save and Next Buttons */}
+                 
+                <div style={{ width: "100%"}}>
                         <button
                           type="button"
-                          className="btn btn-danger w-50 mt-3"
+                          className="btn btn-danger w-90 mt-3"
                           id="next-btn"
                           disabled={!this.state.isFormValid}
+                          onClick={this.handleCompleteLoanApplication}
                         >
-                          Next
+                          Submit Application
                         </button>
-                      </div>
                   </div>
-                </div>
               </div>
             </div>
           </div>

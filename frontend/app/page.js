@@ -30,10 +30,6 @@ export default function Home() {
       if(currentLoan.loanStatus === "initiated"){
          return <LoanInitiatedDisplay/> 
       }
-      else if(currentLoan.loanStatus === "pending-approval"){
-        return <p className="text text-info">Thank you for applying for a loan with us, we are currently processing the loan, an agent will call you.</p>
-        // show the info on how we are checking the eligibility of the loan
-      }
       else if(currentLoan.loanStatus === "pending-collateral-addition"){
          return <CollateralForm loggedInUser={loggedInUser.user} constants={constants}/> 
       }
@@ -45,11 +41,14 @@ export default function Home() {
                   <p className="text text-success">Your loan application has been accepted, just a few more steps in order to finalize the process and disburse your funds.</p>
                   <FilledForms loggedInUser={loggedInUser.user} constants={constants}/>
                </>)
-     }
+       }
+      else if(currentLoan.loanStatus === "pending-approval"){
+        return <p className="text text-info">Thank you for completing the requested steps, we are currently processing the loan, an agent will call you.</p>
+        // show the info on how we are checking the eligibility of the loan
+      }
       else if(currentLoan.loanStatus === "approved"){
          return <p className="text text-success"><strong>Congratulations!! Your loan has been approved, awaiting disbursement of funds.</strong></p>
       }
-      
       else if(currentLoan.loanStatus === "rejected"){
         // show the user that "they are not eligible for a loan at the moment, but they can apply again. Or contact us."
          return (showLoanApplicationForms? <LoanApplicationForm 
