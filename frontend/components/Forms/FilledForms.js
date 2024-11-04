@@ -5,6 +5,7 @@ import { dateAndTimeNow, getImage, logNewAdminNotification, logNewNotification, 
 import React from "react";
 import Uploader from "../Includes/Uploader/Uploader";
 import { Download } from "@mui/icons-material";
+import { Fade, Slide, Zoom } from "@material-ui/core";
 
 export default class FilledForms extends React.Component {
   constructor(props) {
@@ -299,7 +300,7 @@ export default class FilledForms extends React.Component {
             transactionType: "loan-application",
             transactionDate: applicationDate,
             amount: updatedLoan.loanAmount,
-            description: "Documents signing completion of the loan, with id: "+updatedLoan.id,
+            description: "Documents signing completion of the loan, with id: #"+updatedLoan.id,
             loan: {connect: [updatedLoan.id]}
         }
         const notificationObject = {
@@ -338,7 +339,7 @@ export default class FilledForms extends React.Component {
 
   render() {
     return (
-      <>
+      <Zoom in={true}>
         <div className="row">
           <div className="col-lg-12">
             <div className="card">
@@ -372,7 +373,7 @@ export default class FilledForms extends React.Component {
             </div>
           </div>
         </div>
-      </>
+      </Zoom>
     );
   }
 }

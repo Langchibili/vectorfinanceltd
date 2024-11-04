@@ -1,6 +1,7 @@
 "use client";
 
 import { updateUserAccount } from "@/Functions";
+import { Slide } from "@material-ui/core";
 import React from "react";
 
 export default class UpdateDetailsForm extends React.Component {
@@ -98,13 +99,12 @@ export default class UpdateDetailsForm extends React.Component {
     const { firstname, lastname, age, gender, address, dateOfBirth, isFormValid } = this.state;
 
     return (
-      <>
+      <Slide in={true} direction="left">
         <div className="row">
           <div className="col-lg-12">
             <div className="card">
               <div className="card-header align-items-center d-flex">
                 {this.props.loanCategory !== "personal"? <h4 className="card-title mb-0 flex-grow-1">Basic Details Of Either</h4> : <h4 className="card-title mb-0 flex-grow-1">Your Basic Details </h4>}
-                
               </div>
               {this.props.loanCategory !== "personal"? <h6 style={{paddingLeft:'16px', marginTop:'10px'}}><small  style={{color:'gray'}}> (Owner/Representative/Board Member)</small></h6> : <></>}
               <div className="card-body">
@@ -237,7 +237,7 @@ export default class UpdateDetailsForm extends React.Component {
             </div>
           </div>
         </div>
-      </>
+      </Slide>
     );
   }
 }

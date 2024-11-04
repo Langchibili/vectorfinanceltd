@@ -4,6 +4,7 @@ import { api_url, backEndUrl, getJwt } from "@/Constants";
 import { getImage, textHasPhoneNumber, updateUserAccount } from "@/Functions";
 import React from "react";
 import Uploader from "../Includes/Uploader/Uploader";
+import { Slide } from "@material-ui/core";
 
 export default class UpdateSalaryDetailsForm extends React.Component {
   constructor(props) {
@@ -257,7 +258,7 @@ export default class UpdateSalaryDetailsForm extends React.Component {
     const { companyName, employerName, salaryAmount, employementVerificationNumber, companyLocation, isFormValid } = this.state;
 
     return (
-      <>
+      <Slide in={true} direction="left">
         <div className="row">
           <div className="col-lg-12">
             <div className="card">
@@ -425,7 +426,7 @@ export default class UpdateSalaryDetailsForm extends React.Component {
             </div>
           </div>
         </div>
-      </>
+      </Slide>
     );
   }
 }

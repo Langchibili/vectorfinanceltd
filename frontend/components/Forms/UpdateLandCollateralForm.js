@@ -4,6 +4,7 @@ import { api_url, backEndUrl, getJwt } from "@/Constants";
 import { dateAndTimeNow, getImage, getLoanFromId, logNewAdminNotification, logNewNotification, logNewTransactionHistory, textHasPhoneNumber, updateLoan, updateUserAccount } from "@/Functions";
 import React from "react";
 import Uploader from "../Includes/Uploader/Uploader";
+import { Slide } from "@material-ui/core";
 
 export default class UpdateLandCollateralForm extends React.Component {
   constructor(props) {
@@ -223,7 +224,7 @@ export default class UpdateLandCollateralForm extends React.Component {
             transactionType: "loan-application",
             transactionDate: applicationDate,
             amount: updatedLoan.loanAmount,
-            description: "Initiation of the loan, with id: "+updatedLoan.id,
+            description: "Initiation of the loan, with id: #"+updatedLoan.id,
             loan: {connect: [updatedLoan.id]}
         }
         const notificationObject = {
@@ -335,7 +336,7 @@ export default class UpdateLandCollateralForm extends React.Component {
     const { hectors, plotNumber, location, saved, isFormValid } = this.state;
 
     return (
-      <>
+        <Slide in={true} direction="up">
         <div className="row">
           <div className="col-lg-12">
             <div className="card">
@@ -447,7 +448,7 @@ export default class UpdateLandCollateralForm extends React.Component {
             </div>
           </div>
         </div>
-      </>
+      </Slide>
     );
   }
 }

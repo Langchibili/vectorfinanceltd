@@ -1,5 +1,6 @@
 "use client";
 
+import { Fade, Slide, Zoom } from "@material-ui/core";
 import React from "react";
 
 export default class LoanInformationDisplay extends React.Component {
@@ -14,7 +15,7 @@ export default class LoanInformationDisplay extends React.Component {
 
   }
   render() {
-    return <>
+    return <Zoom in={true}>
           <div className="row">
         <div className="col">
           <div className="h-100">
@@ -961,7 +962,7 @@ export default class LoanInformationDisplay extends React.Component {
         </div>{" "}
         {/* end col */}
       </div>
-    </>;
+    </Zoom>;
   }
 }
 //  id

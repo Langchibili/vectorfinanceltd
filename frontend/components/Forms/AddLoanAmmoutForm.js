@@ -1,6 +1,7 @@
 "use client";
 
 import { loanCalculator } from "@/Functions";
+import { Slide } from "@material-ui/core";
 import { Alert } from "@mui/material";
 import React from "react";
 
@@ -279,7 +280,7 @@ export default class AddLoanAmountForm extends React.Component {
     // Predefined list of loan purposes
 
     return (
-      <>
+        <Slide in={true} direction="left">
         <div className="row">
           <div className="col-lg-12">
             <div className="card">
@@ -421,7 +422,7 @@ export default class AddLoanAmountForm extends React.Component {
             </div>
           </div>
         </div>
-      </>
+      </Slide>
     );
   }
 }

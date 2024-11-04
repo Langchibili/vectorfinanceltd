@@ -5,6 +5,7 @@ import UpdateLandCollateralForm from "./UpdateLandCollateralForm";
 import UpdateVehicleCollateralForm from "./UpdateVehicleCollateralForm";
 import UpdateHouseCollateralForm from "./UpdateHouseCollateralForm";
 import { Alert } from "@mui/material";
+import { Fade, Zoom } from "@material-ui/core";
 
 export default class CollateralForm extends React.Component{
     constructor(props){
@@ -49,7 +50,7 @@ export default class CollateralForm extends React.Component{
 
     render(){
         return (
-            <>
+            <Zoom in={true}>
             <div className="row">
               <div className="col-lg-12">
                 <div className="card">
@@ -79,7 +80,7 @@ export default class CollateralForm extends React.Component{
                 </div>
               </div>
             </div>
-          </>
+          </Zoom>
         )
     }
 }

@@ -5,6 +5,7 @@ import { dateAndTimeNow, getImage, getLoanFromId, logNewAdminNotification, logNe
 import React from "react";
 import Uploader from "../Includes/Uploader/Uploader";
 import { Alert } from "@mui/material";
+import { Slide } from "@material-ui/core";
 
 export default class UpdateVehicleCollateralForm extends React.Component {
   constructor(props) {
@@ -215,7 +216,7 @@ export default class UpdateVehicleCollateralForm extends React.Component {
           transactionType: "loan-application",
           transactionDate: applicationDate,
           amount: updatedLoan.loanAmount,
-          description: "Initiation of the loan, with id: "+updatedLoan.id,
+          description: "Initiation of the loan, with id: #"+updatedLoan.id,
           loan: {connect: [updatedLoan.id]}
       }
       const notificationObject = {
@@ -340,7 +341,7 @@ export default class UpdateVehicleCollateralForm extends React.Component {
     const { numberPlate, packed, isFormValid, saved } = this.state;
 
     return (
-      <>
+      <Slide in={true} direction="up">
         <div className="row">
           <div className="col-lg-12">
             <div className="card">
@@ -435,7 +436,7 @@ export default class UpdateVehicleCollateralForm extends React.Component {
             </div>
           </div>
         </div>
-      </>
+      </Slide>
     );
   }
 }

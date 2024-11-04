@@ -98,7 +98,7 @@ export default class PersonalLoanApplicationForm extends React.Component{
                 transactionType: "loan-application",
                 transactionDate: applicationDate,
                 amount: createLoanObject.loanAmount,
-                description: "Initiation of the loan, with id: "+newLoan.id,
+                description: "Initiation of the loan, with id: #"+newLoan.id,
                 loan: {connect: [newLoan.id]}
             }
             const notificationObject = {

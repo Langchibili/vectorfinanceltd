@@ -293,7 +293,7 @@ export default class BusinessInformationForm extends React.Component {
 
     return (
       <>
-        <div className="row">
+        <div data-aos="fade-left" className="row">
           <div className="col-lg-12">
             <div className="card">
               <div className="card-header align-items-center d-flex">
