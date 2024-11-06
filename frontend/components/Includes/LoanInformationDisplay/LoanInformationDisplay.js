@@ -15,7 +15,7 @@ export default class LoanInformationDisplay extends React.Component {
 
   }
   render() {
-    return <Zoom in={true}>
+    return <Slide in={true} direction="right">
           <div className="row">
         <div className="col">
           <div className="h-100">
@@ -962,7 +962,7 @@ export default class LoanInformationDisplay extends React.Component {
         </div>{" "}
         {/* end col */}
       </div>
-    </Zoom>;
+    </Slide>;
   }
 }
 //  id

@@ -1,6 +1,6 @@
 "use client";
 
-import { loanCalculator } from "@/Functions";
+import { loanAmortizationCalculator, simpleInterestLoanCalculator } from "@/Functions";
 import { Slide } from "@material-ui/core";
 import { Alert } from "@mui/material";
 import React from "react";
@@ -10,6 +10,7 @@ export default class AddLoanAmountForm extends React.Component {
     super(props);
     this.state = {
       loanAmount: '',
+      totalPayment: 0,
       onPayroll: this.props.loanCategory !== "personal"? 'no' : '',
       salaryDeduction: '',
       loanCategory: '',
@@ -39,17 +40,32 @@ export default class AddLoanAmountForm extends React.Component {
       // Update maxLoanTerm based on payroll status 
       
       if (value === 'yes') { 
-        this.setState({ loanTerm: this.props.constants.loansInformation.defaultCollaterallLoanTerm, maxLoanTerm: this.props.constants.loansInformation.defaultSalaryLoanTerm }); // Max 60 months for salary-based loans
+        this.setState({ 
+            loanTerm: this.props.constants.loansInformation.defaultCollaterallLoanTerm, 
+            interestRate: this.props.constants.loansInformation.defaultSalaryLoanInterestRate,
+            maxLoanTerm: this.props.constants.loansInformation.defaultSalaryLoanTerm 
+           }); // Max 60 months for salary-based loans
       } else {
-        this.setState({ loanTerm: this.props.constants.loansInformation.defaultCollaterallLoanTerm, maxLoanTerm: this.props.constants.loansInformation.defaultCollaterallLoanTerm }); // Max 12 months for non-salary loans
+        this.setState({ 
+            loanTerm: this.props.constants.loansInformation.defaultCollaterallLoanTerm, 
+            interestRate: this.props.constants.loansInformation.defaultCollaterallLoanInterestRate,
+            maxLoanTerm: this.props.constants.loansInformation.defaultCollaterallLoanTerm 
+          }); // Max 12 months for non-salary loans
       }
     }
     if (name === 'salaryDeduction') {
         // Update maxLoanTerm based on payroll status 
         if (value === 'yes') { 
-          this.setState({ loanTerm: this.props.constants.loansInformation.defaultCollaterallLoanTerm, maxLoanTerm: this.props.constants.loansInformation.defaultSalaryLoanTerm }); // Max 60 months for salary-based loans
+          this.setState({ 
+            loanTerm: this.props.constants.loansInformation.defaultCollaterallLoanTerm, 
+            interestRate: this.props.constants.loansInformation.defaultSalaryLoanInterestRate,
+            maxLoanTerm: this.props.constants.loansInformation.defaultSalaryLoanTerm 
+           }); // Max 60 months for salary-based loans
         } else {
-          this.setState({ loanTerm: this.props.constants.loansInformation.defaultCollaterallLoanTerm, maxLoanTerm: this.props.constants.loansInformation.defaultCollaterallLoanTerm }); // Max 12 months for non-salary loans
+          this.setState({ loanTerm: this.props.constants.loansInformation.defaultCollaterallLoanTerm,
+            interestRate: this.props.constants.loansInformation.defaultCollaterallLoanInterestRate, 
+            maxLoanTerm: this.props.constants.loansInformation.defaultCollaterallLoanTerm 
+           }); // Max 12 months for non-salary loans
         }
     }
   }
@@ -88,16 +104,28 @@ export default class AddLoanAmountForm extends React.Component {
     // Call loanCalculator and update monthly payment and profit
     if (onPayroll === 'yes' && salaryDeduction === 'yes') { // this means this is a salary loan
         annualInterestRate = this.props.constants.loansInformation.defaultSalaryLoanInterestRate
-    }
-    const { monthlyPayment, totalProfit } = loanCalculator(loanAmount, annualInterestRate, loanTerm);
+        const { monthlyPayment, totalProfit, totalPayment } = loanAmortizationCalculator(loanAmount, annualInterestRate, loanTerm);
     
-    // Assuming you have logic for approved loan amount here:
-    const approvedLoanAmount = loanAmount; // You may update this based on business logic
+        // Assuming you have logic for approved loan amount here:
+        const approvedLoanAmount = loanAmount; // You may update this based on business logic
+    
+        // Calculate the percentage of salary
+        const salaryPercentage = (monthlyPayment / salary) * 100;
+    
+        this.setState({ monthlyPayment, totalProfit, totalPayment, approvedLoanAmount, salaryPercentage, interestRate: annualInterestRate });
+        return 
+    }
+   else{
+        const { monthlyPayment, totalPayment } = simpleInterestLoanCalculator(loanAmount, annualInterestRate, loanTerm);
+        
+        // Assuming you have logic for approved loan amount here:
+        const approvedLoanAmount = loanAmount; // You may update this based on business logic
 
-    // Calculate the percentage of salary
-    const salaryPercentage = (monthlyPayment / salary) * 100;
+        // Calculate the percentage of salary
+        const salaryPercentage = (monthlyPayment / salary) * 100;
 
-    this.setState({ monthlyPayment, totalProfit, approvedLoanAmount, salaryPercentage, interestRate: annualInterestRate });
+        this.setState({ monthlyPayment, totalPayment, approvedLoanAmount, salaryPercentage, interestRate: annualInterestRate });
+   }
   }
 
   handleProceedConfirmation = () => {
@@ -120,7 +148,7 @@ export default class AddLoanAmountForm extends React.Component {
   };
   
   renderSalaryWarning = ()=>{
-    const { loanAmount, onPayroll, salaryDeduction, salaryPercentage, salary } = this.state;
+    const { loanAmount, totalPayment, loanTerm, onPayroll, salaryDeduction, salaryPercentage, salary } = this.state;
     if(!salaryDeduction || !onPayroll){
         if(salaryDeduction === "no" || onPayroll === "no"){
             if(parseFloat(loanAmount) > 0){
@@ -138,6 +166,7 @@ export default class AddLoanAmountForm extends React.Component {
             return (
                 <>
                 <Alert severity="success" sx={{marginBottom: '5px'}}>The amount of: <strong>{loanAmount}</strong> is within approvable range</Alert>
+                <Alert severity="info" sx={{marginBottom: '5px'}}>You shall pay a total amount of: <strong>{totalPayment}</strong> during <strong>{loanTerm}</strong> months</Alert>
                 {this.renderProceedWithLoanButton()}
                 </>
             )
@@ -171,6 +200,7 @@ export default class AddLoanAmountForm extends React.Component {
             return (
                     <>
                     <Alert severity="success" sx={{marginBottom: '5px'}}>The amount of: <strong>{loanAmount}</strong> is within approvable range</Alert>
+                    <Alert severity="info" sx={{marginBottom: '5px'}}>You shall pay a total amount of: <strong>{totalPayment}</strong> during <strong>{loanTerm}</strong> months</Alert>
                     {this.renderProceedWithLoanButton()}
                     </>
                 )
@@ -182,7 +212,7 @@ export default class AddLoanAmountForm extends React.Component {
             return <>
                     {/* Proceed Confirmation */}
                     <div className="col-lg-12">
-                        <h6>Would you like to proceed with this amount?</h6>
+                        {this.state.loanAmount? <Alert severity="info" sx={{marginBottom: '5px'}}><strong>Would you like to proceed with this amount?</strong></Alert> : <></>}
                         {/* <button
                             className={`btn btn-${this.state.isFormValid ? 'primary' : 'secondary'}`}
                             disabled={!this.state.isFormValid || !salary || salaryPercentage > 50} // Prevent proceed if invalid
@@ -275,7 +305,7 @@ export default class AddLoanAmountForm extends React.Component {
   }
 
   render() {
-    const { loanAmount, onPayroll, salaryDeduction, loanPurpose, loanPurposeDetails, loanTerm, isFormValid, monthlyPayment, approvedLoanAmount, maxLoanTerm, salary, salaryPercentage, isProceed } = this.state;
+    const { loanAmount, totalPayment, onPayroll, salaryDeduction, loanPurpose, loanPurposeDetails, loanTerm, isFormValid, monthlyPayment, approvedLoanAmount, maxLoanTerm, salary, salaryPercentage, isProceed } = this.state;
     const loanPurposes = this.getLoanPurposes()
     // Predefined list of loan purposes
 
@@ -411,9 +441,12 @@ export default class AddLoanAmountForm extends React.Component {
                       <p>{loanTerm} month(s)</p>
                     </div>
 
-                    {/* Monthly Payment and Salary Percentage */} <div className="col-lg-12">
-                      <h6>Monthly Loan Payment: K {parseFloat(monthlyPayment)}</h6>
-                      <h6>This is {parseFloat(salaryPercentage).toFixed(2)}% of your {salaryDeduction === 'yes'? "salary" : "income"}.</h6>
+                       {/* Monthly Payment and Salary Percentage */} <div className="col-lg-12">
+                     <Alert severity="info" sx={{marginBottom:'5px'}}>
+                        <h6>Monthly Loan Payment: K {parseFloat(monthlyPayment)}</h6>
+                        <h6>Total Loan Payment: K {parseFloat(totalPayment)}</h6>
+                        <h6>This is {parseFloat(salaryPercentage).toFixed(2)}% of your {salaryDeduction === 'yes'? "salary" : "income"}.</h6>
+                     </Alert>
                       {this.renderSalaryWarning()}
                     </div>
                   </div>

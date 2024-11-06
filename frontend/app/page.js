@@ -5,16 +5,21 @@ import FilledForms from "@/components/Forms/FilledForms";
 import LoanApplicationForm from "@/components/Forms/LoanApplicationForm";
 import MainForm from "@/components/Forms/MainForm";
 import ApplyForALoanButton from "@/components/Includes/ApplyForALoanButton/ApplyForALoanButton";
+import HelpPageDisplay from "@/components/Includes/HelpPageDisplay/HelpPageDisplay";
 import LoanInformationDisplay from "@/components/Includes/LoanInformationDisplay/LoanInformationDisplay";
 import LoanInitiatedDisplay from "@/components/Includes/LoanInitiatedDisplay/LoanInitiatedDisplay";
+import LoanTransactionHistory from "@/components/Includes/LoanTransactionHistory/LoanTransactionHistory";
+import { useBottomNav } from "@/Contexts/BottomNavContext";
 import { useConstants } from "@/Contexts/ConstantsContext";
 import { useUser } from "@/Contexts/UserContext";
+import { Slide } from "@material-ui/core";
 import { Alert } from "@mui/material";
 import { useState } from "react";
 
 export default function Home() {
   const [showLoanApplicationForms, setShowLoanApplicationForms] = useState(false)
   const [selectedloanCategory, setSelectedloanCategory] = useState(null)
+  const {BottomNavLink} = useBottomNav()
   
   const loggedInUser = useUser()
   const constants = useConstants()
@@ -25,10 +30,11 @@ export default function Home() {
      }
   }
   const renderMainContent = ()=>{
+    console.log(BottomNavLink)
     const currentLoan = loggedInUser.user.currentLoan
     if(currentLoan){
       if(currentLoan.loanStatus === "initiated"){
-         return <LoanInitiatedDisplay/> 
+         return <LoanInitiatedDisplay /> 
       }
       else if(currentLoan.loanStatus === "pending-collateral-addition"){
          return <CollateralForm loggedInUser={loggedInUser.user} constants={constants}/> 
@@ -183,10 +189,21 @@ export default function Home() {
    )
     }
   }
+ const renderPages = (BottomNavLink)=>{
+    if(!BottomNavLink || parseInt(BottomNavLink) === 0){
+      return renderMainContent()
+    }
+    else if(parseInt(BottomNavLink) === 1){
+      return <LoanTransactionHistory loggedInUser={loggedInUser.user}/>
+    }
+    else{
+      return <HelpPageDisplay loggedInUser={loggedInUser.user} constants={constants}/>
+    }
+  }
   return (
     <div className="page-content">
     <div className="container-fluid">
-      {renderMainContent()}
+       {renderPages(BottomNavLink)}
     </div>
     {/* container-fluid */}
   </div>

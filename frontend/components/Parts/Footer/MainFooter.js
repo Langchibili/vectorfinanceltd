@@ -62,17 +62,15 @@ export default function MainFooter() {
   // }, []); // at times Re-run effect on params change, for now run once
 
   return (
-    <footer className="footer">
       <div className="container-fluid">
         <div className="row">
           <div className="col-sm-6">2024 © VectorFinanceLimited.</div>
           <div className="col-sm-6">
-            <div className="text-sm-end d-none d-sm-block">
-              Design &amp; Develop by Themesbrand
-            </div>
+            {/* <div className="text-sm-end d-none d-sm-block">
+              Design &amp; Develop by Langtechdev
+            </div> */}
           </div>
         </div>
       </div>
-    </footer>
   )
 }

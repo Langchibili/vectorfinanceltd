@@ -7,6 +7,7 @@ import MainMenu from '@/components/Parts/Menus/MainMenu';
 import { UserProvider, useUser } from "@/Contexts/UserContext";
 import BottomNav from "@/components/Includes/BottomNavigation/BottomNavigation";
 import { ConstantsProvider } from "@/Contexts/ConstantsContext";
+import { BottomNavProvider } from "@/Contexts/BottomNavContext";
 
 export default function RootLayout({ children }) {
   return (
@@ -50,13 +51,15 @@ export default function RootLayout({ children }) {
       <div id="layout-wrapper">
       <UserProvider>
         <ConstantsProvider>
-          <HeaderPart/>
-          <div className="vertical-overlay"></div>
+          <BottomNavProvider>
+           <HeaderPart/>
+            <div className="vertical-overlay"></div>
             <div className="main-content">
               {children}
-              <FooterPart/>
+              {/* <FooterPart/> */}
             </div>
-            {/* <BottomNav/> */}
+             <BottomNav/> 
+          </BottomNavProvider>
         </ConstantsProvider>
       </UserProvider>
       </div>

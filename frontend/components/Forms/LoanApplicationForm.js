@@ -1,10 +1,11 @@
 "use client"
 
-import { Slide } from "@mui/material";
+import { IconButton, Slide } from "@mui/material";
 import React from "react";
 import PersonalLoanApplicationForm from "./PersonalLoanApplicationForm";
 import BusinessLoanApplicationForm from "./BusinessLoanApplicationForm";
 import CompanyLoanApplicationForm from "./CompanyLoanApplicationForm";
+import { ArrowBackOutlined } from "@material-ui/icons";
 
 export default class LoanApplicationForm extends React.Component{
     constructor(props){
@@ -33,7 +34,8 @@ export default class LoanApplicationForm extends React.Component{
 
     render(){
         return (<>
-                <button onClick={this.handleGoBackToLoanCategorySelect} className="btn btn-sm">Back</button>
+                {/* <button  className="btn btn-sm">Back</button> */}
+                <IconButton onClick={this.handleGoBackToLoanCategorySelect}><ArrowBackOutlined/></IconButton>
                 {this.renderApplicationForm()}
               </>)
     }

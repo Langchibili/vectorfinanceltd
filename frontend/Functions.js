@@ -133,7 +133,31 @@ export const handleCountsDisplay = (counts) => { // formating counts like: likes
     return text;
 }
 
-export const loanCalculator = (loanAmount, annualInterestRate, loanTerm) => {
+export const simpleInterestLoanCalculator = (loanAmount, annualInterestRate, loanTermMonths) => {
+  const calculateTotalInterest = (amount, annualInterest, months) => {
+    const years = months / 12;
+    return (parseFloat(amount) * annualInterest * years) / 100;
+  };
+
+  const calculateTotalPayment = (loanAmount, totalInterest) => {
+    return parseFloat(loanAmount) + parseFloat(totalInterest);
+  };
+
+  const totalInterest = calculateTotalInterest(loanAmount, annualInterestRate, loanTermMonths);
+  const totalPayment = calculateTotalPayment(loanAmount, totalInterest);
+  const monthlyPayment = totalPayment / loanTermMonths;
+
+  return {
+    totalInterest: parseFloat(totalInterest).toFixed(2),
+    totalPayment: parseFloat(totalPayment).toFixed(2),
+    monthlyPayment: parseFloat(monthlyPayment).toFixed(2),
+  };
+};
+
+
+
+
+export const loanAmortizationCalculator = (loanAmount, annualInterestRate, loanTerm) => {
   const calculateMonthlyPayment = (amount, annualInterest, months) => {
     const monthlyInterest = annualInterest / 100 / 12;
     return (
@@ -153,12 +177,13 @@ export const loanCalculator = (loanAmount, annualInterestRate, loanTerm) => {
   const monthlyPayment = calculateMonthlyPayment(loanAmount, annualInterestRate, loanTerm);
   const totalPayment = calculateTotalPayment(monthlyPayment, loanTerm);
   const totalProfit = calculateProfit(totalPayment, loanAmount);
-
+ 
   return {
-    monthlyPayment: monthlyPayment.toFixed(2),
-    totalProfit: totalProfit.toFixed(2)
+    monthlyPayment: parseFloat(monthlyPayment).toFixed(2),
+    totalProfit: parseFloat(totalProfit).toFixed(2),
+    totalPayment: parseFloat(totalPayment).toFixed(2)
   };
-};
+}
 
 export const getImage = (image, size = "normal", use = "normal") => {
     // Default URLs for profile pictures and cover photos
