@@ -78,6 +78,8 @@ export default class PersonalLoanApplicationForm extends React.Component{
         createLoanObject.salaryPercentage = parseFloat(parseFloat(createLoanObject.salaryPercentage).toFixed(2))
         createLoanObject.loanTerm = parseInt(createLoanObject.loanTerm)
         createLoanObject.clientAskingAmount = createLoanObject.loanAmount 
+        createLoanObject.repaymentAmount = parseFloat(parseFloat(createLoanObject.totalPayment).toFixed(2))
+        delete createLoanObject.totalPayment
         if(this.state.loanType === "salaryBased"){
             createLoanObject.loanCategory = { connect: [this.props.constants.loanCategoriesIds.salaryLoans] }
             createLoanObject.loanType = { connect: [this.props.constants.loanTypesIds.salaryBased] }

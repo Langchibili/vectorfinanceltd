@@ -12,7 +12,10 @@ export default class LoanInformationDisplay extends React.Component {
   }
 
   async componentDidMount() {
-
+  // loan due date,
+  // months till loan is due
+  // days till loan is due
+  // 
   }
   render() {
     return <Slide in={true} direction="right">

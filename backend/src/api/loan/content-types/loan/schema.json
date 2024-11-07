@@ -143,6 +143,12 @@
     },
     "salaryPercentage": {
       "type": "decimal"
+    },
+    "disbursedAmount": {
+      "type": "decimal"
+    },
+    "repaymentAmount": {
+      "type": "decimal"
     }
   }
 }
