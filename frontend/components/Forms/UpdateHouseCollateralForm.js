@@ -224,11 +224,11 @@ export default class UpdateHouseCollateralForm extends React.Component {
             transactionType: "loan-application",
             transactionDate: applicationDate,
             amount: updatedLoan.loanAmount,
-            description: "Initiation of the loan, with id: #"+updatedLoan.id,
+            description: "Initiation of the loan, with id: #"+updatedLoan.id+ ", and amount K"+updatedLoan.loanAmount,
             loan: {connect: [updatedLoan.id]}
-        }
+        } 
         const notificationObject = {
-            title: "A new asset loan, with id "+updatedLoan.id+" has been Initiated",
+            title: "A new asset loan of house collateral, with id "+updatedLoan.id+ ", and amount K"+updatedLoan.loanAmount,
             type: "alert"
         }
         const transactionHistory = await logNewTransactionHistory({data:transactionHistoryObject})

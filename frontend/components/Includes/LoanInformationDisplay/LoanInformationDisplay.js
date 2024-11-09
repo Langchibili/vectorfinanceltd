@@ -3,12 +3,13 @@
 import { Fade, Slide, Zoom } from "@material-ui/core";
 import Link from "next/link";
 import React from "react";
+import PaymentsDisplay from "../PaymentsDisplay/PaymentsDisplay";
 
 export default class LoanInformationDisplay extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-
+        showPaymentsPage: false
     }
   }
 
@@ -18,7 +19,17 @@ export default class LoanInformationDisplay extends React.Component {
   // days till loan is due
   // 
   }
+  
+  handleMakePaymentPage = ()=>{
+     this.setState({
+      showPaymentsPage: !this.state.showPaymentsPage
+     })
+  }
+
   render() {
+    if(this.state.showPaymentsPage){
+      return <PaymentsDisplay handleMakePaymentPage={this.handleMakePaymentPage} loggedInUser={this.props.loggedInUser}/>
+    }
     return <Slide in={true} direction="right">
           <div className="row">
         <div className="col">
@@ -33,7 +44,7 @@ export default class LoanInformationDisplay extends React.Component {
                     </p>
                   </div>
                   <div className="mt-3 mt-lg-0">
-                    <Link href="/payments">
+                    <button onClick={this.handleMakePaymentPage}>
                       <div className="row g-3 mb-0 align-items-center">
                         <div className="col-auto">
                           <button
@@ -46,7 +57,7 @@ export default class LoanInformationDisplay extends React.Component {
                         </div>
                       </div>
                       {/*end row*/}
-                    </Link>
+                    </button>
                   </div>
                 </div>
                 {/* end card header */}

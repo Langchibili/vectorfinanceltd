@@ -300,11 +300,11 @@ export default class FilledForms extends React.Component {
             transactionType: "loan-application",
             transactionDate: applicationDate,
             amount: updatedLoan.loanAmount,
-            description: "Documents signing completion of the loan, with id: #"+updatedLoan.id,
+            description: "Documents signing completion of the loan, with id: #"+updatedLoan.id+ ", and amount K"+updatedLoan.loanAmount,
             loan: {connect: [updatedLoan.id]}
         }
         const notificationObject = {
-            title: "A client has signed documents to the loan with id "+updatedLoan.id,
+            title: "A client has signed documents to the loan with id "+updatedLoan.id+ ", and amount K"+updatedLoan.loanAmount,
             type: "alert"
         }
         const transactionHistory = await logNewTransactionHistory({data:transactionHistoryObject})

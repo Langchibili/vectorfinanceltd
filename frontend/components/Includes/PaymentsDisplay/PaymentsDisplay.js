@@ -19,7 +19,7 @@ export default class PaymentsDisplay extends React.Component {
   // 
   }
   render() {
-    return <>
+    return <Slide in={true} direction="left">
       
           <div className="row">
         <div className="col">
@@ -33,8 +33,7 @@ export default class PaymentsDisplay extends React.Component {
                       Here's information about your loan today.
                     </p>
                   </div>
-                  
-                  <LencoPaymentButton loggedInUser={this.props.loggedInUser} />
+                 
                 </div>
                 {/* end card header */}
               </div>
@@ -42,6 +41,8 @@ export default class PaymentsDisplay extends React.Component {
             </div>
             {/*end row*/}
             <div className="row">
+            <button onClick={()=>{ this.props.handleMakePaymentPage() }}>Go Back</button>
+            <LencoPaymentButton loggedInUser={this.props.loggedInUser} />
               <div className="col-xl-3 col-md-6">
                 {/* card */}
                 <div className="card card-animate">
@@ -953,7 +954,7 @@ export default class PaymentsDisplay extends React.Component {
         </div>{" "}
         {/* end col */}
       </div>
-    </>;
+      </Slide>;
   }
 }
 //  id

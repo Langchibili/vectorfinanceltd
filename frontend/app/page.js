@@ -3,7 +3,6 @@
 import CollateralForm from "@/components/Forms/CollateralForm";
 import FilledForms from "@/components/Forms/FilledForms";
 import LoanApplicationForm from "@/components/Forms/LoanApplicationForm";
-import MainForm from "@/components/Forms/MainForm";
 import ApplyForALoanButton from "@/components/Includes/ApplyForALoanButton/ApplyForALoanButton";
 import HelpPageDisplay from "@/components/Includes/HelpPageDisplay/HelpPageDisplay";
 import LoanInformationDisplay from "@/components/Includes/LoanInformationDisplay/LoanInformationDisplay";
