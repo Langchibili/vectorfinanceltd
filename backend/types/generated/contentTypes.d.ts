@@ -1331,6 +1331,42 @@ export interface ApiNotificationTemplateNotificationTemplate
   };
 }
 
+export interface ApiPaymentPayment extends Schema.CollectionType {
+  collectionName: 'payments';
+  info: {
+    singularName: 'payment';
+    pluralName: 'payments';
+    displayName: 'payment';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    payload: Attribute.JSON;
+    repayment: Attribute.Relation<
+      'api::payment.payment',
+      'oneToOne',
+      'api::repayment.repayment'
+    >;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::payment.payment',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::payment.payment',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
 export interface ApiPhoneNumbersListPhoneNumbersList extends Schema.SingleType {
   collectionName: 'phone_numbers_lists';
   info: {
@@ -1377,7 +1413,7 @@ export interface ApiRepaymentRepayment extends Schema.CollectionType {
     repaymentAmount: Attribute.Decimal;
     paymentDate: Attribute.DateTime;
     paymentMethod: Attribute.Enumeration<
-      ['cash', 'bank', 'airtel-money', 'mtn-money']
+      ['cash', 'bank', 'airtel-money', 'mtn-money', 'card', 'mobile-money']
     >;
     latePaymentPenalty: Attribute.Decimal;
     transactionID: Attribute.String;
@@ -1398,6 +1434,12 @@ export interface ApiRepaymentRepayment extends Schema.CollectionType {
       'plugin::users-permissions.user'
     >;
     proofOfpayment: Attribute.Media;
+    payment: Attribute.Relation<
+      'api::repayment.repayment',
+      'oneToOne',
+      'api::payment.payment'
+    >;
+    transactionReference: Attribute.String;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -1603,6 +1645,7 @@ declare module '@strapi/types' {
       'api::loans-information.loans-information': ApiLoansInformationLoansInformation;
       'api::notification.notification': ApiNotificationNotification;
       'api::notification-template.notification-template': ApiNotificationTemplateNotificationTemplate;
+      'api::payment.payment': ApiPaymentPayment;
       'api::phone-numbers-list.phone-numbers-list': ApiPhoneNumbersListPhoneNumbersList;
       'api::repayment.repayment': ApiRepaymentRepayment;
       'api::send-notification.send-notification': ApiSendNotificationSendNotification;

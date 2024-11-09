@@ -1,1 +1,0 @@
-// this should show all the previous loans obtained and all the transactions

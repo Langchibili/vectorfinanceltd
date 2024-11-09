@@ -2,6 +2,9 @@
 
 export const FakeStr1 = 'kahs3lahebblo2uwb00an~va5lwi_ad_fgaljdj'; // security stuff
 export const FakeStr2 ='klahewi_ad_fgalloanv;;aitalkjfajhsbbluwba==hn3vajd5j=+;'
+export const LencoPubKey = 'pub-42fcf783d7e8d0428f9e94600e291e3d82e425d98359763b'; // security stuff
+export const LencoApiKey ='klahewi_ad_fgalloanv;;aitalkjfajhsbbluwba==hn3vajd5j=+;'
+
 
 
 export const getJWT = ()=>{

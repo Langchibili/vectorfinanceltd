@@ -1,6 +1,7 @@
 "use client";
 
 import { Fade, Slide, Zoom } from "@material-ui/core";
+import Link from "next/link";
 import React from "react";
 
 export default class LoanInformationDisplay extends React.Component {
@@ -32,7 +33,7 @@ export default class LoanInformationDisplay extends React.Component {
                     </p>
                   </div>
                   <div className="mt-3 mt-lg-0">
-                    <form action="#" onClick={(e) => e.preventDefault()}>
+                    <Link href="/payments">
                       <div className="row g-3 mb-0 align-items-center">
                         <div className="col-auto">
                           <button
@@ -40,12 +41,12 @@ export default class LoanInformationDisplay extends React.Component {
                             className="btn btn-soft-success shadow-none"
                           >
                             <i className="ri-add-circle-line align-middle me-1" />{" "}
-                            Make Payment
+                            Make A Payment
                           </button>
                         </div>
                       </div>
                       {/*end row*/}
-                    </form>
+                    </Link>
                   </div>
                 </div>
                 {/* end card header */}

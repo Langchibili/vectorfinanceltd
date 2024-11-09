@@ -24,7 +24,9 @@
         "cash",
         "bank",
         "airtel-money",
-        "mtn-money"
+        "mtn-money",
+        "card",
+        "mobile-money"
       ]
     },
     "latePaymentPenalty": {
@@ -72,12 +74,22 @@
       "inversedBy": "repayment"
     },
     "proofOfpayment": {
+      "type": "media",
+      "multiple": true,
+      "required": false,
       "allowedTypes": [
         "images",
         "files"
-      ],
-      "type": "media",
-      "multiple": true
+      ]
+    },
+    "payment": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::payment.payment",
+      "mappedBy": "repayment"
+    },
+    "transactionReference": {
+      "type": "string"
     }
   }
 }
