@@ -4,11 +4,22 @@ import BottomNavigation from '@mui/material/BottomNavigation';
 import BottomNavigationAction from '@mui/material/BottomNavigationAction';
 import { Help, History, Home } from '@material-ui/icons';
 import { useBottomNav } from '@/Contexts/BottomNavContext';
+import { useEffect } from 'react';
 
 export default function BottomNav() {
   const [value, setValue] = React.useState(0);
+  const [showNav, setShowNav] = React.useState(true);
   const {setBottomNavLink} = useBottomNav()
 
+  useEffect(()=>{
+      if(window.location.pathname !== "/"){
+        setShowNav(false)
+      }
+  },[window.location.pathname])
+ 
+  if(!showNav){
+    return <></>
+  }
   return (
     <>
     <div style={{minHeight:'20px'}}></div>

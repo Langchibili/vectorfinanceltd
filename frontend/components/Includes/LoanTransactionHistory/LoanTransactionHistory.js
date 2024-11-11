@@ -101,7 +101,6 @@ export default class LoanTransactionHistory extends React.Component {
 }
 
 
-
   renderTransactionHistories = ()=>{
     const transactionHistories = this.props.loggedInUser.transactionHistories
     transactionHistories.reverse()
@@ -110,7 +109,6 @@ export default class LoanTransactionHistory extends React.Component {
     }
     else{
       return transactionHistories.map((transactionHistory)=>{
-           console.log(transactionHistory)
            return (
             <>
                <li className="list-group-item ps-0">

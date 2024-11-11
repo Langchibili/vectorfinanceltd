@@ -13,18 +13,12 @@ export default class MainHeader extends React.Component{
         // }
      }
   
-    //  async componentDidMount(){ 
-    //   if(!this.props.loggedInUser.status){ // no need to make a request when a user is logged out
-    //     return
-    //   }
-    //   const user = await getUserById(this.props.loggedInUser.user.id,"details") // the post without populating anything
-    //   const fullnames = user.details?.firstname && user.details?.lastname ? `${user.details.firstname} ${user.details.lastname}` : "UnNamed User";
-    //   this.setState({
-    //       fullnames: fullnames
-    //   })
-    //  }
-   
+       
    render(){
+    const fullnames = this.props.loggedInUser.fullnames
+    const {currentLoan} = this.props.loggedInUser
+    const outstandingAmount = currentLoan? currentLoan.outstandingAmount : "0"
+
     return (
         <header id="page-topbar">
             <div className="layout-width">
@@ -1123,11 +1117,17 @@ export default class MainHeader extends React.Component{
                     </button>
                     <div className="dropdown-menu dropdown-menu-end">
                         {/* item*/}
-                        <h6 className="dropdown-header">Welcome Anna!</h6>
-                        <a className="dropdown-item" href="pages-profile.html">
+                        <h6 className="dropdown-header">Hello {fullnames}!</h6>
+                        <Link className="dropdown-item" href="/profile">
                         <i className="mdi mdi-account-circle text-muted fs-16 align-middle me-1" />{" "}
-                        <span className="align-middle">Profile</span>
-                        </a>
+                        <span className="align-middle">Profile(For Individuals)</span>
+                        
+                        </Link>
+                        <Link className="dropdown-item" href="/business-profile">
+                        <i className="mdi mdi-bank-circle text-muted fs-16 align-middle me-1" />{" "}
+                        <span className="align-middle">Profile(For Businesses)</span>
+                        </Link>
+                       
                         <a className="dropdown-item" href="apps-chat.html">
                         <i className="mdi mdi-message-text-outline text-muted fs-16 align-middle me-1" />{" "}
                         <span className="align-middle">Messages</span>
@@ -1144,7 +1144,7 @@ export default class MainHeader extends React.Component{
                         <a className="dropdown-item" href="pages-profile.html">
                         <i className="mdi mdi-wallet text-muted fs-16 align-middle me-1" />{" "}
                         <span className="align-middle">
-                            Balance : <b>$5971.67</b>
+                            Balance : <b>K{outstandingAmount}</b>
                         </span>
                         </a>
                         <a className="dropdown-item" href="pages-profile-settings.html">
@@ -1158,12 +1158,12 @@ export default class MainHeader extends React.Component{
                         <i className="mdi mdi-lock text-muted fs-16 align-middle me-1" />{" "}
                         <span className="align-middle">Lock screen</span>
                         </a>
-                        <a className="dropdown-item" href="auth-logout-basic.html">
+                        <Link className="dropdown-item" href="/logout">
                         <i className="mdi mdi-logout text-muted fs-16 align-middle me-1" />{" "}
                         <span className="align-middle" data-key="t-logout">
                             Logout
                         </span>
-                        </a>
+                        </Link>
                     </div>
                     </div>
                 </div>

@@ -236,7 +236,7 @@ module.exports = {
                         outstandingAmount: parseFloat(repaymentAmount),
                         repaymentAmount: parseFloat(repaymentAmount),
                         approvalDate: loanAfter.updatedAt,
-                        disbursedAmount: parseFloat(repaymentAmount),
+                        disbursedAmount: parseFloat(loanBefore.loanAmount),
                         disbursementDate: loanAfter.updatedAt,
                         dueDate: calculateDueDate(loanAfter.updatedAt, loanBefore.loanTerm)
                     }

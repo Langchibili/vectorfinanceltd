@@ -8,10 +8,12 @@ import { UserProvider, useUser } from "@/Contexts/UserContext";
 import BottomNav from "@/components/Includes/BottomNavigation/BottomNavigation";
 import { ConstantsProvider } from "@/Contexts/ConstantsContext";
 import { BottomNavProvider } from "@/Contexts/BottomNavContext";
+import React from "react";
+
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" data-layout="vertical" data-topbar="light" data-sidebar="dark" data-sidebar-size="lg" data-sidebar-image="none" data-preloader="disable">
+    <html lang="en" data-layout="vertical" data-topbar="light" data-sidebar="dark" data-sidebar-size="sm" data-sidebar-image="none" data-preloader="disable">
       <head>
       <meta charSet="utf-8" />
         <title>Portal | Vector Finance Limited</title>
@@ -46,6 +48,7 @@ export default function RootLayout({ children }) {
         <link href="/theme/css/app.min.css" rel="stylesheet" type="text/css" />
         {/* custom Css*/}
         <link href="/theme/css/custom.min.css" rel="stylesheet" type="text/css" />
+         {/* <!-- JAVASCRIPT --> */}
       </head>
       <body>
       <div id="layout-wrapper">
@@ -58,12 +61,12 @@ export default function RootLayout({ children }) {
               {children}
               {/* <FooterPart/> */}
             </div>
-             <BottomNav/> 
+            <BottomNav/>
           </BottomNavProvider>
         </ConstantsProvider>
       </UserProvider>
       </div>
-        {/* <!-- JAVASCRIPT --> */}
+       {typeof window !== undefined? <>
         <script src="/theme/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
         <script src="/theme/libs/simplebar/simplebar.min.js"></script>
         <script src="/theme/libs/node-waves/waves.min.js"></script>
@@ -82,10 +85,11 @@ export default function RootLayout({ children }) {
         <script src="/theme/libs/swiper/swiper-bundle.min.js"></script>
 
         {/* <!-- Dashboard init --> */}
-        <script src="/theme/js/pages/dashboard-ecommerce.init.js"></script>
+        {/* <script src="/theme/js/pages/dashboard-ecommerce.init.js"></script> */}
 
         {/* <!-- App js --> */}
         <script src="/theme/js/app.js"></script>
+       </>:<></>}
       </body>
     </html>
   )
@@ -97,9 +101,9 @@ const HeaderPart = ()=>{
   const loggedInUser = useUser()
   return (<>
               {/* Main Header */}
-              <MainHeader loggedInUser={loggedInUser}/>
+              <MainHeader loggedInUser={loggedInUser.user}/>
               {/* Sidebar */}
-              <MainMenu loggedInUser={loggedInUser}/>
+              <MainMenu loggedInUser={loggedInUser.user}/>
   </>)
 }
 
@@ -107,6 +111,6 @@ const FooterPart = ()=>{
   const loggedInUser = useUser()
   return (<>
               {/* Main Footer */}
-              <MainFooter loggedInUser={loggedInUser}/>
+              <MainFooter loggedInUser={loggedInUser.user}/>
   </>)
 }

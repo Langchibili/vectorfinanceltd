@@ -5,7 +5,7 @@ import React, { useEffect } from 'react'
 const LencoPaymentButton = (props) => {
   const mobileNumber = props.loggedInUser.username
   const email = props.loggedInUser.email
-  const amount = props.amount
+  const amount = props.paymentAmount
   const { details } = props.loggedInUser;
   const { currentLoan } = props.loggedInUser;
 
@@ -33,7 +33,7 @@ const LencoPaymentButton = (props) => {
         key: LencoPubKey, // Replace with your Lenco public key
         reference: 'ref-id-'+ currentLoan.id +"-0"+returnNineDigitNumber(mobileNumber)+ "-"+ Date.now(), // Unique reference
         email: email, // Customer's email
-        amount: amount, // Payment amount
+        amount:  amount, // Payment amount
         currency: "ZMW",
         channels: ["card", "mobile-money"],
         customer: {
@@ -59,7 +59,7 @@ const LencoPaymentButton = (props) => {
   }
 
   return (
-    <button className='btn btn-success mt-20' onClick={getPaidWithLenco}>
+    <button className='btn btn-success mt-10' onClick={getPaidWithLenco}>
       Mobile Money and Card Payments
     </button>
   )

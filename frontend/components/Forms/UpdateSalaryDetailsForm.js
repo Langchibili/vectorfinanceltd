@@ -400,15 +400,15 @@ export default class UpdateSalaryDetailsForm extends React.Component {
                       Save
                     </button>
 
-                    <button
+                    {this.props.formDisplay === "profile"? <></> : <button
                       type="button"
                       className="btn btn-danger w-90 mt-3"
                       id="next-btn"
                       onClick={()=>{this.props.handleOpenAddLoanAmountForm()}}
                     >
                       Previous
-                    </button>
-                    <button
+                    </button>}
+                    {this.props.formDisplay === "profile"? <></> : <button
                       type="button"
                       className="btn btn-danger w-90 mt-3"
                       id="next-btn"
@@ -416,7 +416,7 @@ export default class UpdateSalaryDetailsForm extends React.Component {
                       onClick={()=>{this.props.handleCreateBlankLoan()}}
                     >
                       Complete
-                    </button>
+                    </button>}
                     
                   </div>
                  {this.state.error? <p className="text text-danger">{this.state.error}</p> : <></>}

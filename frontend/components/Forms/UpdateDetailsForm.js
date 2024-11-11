@@ -211,14 +211,14 @@ export default class UpdateDetailsForm extends React.Component {
                         disabled={this.state.saving}
                         onClick={this.handleSubmit}
                         type="button"
-                        className="btn btn-success w-50 mt-3"
+                        className="btn btn-success w-90 mt-3"
                         id="confirm-btn"
                         // Submit button logic to be handled separately
                       >
                         Save
                       </button>
                     </div>
-                    <div style={{ width: "100%", textAlign: "right" }}>
+                    {this.props.formDisplay === "profile"? <></> : <div style={{ width: "100%", textAlign: "right" }}>
                       <button
                         type="button"
                         className="btn btn-danger w-50 mt-3"
@@ -228,7 +228,7 @@ export default class UpdateDetailsForm extends React.Component {
                       >
                         Next
                       </button>
-                    </div>
+                    </div>}
                   </div>
                  {this.state.error? <p className="text text-danger">{this.state.error}</p> : <></>}
                  <p className="text text-warning mt-2">Note that all the information you provide here is kept strictly confidential, and it's solely meant for verification and loan eligibility determination purposes</p>

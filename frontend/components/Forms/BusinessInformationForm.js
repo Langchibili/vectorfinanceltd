@@ -4,6 +4,7 @@ import { updateUserAccount } from "@/Functions";
 import React from "react";
 import Uploader from "../Includes/Uploader/Uploader";
 import { api_url, getJwt } from "@/Constants";
+import { Slide } from "@material-ui/core";
 
 export default class BusinessInformationForm extends React.Component {
   constructor(props) {
@@ -292,8 +293,8 @@ export default class BusinessInformationForm extends React.Component {
     } = this.state;
 
     return (
-      <>
-        <div data-aos="fade-left" className="row">
+      <Slide in={true} direction="left">
+        <div className="row">
           <div className="col-lg-12">
             <div className="card">
               <div className="card-header align-items-center d-flex">
@@ -542,15 +543,15 @@ export default class BusinessInformationForm extends React.Component {
                       Save
                     </button>
 
-                    <button
+                    {this.props.formDisplay === "profile"? <></> : <button
                       type="button"
                       className="btn btn-danger w-90 mt-3"
                       id="next-btn"
                       onClick={()=>{this.props.handleOpenAddLoanAmountForm()}}
                     >
                       Previous
-                    </button>
-                    <button
+                    </button>}
+                    {this.props.formDisplay === "profile"? <></> : <button
                       type="button"
                       className="btn btn-danger w-90 mt-3"
                       id="next-btn"
@@ -558,7 +559,7 @@ export default class BusinessInformationForm extends React.Component {
                       onClick={()=>{this.props.handleCreateBlankLoan()}}
                     >
                       Next
-                    </button>
+                    </button>}
                     
                   </div>
 
@@ -571,7 +572,7 @@ export default class BusinessInformationForm extends React.Component {
             </div>
           </div>
         </div>
-      </>
+        </Slide>
     );
   }
 }

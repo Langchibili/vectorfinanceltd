@@ -360,7 +360,7 @@ export default class UpdateClientDetailsForm extends React.Component {
                         Save
                       </button>
                     </div>
-                    <div style={{ width: "100%", textAlign: "right" }}>
+                    {this.props.formDisplay === "profile"? <></> :<div style={{ width: "100%", textAlign: "right" }}>
                       <button
                         type="button"
                         className="btn btn-info w-90 mt-3"
@@ -369,8 +369,8 @@ export default class UpdateClientDetailsForm extends React.Component {
                       >
                         Previous
                       </button>
-                    </div>
-                    <div style={{ width: "100%", textAlign: "right" }}>
+                    </div>}
+                    {this.props.formDisplay === "profile"? <></> :<div style={{ width: "100%", textAlign: "right" }}>
                       <button
                         type="button"
                         className="btn btn-danger w-90 mt-3"
@@ -380,7 +380,7 @@ export default class UpdateClientDetailsForm extends React.Component {
                       >
                         Next
                       </button>
-                    </div>
+                    </div>}
                     
                   </div>
                  {this.state.error? <p className="text text-danger">{this.state.error}</p> : <></>}
