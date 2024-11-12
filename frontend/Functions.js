@@ -120,6 +120,11 @@ export const handleCountsDisplay = (counts) => { // formating counts like: likes
     }
   }
 
+  export const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  }
+
  export const truncateText = (text, maxLength)=> {
     if(!text){
       return ''

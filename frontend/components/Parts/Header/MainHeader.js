@@ -15,9 +15,13 @@ export default class MainHeader extends React.Component{
   
        
    render(){
-    const fullnames = this.props.loggedInUser.fullnames
-    const {currentLoan} = this.props.loggedInUser
-    const outstandingAmount = currentLoan? currentLoan.outstandingAmount : "0"
+    const fullnames = this.props.userIsLoggedIn? this.props.loggedInUser.fullnames : ""
+    let outstandingAmount = ""
+    if(this.props.userIsLoggedIn === true){
+         const {currentLoan} = this.props.loggedInUser
+         outstandingAmount = currentLoan? currentLoan.outstandingAmount : "0"
+    }
+    
 
     return (
         <header id="page-topbar">

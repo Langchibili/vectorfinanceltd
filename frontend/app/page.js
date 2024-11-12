@@ -25,19 +25,14 @@ export default function Home() {
   
   const loggedInUser = useUser()
   const constants = useConstants()
-  console.log(constants)
+  
   if(!loggedInUser.status){
      if(typeof window !== "undefined"){
        window.location = "/signin"
      }
   }
   const renderMainContent = ()=>{
-    sendOTP(loggedInUser.user.username,"phoneNumber")
-    sendOTP(loggedInUser.user.email,"email")
     const currentLoan = loggedInUser.user.currentLoan
-    return <><PhoneOtpVerificationForm phoneNumber={loggedInUser.user.username}/>
-      <br/>
-    <EmailOtpVerificationForm email={loggedInUser.user.email}/></>
     if(currentLoan){
       if(currentLoan.loanStatus === "initiated"){
          return <LoanInitiatedDisplay /> 

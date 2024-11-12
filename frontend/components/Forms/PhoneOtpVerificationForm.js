@@ -87,9 +87,7 @@ export default class PhoneOtpVerificationForm extends Component {
         return
     }
     else{
-        console.log(response)
-        return
-        this.props.action(response); // Authenticate user
+        this.props.action(); // Authenticate user
     }
   }
 
@@ -123,7 +121,7 @@ export default class PhoneOtpVerificationForm extends Component {
 
     return (
         <div className="auth-form">
-        <label className="mb-1 text-white"><strong>Enter code sent to your number</strong></label>
+        <label className="mb-1 text-gray"><strong>Enter code sent to your number</strong></label>
         <div className="form-group">
         <input onChange={this.handleOTPChange} className="form-control" type="text" placeholder="Enter 6 digit Code" value={otp}/>
         </div>

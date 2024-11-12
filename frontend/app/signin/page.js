@@ -1,7 +1,7 @@
 'use client'
 
-import { api_url, submitCreateUserRequest } from "@/Constants";
-import { dynamicConfig, getEmailAddresses, getPhoneNumbers, returnNineDigitNumber, updateEmailAddresses, updatePhoneNumbers, updateUserAccount } from "@/Functions";
+import { api_url } from "@/Constants";
+import { dynamicConfig} from "@/Functions";
 import { saveJwt } from "@/Secrets";
 import Link from "next/link";
 import { useRef, useState } from "react";
@@ -87,15 +87,6 @@ export default function Signin() {
             return
         }
         else{
-            // const phoneNumber = "+260"+returnNineDigitNumber(phone)
-            // const phoneNumbers = getPhoneNumbers()
-            // const emailAddresses = getEmailAddresses()
-            // phoneNumbers.clientNumbers.push(phone)
-            // emailAddresses.clientEmailAddresses.push(email)
-            // console.log(phoneNumbers)
-            // console.log(emailAddresses)
-            // updatePhoneNumbers({data:phoneNumbers.clientNumbers})
-            // updateEmailAddresses()
             window.location = "/"
         }
     // }
@@ -141,9 +132,9 @@ export default function Signin() {
             )
         }
   } 
-
-
+  
   return (
+  
     <div className="auth-page-wrapper auth-bg-cover py-5 d-flex justify-content-center align-items-center min-vh-100">
       <div className="bg-overlay" />
       <div className="auth-page-content overflow-hidden pt-lg-5">

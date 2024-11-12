@@ -1,9 +1,12 @@
 'use client'
 
+import EmailOtpVerificationForm from "@/components/Forms/EmailOtpVerificationForm";
+import PhoneOtpVerificationForm from "@/components/Forms/PhoneOtpVerificationForm";
 import Uploader from "@/components/Includes/Uploader/Uploader";
 import { submitCreateUserRequest } from "@/Constants";
-import { dynamicConfig, textHasPhoneNumber, updateUserAccount } from "@/Functions";
+import { dynamicConfig, sendOTP, textHasPhoneNumber, updateUserAccount, validateEmail } from "@/Functions";
 import { saveJwt } from "@/Secrets";
+import { Alert } from "@mui/material";
 import Link from "next/link";
 import { useRef, useState } from "react";
 
@@ -21,6 +24,9 @@ export default function Signup() {
 
   // State for error messages
   const [serverError,setServerError] = useState(null)
+  const [numberOtpVerified,setNumberOtpVerified] = useState(false)
+  const [emailOtpVerified,setEmailOtpVerified] = useState(false)
+  const [beginOtpVerification,setBeginOtpVerification] = useState(true)
   const [loading,setLoading] = useState(false)
   const [errors, setErrors] = useState({
     email: "",
@@ -75,6 +81,10 @@ export default function Signup() {
         newErrors.phone = "Please enter a valid phone number";
         isValid = false;
     }
+    if(!validateEmail(email)){
+        newErrors.email = "Please enter a valid email address";
+        isValid = false;
+    }
 
     setErrors(newErrors);
     return isValid;
@@ -83,6 +93,14 @@ export default function Signup() {
   // Handle form submit (You will add the actual submit logic)
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if(!numberOtpVerified){
+      setServerError("Please verify your email address")
+      return
+    }
+    if(!emailOtpVerified){
+      setServerError("Please verify your email address")
+      return
+    }
     const email = emailRef.current.value.trim();
     const firstName = firstNameRef.current.value.trim();
     const lastName = lastNameRef.current.value.trim();
@@ -126,10 +144,49 @@ export default function Signup() {
     else {
       return
     }
-  };
+  }
 
+  const handleBeginOtpVerification = (e)=>{
+    e.preventDefault()
+    if(validateForm()){
+      const phone = phoneRef.current.value.trim();
+      const email = emailRef.current.value.trim();
+      if(!phone || !email){ 
+        return
+      }
+      if(!textHasPhoneNumber(phone)){
+        return
+      }
+      if(!validateEmail(email)){
+        return
+      }
+      setBeginOtpVerification(false)
+      sendOTP(phone,"phoneNumber")
+      sendOTP(email,"email")
+    }
+  }
 
-  
+  const renderPhoneOtpVerificationForm = ()=>{
+    if(phoneRef.current && textHasPhoneNumber(phoneRef.current.value.trim())){
+       return (
+        <> <h5>Verify Your Number</h5>
+            <PhoneOtpVerificationForm action={(e)=>{e.preventDefault(); setNumberOtpVerified(true);}} phoneNumber={phoneRef.current.value.trim()}/> 
+            <hrs/>
+         </>
+       )
+    }
+  }
+
+  const renderEmailOtpVerificationForm = ()=>{
+    if(emailRef.current && validateEmail(emailRef.current.value.trim())){
+       return (
+        <> <h5>Verify Your Email Address</h5>
+            <EmailOtpVerificationForm action={(e)=>{e.preventDefault(); setEmailOtpVerified(true);}} email={emailRef.current.value.trim()}/> 
+          </>
+       )
+    }
+  }
+
 
   return (
     <div className="auth-page-wrapper auth-bg-cover py-5 d-flex justify-content-center align-items-center min-vh-100">
@@ -155,13 +212,14 @@ export default function Signup() {
                         </p>
                       </div>
                       <div className="mt-4">
-                        <form className="needs-validation" noValidate="" onSubmit={handleSubmit}>
+                        <form className="needs-validation" noValidate="">
                           <div className="mb-3">
                             <label htmlFor="useremail" className="form-label">
                               Email <span className="text-danger">*</span>
                             </label>
                             <input
                               type="email"
+                              disabled={emailRef.current && validateEmail(emailRef.current.value.trim())}
                               className={`form-control ${errors.email ? 'is-invalid' : ''}`}
                               id="useremail"
                               placeholder="Enter Email Address"
@@ -200,6 +258,7 @@ export default function Signup() {
                               Phone number <span className="text-danger">*</span>
                             </label>
                             <input
+                              disabled={phoneRef.current && textHasPhoneNumber(phoneRef.current.value.trim())}
                               type="text"
                               className={`form-control ${errors.phone ? 'is-invalid' : ''}`}
                               id="phonenumber"
@@ -231,6 +290,9 @@ export default function Signup() {
                               {errors.password && <div className="invalid-feedback">{errors.password}</div>}
                             </div>
                           </div>
+                          
+                          {!numberOtpVerified? <><br/><hr/>{renderPhoneOtpVerificationForm()}</> : <Alert severity="success">Phone Number Verified</Alert>}
+                          {!emailOtpVerified? <><br/><hr/>{renderEmailOtpVerificationForm()}</> : <Alert severity="success">Email Address Verified</Alert>}
                           <div className="mb-4">
                                 <p className="mb-0 fs-12 text-muted fst-italic">
                                 By registering you agree to the VectorFinance{" "}
@@ -244,9 +306,12 @@ export default function Signup() {
                             </div>
                             <p className="text text-danger">{serverError}</p>
                           <div className="mt-4">
-                            <button disabled={loading} className="btn btn-success w-100">
+                            {beginOtpVerification? <button className="btn btn-success w-100" onClick={handleBeginOtpVerification}>
+                                Sign Up
+                            </button> :
+                            <button onClick={handleSubmit} disabled={loading} className="btn btn-success w-100">
                               {loading? "Setting Account Up..." : "Sign Up"}
-                            </button>
+                            </button>}
                           </div>
                         </form>
                       </div>

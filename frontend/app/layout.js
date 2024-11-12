@@ -101,9 +101,9 @@ const HeaderPart = ()=>{
   const loggedInUser = useUser()
   return (<>
               {/* Main Header */}
-              <MainHeader loggedInUser={loggedInUser.user}/>
+              <MainHeader loggedInUser={loggedInUser.user} userIsLoggedIn={loggedInUser.status}/>
               {/* Sidebar */}
-              <MainMenu loggedInUser={loggedInUser.user}/>
+              <MainMenu loggedInUser={loggedInUser.user} userIsLoggedIn={loggedInUser.status}/>
   </>)
 }
 
@@ -111,6 +111,6 @@ const FooterPart = ()=>{
   const loggedInUser = useUser()
   return (<>
               {/* Main Footer */}
-              <MainFooter loggedInUser={loggedInUser.user}/>
+              <MainFooter loggedInUser={loggedInUser.user} userIsLoggedIn={loggedInUser.status}/>
   </>)
 }
