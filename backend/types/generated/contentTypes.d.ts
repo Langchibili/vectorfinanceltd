@@ -780,6 +780,8 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
       'api::notification.notification'
     >;
     business: Attribute.Component<'client-details.business'>;
+    phoneNumberVerified: Attribute.Boolean & Attribute.DefaultTo<false>;
+    emailAddressVerified: Attribute.Boolean;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
@@ -926,6 +928,31 @@ export interface ApiApprovalApproval extends Schema.CollectionType {
       'oneToOne',
       'admin::user'
     > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiAuthAuth extends Schema.CollectionType {
+  collectionName: 'auths';
+  info: {
+    singularName: 'auth';
+    pluralName: 'auths';
+    displayName: 'auth';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    identifier: Attribute.String & Attribute.Unique;
+    identifierType: Attribute.Enumeration<['phoneNumber', 'email']>;
+    otp: Attribute.String;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<'api::auth.auth', 'oneToOne', 'admin::user'> &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<'api::auth.auth', 'oneToOne', 'admin::user'> &
       Attribute.Private;
   };
 }
@@ -1636,6 +1663,7 @@ declare module '@strapi/types' {
       'plugin::i18n.locale': PluginI18NLocale;
       'api::admin-notification.admin-notification': ApiAdminNotificationAdminNotification;
       'api::approval.approval': ApiApprovalApproval;
+      'api::auth.auth': ApiAuthAuth;
       'api::email-addresses-list.email-addresses-list': ApiEmailAddressesListEmailAddressesList;
       'api::finance.finance': ApiFinanceFinance;
       'api::form.form': ApiFormForm;

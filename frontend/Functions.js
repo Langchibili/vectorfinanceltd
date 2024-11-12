@@ -337,6 +337,70 @@ export const updateLoan = async (data,loanId)=>{
   return null
 }
 
+export const getPhoneNumbers = async ()=>{
+  const phoneNumbers = await fetch(api_url+'/phone-numbers-list',{
+    headers: {
+      'Authorization': `Bearer ${getJwt()}`,
+      'Content-Type': 'application/json'
+    }
+  }).then(response => response.json())
+    .then(data => data)
+    .catch(error => console.error(error))
+  if(phoneNumbers && phoneNumbers.data){
+     return phoneNumbers.data.attributes
+  }
+ }
+ 
+ export const getEmailAddresses = async ()=>{
+  const emailAddresses = await fetch(api_url+'/email-addresses-list',{
+    headers: {
+      'Authorization': `Bearer ${getJwt()}`,
+      'Content-Type': 'application/json'
+    }
+  }).then(response => response.json())
+    .then(data => data)
+    .catch(error => console.error(error))
+  if(emailAddresses && emailAddresses.data){
+     return emailAddresses.data.attributes
+  }
+ }
+
+ export const updatePhoneNumbers = async (data)=>{
+  const loan =  await fetch(api_url+'/phone-numbers-list', {
+      method: 'PUT',
+      headers: {
+       'Authorization': `Bearer ${getJwt()}`,
+       'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data),
+    })
+    .then(response => response.json())
+    .then(data => data)
+}
+
+export const updateEmailAddresses = async (data)=>{
+  const loan =  await fetch(api_url+'/email-addresses-list', {
+      method: 'PUT',
+      headers: {
+       'Authorization': `Bearer ${getJwt()}`,
+       'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data),
+    })
+    .then(response => response.json())
+    .then(data => data)
+}
+ 
+export const sendOTP = async (identifier,identifierType) => {
+  // Make request to resend OTP
+  fetch(api_url+'/auths?identifier='+identifier+'&auth_stage=sendotp&identifierType='+identifierType,{
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }).then(response => response.json())
+      .then(data => data)
+      .catch(error => console.error(error))
+}
 
 export const getLoanCategoryIds = async ()=>{
   const loanCategories = await fetch(api_url+'/loan-categories',{
@@ -355,6 +419,7 @@ export const getLoanCategoryIds = async ()=>{
   }
   return loanCategoryIdsObject
  }
+ 
  export const getLoanTypesIds = async ()=>{
   const loanTypes = await fetch(api_url+'/types',{
     headers: {

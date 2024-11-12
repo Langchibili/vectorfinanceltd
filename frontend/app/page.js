@@ -1,8 +1,10 @@
 "use client"
 
 import CollateralForm from "@/components/Forms/CollateralForm";
+import EmailOtpVerificationForm from "@/components/Forms/EmailOtpVerificationForm";
 import FilledForms from "@/components/Forms/FilledForms";
 import LoanApplicationForm from "@/components/Forms/LoanApplicationForm";
+import PhoneOtpVerificationForm from "@/components/Forms/PhoneOtpVerificationForm";
 import ApplyForALoanButton from "@/components/Includes/ApplyForALoanButton/ApplyForALoanButton";
 import HelpPageDisplay from "@/components/Includes/HelpPageDisplay/HelpPageDisplay";
 import LoanInformationDisplay from "@/components/Includes/LoanInformationDisplay/LoanInformationDisplay";
@@ -11,6 +13,7 @@ import LoanTransactionHistory from "@/components/Includes/LoanTransactionHistory
 import { useBottomNav } from "@/Contexts/BottomNavContext";
 import { useConstants } from "@/Contexts/ConstantsContext";
 import { useUser } from "@/Contexts/UserContext";
+import { sendOTP } from "@/Functions";
 import { Slide } from "@material-ui/core";
 import { Alert } from "@mui/material";
 import { useState } from "react";
@@ -29,8 +32,12 @@ export default function Home() {
      }
   }
   const renderMainContent = ()=>{
-    console.log(BottomNavLink)
+    sendOTP(loggedInUser.user.username,"phoneNumber")
+    sendOTP(loggedInUser.user.email,"email")
     const currentLoan = loggedInUser.user.currentLoan
+    return <><PhoneOtpVerificationForm phoneNumber={loggedInUser.user.username}/>
+      <br/>
+    <EmailOtpVerificationForm email={loggedInUser.user.email}/></>
     if(currentLoan){
       if(currentLoan.loanStatus === "initiated"){
          return <LoanInitiatedDisplay /> 

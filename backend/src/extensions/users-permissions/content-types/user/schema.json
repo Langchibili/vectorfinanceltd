@@ -165,6 +165,13 @@
       "type": "component",
       "repeatable": false,
       "component": "client-details.business"
+    },
+    "phoneNumberVerified": {
+      "type": "boolean",
+      "default": false
+    },
+    "emailAddressVerified": {
+      "type": "boolean"
     }
   }
 }
