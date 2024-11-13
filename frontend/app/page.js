@@ -1,10 +1,8 @@
 "use client"
 
 import CollateralForm from "@/components/Forms/CollateralForm";
-import EmailOtpVerificationForm from "@/components/Forms/EmailOtpVerificationForm";
 import FilledForms from "@/components/Forms/FilledForms";
 import LoanApplicationForm from "@/components/Forms/LoanApplicationForm";
-import PhoneOtpVerificationForm from "@/components/Forms/PhoneOtpVerificationForm";
 import ApplyForALoanButton from "@/components/Includes/ApplyForALoanButton/ApplyForALoanButton";
 import HelpPageDisplay from "@/components/Includes/HelpPageDisplay/HelpPageDisplay";
 import LoanInformationDisplay from "@/components/Includes/LoanInformationDisplay/LoanInformationDisplay";
@@ -13,8 +11,6 @@ import LoanTransactionHistory from "@/components/Includes/LoanTransactionHistory
 import { useBottomNav } from "@/Contexts/BottomNavContext";
 import { useConstants } from "@/Contexts/ConstantsContext";
 import { useUser } from "@/Contexts/UserContext";
-import { sendOTP } from "@/Functions";
-import { Slide } from "@material-ui/core";
 import { Alert } from "@mui/material";
 import { useState } from "react";
 

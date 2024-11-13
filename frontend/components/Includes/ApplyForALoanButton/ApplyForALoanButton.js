@@ -44,11 +44,11 @@ export default function ApplyForALoanButton(props) {
 
   if(typeof window !== "undefined"){
     return (
-        <div>
+        <div style={{width:'100%', textAlign:'center'}}>
          {!showForm? <Slide in={!showForm}>
             <button
               className={"btn btn-success mb-4"}
-              style={{backgroundColor:props.color,width: window.innerWidth > 600? "600px" : "100%"}}
+              style={{margin:'0 auto',backgroundColor:props.color,width: window.innerWidth > 600? "600px" : "100%"}}
               onClick={handleShowFormOpen}
             >
             <EditNote/>
