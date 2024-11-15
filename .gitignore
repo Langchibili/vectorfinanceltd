@@ -1,10 +1,13 @@
 backend/node_modules
+backend/src-old
+backend-err
+backend-old-stuff
 backend/.strapi
 backend/.strapi-updater.json
 backend/build
 backend/.env
-backend-err
-backend-old-stuff
+backend/config-old
+
 frontend/Secrets.js
 frontend/mvp-and-mmp-features.txt
 frontend/logic.txt
