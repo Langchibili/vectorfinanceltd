@@ -51,9 +51,9 @@ export default function MobileNav(props) {
       onKeyDown={toggleDrawer(anchor, false)}
     >
       <List>
-        {[['Home','/'],['Profile(For Individuals)','/profile'], ['Profile(For Businesses)','/business-profile'],['Contact Us','/contact'], ['About Us','/about'], ['Logout','/logout']].map((text, index) => (
+        {[['Home','/'],['Profile(For Individuals)','/profile'], ['Profile(For Businesses)','/business-profile'],['Contact Us','https://vectorfinancelimited.com/contact-us/'], ['About Us','https://vectorfinancelimited.com/about-us/'], ['Logout','/logout']].map((text, index) => (
           window.location.pathname === "/" && text[0] === "Home"? '' :
-          <ListItem key={text[0]} disablePadding onClick={(e)=>{router.push(text[1]); props.handlePageChange(e)}}>
+          <ListItem key={text[0]} disablePadding onClick={(e)=>{router.push(text[1]); /*props.handlePageChange(e)*/}}>
             <ListItemButton>
               <ListItemIcon>
                 {renderLinkIcon(text[0])}

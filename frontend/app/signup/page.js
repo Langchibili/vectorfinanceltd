@@ -4,8 +4,9 @@ import EmailOtpVerificationForm from "@/components/Forms/EmailOtpVerificationFor
 import PhoneOtpVerificationForm from "@/components/Forms/PhoneOtpVerificationForm";
 import Uploader from "@/components/Includes/Uploader/Uploader";
 import { submitCreateUserRequest } from "@/Constants";
-import { dynamicConfig, sendOTP, textHasPhoneNumber, updateUserAccount, validateEmail } from "@/Functions";
+import { dynamicConfig, scrolltoTopOFPage, sendOTP, textHasPhoneNumber, updateUserAccount, validateEmail } from "@/Functions";
 import { saveJwt } from "@/Secrets";
+import { Slide } from "@material-ui/core";
 import { Alert } from "@mui/material";
 import Link from "next/link";
 import { useRef, useState } from "react";
@@ -187,7 +188,7 @@ export default function Signup() {
     }
   }
 
-
+  scrolltoTopOFPage()
   return (
     <div className="auth-page-wrapper auth-bg-cover py-5 d-flex justify-content-center align-items-center min-vh-100">
       <div className="bg-overlay" />
@@ -197,12 +198,15 @@ export default function Signup() {
             <div className="col-lg-12">
               <div className="card overflow-hidden m-0">
                 <div className="row justify-content-center g-0">
+                 <Slide in={true} direction="right">
                   <div className="col-lg-6">
                     <div className="p-lg-5 p-4 auth-one-bg h-100">
                       <div className="bg-overlay" />
                       {/* Carousel section omitted for brevity */}
                     </div>
                   </div>
+                  </Slide>
+                  <Slide in={true} direction="left">
                   <div className="col-lg-6">
                     <div className="p-lg-5 p-4">
                       <div>
@@ -328,6 +332,7 @@ export default function Signup() {
                       </div>
                     </div>
                   </div>
+                  </Slide>
                 </div>
               </div>
               {/* end card */}
@@ -340,5 +345,5 @@ export default function Signup() {
       </div>
       {/* end auth page content */}
     </div>
-  );
+  )
 }

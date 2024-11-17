@@ -18,6 +18,7 @@ export default class UpdateClientDetailsForm extends React.Component {
       isFormValid: false,
       saving: false,
       clientDetailsId: null,
+      saved: false,
       error:null
     };
   }
@@ -34,7 +35,6 @@ export default class UpdateClientDetailsForm extends React.Component {
   }
 
   async componentDidMount() {
-    console.log(this.props)
     let { clientDetails } =  this.props.loggedInUser; // because the user object has the client details, though no nrc
     if(!clientDetails){
         const blankDetailsObject = {
@@ -58,7 +58,7 @@ export default class UpdateClientDetailsForm extends React.Component {
       IDback: clientDetails?.IDback || '',
       clientDetailsId: clientDetails?.id || null
     },()=>{
-        this.checkFormValidity()
+        this.checkFormValidity(true)
     })
   }
 
@@ -66,10 +66,10 @@ export default class UpdateClientDetailsForm extends React.Component {
     //new Date(details.dateOfBirth).toLocaleDateString('en-US')
     const { name, value } = e.target;
     // Update state based on field name
-    this.setState({ [name]: value }, this.checkFormValidity);
+    this.setState({ [name]: value, saved: false }, this.checkFormValidity);
   }
 
-  checkFormValidity = () => {
+  checkFormValidity = (initialCheck=false) => {
     const { employementStatus, idType, IDfront, IDback } = this.state;
 
     // Validate that all fields are filled
@@ -79,7 +79,17 @@ export default class UpdateClientDetailsForm extends React.Component {
       IDfront &&
       IDback;
 
-    this.setState({ isFormValid });
+      if(!initialCheck){
+        this.setState({ isFormValid });
+      }
+      else{
+        if(isFormValid){
+          this.setState({ isFormValid:isFormValid, saved: true})
+        }
+        else{
+          this.setState({ isFormValid})
+        }
+      }
   }
 
   handleSubmit = async (e)=>{
@@ -126,7 +136,8 @@ export default class UpdateClientDetailsForm extends React.Component {
         saving: false,
         IDfront: IDfront,
         IDback: IDback,
-        clientDetailsId: clientDetailsId
+        clientDetailsId: clientDetailsId,
+        saved: true
     },()=>{
         this.checkFormValidity()
         console.log(this.state)
@@ -237,7 +248,7 @@ export default class UpdateClientDetailsForm extends React.Component {
   renderFile
 
   render() {
-    const { employementStatus, idType, isFormValid } = this.state;
+    const { employementStatus, idType, saved, isFormValid } = this.state;
 
     return (
       <Slide in={true} direction="left">
@@ -357,7 +368,7 @@ export default class UpdateClientDetailsForm extends React.Component {
                         id="confirm-btn"
                         // Submit button logic to be handled separately
                       >
-                        Save
+                        {this.state.saving? "Saving..." : "save"}
                       </button>
                     </div>
                     {this.props.formDisplay === "profile"? <></> :<div style={{ width: "100%", textAlign: "right" }}>
@@ -365,7 +376,7 @@ export default class UpdateClientDetailsForm extends React.Component {
                         type="button"
                         className="btn btn-info w-90 mt-3"
                         id="next-btn"
-                        onClick={()=>{this.props.handleOpenUpdateDetailsForm()}}
+                        onClick={()=>{this.props.handleOpenUpdateDetailsForm();this.props.handleFormReopen();}}
                       >
                         Previous
                       </button>
@@ -375,7 +386,7 @@ export default class UpdateClientDetailsForm extends React.Component {
                         type="button"
                         className="btn btn-danger w-90 mt-3"
                         id="next-btn"
-                        disabled={!isFormValid}
+                        disabled={!isFormValid || !saved}
                         onClick={()=>{this.props.handleOpenAddLoanAmountForm()}}
                       >
                         Next

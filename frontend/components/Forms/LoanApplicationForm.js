@@ -6,10 +6,15 @@ import PersonalLoanApplicationForm from "./PersonalLoanApplicationForm";
 import BusinessLoanApplicationForm from "./BusinessLoanApplicationForm";
 import CompanyLoanApplicationForm from "./CompanyLoanApplicationForm";
 import { ArrowBackOutlined } from "@material-ui/icons";
+import { scrolltoTopOFPage } from "@/Functions";
 
 export default class LoanApplicationForm extends React.Component{
     constructor(props){
         super(props)
+    }
+
+    componentDidMount(){
+      scrolltoTopOFPage()
     }
 
     renderApplicationForm = ()=>{

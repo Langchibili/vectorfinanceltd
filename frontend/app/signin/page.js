@@ -1,8 +1,9 @@
 'use client'
 
 import { api_url } from "@/Constants";
-import { dynamicConfig} from "@/Functions";
+import { dynamicConfig, scrolltoTopOFPage} from "@/Functions";
 import { saveJwt } from "@/Secrets";
+import { Slide } from "@material-ui/core";
 import Link from "next/link";
 import { useRef, useState } from "react";
 
@@ -132,9 +133,8 @@ export default function Signin() {
             )
         }
   } 
-  
+  scrolltoTopOFPage()
   return (
-  
     <div className="auth-page-wrapper auth-bg-cover py-5 d-flex justify-content-center align-items-center min-vh-100">
       <div className="bg-overlay" />
       <div className="auth-page-content overflow-hidden pt-lg-5">
@@ -143,12 +143,15 @@ export default function Signin() {
             <div className="col-lg-12">
               <div className="card overflow-hidden m-0">
                 <div className="row justify-content-center g-0">
+                 <Slide in={true} direction="right">
                   <div className="col-lg-6">
                     <div className="p-lg-5 p-4 auth-one-bg h-100">
                       <div className="bg-overlay" />
                       {/* Carousel section omitted for brevity */}
                     </div>
                   </div>
+                  </Slide>
+                  <Slide in={true} direction="left">
                   <div className="col-lg-6">
                     <div className="p-lg-5 p-4">
                       <div>
@@ -207,6 +210,7 @@ export default function Signin() {
                       </div>
                     </div>
                   </div>
+                  </Slide>
                 </div>
               </div>
               {/* end card */}
@@ -219,5 +223,5 @@ export default function Signin() {
       </div>
       {/* end auth page content */}
     </div>
-  );
+  )
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import { checkUserLogginStatus } from "@/Constants";
 import { updateUserAccount } from "@/Functions";
 import { Slide } from "@material-ui/core";
 import React from "react";
@@ -17,13 +18,17 @@ export default class UpdateDetailsForm extends React.Component {
       // More fields can be added as necessary
       isFormValid: false,
       saving: false,
+      saved: false,
       error:null
     };
   }
 
-  componentDidMount() {
-    const { details } = this.props.loggedInUser;
-
+  async componentDidMount() {
+    let details = this.props.loggedInUser.details;
+    if(this.props.formReOpened){ // this means a user has clicked the previous button on the next form
+        const loggedInUser = await checkUserLogginStatus()
+        details  = loggedInUser.user.details
+    }
     // Set default values, ensure nulls are handled
     this.setState({
       firstname: details?.firstname || '',
@@ -35,7 +40,7 @@ export default class UpdateDetailsForm extends React.Component {
         ? details.dateOfBirth // format MM/DD/YYYY
         : '',
     },()=>{
-      this.checkFormValidity()
+      this.checkFormValidity(true)
     });
   }
 
@@ -44,10 +49,10 @@ export default class UpdateDetailsForm extends React.Component {
     const { name, value } = e.target;
     // Update state based on field name
     // name === "dateOfBirth"? new Date(value).toLocaleDateString('en-US') :
-    this.setState({ [name]: value }, this.checkFormValidity);
+    this.setState({ [name]: value, saved: false}, this.checkFormValidity);
   };
 
-  checkFormValidity = () => {
+  checkFormValidity = (initialCheck=false) => {
     const { firstname, lastname, age, gender, address, dateOfBirth } = this.state;
 
     // Validate that all fields are filled
@@ -59,7 +64,17 @@ export default class UpdateDetailsForm extends React.Component {
       address &&
       dateOfBirth;
 
-    this.setState({ isFormValid });
+      if(!initialCheck){
+        this.setState({ isFormValid });
+      }
+      else{
+        if(isFormValid){
+          this.setState({ isFormValid:isFormValid, saved: true})
+        }
+        else{
+          this.setState({ isFormValid})
+        }
+      }
   }
 
   handleSubmit = async (e)=>{
@@ -91,12 +106,13 @@ export default class UpdateDetailsForm extends React.Component {
      }
      this.checkFormValidity()
      this.setState({
-        saving: false
+        saving: false,
+        saved: true
     })
   }
 
   render() {
-    const { firstname, lastname, age, gender, address, dateOfBirth, isFormValid } = this.state;
+    const { firstname, lastname, age, gender, saved, address, dateOfBirth, isFormValid } = this.state;
 
     return (
       <Slide in={true} direction="left">
@@ -215,7 +231,7 @@ export default class UpdateDetailsForm extends React.Component {
                         id="confirm-btn"
                         // Submit button logic to be handled separately
                       >
-                        Save
+                        {this.state.saving? "Saving..." : "save"}
                       </button>
                     </div>
                     {this.props.formDisplay === "profile"? <></> : <div style={{ width: "100%", textAlign: "right" }}>
@@ -223,7 +239,7 @@ export default class UpdateDetailsForm extends React.Component {
                         type="button"
                         className="btn btn-danger w-50 mt-3"
                         id="next-btn"
-                        disabled={!isFormValid}
+                        disabled={!isFormValid || !saved}
                         onClick={()=>{this.props.handleOpenUpdateClientDetailsForm()}}
                       >
                         Next

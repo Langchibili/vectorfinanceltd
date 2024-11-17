@@ -25,6 +25,7 @@ export default class BusinessInformationForm extends React.Component {
       pacraPrintOut: null,
       pacraPrintOutId: null,
       isFormValid: false,
+      saved: false,
       error: null,
     };
   }
@@ -64,17 +65,17 @@ export default class BusinessInformationForm extends React.Component {
             pacraPrintOut: business?.pacraPrintOut || '',
             pacraPrintOutId: business?.id || null
         },()=>{
-            this.checkFormValidity()
+            this.checkFormValidity(true)
         })
     });
   }
 
   handleInputChange = (e) => {
     const { name, value } = e.target;
-    this.setState({ [name]: value }, this.checkFormValidity);
+    this.setState({ [name]: value, saved: false }, this.checkFormValidity);
   };
 
-  checkFormValidity = () => {
+  checkFormValidity = (initialCheck=false) => {
     let companyRegistrationNumber = this.state.companyRegistrationNumber
     let percentageOwnership = this.state.percentageOwnership
     let existingLoanDetails = this.state.existingLoanDetails
@@ -113,7 +114,18 @@ export default class BusinessInformationForm extends React.Component {
     const isFormValid = businessName && businessType && ownershipType && registrationStatus && companyRegistrationNumber &&
       yearsInBusiness && annualRevenue && shareholderStatus && percentageOwnership && netProfit && existingLoanDetails &&
       currentBusinessDebt && pacraPrintOut;
-      this.setState({ isFormValid });
+      
+      if(!initialCheck){
+        this.setState({ isFormValid });
+      }
+      else{
+        if(isFormValid){
+          this.setState({ isFormValid:isFormValid, saved: true})
+        }
+        else{
+          this.setState({ isFormValid})
+        }
+      }
   }
 
   handleSubmit = async (e) => {
@@ -196,6 +208,7 @@ export default class BusinessInformationForm extends React.Component {
         shareholderStatus: shareholderStatus,
         pacraPrintOut: pacraPrintOut,
         pacraPrintOutId: pacraPrintOutId,
+        saved: true,
         saving: false
      })
   }
@@ -289,7 +302,7 @@ export default class BusinessInformationForm extends React.Component {
     const {
       businessName, businessType, ownershipType, registrationStatus, companyRegistrationNumber, yearsInBusiness,
       annualRevenue, shareholderStatus, percentageOwnership, netProfit, currentBusinessDebt,
-      existingLoanDetails,isFormValid
+      existingLoanDetails,isFormValid,saved
     } = this.state;
 
     return (
@@ -540,14 +553,14 @@ export default class BusinessInformationForm extends React.Component {
                       className="btn btn-success w-90 mt-3"
                       id="confirm-btn"
                     >
-                      Save
+                      {this.state.saving? "Saving..." : "save"}
                     </button>
 
                     {this.props.formDisplay === "profile"? <></> : <button
                       type="button"
                       className="btn btn-danger w-90 mt-3"
                       id="next-btn"
-                      onClick={()=>{this.props.handleOpenAddLoanAmountForm()}}
+                      onClick={()=>{this.props.handleOpenAddLoanAmountForm();this.props.handleFormReopen();}}
                     >
                       Previous
                     </button>}
@@ -555,7 +568,7 @@ export default class BusinessInformationForm extends React.Component {
                       type="button"
                       className="btn btn-danger w-90 mt-3"
                       id="next-btn"
-                      disabled={!isFormValid}
+                      disabled={!isFormValid || !saved}
                       onClick={()=>{this.props.handleCreateBlankLoan()}}
                     >
                       Next

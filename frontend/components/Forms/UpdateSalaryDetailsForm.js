@@ -20,6 +20,7 @@ export default class UpdateSalaryDetailsForm extends React.Component {
       // More fields can be added as necessary
       isFormValid: false,
       saving: false,
+      saved: false,
       salaryDetailsId: null,
       error:null
     };
@@ -63,7 +64,7 @@ export default class UpdateSalaryDetailsForm extends React.Component {
       verificationVideo: salary?.verificationVideo || '',
       salaryDetailsId: salary?.id || null
     },()=>{
-        this.checkFormValidity()
+        this.checkFormValidity(true)
     })
   }
 
@@ -71,10 +72,10 @@ export default class UpdateSalaryDetailsForm extends React.Component {
     //new Date(details.dateOfBirth).toLocaleDateString('en-US')
     const { name, value } = e.target;
     // Update state based on field name
-    this.setState({ [name]: name === "salaryAmount"? parseFloat(value) : value }, this.checkFormValidity);
+    this.setState({ [name]: name === "salaryAmount"? parseFloat(value) : value, saved: false }, this.checkFormValidity);
   }
 
-  checkFormValidity = () => {
+  checkFormValidity = (initialCheck=false) => {
     const { companyName, employerName, salaryAmount, employementVerificationNumber, companyLocation, paySlip, verificationVideo} = this.state;
 
     // Validate that all fields are filled
@@ -87,7 +88,17 @@ export default class UpdateSalaryDetailsForm extends React.Component {
       paySlip &&
       !verificationVideo; // no verification video since we do not intend to use the feature yet
 
-    this.setState({ isFormValid });
+      if(!initialCheck){
+        this.setState({ isFormValid });
+      }
+      else{
+        if(isFormValid){
+          this.setState({ isFormValid:isFormValid, saved: true})
+        }
+        else{
+          this.setState({ isFormValid})
+        }
+      }
   }
 
   handleSubmit = async (e)=>{
@@ -120,7 +131,8 @@ export default class UpdateSalaryDetailsForm extends React.Component {
         saving: true,
         paySlip: paySlip,
         verificationVideo: verificationVideo,
-        salaryDetailsId: salaryDetailsId
+        salaryDetailsId: salaryDetailsId,
+        saved: true
      })
      updateObject.id = salaryDetailsId
      const updatedUser = await updateUserAccount({salary:updateObject},this.props.loggedInUser.id)
@@ -255,7 +267,7 @@ export default class UpdateSalaryDetailsForm extends React.Component {
 
 
   render() {
-    const { companyName, employerName, salaryAmount, employementVerificationNumber, companyLocation, isFormValid } = this.state;
+    const { companyName, employerName, salaryAmount, saved, employementVerificationNumber, companyLocation, isFormValid } = this.state;
 
     return (
       <Slide in={true} direction="left">
@@ -397,14 +409,14 @@ export default class UpdateSalaryDetailsForm extends React.Component {
                       className="btn btn-success w-90 mt-3"
                       id="confirm-btn"
                     >
-                      Save
+                      {this.state.saving? "Saving..." : "save"}
                     </button>
 
                     {this.props.formDisplay === "profile"? <></> : <button
                       type="button"
                       className="btn btn-danger w-90 mt-3"
                       id="next-btn"
-                      onClick={()=>{this.props.handleOpenAddLoanAmountForm()}}
+                      onClick={()=>{this.props.handleOpenAddLoanAmountForm();this.props.handleFormReopen();}}
                     >
                       Previous
                     </button>}
@@ -412,7 +424,7 @@ export default class UpdateSalaryDetailsForm extends React.Component {
                       type="button"
                       className="btn btn-danger w-90 mt-3"
                       id="next-btn"
-                      disabled={!isFormValid}
+                      disabled={!isFormValid || !saved}
                       onClick={()=>{this.props.handleCreateBlankLoan()}}
                     >
                       Complete

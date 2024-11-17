@@ -6,7 +6,7 @@ import UpdateDetailsForm from "./UpdateDetailsForm";
 import AddLoanAmountForm from "./AddLoanAmmoutForm";
 import BusinessInformationForm from "./BusinessInformationForm";
 import UpdateSalaryDetailsForm from "./UpdateSalaryDetailsForm";
-import { createNewLoan, dateAndTimeNow, logNewAdminNotification, logNewNotification, logNewTransactionHistory, updateUserAccount } from "@/Functions";
+import { createNewLoan, dateAndTimeNow, scrolltoTopOFPage, updateUserAccount } from "@/Functions";
 
 export default class BusinessLoanApplicationForm extends React.Component{
     constructor(props){
@@ -18,11 +18,13 @@ export default class BusinessLoanApplicationForm extends React.Component{
           openUpdateDetailsForm: false,
           openUpdateClientDetailsForm: false,
           openAddLoanAmountForm: false,
-          openBusinessInformationForm: false
+          openBusinessInformationForm: false,
+          formReOpened: false
         }
     }
      
     handleOpenUpdateDetailsForm = ()=>{
+        scrolltoTopOFPage()
         this.setState({
             openUpdateDetailsForm: true,
             openUpdateClientDetailsForm: false,
@@ -31,6 +33,7 @@ export default class BusinessLoanApplicationForm extends React.Component{
         })
     }
     handleOpenUpdateClientDetailsForm = ()=>{
+        scrolltoTopOFPage()
         this.setState({
             openUpdateDetailsForm: false,
             openUpdateClientDetailsForm: true,
@@ -39,6 +42,7 @@ export default class BusinessLoanApplicationForm extends React.Component{
         })
     }
     handleOpenAddLoanAmountForm = ()=>{
+        scrolltoTopOFPage()
         this.setState({
             openUpdateDetailsForm: false,
             openUpdateClientDetailsForm: false,
@@ -47,6 +51,7 @@ export default class BusinessLoanApplicationForm extends React.Component{
         })
     }
     handleOpenBusinessInformationForm = ()=>{
+        scrolltoTopOFPage()
         this.setState({
             openUpdateDetailsForm: false,
             openUpdateClientDetailsForm: false,
@@ -54,6 +59,14 @@ export default class BusinessLoanApplicationForm extends React.Component{
             openBusinessInformationForm: true
         })
     }
+
+    handleFormReopen = ()=>{
+        scrolltoTopOFPage()
+        this.setState({
+            formReOpened: true
+        })
+    }
+   
 
     handleCreateBlankLoan = async ()=>{
         // create new loan 
@@ -111,20 +124,23 @@ export default class BusinessLoanApplicationForm extends React.Component{
         if(this.state.openUpdateDetailsForm){
             return <UpdateDetailsForm 
                         {...this.props} 
-                        handleOpenUpdateClientDetailsForm={this.handleOpenUpdateClientDetailsForm}/>
+                        handleOpenUpdateClientDetailsForm={this.handleOpenUpdateClientDetailsForm}
+                        formReOpened={this.state.formReOpened}/>
         }
         else if(this.state.openUpdateClientDetailsForm){
             return <UpdateClientDetailsForm 
                         {...this.props} 
                         handleOpenUpdateDetailsForm={this.handleOpenUpdateDetailsForm} 
-                        handleOpenAddLoanAmountForm={this.handleOpenAddLoanAmountForm}/>
+                        handleOpenAddLoanAmountForm={this.handleOpenAddLoanAmountForm}
+                        handleFormReopen={this.handleFormReopen}/>
         }
         else if(this.state.openAddLoanAmountForm){
             return <AddLoanAmountForm 
                         {...this.props} 
                         setLoanInformation={this.setLoanInformation} 
                         handleOpenUpdateClientDetailsForm={this.handleOpenUpdateClientDetailsForm}
-                        handleOpenBusinessInformationForm={this.handleOpenBusinessInformationForm}/>
+                        handleOpenBusinessInformationForm={this.handleOpenBusinessInformationForm}
+                        handleFormReopen={this.handleFormReopen}/>
         }
         else if(this.state.openBusinessInformationForm){
             if(this.state.loanType === "salaryBased"){
@@ -132,18 +148,21 @@ export default class BusinessLoanApplicationForm extends React.Component{
                         {...this.props} 
                         handleCreateBlankLoan={this.handleCreateBlankLoan}
                         setLoanInformation={this.setLoanInformation} 
-                        handleOpenAddLoanAmountForm={this.handleOpenAddLoanAmountForm}/>
+                        handleOpenAddLoanAmountForm={this.handleOpenAddLoanAmountForm}
+                        handleFormReopen={this.handleFormReopen}/>
             }
             return <BusinessInformationForm 
                         {...this.props} 
                         handleCreateBlankLoan={this.handleCreateBlankLoan}
                         setLoanInformation={this.setLoanInformation} 
-                        handleOpenAddLoanAmountForm={this.handleOpenAddLoanAmountForm}/>
+                        handleOpenAddLoanAmountForm={this.handleOpenAddLoanAmountForm}
+                        handleFormReopen={this.handleFormReopen}/>
         }
         else{
             return <UpdateDetailsForm 
                         {...this.props}
-                        handleOpenUpdateClientDetailsForm={this.handleOpenUpdateClientDetailsForm}/>
+                        handleOpenUpdateClientDetailsForm={this.handleOpenUpdateClientDetailsForm}
+                        formReOpened={this.state.formReOpened}/>
         }              
     }
 

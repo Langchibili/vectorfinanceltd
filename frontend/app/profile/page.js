@@ -12,7 +12,7 @@ export default function Profile() {
 
       return (
         <div className="p-3">
-            <h3 className="mb-3 mt-20 p-3">For Personal Loan Applicants</h3>
+            <h3 className="mb-3 mt-10 p-3">For Personal Loan Applicants</h3>
             <UpdateDetailsForm loggedInUser={loggedInUser.user} constants={constants} loanCategory = "personal" formDisplay="profile"/> 
             <UpdateClientDetailsForm loggedInUser={loggedInUser.user} constants={constants} loanCategory = "personal" formDisplay="profile"/> 
             <UpdateSalaryDetailsForm loggedInUser={loggedInUser.user} constants={constants} loanCategory = "personal" formDisplay="profile"/>

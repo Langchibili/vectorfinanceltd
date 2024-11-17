@@ -246,7 +246,7 @@ export default class AddLoanAmountForm extends React.Component {
                         type="button"
                         className="btn btn-success w-90 mt-3"
                         id="confirm-btn"
-                        onClick={()=>{ this.props.handleOpenUpdateClientDetailsForm() }}
+                        onClick={()=>{ this.props.handleOpenUpdateClientDetailsForm();this.props.handleFormReopen(); }}
                     > 
                         Previous
                     </button>

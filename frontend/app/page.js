@@ -11,6 +11,7 @@ import LoanTransactionHistory from "@/components/Includes/LoanTransactionHistory
 import { useBottomNav } from "@/Contexts/BottomNavContext";
 import { useConstants } from "@/Contexts/ConstantsContext";
 import { useUser } from "@/Contexts/UserContext";
+import { scrolltoTopOFPage } from "@/Functions";
 import { Alert } from "@mui/material";
 import { useState } from "react";
 
@@ -18,15 +19,11 @@ export default function Home() {
   const [showLoanApplicationForms, setShowLoanApplicationForms] = useState(false)
   const [selectedloanCategory, setSelectedloanCategory] = useState(null)
   const {BottomNavLink} = useBottomNav()
-  
   const loggedInUser = useUser()
   const constants = useConstants()
   
-  if(!loggedInUser.status){
-     if(typeof window !== "undefined"){
-       window.location = "/signin"
-     }
-  }
+  
+  scrolltoTopOFPage() // should always show the top of the page as the view point
   const renderMainContent = ()=>{
     const currentLoan = loggedInUser.user.currentLoan
     if(currentLoan){
@@ -187,14 +184,21 @@ export default function Home() {
     }
   }
  const renderPages = (BottomNavLink)=>{
-    if(!BottomNavLink || parseInt(BottomNavLink) === 0){
-      return renderMainContent()
-    }
-    else if(parseInt(BottomNavLink) === 1){
-      return <LoanTransactionHistory loggedInUser={loggedInUser.user}/>
+   if(!loggedInUser || !loggedInUser.status){
+      if(typeof window !== "undefined"){
+        window.location = "/signin"
+      }
     }
     else{
-      return <HelpPageDisplay loggedInUser={loggedInUser.user} constants={constants}/>
+      if(!BottomNavLink || parseInt(BottomNavLink) === 0){
+        return renderMainContent()
+      }
+      else if(parseInt(BottomNavLink) === 1){
+        return <LoanTransactionHistory loggedInUser={loggedInUser.user}/>
+      }
+      else{
+        return <HelpPageDisplay loggedInUser={loggedInUser.user} constants={constants}/>
+      }
     }
   }
   return (
