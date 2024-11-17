@@ -103,7 +103,7 @@ export default class LoanInformationDisplay extends React.Component {
     const {left} = this.calculateMonthsAndDays(disbursementDate,dueDate)
      
     if(this.state.showPaymentsPage){
-      return <PaymentsDisplay handleMakePaymentPage={this.handleMakePaymentPage} loggedInUser={this.props.loggedInUser}/>
+      return <div className="col col-md-8 col-lg-6" style={{margin:'0 auto'}}><PaymentsDisplay handleMakePaymentPage={this.handleMakePaymentPage} loggedInUser={this.props.loggedInUser}/></div>
     }
     return <Slide in={true} direction="right">
           <div className="row">

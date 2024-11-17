@@ -120,12 +120,12 @@ export default class PhoneOtpVerificationForm extends Component {
     const { otp, countdown, resendDisabled } = this.state;
 
     return (
-        <div className="auth-form">
+        <div className="auth-form mt-2">
         <label className="mb-1 text-gray"><strong>Enter code sent to your number</strong></label>
         <div className="form-group">
-        <input onChange={this.handleOTPChange} className="form-control" type="text" placeholder="Enter 6 digit Code" value={otp}/>
+        <input onChange={this.handleOTPChange} className="form-control mb-2" type="text" placeholder="Enter 6 digit Code" value={otp}/>
         </div>
-        <button disabled={this.state.submitting} className="btn bg-white text-primary btn-block" onClick={this.verifyOTP}>{this.state.submittingText}</button>
+        <button disabled={this.state.submitting} className="btn bg-white text-primary btn-block mb-2" onClick={this.verifyOTP}>{this.state.submittingText}</button>
         <p>Time remaining to resend Code: {countdown} seconds</p>
         <button className="btn bg-white text-primary btn-block" onClick={this.resendOTP} disabled={resendDisabled}>
           Resend OTP

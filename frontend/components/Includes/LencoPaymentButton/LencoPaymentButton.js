@@ -1,15 +1,18 @@
 import { returnNineDigitNumber } from '@/Functions';
 import { LencoPubKey } from '@/Secrets'
+import { CreditCard } from '@material-ui/icons';
 import React, { useEffect } from 'react'
 
 const LencoPaymentButton = (props) => {
-  const mobileNumber = props.loggedInUser.username
+  const mobileNumber = props.phoneNumber
+  const paymentMethod = props.paymentMethod
   const email = props.loggedInUser.email
-  const amount = props.paymentAmount
-  const { details } = props.loggedInUser;
-  const { currentLoan } = props.loggedInUser;
+  const amount = parseFloat(props.paymentAmount).toFixed(2)
+  const { details } = props.loggedInUser
+  const { currentLoan } = props.loggedInUser
 
-
+  console.log(props)
+ 
   useEffect(() => {
     // Load the LencoPay script
     const script = document.createElement('script')
@@ -27,19 +30,19 @@ const LencoPaymentButton = (props) => {
     if(!currentLoan){
       return
     }
-    if (window.LencoPay) {
-      console.log('ref-id-'+ currentLoan.id +"-0"+returnNineDigitNumber(mobileNumber)+ "-"+ Date.now())
+    if (window.LencoPay){
+      console.log('ref-id-'+ currentLoan.id +"-0"+returnNineDigitNumber(mobileNumber)+ "-"+ Date.now()+"-amt-"+amount)
       window.LencoPay.getPaid({
         key: LencoPubKey, // Replace with your Lenco public key
-        reference: 'ref-id-'+ currentLoan.id +"-0"+returnNineDigitNumber(mobileNumber)+ "-"+ Date.now(), // Unique reference
+        reference: 'ref-id-'+ currentLoan.id +"-0"+returnNineDigitNumber(mobileNumber)+ "-"+ Date.now()+"-amt-"+amount, // Unique reference
         email: email, // Customer's email
         amount:  amount, // Payment amount
         currency: "ZMW",
-        channels: ["card", "mobile-money"],
+        channels: paymentMethod,
         customer: {
           firstName: details?.firstname || 'unknown client',
           lastName: details?.lastname || '',
-          phone: "0"+returnNineDigitNumber(mobileNumber),
+          phone: "0"+returnNineDigitNumber(mobileNumber)
         },
         onSuccess: function (response) {
           const reference = response.reference
@@ -53,15 +56,43 @@ const LencoPaymentButton = (props) => {
           alert('We will redirect you when the payment is confirmed')
         },
       })
-    } else {
+    } else{
       console.error("LencoPay script not loaded")
     }
   }
 
   return (
-    <button className='btn btn-success mt-10' onClick={getPaidWithLenco}>
-      Mobile Money and Card Payments
-    </button>
+    <button
+    style={{
+        backgroundColor: props.disabled? 'gray' : '#28a745',
+        color: '#fff',
+        border: 'none',
+        borderRadius: '4px',
+        padding: '10px 20px',
+        fontSize: '16px',
+        fontWeight: 'bold',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: '10px',
+        cursor: 'pointer',
+        boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)',
+        transition: 'background-color 0.3s ease, transform 0.2s ease'
+    }}
+    onMouseOver={(e) => {
+        e.currentTarget.style.backgroundColor = props.disabled? 'gray' : '#218838'
+        e.currentTarget.style.transform = 'scale(1.05)'
+    }}
+    onMouseOut={(e) => {
+        e.currentTarget.style.backgroundColor = props.disabled? 'gray' : '#28a745'
+        e.currentTarget.style.transform = 'scale(1)'
+    }}
+    onClick={getPaidWithLenco}
+    disabled={props.disabled}
+    >
+    <CreditCard/>
+      Pay Now
+</button>
   )
 }
 
