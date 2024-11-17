@@ -157,6 +157,13 @@ export default class UpdateVehicleCollateralForm extends React.Component {
      delete updateObject.whitebook
      delete updateObject.collateralId
      delete updateObject.vehicleId
+
+     if(!updateObject.numberPlate){
+       updateObject.numberPlate = null
+     }
+     if(!updateObject.packed){
+       updateObject.packed = null
+     }
      
      this.setState({
         saving: true,

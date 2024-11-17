@@ -89,7 +89,7 @@ export default class UpdateSalaryDetailsForm extends React.Component {
       !verificationVideo; // no verification video since we do not intend to use the feature yet
 
       if(!initialCheck){
-        this.setState({ isFormValid });
+        this.setState({ isFormValid })
       }
       else{
         if(isFormValid){
@@ -126,7 +126,23 @@ export default class UpdateSalaryDetailsForm extends React.Component {
      delete updateObject.paySlip
      delete updateObject.verificationVideo
      delete updateObject.salaryDetailsId
-     
+
+     if(!updateObject.companyName){
+        updateObject.companyName = null
+     }
+     if(!updateObject.employerName){
+        updateObject.employerName = null
+     }
+     if(!updateObject.salaryAmount){
+        updateObject.salaryAmount = null
+     }
+     if(!updateObject.employementVerificationNumber){
+        updateObject.employementVerificationNumber = null
+     }
+     if(!updateObject.companyLocation){
+        updateObject.companyLocation = null
+     }
+
      this.setState({
         saving: true,
         paySlip: paySlip,

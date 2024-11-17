@@ -3,6 +3,7 @@ import BusinessInformationForm from "@/components/Forms/BusinessInformationForm"
 import UpdateClientDetailsForm from "@/components/Forms/UpdateClientDetailsForm";
 import UpdateDetailsForm from "@/components/Forms/UpdateDetailsForm";
 import { useConstants } from "@/Contexts/ConstantsContext";
+import { usePage } from "@/Contexts/PageContext";
 import { useUser } from "@/Contexts/UserContext";
 import { scrolltoTopOFPage } from "@/Functions";
 import { Slide } from "@material-ui/core";
@@ -10,7 +11,9 @@ import { Slide } from "@material-ui/core";
 export default function Profile() {
     const loggedInUser = useUser()
     const constants = useConstants()
-
+    const { setPage } = usePage()
+  
+    setPage('/business-profile')
     scrolltoTopOFPage()
     return (
         <Slide in={true} direction="up">

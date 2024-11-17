@@ -104,7 +104,7 @@ export default class UpdateHouseCollateralForm extends React.Component {
     //new Date(details.dateOfBirth).toLocaleDateString('en-US')
     const { name, value } = e.target;
     // Update state based on field name
-    this.setState({ [name]: value, saved: false }, this.checkFormValidity);
+    this.setState({ [name]: !value? '' : value, saved: false }, this.checkFormValidity);
   }
 
   checkFormValidity = (initialCheck=false) => {
@@ -166,6 +166,16 @@ export default class UpdateHouseCollateralForm extends React.Component {
      delete updateObject.collateralId
      delete updateObject.houseId
      
+     if(!updateObject.plotNumber){
+      updateObject.plotNumber = null
+     }
+     if(!updateObject.dimensions){
+       updateObject.dimensions = null
+     }
+     if(!updateObject.location){
+       updateObject.location = null
+     }
+
      this.setState({
         saving: true,
         titleDeed: titleDeed,

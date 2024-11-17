@@ -23,7 +23,7 @@ export default class BusinessInformationForm extends React.Component {
       currentBusinessDebt: '',
       existingLoanDetails: '',
       pacraPrintOut: null,
-      pacraPrintOutId: null,
+      businessId: null,
       isFormValid: false,
       saved: false,
       error: null,
@@ -41,8 +41,23 @@ export default class BusinessInformationForm extends React.Component {
       .then(data => data)
   }
 
-   componentDidMount() {
-    const { business } = this.props.loggedInUser
+   async componentDidMount() {
+    let { business } = this.props.loggedInUser // because the user object has the client details, though no nrc
+    console.log(business)
+    if(!business){
+        const blankBusinessObject = {
+            businessName: null,
+            businessType: null,
+            pacraPrintOut: null
+        } // create a blank slate ofbusiness details to obtain the component's id
+        const updatedUser = await updateUserAccount({business:blankBusinessObject},this.props.loggedInUser.id)
+        if(updatedUser.hasOwnProperty('error')){
+            return
+        }
+    }
+    const user = await this.getBusinessDetails();
+    business = user.business
+    // Set default values, ensure nulls are handled
     // Set default values, ensure nulls are handled
     this.setState({
       businessName: business?.businessName || '',
@@ -56,65 +71,52 @@ export default class BusinessInformationForm extends React.Component {
       percentageOwnership: business?.percentageOfOwnership || '',
       netProfit: business?.netProfit || '',
       currentBusinessDebt: business?.businessHasDebt || '',
-      existingLoanDetails: business?.existingLoanDetails || ''
-    },async ()=>{
-        const pacraPrint = await this.getBusinessDetails();
-        const { business } = pacraPrint
-        console.log(business?.id)
-        this.setState({
-            pacraPrintOut: business?.pacraPrintOut || '',
-            pacraPrintOutId: business?.id || null
-        },()=>{
-            this.checkFormValidity(true)
-        })
-    });
+      existingLoanDetails: business?.existingLoanDetails || '',
+      pacraPrintOut: business?.pacraPrintOut || '',
+      businessId: business?.id || null
+    },()=>{
+        this.checkFormValidity(true)
+    })
   }
 
   handleInputChange = (e) => {
     const { name, value } = e.target;
-    this.setState({ [name]: value, saved: false }, this.checkFormValidity);
+    console.log(name,value)
+    this.setState({ [name]: !value? '' : value, saved: false }, this.checkFormValidity);
   };
 
   checkFormValidity = (initialCheck=false) => {
     let companyRegistrationNumber = this.state.companyRegistrationNumber
     let percentageOwnership = this.state.percentageOwnership
     let existingLoanDetails = this.state.existingLoanDetails
+    let pacraPrintOut = this.state.pacraPrintOut
 
     if(this.state.shareholderStatus){
         if(this.state.shareholderStatus === "no"){
-            percentageOwnership = '0'
-        }
-        else{
-            percentageOwnership = this.state.percentageOwnership
+            percentageOwnership = 'none' // add a value to pass the truthy check
         }
     }
     if(this.state.registrationStatus){
         if(this.state.registrationStatus === "no"){
-            companyRegistrationNumber = '0'
-        }
-        else{
-            companyRegistrationNumber = this.state.companyRegistrationNumber
+            pacraPrintOut = "none" // add a value to pass the truthy check
+            companyRegistrationNumber = 'none' // add a value to pass the truthy check
         }
     }
 
     if(this.state.currentBusinessDebt){
         if(this.state.currentBusinessDebt === "no"){
-            existingLoanDetails = 'valid'
-        }
-        else{
-            existingLoanDetails = this.state.existingLoanDetails
+            existingLoanDetails = 'none' // add a value to pass the truthy check
         }
     }
     
     const {
       businessName, businessType, ownershipType, registrationStatus, yearsInBusiness,
-      annualRevenue, shareholderStatus, netProfit, currentBusinessDebt, pacraPrintOut
+      annualRevenue, shareholderStatus, netProfit, currentBusinessDebt
     } = this.state;
 
     const isFormValid = businessName && businessType && ownershipType && registrationStatus && companyRegistrationNumber &&
       yearsInBusiness && annualRevenue && shareholderStatus && percentageOwnership && netProfit && existingLoanDetails &&
       currentBusinessDebt && pacraPrintOut;
-      
       if(!initialCheck){
         this.setState({ isFormValid });
       }
@@ -133,7 +135,7 @@ export default class BusinessInformationForm extends React.Component {
     const shareholderStatus = this.state.shareholderStatus
     const registrationStatus = this.state.registrationStatus
     const pacraPrintOut = this.state.pacraPrintOut
-    const pacraPrintOutId = this.state.pacraPrintOutId
+    const businessId = this.state.businessId
     updateObject.isBusinessRegistered = this.state.registrationStatus
     updateObject.isClientAShareHolder = this.state.shareholderStatus
     updateObject.percentageOfOwnership = this.state.percentageOwnership
@@ -146,50 +148,54 @@ export default class BusinessInformationForm extends React.Component {
     delete updateObject.shareholderStatus
     delete updateObject.percentageOwnership
     delete updateObject.currentBusinessDebt
-    delete updateObject.pacraPrintOutId
+    delete updateObject.businessId
     delete updateObject.pacraPrintOut
     
+    if(!updateObject.businessName){
+        updateObject.businessName = null
+    }
     if(!updateObject.businessType){
-        delete updateObject.businessType
+      updateObject.businessType = null
     }
     if(!updateObject.ownershipType){
-        delete updateObject.ownershipType 
+        updateObject.ownershipType = null
     }
     if(!updateObject.isBusinessRegistered){
-        delete updateObject.isBusinessRegistered
+        updateObject.isBusinessRegistered = null
     }
     if(!updateObject.isClientAShareHolder){
-        delete updateObject.isClientAShareHolder 
+        updateObject.isClientAShareHolder = null
     }
     if(!updateObject.yearsInBusiness){
-        delete updateObject.yearsInBusiness
+        updateObject.yearsInBusiness = null
     }
     if(!updateObject.percentageOfOwnership){
-        delete updateObject.percentageOfOwnership
+        updateObject.percentageOfOwnership = null
     }
     if(!updateObject.companyRegistrationNumber){
-        delete updateObject.companyRegistrationNumber
+        updateObject.companyRegistrationNumber = null
     }
     if(!updateObject.businessHasDebt){
-        delete updateObject.businessHasDebt
+        updateObject.businessHasDebt = null
     }
     if(!updateObject.annualRevenue){
-        delete updateObject.annualRevenue 
+        updateObject.annualRevenue = null
     }
     if(!updateObject.netProfit){
-        delete updateObject.netProfit
+        updateObject.netProfit = null
     }
     if(!updateObject.percentageOwnership){
-        delete updateObject.percentageOwnership
+        updateObject.percentageOwnership = null
     }
     
      this.setState({
         saving: true,
         pacraPrintOut: pacraPrintOut,
-        pacraPrintOutId: pacraPrintOutId,
+        businessId: businessId,
         shareholderStatus: shareholderStatus,
         registrationStatus: registrationStatus
      })
+     updateObject.id = businessId
      const updatedUser = await updateUserAccount({business:updateObject},this.props.loggedInUser.id)
      console.log(updatedUser)
      console.log(updateObject)
@@ -198,19 +204,39 @@ export default class BusinessInformationForm extends React.Component {
             error: 'something went wrong, try again',
             shareholderStatus: shareholderStatus,
             pacraPrintOut: pacraPrintOut,
-            pacraPrintOutId: pacraPrintOutId,
+            businessId: businessId,
             saving: false
         })
         return
      }
-     this.checkFormValidity()
      this.setState({
-        shareholderStatus: shareholderStatus,
         pacraPrintOut: pacraPrintOut,
-        pacraPrintOutId: pacraPrintOutId,
+        businessId: businessId,
         saved: true,
         saving: false
+     },async ()=>{
+        const { business } = await this.getBusinessDetails(); // get the newly updated business component
+        this.setState({
+          businessName: business?.businessName || '',
+          businessType: business?.businessType || '',
+          ownershipType: business?.ownershipType || '',
+          registrationStatus: business?.isBusinessRegistered || '',
+          companyRegistrationNumber: business?.companyRegistrationNumber || '',
+          yearsInBusiness: business?.yearsInBusiness || '',
+          annualRevenue: business?.annualRevenue || '',
+          shareholderStatus: business?.isClientAShareHolder || '',
+          percentageOwnership: business?.percentageOfOwnership || '',
+          netProfit: business?.netProfit || '',
+          currentBusinessDebt: business?.businessHasDebt || '',
+          existingLoanDetails: business?.existingLoanDetails || '',
+          pacraPrintOut: pacraPrintOut,
+          businessId: business?.id || null
+        },()=>{
+            this.checkFormValidity()
+        })
      })
+
+     
   }
 
   addPacraPrintOut = (files) => {
@@ -302,7 +328,7 @@ export default class BusinessInformationForm extends React.Component {
     const {
       businessName, businessType, ownershipType, registrationStatus, companyRegistrationNumber, yearsInBusiness,
       annualRevenue, shareholderStatus, percentageOwnership, netProfit, currentBusinessDebt,
-      existingLoanDetails,isFormValid,saved
+      existingLoanDetails, isFormValid, saved
     } = this.state;
 
     return (
@@ -446,7 +472,7 @@ export default class BusinessInformationForm extends React.Component {
                           <input
                               type="number"
                               name="percentageOwnership"
-                              value={percentageOwnership}
+                              value={parseFloat(percentageOwnership) || ''}
                               autoComplete="off"
                               onChange={this.handleInputChange}
                               className="form-control"
@@ -493,7 +519,7 @@ export default class BusinessInformationForm extends React.Component {
                     </div>
 
                     {/* Existing Loan Details (If any) */}
-                    <div className="col-lg-12">
+                   {currentBusinessDebt === "yes" && (<div className="col-lg-12">
                       <h6>If you have any existing loans, please provide details</h6>
                       <div className="input-group">
                       <textarea
@@ -508,11 +534,11 @@ export default class BusinessInformationForm extends React.Component {
                         >
                         </textarea>
                       </div>
-                    </div>
+                    </div>)}
                   </div>
                   
                   {/*  companyRegistrationNumber */}
-                  {registrationStatus === 'yes' && <div className="col-lg-12 mt-4">
+                  {registrationStatus === 'yes' && (<div className="col-lg-12 mt-4">
                     <h6>Enter the Company Registration Number?</h6>
                     <div className="input-group">
                         <input
@@ -525,15 +551,15 @@ export default class BusinessInformationForm extends React.Component {
                             aria-label="Net profit input"
                         />
                     </div>
-                 </div>}
+                 </div>)}
                  
-                 {this.state.pacraPrintOutId?  <div style={{marginTop:'20px'}}>
+                 {registrationStatus === 'yes' && this.state.businessId?  <div style={{marginTop:'20px'}}>
                         <h5>Pacra Print or Certification Of Incorperation<small  style={{color:'gray'}}></small></h5>
                         <small  style={{color:'lightgray'}}>(can even be past 6 or a year)</small>
                         <Uploader 
                             addFiles={this.addPacraPrintOut}
                             displayType="circular"
-                            refId={this.state.pacraPrintOutId}
+                            refId={this.state.businessId}
                             refName="client-details.business"
                             fieldName="pacraPrintOut"
                             allowMultiple={false}

@@ -49,7 +49,7 @@ export default class UpdateDetailsForm extends React.Component {
     const { name, value } = e.target;
     // Update state based on field name
     // name === "dateOfBirth"? new Date(value).toLocaleDateString('en-US') :
-    this.setState({ [name]: value, saved: false}, this.checkFormValidity);
+    this.setState({ [name]: !value? '' : value, saved: false}, this.checkFormValidity);
   };
 
   checkFormValidity = (initialCheck=false) => {
@@ -83,14 +83,24 @@ export default class UpdateDetailsForm extends React.Component {
      delete updateObject.isFormValid
      delete updateObject.saving
      delete updateObject.error
+     
      if(!updateObject.age){
-      delete updateObject.age
+        updateObject.age = null
      }
      if(!updateObject.gender){
-      delete updateObject.gender
+        updateObject.gender = null
      }
      if(!updateObject.dateOfBirth){
-      delete updateObject.dateOfBirth
+        updateObject.dateOfBirth = null
+     }
+     if(!updateObject.firstname){
+      updateObject.firstname = null
+     }
+     if(!updateObject.lastname){
+        updateObject.lastname = null
+     }
+     if(!updateObject.address){
+        updateObject.address = null
      }
      this.setState({
         saving: true

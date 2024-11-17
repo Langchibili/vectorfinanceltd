@@ -10,6 +10,7 @@ import LoanInitiatedDisplay from "@/components/Includes/LoanInitiatedDisplay/Loa
 import LoanTransactionHistory from "@/components/Includes/LoanTransactionHistory/LoanTransactionHistory";
 import { useBottomNav } from "@/Contexts/BottomNavContext";
 import { useConstants } from "@/Contexts/ConstantsContext";
+import { usePage } from "@/Contexts/PageContext";
 import { useUser } from "@/Contexts/UserContext";
 import { scrolltoTopOFPage } from "@/Functions";
 import { Alert } from "@mui/material";
@@ -21,8 +22,9 @@ export default function Home() {
   const {BottomNavLink} = useBottomNav()
   const loggedInUser = useUser()
   const constants = useConstants()
+  const { setPage } = usePage()
   
-  
+  setPage('/')
   scrolltoTopOFPage() // should always show the top of the page as the view point
   const renderMainContent = ()=>{
     const currentLoan = loggedInUser.user.currentLoan

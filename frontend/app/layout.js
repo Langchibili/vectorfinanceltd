@@ -6,6 +6,7 @@ import { UserProvider, useUser } from "@/Contexts/UserContext";
 import BottomNav from "@/components/Includes/BottomNavigation/BottomNavigation";
 import { ConstantsProvider } from "@/Contexts/ConstantsContext";
 import { BottomNavProvider } from "@/Contexts/BottomNavContext";
+import { PageProvider } from "@/Contexts/PageContext";
 import React from "react";
 import Script from "next/script";
 import MobileNav from "@/components/Parts/Header/MobileNav";
@@ -54,6 +55,7 @@ export default function RootLayout({ children }) {
       <div id="layout-wrapper">
       <UserProvider>
         <ConstantsProvider>
+         <PageProvider>
           <BottomNavProvider>
            <HeaderPart/>
             <div className="vertical-overlay"></div>
@@ -63,6 +65,7 @@ export default function RootLayout({ children }) {
             </div>
             <BottomNav/>
           </BottomNavProvider>
+         </PageProvider>
         </ConstantsProvider>
       </UserProvider>
       </div>
