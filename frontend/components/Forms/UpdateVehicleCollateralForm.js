@@ -229,7 +229,7 @@ export default class UpdateVehicleCollateralForm extends React.Component {
           transactionType: "loan-application",
           transactionDate: applicationDate,
           amount: updatedLoan.loanAmount,
-          description: "Initiation of the loan, with id: #"+updatedLoan.id+ ", and amount K"+updatedLoan.loanAmount,
+          description: "Initiation of the loan, with id #"+updatedLoan.id+ ", and amount K"+updatedLoan.loanAmount,
           loan: {connect: [updatedLoan.id]}
       }
       const notificationObject = {

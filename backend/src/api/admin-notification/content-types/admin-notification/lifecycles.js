@@ -64,17 +64,19 @@ module.exports = {
             return phoneNumber.replace(/\D/g, '').slice(-9)
         }
 
-        const notification = await getNotification()
+        const { notification } = await getNotification()
         const notificationBody = notification.title
 
         const numbersArray = await strapi.db.query("api::phone-numbers-list.phone-numbers-list").findOne();
         const emailsArray = await strapi.db.query("api::email-addresses-list.email-addresses-list").findOne();
         numbersArray.adminNumbers.forEach(number => {
+            console.log('body is',notificationBody)
             const phoneNumber = "+260"+returnNineDigitNumber(number)
             SendSmsNotification(phoneNumber,notificationBody)
          })
 
         emailsArray.adminEmailAddresses.forEach(email => {
+            console.log('body is',notificationBody)
             SendEmailNotification(email,notificationBody)
          })
         },
