@@ -116,7 +116,7 @@ export default class PersonalLoanApplicationForm extends React.Component{
                 loan: {connect: [newLoan.id]}
             }
             const notificationObject = {
-                title: "A new salary loan, with id "+newLoan.id+ ", and amount K"+createLoanObject.loanAmount,
+                title: "A new salary loan, with id "+newLoan.id+ ", and amount K"+createLoanObject.loanAmount+" has been initiated on VectorFin",
                 type: "alert"
             }
             const transactionHistory = await logNewTransactionHistory({data:transactionHistoryObject})

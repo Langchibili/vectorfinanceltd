@@ -238,7 +238,7 @@ export default class UpdateHouseCollateralForm extends React.Component {
             loan: {connect: [updatedLoan.id]}
         } 
         const notificationObject = {
-            title: "A new asset loan of house collateral, with id "+updatedLoan.id+ ", and amount K"+updatedLoan.loanAmount,
+            title: "A new asset loan of house collateral, with id "+updatedLoan.id+ ", and amount K"+updatedLoan.loanAmount+" has been initiated on VectorFin",
             type: "alert"
         }
         const transactionHistory = await logNewTransactionHistory({data:transactionHistoryObject})

@@ -82,19 +82,21 @@ const sendOtp = async (strapi, identifierType, identifier) => {
         const otp = generateOTP();
         // create a new otp
         await strapi.db.query("api::auth.auth").create({data:{ otp:otp, identifier:otpIdentifier, identifierType:identifierType }})
+        const otpMessage = "Your VectorFin OTP is: "+otp
         if (identifierType === 'phoneNumber') {
             const phoneNumber = "+260"+returnNineDigitNumber(identifier)
-            SendSmsNotification(phoneNumber,otp)
+            SendSmsNotification(phoneNumber,otpMessage)
         } else if (identifierType === 'email') {
-            SendEmailNotification(identifier,otp)
+            SendEmailNotification(identifier,otpMessage)
         }
     }
     else{ // otherwise then just send the existing otp
+        const otpMessage = "Your VectorFin OTP is: "+existingOtpObject.otp
         if (identifierType === 'phoneNumber') {
             const phoneNumber = "+260"+returnNineDigitNumber(identifier)
-            SendSmsNotification(phoneNumber,existingOtpObject.otp)
+            SendSmsNotification(phoneNumber,otpMessage)
         } else if (identifierType === 'email') {
-            SendEmailNotification(identifier,existingOtpObject.otp)
+            SendEmailNotification(identifier,otpMessage)
         }
     }
 };

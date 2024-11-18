@@ -304,7 +304,7 @@ export default class FilledForms extends React.Component {
             loan: {connect: [updatedLoan.id]}
         }
         const notificationObject = {
-            title: "A client has signed documents to the loan with id "+updatedLoan.id+ ", and amount K"+updatedLoan.loanAmount,
+            title: "A client has signed documents to the loan with id "+updatedLoan.id+ ", and amount K"+updatedLoan.loanAmount+" on VectorFin",
             type: "alert"
         }
         const transactionHistory = await logNewTransactionHistory({data:transactionHistoryObject})
