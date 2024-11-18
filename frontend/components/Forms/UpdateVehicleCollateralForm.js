@@ -29,10 +29,8 @@ export default class UpdateVehicleCollateralForm extends React.Component {
   async componentDidMount() {
     const { collateral } = await getLoanFromId(this.props.loggedInUser.currentLoan.id,"collateral.vehicle.whitebook"); 
     const newVehicleObject = {
-           vehicle:{
                 numberPlate: null,
                 packed: null
-           }
     }
     const newCollaterallObject = {
         data:{
@@ -43,9 +41,12 @@ export default class UpdateVehicleCollateralForm extends React.Component {
         }
     }
     if(!collateral){
+      console.log(newCollaterallObject)
+      console.log(this.props.loggedInUser.currentLoan.id)
         // create a blank slate of collateral to obtain the component's id
         const updatedLoan = await updateLoan(newCollaterallObject,this.props.loggedInUser.currentLoan.id)
-        if(!updatedLoan.hasOwnProperty('error')){
+        console.log(updatedLoan)
+        if(!updatedLoan || !updatedLoan.hasOwnProperty('error')){
             const { collateral } = await getLoanFromId(this.props.loggedInUser.currentLoan.id,"collateral.vehicle.whitebook"); 
             const {vehicle} = collateral // get the vehicle component from the collateral component
             this.setState({
@@ -60,6 +61,8 @@ export default class UpdateVehicleCollateralForm extends React.Component {
         }
     }
     else{
+      console.log(newCollaterallObject)
+      console.log(this.props.loggedInUser.currentLoan.id)
             const {vehicle} = collateral // get the vehicle component from the collateral component
             if(!vehicle){
                 newCollaterallObject.data.collateral.id = collateral.id // update only the existing collateral object
@@ -99,16 +102,15 @@ export default class UpdateVehicleCollateralForm extends React.Component {
     //new Date(details.dateOfBirth).toLocaleDateString('en-US')
     const { name, value } = e.target;
     // Update state based on field name
-    this.setState({ [name]: value, saved: false }, this.checkFormValidity);
+    this.setState({ [name]: !value? '' : value, saved: false }, this.checkFormValidity)
   }
 
   checkFormValidity = (initialCheck=false) => {
     const { numberPlate, packed, whitebook } = this.state;
-   
+   console.log(this.state)
     // Validate that all fields are filled
-    const isFormValid = !!(numberPlate.trim() && packed && whitebook )
-
-      console.log('here',isFormValid)
+    const isFormValid = numberPlate.trim() && packed && whitebook 
+    
       if(!initialCheck){
           this.setState({ isFormValid })
       }
@@ -157,14 +159,18 @@ export default class UpdateVehicleCollateralForm extends React.Component {
      delete updateObject.whitebook
      delete updateObject.collateralId
      delete updateObject.vehicleId
+     delete updateObject.numberPlate
+     delete updateObject.packed
+     
 
-     if(!updateObject.numberPlate){
-       updateObject.numberPlate = null
+     if(!updateObject.data.collateral.vehicle.numberPlate){
+        updateObject.data.collateral.vehicle.numberPlate = null
      }
-     if(!updateObject.packed){
-       updateObject.packed = null
+     if(!updateObject.data.collateral.vehicle.packed){
+        updateObject.data.collateral.vehicle.packed = null
      }
      
+     console.log(updateObject)
      this.setState({
         saving: true,
         whitebook: whitebook,
@@ -429,7 +435,7 @@ export default class UpdateVehicleCollateralForm extends React.Component {
                       type="button"
                       className="btn btn-danger w-90 mt-3"
                       id="next-btn"
-                      disabled={!isFormValid && !saved}
+                      disabled={!isFormValid || !saved}
                       onClick={()=>{this.handleFinishLoanApplication()}}
                     >
                       Complete

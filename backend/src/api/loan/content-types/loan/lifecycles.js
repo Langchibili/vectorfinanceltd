@@ -135,7 +135,10 @@ module.exports = {
     async afterUpdate(event) {
         const { result, params } = event;
         const { data } = params;
-
+        
+        if(!params.data.id){
+            return
+        }
         const getLoan = async () => {
             return await strapi.db.query("api::loan.loan").findOne({
                 where: { id: params.data.id },
@@ -150,54 +153,54 @@ module.exports = {
             if(parseInt(loanBefore.outstandingAmount) > 1){ // it means you already approved the loan
                 return
             }
-            const simpleInterestLoanCalculator = (loanAmount, annualInterestRate, loanTermMonths) => {
-                const calculateTotalInterest = (amount, annualInterest, months) => {
-                    const years = months / 12;
-                    return (parseFloat(amount) * annualInterest * years) / 100;
+          const simpleInterestLoanCalculator = (loanAmount, monthlyInterestRate, loanTermMonths) => {
+                const calculateTotalInterest = (amount, monthlyInterest, months) => {
+                  return (parseFloat(amount) * monthlyInterest * months) / 100;
                 };
-
+              
                 const calculateTotalPayment = (loanAmount, totalInterest) => {
-                    return parseFloat(loanAmount) + parseFloat(totalInterest);
+                  return parseFloat(loanAmount) + parseFloat(totalInterest);
                 };
-
-                const totalInterest = calculateTotalInterest(loanAmount, annualInterestRate, loanTermMonths);
+              
+                const totalInterest = calculateTotalInterest(loanAmount, monthlyInterestRate, loanTermMonths);
                 const totalPayment = calculateTotalPayment(loanAmount, totalInterest);
                 const monthlyPayment = totalPayment / loanTermMonths;
-
+              
                 return {
-                    totalInterest: parseFloat(totalInterest).toFixed(2),
-                    totalPayment: parseFloat(totalPayment).toFixed(2),
-                    monthlyPayment: parseFloat(monthlyPayment).toFixed(2),
+                  totalInterest: parseFloat(totalInterest).toFixed(2),
+                  totalPayment: parseFloat(totalPayment).toFixed(2),
+                  monthlyPayment: parseFloat(monthlyPayment).toFixed(2),
                 };
-            };
-
-            const loanAmortizationCalculator = (loanAmount, annualInterestRate, loanTerm) => {
-                const calculateMonthlyPayment = (amount, annualInterest, months) => {
-                    const monthlyInterest = annualInterest / 100 / 12;
-                    return (
-                        (amount * monthlyInterest * Math.pow(1 + monthlyInterest, months)) /
-                        (Math.pow(1 + monthlyInterest, months) - 1)
-                    );
+              };
+              
+              
+              
+             const loanAmortizationCalculator = (loanAmount, monthlyInterestRate, loanTermMonths) => {
+                const calculateMonthlyPayment = (amount, monthlyInterest, months) => {
+                  return (
+                    (amount * monthlyInterest * Math.pow(1 + monthlyInterest, months)) /
+                    (Math.pow(1 + monthlyInterest, months) - 1)
+                  );
                 };
-
+              
                 const calculateTotalPayment = (monthlyPayment, months) => {
-                    return monthlyPayment * months;
+                  return monthlyPayment * months;
                 };
-
+              
                 const calculateProfit = (totalPayment, loanAmount) => {
-                    return totalPayment - loanAmount;
+                  return totalPayment - loanAmount;
                 };
-
-                const monthlyPayment = calculateMonthlyPayment(loanAmount, annualInterestRate, loanTerm);
-                const totalPayment = calculateTotalPayment(monthlyPayment, loanTerm);
+              
+                const monthlyPayment = calculateMonthlyPayment(loanAmount, monthlyInterestRate / 100, loanTermMonths);
+                const totalPayment = calculateTotalPayment(monthlyPayment, loanTermMonths);
                 const totalProfit = calculateProfit(totalPayment, loanAmount);
-
+              
                 return {
-                    monthlyPayment: parseFloat(monthlyPayment).toFixed(2),
-                    totalProfit: parseFloat(totalProfit).toFixed(2),
-                    totalPayment: parseFloat(totalPayment).toFixed(2)
+                  monthlyPayment: parseFloat(monthlyPayment).toFixed(2),
+                  totalProfit: parseFloat(totalProfit).toFixed(2),
+                  totalPayment: parseFloat(totalPayment).toFixed(2),
                 };
-            };
+              };
 
            
             const calculateDueDate = (date, loanTerm)=>{

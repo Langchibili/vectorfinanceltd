@@ -29,11 +29,9 @@ export default class UpdateLandCollateralForm extends React.Component {
   async componentDidMount() {
     const { collateral } = await getLoanFromId(this.props.loggedInUser.currentLoan.id,"collateral.land.titleDeed"); 
     const newLandObject = {
-           land:{
                 hectors: null,
                 plotNumber: null,
                 location: null
-           }
     }
     const newCollaterallObject = {
         data:{
@@ -166,16 +164,16 @@ export default class UpdateLandCollateralForm extends React.Component {
      delete updateObject.collateralId
      delete updateObject.landId
      
-     if(!updateObject.plotNumber){
-        updateObject.plotNumber = null
+     if(!updateObject.data.collateral.land.plotNumber){
+         updateObject.data.collateral.land.plotNumber = null
      }
-     if(!updateObject.hectors){
-      updateObject.hectors = null
+     if(!updateObject.data.collateral.land.hectors){
+         updateObject.data.collateral.land.hectors = null
      }
-     if(!updateObject.location){
-      updateObject.location = null
+     if(!updateObject.data.collateral.land.location){
+         updateObject.data.collateral.land.location = null
      }
-
+   
      this.setState({
         saving: true,
         titleDeed: titleDeed,

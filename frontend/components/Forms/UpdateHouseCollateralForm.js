@@ -29,11 +29,9 @@ export default class UpdateHouseCollateralForm extends React.Component {
   async componentDidMount() {
     const { collateral } = await getLoanFromId(this.props.loggedInUser.currentLoan.id,"collateral.house.titleDeed"); 
     const newLandObject = {
-           house:{
                 dimensions: null,
                 plotNumber: null,
                 location: null
-           }
     }
     const newCollaterallObject = {
         data:{
@@ -166,15 +164,15 @@ export default class UpdateHouseCollateralForm extends React.Component {
      delete updateObject.collateralId
      delete updateObject.houseId
      
-     if(!updateObject.plotNumber){
-      updateObject.plotNumber = null
-     }
-     if(!updateObject.dimensions){
-       updateObject.dimensions = null
-     }
-     if(!updateObject.location){
-       updateObject.location = null
-     }
+      if(!updateObject.data.collateral.house.plotNumber){
+          updateObject.data.collateral.house.plotNumber = null
+      }
+      if(!updateObject.data.collateral.house.dimensions){
+          updateObject.data.collateral.house.dimensions = null
+      }
+      if(!updateObject.data.collateral.house.location){
+          updateObject.data.collateral.house.location = null
+      }
 
      this.setState({
         saving: true,

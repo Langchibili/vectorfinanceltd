@@ -36,7 +36,7 @@ export default function Home() {
          return <CollateralForm loggedInUser={loggedInUser.user} constants={constants}/> 
       }
       else if(currentLoan.loanStatus === "pending-collateral-inspection"){
-        return <Alert  severity="info">Thank you for applying for a loan with us, we are currently processing the loan, and agent will call you to proceed with inspection of your collateral.</Alert>
+        return <Alert  severity="info">Thank you for applying for a loan with us, we are currently processing the loan, an agent will call you to proceed with inspection of your collateral.</Alert>
       }
       else if(currentLoan.loanStatus === "accepted"){
         return (<>
@@ -186,7 +186,7 @@ export default function Home() {
     }
   }
  const renderPages = (BottomNavLink)=>{
-   if(!loggedInUser || !loggedInUser.status){
+   if(!loggedInUser.status){
       if(typeof window !== "undefined"){
         window.location = "/signin"
       }
