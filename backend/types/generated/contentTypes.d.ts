@@ -780,7 +780,6 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
       'api::notification.notification'
     >;
     business: Attribute.Component<'client-details.business'>;
-    mobileMoneyNumberVerified: Attribute.Boolean;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<

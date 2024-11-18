@@ -165,9 +165,6 @@
       "type": "component",
       "repeatable": false,
       "component": "client-details.business"
-    },
-    "mobileMoneyNumberVerified": {
-      "type": "boolean"
     }
   }
 }

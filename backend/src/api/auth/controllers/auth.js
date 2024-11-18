@@ -83,6 +83,7 @@ const sendOtp = async (strapi, identifierType, identifier) => {
         // create a new otp
         await strapi.db.query("api::auth.auth").create({data:{ otp:otp, identifier:otpIdentifier, identifierType:identifierType }})
         if (identifierType === 'phoneNumber') {
+            const phoneNumber = "+260"+returnNineDigitNumber(identifier)
             SendSmsNotification(identifier,otp)
         } else if (identifierType === 'email') {
             SendEmailNotification(identifier,otp)
@@ -90,6 +91,7 @@ const sendOtp = async (strapi, identifierType, identifier) => {
     }
     else{ // otherwise then just send the existing otp
         if (identifierType === 'phoneNumber') {
+            const phoneNumber = "+260"+returnNineDigitNumber(identifier)
             SendSmsNotification(identifier,existingOtpObject.otp)
         } else if (identifierType === 'email') {
             SendEmailNotification(identifier,existingOtpObject.otp)
