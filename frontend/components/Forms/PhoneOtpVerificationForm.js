@@ -41,7 +41,8 @@ export default class PhoneOtpVerificationForm extends Component {
     }, 1000);
   };
 
-  verifyOTP = async () => {
+  verifyOTP = async (e) => {
+    e.preventDefault()
     if(this.state.otp.length === 0){
         this.setState({
             errorExists: true,
@@ -87,11 +88,12 @@ export default class PhoneOtpVerificationForm extends Component {
         return
     }
     else{
-        this.props.action(); // Authenticate user
+        this.props.action() // Authenticate user
     }
   }
 
-  resendOTP = async () => {
+  resendOTP = async (e) => {
+    e.preventDefault()
     // Make request to resend OTP
     fetch(api_url+'/auths?identifier='+this.props.phoneNumber+'&auth_stage=sendotp&identifierType=phoneNumber',{
         headers: {

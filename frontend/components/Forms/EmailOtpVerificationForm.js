@@ -40,7 +40,8 @@ export default class EmailOtpVerificationForm extends Component {
     }, 1000);
   };
 
-  verifyOTP = async () => {
+  verifyOTP = async (e) => {
+    e.preventDefault()
     if(this.state.otp.length === 0){
         this.setState({
             errorExists: true,
@@ -86,11 +87,12 @@ export default class EmailOtpVerificationForm extends Component {
         return
     }
     else{
-        this.props.action(); // Authenticate user
+        this.props.action() // Authenticate user
     }
   }
 
-  resendOTP = async () => {
+  resendOTP = async (e) => {
+    e.preventDefault()
     // Make request to resend OTP
     fetch(api_url+'/auths?identifier='+this.props.email+'&auth_stage=sendotp&identifierType=email',{
         headers: {
@@ -117,7 +119,6 @@ export default class EmailOtpVerificationForm extends Component {
 
   render() {
     const { otp, countdown, resendDisabled } = this.state;
-
     return (
         <div className="auth-form mt-2">
         <label className="mb-1 text-gray"><strong>Enter code sent to your email address</strong></label>
@@ -132,6 +133,6 @@ export default class EmailOtpVerificationForm extends Component {
         <br/>
         {this.state.errorExists? <Alert severity='warning'>{this.state.error}</Alert> : <></>}
       </div>
-    );
+    )
   }
 }

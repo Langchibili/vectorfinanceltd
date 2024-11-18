@@ -2,7 +2,6 @@
 
 import EmailOtpVerificationForm from "@/components/Forms/EmailOtpVerificationForm";
 import PhoneOtpVerificationForm from "@/components/Forms/PhoneOtpVerificationForm";
-import Uploader from "@/components/Includes/Uploader/Uploader";
 import { submitCreateUserRequest } from "@/Constants";
 import { dynamicConfig, scrolltoTopOFPage, sendOTP, textHasPhoneNumber, updateUserAccount, validateEmail } from "@/Functions";
 import { saveJwt } from "@/Secrets";
@@ -171,7 +170,7 @@ export default function Signup() {
     if(phoneRef.current && textHasPhoneNumber(phoneRef.current.value.trim())){
        return (
         <> <h5>Verify Your Number</h5>
-            <PhoneOtpVerificationForm action={(e)=>{e.preventDefault(); setNumberOtpVerified(true);}} phoneNumber={phoneRef.current.value.trim()}/> 
+            <PhoneOtpVerificationForm action={()=>{setNumberOtpVerified(true)}} phoneNumber={phoneRef.current.value.trim()}/> 
             <hrs/>
          </>
        )
@@ -182,7 +181,7 @@ export default function Signup() {
     if(emailRef.current && validateEmail(emailRef.current.value.trim())){
        return (
         <> <h5>Verify Your Email Address</h5>
-            <EmailOtpVerificationForm action={(e)=>{e.preventDefault(); setEmailOtpVerified(true);}} email={emailRef.current.value.trim()}/> 
+            <EmailOtpVerificationForm action={()=>{setEmailOtpVerified(true)}} email={emailRef.current.value.trim()}/> 
           </>
        )
     }
@@ -217,20 +216,6 @@ export default function Signup() {
                       </div>
                       <div className="mt-4">
                         <form className="needs-validation" noValidate="">
-                          <div className="mb-3">
-                            <label htmlFor="useremail" className="form-label">
-                              Email <span className="text-danger">*</span>
-                            </label>
-                            <input
-                              type="email"
-                              disabled={emailRef.current && validateEmail(emailRef.current.value.trim())}
-                              className={`form-control ${errors.email ? 'is-invalid' : ''}`}
-                              id="useremail"
-                              placeholder="Enter Email Address"
-                              ref={emailRef}
-                            />
-                            {errors.email && <div className="invalid-feedback">{errors.email}</div>}
-                          </div>
                           <div className="mb-3">
                             <label htmlFor="firstname" className="form-label">
                               First name <span className="text-danger">*</span>
@@ -271,7 +256,20 @@ export default function Signup() {
                             />
                             {errors.phone && <div className="invalid-feedback">{errors.phone}</div>}
                           </div>
-                          
+                          <div className="mb-3">
+                            <label htmlFor="useremail" className="form-label">
+                              Email <span className="text-danger">*</span>
+                            </label>
+                            <input
+                              type="email"
+                              disabled={emailRef.current && validateEmail(emailRef.current.value.trim())}
+                              className={`form-control ${errors.email ? 'is-invalid' : ''}`}
+                              id="useremail"
+                              placeholder="Enter Email Address"
+                              ref={emailRef}
+                            />
+                            {errors.email && <div className="invalid-feedback">{errors.email}</div>}
+                          </div>
                           <div className="mb-3">
                             <label className="form-label" htmlFor="password-input">
                               Password
@@ -295,8 +293,8 @@ export default function Signup() {
                             </div>
                           </div>
                           
-                          {!numberOtpVerified? <><br/><hr/>{renderPhoneOtpVerificationForm()}</> : <Alert severity="success">Phone Number Verified</Alert>}
-                          {!emailOtpVerified? <><br/><hr/>{renderEmailOtpVerificationForm()}</> : <Alert severity="success">Email Address Verified</Alert>}
+                          {!numberOtpVerified? <><br/><hr/>{renderPhoneOtpVerificationForm()}</> : <Alert severity="success" sx={{marginBottom:'10px'}}>Phone Number Verified</Alert>}
+                          {!emailOtpVerified? <><br/><hr/>{renderEmailOtpVerificationForm()}</> : <Alert severity="success" sx={{marginBottom:'10px'}}>Email Address Verified</Alert>}
                           <div className="mb-4">
                                 <p className="mb-0 fs-12 text-muted fst-italic">
                                 By registering you agree to the VectorFinance{" "}

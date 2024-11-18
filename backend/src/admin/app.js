@@ -41,17 +41,25 @@ const config = {
       "Auth.form.error.invalid": "email, number or password invalid."
     }
   },
+  theme: {
+    colors: {
+      alternative100: "#f6ecfc",
+      alternative200: "#e0c1f4",
+      alternative500: "#ac73e6",
+      alternative600: "#9736e8",
+      alternative700: "#8312d1",
+      danger700: "#b72b1a",
+    },
+  },
+  tutorials: false,
   auth: { // Replace the Strapi logo in auth (login) views
-    logo: AuthLogo,
-    favicon: favicon
+    logo: AuthLogo
   },
   menu: { // Replace the Strapi logo in the main navigation
-    logo: MenuLogo,
-    favicon: favicon
-    
+    logo: MenuLogo
   },
   head: {
-      favicon: favicon,
+      favicon: favicon
   }
 };
 
