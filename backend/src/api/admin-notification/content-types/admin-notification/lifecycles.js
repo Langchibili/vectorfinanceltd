@@ -39,14 +39,14 @@ module.exports = {
             const transporter = nodemailer.createTransport({
                 service: process.env.EMAILSERVICENAME, // Or specify an SMTP host
                 auth: {
-                user: process.env.EMAILSERVICEUSERNAME,
-                pass: process.env.EMAILSERVICEPASSWORD
+                user: process.env.NOTIFICATIONSEMAILSERVICEUSERNAME,
+                pass: process.env.NOTIFICATIONSEMAILSERVICEPASSWORD
                 }
             })
             
             // Send email
             transporter.sendMail({
-                from: process.env.EMAILSERVICEUSERNAME,
+                from: process.env.NOTIFICATIONSEMAILSERVICEUSERNAME,
                 to: email,
                 subject: 'Message from Vector Finance Limited',
                 text: notificationBody
