@@ -756,11 +756,6 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
       'oneToMany',
       'api::transaction-history.transaction-history'
     >;
-    ky_cverification: Attribute.Relation<
-      'plugin::users-permissions.user',
-      'oneToOne',
-      'api::ky-cverification.ky-cverification'
-    >;
     fullnames: Attribute.String;
     salary: Attribute.Component<'client-details.salary'>;
     applicationForms: Attribute.Component<'forms.application-forms', true>;
@@ -1053,45 +1048,6 @@ export interface ApiFormForm extends Schema.CollectionType {
     createdBy: Attribute.Relation<'api::form.form', 'oneToOne', 'admin::user'> &
       Attribute.Private;
     updatedBy: Attribute.Relation<'api::form.form', 'oneToOne', 'admin::user'> &
-      Attribute.Private;
-  };
-}
-
-export interface ApiKyCverificationKyCverification
-  extends Schema.CollectionType {
-  collectionName: 'ky_cverifications';
-  info: {
-    singularName: 'ky-cverification';
-    pluralName: 'ky-cverifications';
-    displayName: ' KYCverification';
-    description: '';
-  };
-  options: {
-    draftAndPublish: true;
-  };
-  attributes: {
-    KYCstatus: Attribute.Enumeration<['Pending', 'Verified', 'Rejected']> &
-      Attribute.DefaultTo<'Pending'>;
-    KYCdetails: Attribute.Component<'user-profile.client-details'>;
-    client: Attribute.Relation<
-      'api::ky-cverification.ky-cverification',
-      'oneToOne',
-      'plugin::users-permissions.user'
-    >;
-    createdAt: Attribute.DateTime;
-    updatedAt: Attribute.DateTime;
-    publishedAt: Attribute.DateTime;
-    createdBy: Attribute.Relation<
-      'api::ky-cverification.ky-cverification',
-      'oneToOne',
-      'admin::user'
-    > &
-      Attribute.Private;
-    updatedBy: Attribute.Relation<
-      'api::ky-cverification.ky-cverification',
-      'oneToOne',
-      'admin::user'
-    > &
       Attribute.Private;
   };
 }
@@ -1665,7 +1621,6 @@ declare module '@strapi/types' {
       'api::email-addresses-list.email-addresses-list': ApiEmailAddressesListEmailAddressesList;
       'api::finance.finance': ApiFinanceFinance;
       'api::form.form': ApiFormForm;
-      'api::ky-cverification.ky-cverification': ApiKyCverificationKyCverification;
       'api::loan.loan': ApiLoanLoan;
       'api::loan-category.loan-category': ApiLoanCategoryLoanCategory;
       'api::loans-information.loans-information': ApiLoansInformationLoansInformation;

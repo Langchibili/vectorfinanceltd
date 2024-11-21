@@ -122,12 +122,6 @@
       "target": "api::transaction-history.transaction-history",
       "mappedBy": "client"
     },
-    "ky_cverification": {
-      "type": "relation",
-      "relation": "oneToOne",
-      "target": "api::ky-cverification.ky-cverification",
-      "mappedBy": "client"
-    },
     "fullnames": {
       "type": "string"
     },

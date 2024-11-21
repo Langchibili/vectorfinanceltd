@@ -32,5 +32,8 @@ module.exports = () => ({
             xsmall: 64
           }
         }
-      }   
+    },
+    'purchase-content-releases':{
+           enabled: false
+    }   
 })

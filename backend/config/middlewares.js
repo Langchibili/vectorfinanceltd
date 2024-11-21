@@ -7,6 +7,11 @@ module.exports = [
   'strapi::query',
   'strapi::body',
   'strapi::session',
-  'strapi::favicon',
-  'strapi::public',
-];
+  {
+    name: 'strapi::favicon',
+    config: {
+      path: './src/admin/extensions/vectorfinancelimitedlogo.png'
+    }
+  },
+  'strapi::public'
+]
