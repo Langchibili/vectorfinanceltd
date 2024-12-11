@@ -1,11 +1,11 @@
 "use client"
 
-import { IconButton, Slide } from "@mui/material";
+import { IconButton } from "@mui/material";
+import { ArrowBackOutlined } from "@material-ui/icons";
 import React from "react";
 import PersonalLoanApplicationForm from "./PersonalLoanApplicationForm";
 import BusinessLoanApplicationForm from "./BusinessLoanApplicationForm";
 import CompanyLoanApplicationForm from "./CompanyLoanApplicationForm";
-import { ArrowBackOutlined } from "@material-ui/icons";
 import { scrolltoTopOFPage } from "@/Functions";
 
 export default class LoanApplicationForm extends React.Component{

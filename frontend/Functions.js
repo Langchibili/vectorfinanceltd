@@ -257,8 +257,33 @@ export const getImage = (image, size = "normal", use = "normal") => {
     .then(response => response.json())
     .then(data => data)
   }
+  
+  export const pushUserIntoLoanClientsList = async (createObject)=>{
+    return await fetch(api_url+'/loans-clients', {
+      method: 'POST',
+      headers: {
+       'Authorization': `Bearer ${getJwt()}`,
+       'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(createObject),
+    })
+    .then(response => response.json())
+    .then(data => data)
+  }
 
-
+  export const pushUserIntoInvestmentClientsList = async (createObject)=>{
+    return await fetch(api_url+'/investment-clients', {
+      method: 'POST',
+      headers: {
+       'Authorization': `Bearer ${getJwt()}`,
+       'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(createObject),
+    })
+    .then(response => response.json())
+    .then(data => data)
+  }
+  
 // LOAN FUNCTIONS
 
 export const createNewLoan = async (data)=>{

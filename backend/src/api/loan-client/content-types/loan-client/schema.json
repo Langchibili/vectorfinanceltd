@@ -1,0 +1,27 @@
+{
+  "kind": "collectionType",
+  "collectionName": "loans_clients",
+  "info": {
+    "singularName": "loan-client",
+    "pluralName": "loans-clients",
+    "displayName": "loansClients",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "fullnames": {
+      "type": "string"
+    },
+    "phoneNumber": {
+      "type": "string"
+    },
+    "client": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "plugin::users-permissions.user"
+    }
+  }
+}

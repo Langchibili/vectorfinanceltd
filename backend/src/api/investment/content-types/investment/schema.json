@@ -1,0 +1,49 @@
+{
+  "kind": "collectionType",
+  "collectionName": "investments",
+  "info": {
+    "singularName": "investment",
+    "pluralName": "investments",
+    "displayName": "Investments",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "amountInvested": {
+      "type": "decimal"
+    },
+    "termInMonths": {
+      "type": "decimal"
+    },
+    "paymentMethod": {
+      "type": "enumeration",
+      "enum": [
+        "airtel-money",
+        "mtn-money",
+        "card",
+        "bank",
+        "cash"
+      ]
+    },
+    "dateInvested": {
+      "type": "datetime"
+    },
+    "payment": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::admin-notification.admin-notification"
+    },
+    "investmentInterestRate": {
+      "type": "decimal"
+    },
+    "client": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "investments"
+    }
+  }
+}

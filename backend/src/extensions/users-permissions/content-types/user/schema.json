@@ -159,6 +159,17 @@
       "type": "component",
       "repeatable": false,
       "component": "client-details.business"
+    },
+    "currentInvestment": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::investment.investment"
+    },
+    "investments": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::investment.investment",
+      "mappedBy": "client"
     }
   }
 }

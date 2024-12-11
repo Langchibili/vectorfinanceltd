@@ -1,5 +1,5 @@
 import logo from "./extensions/vectorfinancelimitedlogo.png";
-import './styles.css';
+//import './styles.css';
 
 const config = { 
   // Disable video tutorials
@@ -25,7 +25,7 @@ const config = {
       "Auth.form.error.invalid": "email, number or password invalid.",
       "Auth.form.register.subtitle": "This admin panel is only for vector finance limited admins",
       "app.components.HomePage.welcomeBlock.content.again": "This admin panel is designed for loans and finance management by vector finance limited admins. Go to the Content Manager tab to view, edit, create or edit loan content.",
-      "Auth.form.register.news.label": "",
+      "Auth.form.register.news.label": "Make sure you create a memorable password.",
       "Settings.application.strapi-version": "",
       "Settings.application.strapiVersion": "",
       "Settings.application.link-upgrade": ""

@@ -1,0 +1,26 @@
+{
+  "kind": "collectionType",
+  "collectionName": "investment_clients",
+  "info": {
+    "singularName": "investment-client",
+    "pluralName": "investment-clients",
+    "displayName": "InvestmentClients"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "fullnames": {
+      "type": "string"
+    },
+    "phoneNumber": {
+      "type": "string"
+    },
+    "client": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "plugin::users-permissions.user"
+    }
+  }
+}

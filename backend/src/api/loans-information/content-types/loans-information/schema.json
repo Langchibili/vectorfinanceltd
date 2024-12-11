@@ -23,6 +23,18 @@
     },
     "defaultSalaryLoanTerm": {
       "type": "decimal"
+    },
+    "defaultInvestMentInterestRate": {
+      "type": "decimal"
+    },
+    "threeMonthsMinimumInvestmentAmount": {
+      "type": "decimal"
+    },
+    "sixMonthsMinimumInvestmentAmount": {
+      "type": "decimal"
+    },
+    "twelveMonthsMinimumInvestmentAmount": {
+      "type": "decimal"
     }
   }
 }

@@ -4,7 +4,8 @@
   "info": {
     "singularName": "finance",
     "pluralName": "finances",
-    "displayName": "finance"
+    "displayName": "finance",
+    "description": ""
   },
   "options": {
     "draftAndPublish": true
@@ -21,6 +22,12 @@
       "type": "decimal"
     },
     "totalAmountUnpaid": {
+      "type": "decimal"
+    },
+    "totalAmountInvestedIn": {
+      "type": "decimal"
+    },
+    "TotalInvestedInterestMade": {
       "type": "decimal"
     }
   }

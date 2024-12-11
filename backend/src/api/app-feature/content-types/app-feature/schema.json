@@ -1,0 +1,26 @@
+{
+  "kind": "collectionType",
+  "collectionName": "app_features",
+  "info": {
+    "singularName": "app-feature",
+    "pluralName": "app-features",
+    "displayName": "AppFeature"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string"
+    },
+    "about_feature": {
+      "type": "blocks",
+      "private": true
+    },
+    "status": {
+      "type": "boolean",
+      "default": false
+    }
+  }
+}

@@ -249,7 +249,74 @@ export default class UpdateClientDetailsForm extends React.Component {
   }
  
 
-  renderFile
+  renderEmploymentSection = (handleInputChange,employementStatus)=>{
+    if(this.props.purpose){
+      if(this.props.purpose === "investment"){
+         return <></>
+      }
+    }
+   return(
+        <div className="row gy-4">
+        {this.props.loanCategory === "personal"? <div className="col-lg-12">
+            <div className="input-group">
+                <label className="input-group-text" htmlFor="inputGroupSelect02">
+                Employement Status
+                </label>
+                <select 
+                    className="form-select" 
+                    id="inputGroupSelect01"
+                    name="employementStatus"
+                    autoComplete="off"
+                    value={employementStatus}
+                    disabled={!this.state.clientDetailsId}
+                    onChange={handleInputChange}
+                >
+                <option value="">Choose...</option>
+                <option value="employed">Employed</option>
+                <option value="self-employed">Self-Employed</option>
+                <option value="unemployed">UnEmployed</option>
+                </select>
+            </div>
+        </div> : <></>
+        }
+        {/* <div className="col-lg-12">
+        <label htmlFor="inputGroupSelect02">
+                Monthly {this.props.loanCategory !== "personal"? "Income" : "Salary"}
+                </label>
+        <div className="input-group">
+            <span className="input-group-text">K</span>
+            <input
+            name="monthlyIncome"
+            value={monthlyIncome}
+            onChange={this.handleInputChange}
+            type="number"
+            autoComplete="off"
+            className="form-control"
+            />
+            <span className="input-group-text">.00</span>
+        </div>
+        </div> */}
+    </div>
+   )
+  } 
+
+  renderFormTitle = ()=>{
+    if(this.props.purpose){
+      if(this.props.purpose === "investment"){
+         return (<div className="card-header align-items-center d-flex">
+                  <h5 className="card-title mb-0 flex-grow-1"> Identity Details </h5>
+                </div>)
+      }
+    }
+     else{
+      return(
+           <><div className="card-header align-items-center d-flex">
+              <h5 className="card-title mb-0 flex-grow-1">{this.props.loanCategory === "personal"? "Employement Status & Id" : "Identity Details Of"} </h5>
+            </div>
+           {this.props.loanCategory !== "personal"? <h6 style={{paddingLeft:'16px', marginTop:'10px'}}><small  style={{color:'gray'}}> (Owner/Representative/Board Member)</small></h6> : <></>}</>
+      )
+     }
+  }
 
   render() {
     const { employementStatus, idType, saved, isFormValid } = this.state;
@@ -259,53 +326,10 @@ export default class UpdateClientDetailsForm extends React.Component {
         <div className="row">
           <div className="col-lg-12">
             <div className="card">
-              <div className="card-header align-items-center d-flex">
-                <h5 className="card-title mb-0 flex-grow-1">{this.props.loanCategory === "personal"? "Employement Status & Id" : "Identity Details Of"} </h5>
-              </div>
-              {this.props.loanCategory !== "personal"? <h6 style={{paddingLeft:'16px', marginTop:'10px'}}><small  style={{color:'gray'}}> (Owner/Representative/Board Member)</small></h6> : <></>}
+              {this.renderFormTitle()}
               <div className="card-body">
                 <div className="live-preview">
-                  <div className="row gy-4">
-                    {this.props.loanCategory === "personal"? <div className="col-lg-12">
-                        <div className="input-group">
-                            <label className="input-group-text" htmlFor="inputGroupSelect02">
-                            Employement Status
-                            </label>
-                            <select 
-                                className="form-select" 
-                                id="inputGroupSelect01"
-                                name="employementStatus"
-                                autoComplete="off"
-                                value={employementStatus}
-                                disabled={!this.state.clientDetailsId}
-                                onChange={this.handleInputChange}
-                            >
-                            <option value="">Choose...</option>
-                            <option value="employed">Employed</option>
-                            <option value="self-employed">Self-Employed</option>
-                            <option value="unemployed">UnEmployed</option>
-                            </select>
-                        </div>
-                    </div> : <></>
-                    }
-                    {/* <div className="col-lg-12">
-                    <label htmlFor="inputGroupSelect02">
-                            Monthly {this.props.loanCategory !== "personal"? "Income" : "Salary"}
-                            </label>
-                    <div className="input-group">
-                        <span className="input-group-text">K</span>
-                        <input
-                        name="monthlyIncome"
-                        value={monthlyIncome}
-                        onChange={this.handleInputChange}
-                        type="number"
-                        autoComplete="off"
-                        className="form-control"
-                        />
-                        <span className="input-group-text">.00</span>
-                    </div>
-                    </div> */}
-                  </div>
+                  {this.renderEmploymentSection(this.handleInputChange,employementStatus)}
                   <div className="col-lg-12 mt-4">
                         <div className="input-group">
                             <label className="input-group-text" htmlFor="inputGroupSelect02">

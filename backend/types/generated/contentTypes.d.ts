@@ -775,6 +775,16 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
       'api::notification.notification'
     >;
     business: Attribute.Component<'client-details.business'>;
+    currentInvestment: Attribute.Relation<
+      'plugin::users-permissions.user',
+      'oneToOne',
+      'api::investment.investment'
+    >;
+    investments: Attribute.Relation<
+      'plugin::users-permissions.user',
+      'oneToMany',
+      'api::investment.investment'
+    >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
@@ -873,6 +883,38 @@ export interface ApiAdminNotificationAdminNotification
       Attribute.Private;
     updatedBy: Attribute.Relation<
       'api::admin-notification.admin-notification',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiAppFeatureAppFeature extends Schema.CollectionType {
+  collectionName: 'app_features';
+  info: {
+    singularName: 'app-feature';
+    pluralName: 'app-features';
+    displayName: 'AppFeature';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    name: Attribute.String;
+    about_feature: Attribute.Blocks & Attribute.Private;
+    status: Attribute.Boolean & Attribute.DefaultTo<false>;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::app-feature.app-feature',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::app-feature.app-feature',
       'oneToOne',
       'admin::user'
     > &
@@ -988,6 +1030,7 @@ export interface ApiFinanceFinance extends Schema.SingleType {
     singularName: 'finance';
     pluralName: 'finances';
     displayName: 'finance';
+    description: '';
   };
   options: {
     draftAndPublish: true;
@@ -997,6 +1040,8 @@ export interface ApiFinanceFinance extends Schema.SingleType {
     totalAmountPaid: Attribute.Decimal;
     netProfitLoss: Attribute.Decimal;
     totalAmountUnpaid: Attribute.Decimal;
+    totalAmountInvestedIn: Attribute.Decimal;
+    TotalInvestedInterestMade: Attribute.Decimal;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -1052,12 +1097,96 @@ export interface ApiFormForm extends Schema.CollectionType {
   };
 }
 
+export interface ApiInvestmentInvestment extends Schema.CollectionType {
+  collectionName: 'investments';
+  info: {
+    singularName: 'investment';
+    pluralName: 'investments';
+    displayName: 'Investments';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    amountInvested: Attribute.Decimal;
+    termInMonths: Attribute.Decimal;
+    paymentMethod: Attribute.Enumeration<
+      ['airtel-money', 'mtn-money', 'card', 'bank', 'cash']
+    >;
+    dateInvested: Attribute.DateTime;
+    payment: Attribute.Relation<
+      'api::investment.investment',
+      'oneToOne',
+      'api::admin-notification.admin-notification'
+    >;
+    investmentInterestRate: Attribute.Decimal;
+    client: Attribute.Relation<
+      'api::investment.investment',
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::investment.investment',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::investment.investment',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiInvestmentClientInvestmentClient
+  extends Schema.CollectionType {
+  collectionName: 'investment_clients';
+  info: {
+    singularName: 'investment-client';
+    pluralName: 'investment-clients';
+    displayName: 'InvestmentClients';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    fullnames: Attribute.String;
+    phoneNumber: Attribute.String;
+    client: Attribute.Relation<
+      'api::investment-client.investment-client',
+      'oneToOne',
+      'plugin::users-permissions.user'
+    >;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::investment-client.investment-client',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::investment-client.investment-client',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
 export interface ApiLoanLoan extends Schema.CollectionType {
   collectionName: 'loans';
   info: {
     singularName: 'loan';
     pluralName: 'loans';
-    displayName: 'Loan';
+    displayName: 'Loans';
     description: '';
   };
   options: {
@@ -1203,6 +1332,43 @@ export interface ApiLoanCategoryLoanCategory extends Schema.CollectionType {
   };
 }
 
+export interface ApiLoanClientLoanClient extends Schema.CollectionType {
+  collectionName: 'loans_clients';
+  info: {
+    singularName: 'loan-client';
+    pluralName: 'loans-clients';
+    displayName: 'loansClients';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    fullnames: Attribute.String;
+    phoneNumber: Attribute.String;
+    client: Attribute.Relation<
+      'api::loan-client.loan-client',
+      'oneToOne',
+      'plugin::users-permissions.user'
+    >;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::loan-client.loan-client',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::loan-client.loan-client',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
 export interface ApiLoansInformationLoansInformation extends Schema.SingleType {
   collectionName: 'loans_informations';
   info: {
@@ -1219,6 +1385,10 @@ export interface ApiLoansInformationLoansInformation extends Schema.SingleType {
     defaultCollaterallLoanInterestRate: Attribute.Decimal;
     defaultCollaterallLoanTerm: Attribute.Decimal;
     defaultSalaryLoanTerm: Attribute.Decimal;
+    defaultInvestMentInterestRate: Attribute.Decimal;
+    threeMonthsMinimumInvestmentAmount: Attribute.Decimal;
+    sixMonthsMinimumInvestmentAmount: Attribute.Decimal;
+    twelveMonthsMinimumInvestmentAmount: Attribute.Decimal;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -1616,13 +1786,17 @@ declare module '@strapi/types' {
       'plugin::users-permissions.user': PluginUsersPermissionsUser;
       'plugin::i18n.locale': PluginI18NLocale;
       'api::admin-notification.admin-notification': ApiAdminNotificationAdminNotification;
+      'api::app-feature.app-feature': ApiAppFeatureAppFeature;
       'api::approval.approval': ApiApprovalApproval;
       'api::auth.auth': ApiAuthAuth;
       'api::email-addresses-list.email-addresses-list': ApiEmailAddressesListEmailAddressesList;
       'api::finance.finance': ApiFinanceFinance;
       'api::form.form': ApiFormForm;
+      'api::investment.investment': ApiInvestmentInvestment;
+      'api::investment-client.investment-client': ApiInvestmentClientInvestmentClient;
       'api::loan.loan': ApiLoanLoan;
       'api::loan-category.loan-category': ApiLoanCategoryLoanCategory;
+      'api::loan-client.loan-client': ApiLoanClientLoanClient;
       'api::loans-information.loans-information': ApiLoansInformationLoansInformation;
       'api::notification.notification': ApiNotificationNotification;
       'api::notification-template.notification-template': ApiNotificationTemplateNotificationTemplate;
