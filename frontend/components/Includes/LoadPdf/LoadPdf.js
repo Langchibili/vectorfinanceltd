@@ -22,7 +22,7 @@ const LoadPdf = ({ pdfUrl, strapiUploadUrl, authToken }) => {
 
     for (let i = 1; i <= pdf.numPages; i++) {
       const page = await pdf.getPage(i)
-      const viewport = page.getViewport({ scale: 1.5 })
+      const viewport = page.getViewport({ scale: 2 })
 
       // Create a canvas for rendering the page
       const canvas = document.createElement('canvas')
@@ -66,10 +66,11 @@ const LoadPdf = ({ pdfUrl, strapiUploadUrl, authToken }) => {
           input.style.left = `${mappedX}px`
           input.style.top = `${viewport.height - mappedY}px`
           input.style.width = `${item.width * viewport.scale}px`
-          input.style.height = '20px'
+          input.style.height = '25px'
           input.style.border = '1px solid #ccc'
           input.style.backgroundColor = 'transparent'
           input.style.zIndex = 10
+          input.style.verticalAlign = "text-top"
 
           input.addEventListener('input', (e) => {
             fields.find(

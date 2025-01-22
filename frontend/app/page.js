@@ -1,12 +1,12 @@
 "use client"
 
+import ESigningForms from "@/components/ESigningForms/ESigningForms";
 import CollateralForm from "@/components/Forms/CollateralForm";
 import FilledForms from "@/components/Forms/FilledForms";
 import InvestmentForm from "@/components/Forms/InvestmentForm";
 import LoanApplicationForm from "@/components/Forms/LoanApplicationForm";
 import ApplyForALoanButton from "@/components/Includes/ApplyForALoanButton/ApplyForALoanButton";
 import FormSigning from "@/components/Includes/FormSigning/FormSigning";
-import HandWritingPad from "@/components/Includes/HandWritingPad/HandWritingPad";
 import HelpPageDisplay from "@/components/Includes/HelpPageDisplay/HelpPageDisplay";
 import InvestButton from "@/components/Includes/InvestButton/InvestButton";
 import LoanInformationDisplay from "@/components/Includes/LoanInformationDisplay/LoanInformationDisplay";
@@ -61,8 +61,8 @@ export default function Home() {
         else if(currentLoan.loanStatus === "accepted"){
           return (<>
                     <p className="text text-success">Your loan application has been accepted, just a few more steps in order to finalize the process and disburse your funds.</p>
-                    <FilledForms loggedInUser={loggedInUser.user} constants={constants}/>
-                </>)
+                    {loggedInUser.user.signingMethod && loggedInUser.user.signingMethod === "e-signing"? <ESigningForms loggedInUser={loggedInUser.user} constants={constants}/> : <FilledForms loggedInUser={loggedInUser.user} constants={constants}/> /* use esigning unless manually input to do otherwise */}
+                 </>)
         }
         else if(currentLoan.loanStatus === "pending-approval"){
           return <p className="text text-info">Thank you for completing the requested steps, we are currently processing the loan, an agent will call you.</p>
@@ -237,7 +237,6 @@ export default function Home() {
 
   }
  const renderPages = (BottomNavLink)=>{
-  // return  <FormSigning/>
    if(!loggedInUser.status){
       if(typeof window !== "undefined"){
         window.location = "/signin"

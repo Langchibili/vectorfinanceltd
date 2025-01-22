@@ -1,6 +1,7 @@
+import { api_url, getJwt } from '@/Constants'
 import React, { useRef, useState, useEffect } from 'react'
 
-const HandWritingPad = () => {
+const HandWritingPad = (props) => {
   const canvasRef = useRef(null)
   const [isDrawing, setIsDrawing] = useState(false)
   const [handwritingImage, setHandwritingImage] = useState(null)
@@ -10,8 +11,8 @@ const HandWritingPad = () => {
   // Resize canvas based on screen size for responsiveness
   useEffect(() => {
     const canvas = canvasRef.current
-    canvas.width = window.innerWidth
-    canvas.height = 400 // Adjust height as needed
+    canvas.width = window.innerWidth - 50
+    canvas.height = window.innerHeight - (0.75 * window.innerHeight)
     const context = canvas.getContext('2d')
     context.lineJoin = 'round'
     context.lineCap = 'round'
@@ -52,10 +53,47 @@ const HandWritingPad = () => {
     setIsDrawing(false)
   }
 
+  const saveHandwritingToAPI = async () => {
+    const canvas = canvasRef.current
+    const dataURL = canvas.toDataURL('image/png') // Get the image data
+    setHandwritingImage(dataURL) // Update state with the data URL
+  
+    // Convert base64 to a blob
+    const blob = await fetch(dataURL).then(res => res.blob())
+    const formData = new FormData()
+    formData.append('files', blob, props.loggedInUser.id+'-signature.png') // Append the file
+    formData.append('ref', 'plugin::users-permissions.user') // Strapi model reference
+    formData.append('refId', props.loggedInUser.id) // User ID
+    formData.append('field', 'signature') // Field name in Strapi
+  
+    try {
+      const response = await fetch(`${api_url}/upload`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${getJwt()}`, // Replace with the user's JWT token
+        },
+        body: formData,
+      })
+  
+      if (response.ok) {
+        const result = await response.json()
+        props.handleSignatureSave(result)
+        console.log('API Response:', result)
+      } else {
+        console.error('Failed to save signature:', response.statusText)
+        alert('Failed to save signature. Please try again.')
+      }
+    } catch (error) {
+      console.error('Error uploading signature:', error)
+      alert('An error occurred while saving the signature.')
+    }
+  }
+
   const saveHandwriting = () => {
     const canvas = canvasRef.current
     const dataURL = canvas.toDataURL('image/png')
-    setHandwritingImage(dataURL)
+    setHandwritingImage(dataURL) // save handwriting in order to show it on the screen
+    saveHandwritingToAPI() // save to the backend
   }
 
   const clearCanvas = () => {
@@ -66,8 +104,8 @@ const HandWritingPad = () => {
   }
 
   return (
-    <div style={{ textAlign: 'center', position: 'fixed', width: '100%' }}>
-      <h2>Handwriting Canvas</h2>
+    <div style={{ textAlign: 'center', position: 'fixed', width: '100%' , margin:'0 auto'}}>
+      <h2 style={{textAlign:'left'}}>Write your signature</h2>
       <canvas
         ref={canvasRef}
         style={{
@@ -105,7 +143,7 @@ const HandWritingPad = () => {
           />
         </label>
         <div style={{ marginTop: '10px' }}>
-          <button onClick={saveHandwriting}>Save Handwriting</button>
+          <button onClick={saveHandwriting}>Save Signature</button>
           <button onClick={clearCanvas}>Clear</button>
         </div>
       </div>

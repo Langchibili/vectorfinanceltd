@@ -1,6 +1,7 @@
 import React from "react"
 import jsPDF from "jspdf"
 import html2canvas from "html2canvas"
+import { scrolltoTopOFPage } from "@/Functions"
 
 export default class NewLoanForm extends React.Component {
   exportToPDF = () => {
@@ -57,8 +58,12 @@ export default class NewLoanForm extends React.Component {
         yOffset += currentHeight
       }
 
-      pdf.save("LoanApplicationForm.pdf")
+      pdf.save("LoanApplicationForm_clientid_"+this.props.loggedInUser.id+".pdf")
     })
+  }
+
+  componentDidMount(){
+    scrolltoTopOFPage()
   }
 
   render() {
@@ -69,9 +74,11 @@ export default class NewLoanForm extends React.Component {
       borderBottom: '1px solid #3228287a',
       borderStyle: 'dashed',
       marginBottom: '5px',
+      height: '25px',
       width: 'auto',
       minWidth: '50px',
       flexGrow: 1,
+      verticalAlign: 'text-top'
     }
 
     
@@ -240,6 +247,40 @@ const tableHeaderStyle = {
             <button onClick={this.exportToPDF} style={{ marginTop: '20px' }}>
               Download as PDF
             </button>
+                  <div style={{ width: "100%", display: "flex", justifyContent: "space-between" }}>
+                    <div style={{ width: "100%" }}>
+                      <button
+                        // disabled={this.state.saving}
+                        onClick={()=>{this.props.handleRenderPreviousForm()}}
+                        type="button"
+                        className="btn btn-success w-90 mt-3"
+                        id="confirm-btn"
+                        // Submit button logic to be handled separately
+                      >
+                        Previous
+                      </button>
+                    </div>
+                   <div style={{ width: "100%", textAlign: "right" }}>
+                      {!this.props.isLastForm? <button
+                        type="button"
+                        className="btn btn-danger w-50 mt-3"
+                        id="next-btn"
+                        // disabled={!isFormValid || !saved}
+                        onClick={()=>{this.props.handleRenderNextForm()}}
+                      >
+                        Next
+                      </button> :
+                      <button
+                        type="button"
+                        className="btn btn-danger w-90 mt-3"
+                        id="next-btn"
+                         // disabled={!this.state.isFormValid}
+                        onClick={()=>{this.props.handleCompleteLoanApplication}}
+                      >
+                        Submit Application
+                      </button>}
+                    </div>
+                  </div>
           </div>
         </div>
       )

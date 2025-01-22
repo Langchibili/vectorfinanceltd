@@ -785,6 +785,9 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
       'oneToMany',
       'api::investment.investment'
     >;
+    signature: Attribute.Media;
+    signingMethod: Attribute.Enumeration<['e-signing', 'manual']> &
+      Attribute.DefaultTo<'e-signing'>;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<

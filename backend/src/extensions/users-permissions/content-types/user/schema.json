@@ -170,6 +170,22 @@
       "relation": "oneToMany",
       "target": "api::investment.investment",
       "mappedBy": "client"
+    },
+    "signature": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "signingMethod": {
+      "type": "enumeration",
+      "enum": [
+        "e-signing",
+        "manual"
+      ],
+      "default": "e-signing"
     }
   }
 }
