@@ -788,6 +788,7 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
     signature: Attribute.Media;
     signingMethod: Attribute.Enumeration<['e-signing', 'manual']> &
       Attribute.DefaultTo<'e-signing'>;
+    witnessSignature: Attribute.Media;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<

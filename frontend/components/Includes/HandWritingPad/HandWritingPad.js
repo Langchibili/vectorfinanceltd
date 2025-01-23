@@ -1,25 +1,52 @@
-import { api_url, getJwt } from '@/Constants'
+import { api_url, backEndUrl, getJwt } from '@/Constants'
+import { Button } from '@mui/material'
 import React, { useRef, useState, useEffect } from 'react'
 
 const HandWritingPad = (props) => {
   const canvasRef = useRef(null)
   const [isDrawing, setIsDrawing] = useState(false)
   const [handwritingImage, setHandwritingImage] = useState(null)
+  const [signatureImage, setSignatureImage] = useState(null)
+  const [witnesSignatureImage, setWitnesSignatureImage] = useState(null)
   const [brushSize, setBrushSize] = useState(2)
   const [brushColor, setBrushColor] = useState('#000000')
 
+  // useEffect(() => {
+   
+  // }, [props.handleWitnessSignatureSave, props.loggedInUser, handwritingImage, backEndUrl])
+  
+
   // Resize canvas based on screen size for responsiveness
   useEffect(() => {
+    if (props.handleWitnessSignatureSave) {
+      if (props.loggedInUser?.witnessSignature?.url) {
+        const newImage = backEndUrl + props.loggedInUser.witnessSignature.url
+        if (newImage !== handwritingImage) { // Prevent redundant updates
+          setWitnesSignatureImage(newImage)
+          setHandwritingImage(newImage)
+        }
+      }
+    } else {
+      if (props.loggedInUser?.signature?.url) {
+        const newImage = backEndUrl + props.loggedInUser.signature.url
+        if (newImage !== handwritingImage) { // Prevent redundant updates
+          setSignatureImage(newImage)
+          setHandwritingImage(newImage)
+        }
+      }
+    }
+    
+    
     const canvas = canvasRef.current
-    canvas.width = window.innerWidth - 50
+    canvas.width = window.innerWidth < 400? window.innerWidth - 50 : 300
     canvas.height = window.innerHeight - (0.75 * window.innerHeight)
     const context = canvas.getContext('2d')
     context.lineJoin = 'round'
     context.lineCap = 'round'
     context.lineWidth = brushSize
     context.strokeStyle = brushColor
-  }, [brushSize, brushColor])
-
+  }, [props.handleWitnessSignatureSave, props.loggedInUser, brushSize, brushColor])
+ 
   // Get touch/mouse position relative to the canvas
   const getCanvasCoordinates = (e) => {
     const canvas = canvasRef.current
@@ -57,14 +84,28 @@ const HandWritingPad = (props) => {
     const canvas = canvasRef.current
     const dataURL = canvas.toDataURL('image/png') // Get the image data
     setHandwritingImage(dataURL) // Update state with the data URL
-  
+    
+    if(props.handleWitnessSignatureSave){
+      setWitnesSignatureImage(dataURL)
+    }
+    else{
+      setSignatureImage(dataURL)
+    }
     // Convert base64 to a blob
     const blob = await fetch(dataURL).then(res => res.blob())
-    const formData = new FormData()
-    formData.append('files', blob, props.loggedInUser.id+'-signature.png') // Append the file
-    formData.append('ref', 'plugin::users-permissions.user') // Strapi model reference
-    formData.append('refId', props.loggedInUser.id) // User ID
-    formData.append('field', 'signature') // Field name in Strapi
+    let formData = new FormData()
+    if(props.handleWitnessSignatureSave){ // for the witness
+      formData.append('files', blob, props.loggedInUser.id+'_witness_signature.png') // Append the file
+      formData.append('ref', 'plugin::users-permissions.user') // Strapi model reference
+      formData.append('refId', props.loggedInUser.id) // User ID
+      formData.append('field', 'witnessSignature') // Field name in Strapi
+    }
+    else{ // for the loan applicant
+      formData.append('files', blob, props.loggedInUser.id+'_signature.png') // Append the file
+      formData.append('ref', 'plugin::users-permissions.user') // Strapi model reference
+      formData.append('refId', props.loggedInUser.id) // User ID
+      formData.append('field', 'signature') // Field name in Strapi
+    }
   
     try {
       const response = await fetch(`${api_url}/upload`, {
@@ -77,7 +118,12 @@ const HandWritingPad = (props) => {
   
       if (response.ok) {
         const result = await response.json()
-        props.handleSignatureSave(result)
+        if(props.handleSignatureSave){
+          props.handleSignatureSave(result[0])
+        }
+        if(props.handleWitnessSignatureSave){
+          props.handleWitnessSignatureSave(result[0])
+        }
         console.log('API Response:', result)
       } else {
         console.error('Failed to save signature:', response.statusText)
@@ -92,6 +138,12 @@ const HandWritingPad = (props) => {
   const saveHandwriting = () => {
     const canvas = canvasRef.current
     const dataURL = canvas.toDataURL('image/png')
+    if(props.handleSignatureSave){
+      props.handleSignatureSave(dataURL)
+    }
+    if(props.handleWitnessSignatureSave){
+      props.handleWitnessSignatureSave(dataURL)
+    }
     setHandwritingImage(dataURL) // save handwriting in order to show it on the screen
     saveHandwritingToAPI() // save to the backend
   }
@@ -105,7 +157,7 @@ const HandWritingPad = (props) => {
 
   return (
     <div style={{ textAlign: 'center', position: 'fixed', width: '100%' , margin:'0 auto'}}>
-      <h2 style={{textAlign:'left'}}>Write your signature</h2>
+      <h3 style={{textAlign:'left'}}>{props.handleWitnessSignatureSave? "A witness's signature" : "Write your signature"}<small>{props.handleWitnessSignatureSave? "  (should be entered by the witness not you)" : ""}</small></h3>
       <canvas
         ref={canvasRef}
         style={{
@@ -121,7 +173,7 @@ const HandWritingPad = (props) => {
         onTouchMove={draw}
         onTouchEnd={stopDrawing}
       ></canvas>
-      <div style={{ margin: '10px' }}>
+      <div style={{ margin: '10px',textAlign:'left' }}>
         <label>
           Brush Size:
           <input
@@ -133,7 +185,7 @@ const HandWritingPad = (props) => {
             style={{ margin: '0 10px' }}
           />
         </label>
-        <label>
+        {/* <label>
           Brush Color:
           <input
             type="color"
@@ -141,25 +193,50 @@ const HandWritingPad = (props) => {
             onChange={(e) => setBrushColor(e.target.value)}
             style={{ margin: '0 10px' }}
           />
-        </label>
-        <div style={{ marginTop: '10px' }}>
-          <button onClick={saveHandwriting}>Save Signature</button>
-          <button onClick={clearCanvas}>Clear</button>
+        </label> */}
+        <div style={{ marginTop: '10px'}}>
+          <Button onClick={saveHandwriting} variant="outlined">Save Signature</Button>
+          <Button onClick={clearCanvas} variant="outlined" color='secondary' sx={{marginLeft:'10px'}}>Clear</Button>
         </div>
       </div>
-      {handwritingImage && (
-        <div>
-          <h3>Saved Handwriting:</h3>
+      {/* {handwritingImage && (
+        <div key={props.handleWitnessSignatureSave? 'witness' : 'signature'}>
+          <h4>Saved Handwriting:</h4>
           <img
-            src={handwritingImage}
-            alt="Handwritten Text"
+            src={props.handleWitnessSignatureSave? witnesSignatureImage : signatureImage}
+            alt="signature"
             style={{
               border: '1px solid #000',
               backgroundColor: '#fff',
             }}
           />
         </div>
-      )}
+      )} */}
+      {props.handleWitnessSignatureSave? (
+        witnesSignatureImage? <div>
+          <h4>Saved Handwriting:</h4>
+          <img
+            src={witnesSignatureImage}
+            alt="signature"
+            style={{
+              border: '1px solid #000',
+              backgroundColor: '#fff',
+            }}
+          />
+        </div> : <></>
+      ) : (
+        signatureImage? <div>
+          <h4>Saved Handwriting:</h4>
+          <img
+            src={signatureImage}
+            alt="signature"
+            style={{
+              border: '1px solid #000',
+              backgroundColor: '#fff',
+            }}
+          />
+        </div> : <></>
+      ) }
     </div>
   )
 }

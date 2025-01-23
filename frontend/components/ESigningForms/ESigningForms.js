@@ -14,8 +14,12 @@ export default class ESigningForms extends React.Component {
       forms: [],
       formToDisplay: null,
       filledForms: [],
+      toSignApplicationForms: [],
       isLastForm: false,
-      showSignatureForm: false
+      showSignatureForm: false,
+      getWitnessSignature: false,
+      signature: this.props.loggedInUser.signature,
+      witnessSignature: this.props.loggedInUser.witnessSignature
     }
   }
 
@@ -28,11 +32,72 @@ export default class ESigningForms extends React.Component {
         }
       });
       const data = await response.json();
-      this.setState({ forms: data.formsToFill });
+      this.setState({ forms: data.formsToFill })
+      return data.formsToFill
     } catch (error) {
       this.setState({ error: "Failed to load forms." });
     }
   };
+
+  getApplicationForms= async()=>{
+    const userWithUpdatedForms = await fetch(api_url+'/users/me?populate=applicationForms.signedForm', {
+       headers: {
+        'Authorization': `Bearer ${getJwt()}`,
+        'Content-Type': 'application/json'
+       }
+     })
+     .then(response => response.json())
+     .then(data => data)
+
+     const toSignApplicationForms = userWithUpdatedForms.applicationForms.map((applicationForm)=>{
+       return {formName: applicationForm.formName,id: applicationForm.id}
+     })
+
+     this.setState({
+       toSignApplicationForms: toSignApplicationForms
+     },()=>{
+       console.log(this.state)
+     })
+     return userWithUpdatedForms.applicationForms
+ }
+
+ createApplicationForms = async (forms)=>{
+  console.log(this.props.loggedInUser)
+   if(this.props.loggedInUser.applicationForms.length > 0){
+     if(this.props.loggedInUser.applicationForms.length !== forms.length){
+         const newFormsToFill = this.props.loggedInUser.applicationForms.map((form)=>{
+           return {
+             formName: form.formName,
+             id: form.id
+           }
+         })
+         forms.forEach((form) => {
+           if (!newFormsToFill.some((formToFill) => formToFill.formName === form.formName)) {
+             newFormsToFill.push({
+               formName: form.formName
+             });
+           }
+         });
+         
+         console.log(newFormsToFill)
+         const updatedUser = await updateUserAccount({applicationForms:newFormsToFill},this.props.loggedInUser.id)
+         return
+     }
+     return
+   } // means you have already created the forms to be signed list
+   //applicationForms 
+   const applicationFormsObject = forms.map((form)=>{
+     return {
+       formName: form.formName
+     }
+   })
+   console.log(applicationFormsObject)
+ //  user.applicationForms[0].id
+   const updatedUser = await updateUserAccount({applicationForms:applicationFormsObject},this.props.loggedInUser.id)
+   if(!updatedUser.hasOwnProperty('error')){
+      this.getApplicationForms()
+   }
+ }
 
   renderForms = () => {
     return this.state.forms.map((formItem) => (
@@ -109,7 +174,6 @@ export default class ESigningForms extends React.Component {
         showSignatureForm: false,
         forms: forms.filter(form => form.id !== formToDisplay.id)
       })
-      
     }
     else{ // means this is the very last form so the user can finalize the loan
       this.setState({
@@ -157,23 +221,54 @@ export default class ESigningForms extends React.Component {
     })
   }
 
-  async componentDidMount() {
-    this.getFormsToFill();
-    scrolltoTopOFPage()
-  }
+  handleSignatureSave = (signature)=>{
+    this.setState({
+       signature:signature
+    })
+ }
 
+ handleWitnessSignatureSave = (signature)=>{
+   this.setState({
+       witnessSignature:signature
+   })
+ }
+
+  handleShowWitnessSignatureForm = ()=>{
+  this.setState({
+    getWitnessSignature: true
+  })
+ }
+
+ async componentDidMount() {
+  const forms = await this.getFormsToFill();
+  this.createApplicationForms(forms)
+  this.getApplicationForms()
+  scrolltoTopOFPage()
+}
 
 
   render() {
     if(this.state.showSignatureForm){
-      return <SaveSignature loggedInUser={this.props.loggedInUser}handleShowFormsToSignPage={this.handleShowFormsToSignPage} handleShowFirstForm={this.handleShowFirstForm}/>
+      return <SaveSignature 
+                  handleSignatureSave={this.handleSignatureSave}
+                  handleWitnessSignatureSave={this.handleWitnessSignatureSave}
+                  handleShowWitnessSignatureForm={this.handleShowWitnessSignatureForm}
+                  getWitnessSignature={this.state.getWitnessSignature} 
+                  signature={this.state.signature}
+                  witnessSignature={this.state.witnessSignature}
+                  loggedInUser={this.props.loggedInUser} 
+                  handleShowFormsToSignPage={this.handleShowFormsToSignPage} 
+                  handleShowFirstForm={this.handleShowFirstForm}/>
     }
     if(this.state.formToDisplay){
       return <LoadForm 
                   handleRenderPreviousForm={this.handleRenderPreviousForm}
                   handleRenderNextForm={this.handleRenderNextForm}
                   handleCompleteLoanApplication={this.handleCompleteLoanApplication}
+                  signature={this.state.signature}
+                  witnessSignature={this.state.witnessSignature}
                   loggedInUser={this.props.loggedInUser} 
+                  toSignApplicationForms={this.state.toSignApplicationForms /* formNames and ids of blank signedForm components */}
                   isLastForm={this.state.isLastForm}
                   form={this.state.formToDisplay}
               />

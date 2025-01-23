@@ -186,6 +186,13 @@
         "manual"
       ],
       "default": "e-signing"
+    },
+    "witnessSignature": {
+      "allowedTypes": [
+        "images"
+      ],
+      "type": "media",
+      "multiple": false
     }
   }
 }

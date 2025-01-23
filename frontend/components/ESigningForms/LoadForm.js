@@ -15,18 +15,21 @@ export default class LoadForm extends React.Component {
     } 
     renderForm = ()=>{
         const form = this.props.form
-        console.log('the current form', form)
+        const getToSignApplicationFormId  = this.props.toSignApplicationForms.filter(formToSign => formToSign.formName === form.formName)
+        if(!getToSignApplicationFormId[0]){
+            return <Alert severity="error">Sorry, a problem occured while loading the form, reflesh the page or go back and reflesh the page.</Alert>
+        }
         if(form.formName === "newLoanForm"){
-            return <NewLoanForm {...this.props}/>
+            return <NewLoanForm {...this.props} toSignApplicationFormId={getToSignApplicationFormId[0].id}/>
         }
         else if(form.formName === "salesAgreementForm"){
-            return <SalesAgreementForm {...this.props}/>
+            return <SalesAgreementForm {...this.props} toSignApplicationFormId={getToSignApplicationFormId[0].id}/>
         }
         else if(form.formName === "contractOfLandSaleForm"){
-            return <ContractOfLandSaleForm {...this.props}/>
+            return <ContractOfLandSaleForm {...this.props} toSignApplicationFormId={getToSignApplicationFormId[0].id}/>
         }
         else if(form.formName === "loanGuarantorForm"){
-            return <LoanGuarantorForm {...this.props}/>
+            return <LoanGuarantorForm {...this.props} toSignApplicationFormId={getToSignApplicationFormId[0].id}/>
         }
         else {
             return <Alert severity="error">Sorry, a problem occured while loading the form, reflesh the page or go back and reflesh the page.</Alert>
