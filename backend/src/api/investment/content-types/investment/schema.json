@@ -15,7 +15,7 @@
     "amountInvested": {
       "type": "decimal"
     },
-    "termInMonths": {
+    "periodInMonths": {
       "type": "decimal"
     },
     "paymentMethod": {

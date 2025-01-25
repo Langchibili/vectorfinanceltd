@@ -43,7 +43,8 @@ export default function Home() {
               return( <InvestmentForm 
                       setshowInvestMentForms={setshowInvestMentForms} 
                       loanCategory="personal"
-                      loggedInUser={loggedInUser.user} constants={constants}
+                      loggedInUser={loggedInUser.user} 
+                      constants={constants}
                       />)
       }
       // loans stuff

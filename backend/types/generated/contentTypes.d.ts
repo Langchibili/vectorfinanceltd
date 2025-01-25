@@ -789,6 +789,7 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
     signingMethod: Attribute.Enumeration<['e-signing', 'manual']> &
       Attribute.DefaultTo<'e-signing'>;
     witnessSignature: Attribute.Media;
+    InvestmentProfile: Attribute.Component<'client-details.investment-profile'>;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
@@ -1114,7 +1115,7 @@ export interface ApiInvestmentInvestment extends Schema.CollectionType {
   };
   attributes: {
     amountInvested: Attribute.Decimal;
-    termInMonths: Attribute.Decimal;
+    periodInMonths: Attribute.Decimal;
     paymentMethod: Attribute.Enumeration<
       ['airtel-money', 'mtn-money', 'card', 'bank', 'cash']
     >;
@@ -1390,9 +1391,19 @@ export interface ApiLoansInformationLoansInformation extends Schema.SingleType {
     defaultCollaterallLoanTerm: Attribute.Decimal;
     defaultSalaryLoanTerm: Attribute.Decimal;
     defaultInvestMentInterestRate: Attribute.Decimal;
-    threeMonthsMinimumInvestmentAmount: Attribute.Decimal;
-    sixMonthsMinimumInvestmentAmount: Attribute.Decimal;
-    twelveMonthsMinimumInvestmentAmount: Attribute.Decimal;
+    threeMonthsMaximumInvestmentAmount: Attribute.Decimal;
+    sixMonthsMaximumInvestmentAmount: Attribute.Decimal;
+    twelveMonthsMaximumInvestmentAmount: Attribute.Decimal;
+    minimumInvestMentAmount: Attribute.Decimal;
+    minimumInvestMentAmountInUSD: Attribute.Decimal;
+    defaultUSDInvestMentInterestRate: Attribute.Decimal;
+    threeMonthsMaximumInvestmentAmountInUSD: Attribute.Decimal;
+    sixMonthsMaximumInvestmentAmountInUSD: Attribute.Decimal;
+    twelveMonthsMaximumInvestmentAmountInUSD: Attribute.Decimal;
+    lateLoanPaymentPenalty: Attribute.Decimal;
+    earlyInvestmentWithdrawPenalty: Attribute.Decimal;
+    nineMonthsMaximumInvestmentAmount: Attribute.Decimal;
+    nineMonthsMaximumInvestmentAmountInUSD: Attribute.Decimal;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;

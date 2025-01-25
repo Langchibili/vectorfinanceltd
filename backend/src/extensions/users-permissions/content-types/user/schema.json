@@ -188,11 +188,18 @@
       "default": "e-signing"
     },
     "witnessSignature": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
       "allowedTypes": [
         "images"
-      ],
-      "type": "media",
-      "multiple": false
+      ]
+    },
+    "InvestmentProfile": {
+      "displayName": "InvestmentProfile",
+      "type": "component",
+      "repeatable": false,
+      "component": "client-details.investment-profile"
     }
   }
 }

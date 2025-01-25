@@ -12,81 +12,6 @@ export default class NewLoanForm extends React.Component {
         formSaved: false
       }
   }
-  // exportToPDF = () => {
-  //   const element = document.getElementById("content-container")
-  //   const images = element.getElementsByTagName("img")
-  //   const totalImages = images.length
-  //   let loadedImages = 0
-  
-  //   const checkAllImagesLoaded = () => {
-  //     if (loadedImages === totalImages) {
-  //       html2canvas(element, { scale: 2 }).then((canvas) => {
-  //         const imgData = canvas.toDataURL("image/png")
-  //         const canvasWidth = canvas.width
-  //         const canvasHeight = canvas.height
-  //         const pdf = new jsPDF("p", "mm", "a4")
-  //         const padding = 20
-  //         const pageWidth = 210
-  //         const pageHeight = 297
-  //         const scaleFactor = (pageWidth - padding * 2) / canvasWidth
-  //         const scaledCanvasHeight = canvasHeight * scaleFactor
-  //         const availableHeight = pageHeight - padding * 2
-  
-  //         let yOffset = 0
-  //         while (yOffset < canvasHeight) {
-  //           const currentHeight = Math.min(
-  //             availableHeight / scaleFactor,
-  //             canvasHeight - yOffset
-  //           )
-  
-  //           const canvasSlice = document.createElement("canvas")
-  //           canvasSlice.width = canvasWidth
-  //           canvasSlice.height = currentHeight
-  
-  //           const context = canvasSlice.getContext("2d")
-  //           context.drawImage(
-  //             canvas,
-  //             0,
-  //             yOffset,
-  //             canvasWidth,
-  //             currentHeight,
-  //             0,
-  //             0,
-  //             canvasWidth,
-  //             currentHeight
-  //           )
-  
-  //           const imgSlice = canvasSlice.toDataURL("image/png")
-  //           if (yOffset > 0) pdf.addPage()
-  //           pdf.addImage(
-  //             imgSlice,
-  //             "PNG",
-  //             padding,
-  //             padding,
-  //             pageWidth - padding * 2,
-  //             currentHeight * scaleFactor
-  //           )
-  
-  //           yOffset += currentHeight
-  //         }
-  
-  //         pdf.save("LoanApplicationForm_clientid_" + this.props.loggedInUser.id + ".pdf")
-  //       })
-  //     }
-  //   }
-  
-  //   for (let i = 0; i < totalImages; i++) {
-  //     if (images[i].complete) {
-  //       loadedImages++
-  //       if (loadedImages === totalImages) checkAllImagesLoaded()
-  //     } else {
-  //       images[i].addEventListener("load", () => {
-  //         loadedImages++
-  //         if (loadedImages === totalImages) checkAllImagesLoaded()
-  //       })
-  //     }
-  //   }
-  // }
 
   saveHandwritingToAPI = async () => {
     const element = document.getElementById("content-container");
@@ -198,7 +123,6 @@ export default class NewLoanForm extends React.Component {
 
   
   componentDidMount(){
-    console.log(this.props.toSignApplicationFormId)
     scrolltoTopOFPage()
   }
 
@@ -406,7 +330,7 @@ const tableHeaderStyle = {
                         type="button"
                         className="btn btn-danger w-50 mt-3"
                         id="next-btn"
-                        // disabled={!isFormValid || !saved}
+                        disabled={!this.state.formSaved}
                         onClick={()=>{this.props.handleRenderNextForm()}}
                       >
                         Next

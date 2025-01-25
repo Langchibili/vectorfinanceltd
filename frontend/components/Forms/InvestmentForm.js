@@ -23,6 +23,10 @@ export default class InvestmentForm extends React.Component{
     }
      
     componentDidMount(){
+        // a user can invest as either an individual or a company
+        // if a company, we collect the certificate of incorperation 
+        // if 
+        // if a user is foreign, they must invest using usd only
         scrolltoTopOFPage()
       }
 

@@ -1,0 +1,28 @@
+{
+  "collectionName": "components_client_details_investment_profiles",
+  "info": {
+    "displayName": "InvestmentProfile"
+  },
+  "options": {},
+  "attributes": {
+    "clientType": {
+      "type": "enumeration",
+      "enum": [
+        "individual",
+        "company"
+      ],
+      "default": "individual"
+    },
+    "country": {
+      "type": "string"
+    },
+    "certificateOfIncorperation": {
+      "allowedTypes": [
+        "images",
+        "files"
+      ],
+      "type": "media",
+      "multiple": true
+    }
+  }
+}

@@ -31,6 +31,19 @@ export interface ClientDetailsBusiness extends Schema.Component {
   };
 }
 
+export interface ClientDetailsInvestmentProfile extends Schema.Component {
+  collectionName: 'components_client_details_investment_profiles';
+  info: {
+    displayName: 'InvestmentProfile';
+  };
+  attributes: {
+    clientType: Attribute.Enumeration<['individual', 'company']> &
+      Attribute.DefaultTo<'individual'>;
+    country: Attribute.String;
+    certificateOfIncorperation: Attribute.Media;
+  };
+}
+
 export interface ClientDetailsSalary extends Schema.Component {
   collectionName: 'components_client_details_salaries';
   info: {
@@ -166,6 +179,7 @@ declare module '@strapi/types' {
   export module Shared {
     export interface Components {
       'client-details.business': ClientDetailsBusiness;
+      'client-details.investment-profile': ClientDetailsInvestmentProfile;
       'client-details.salary': ClientDetailsSalary;
       'forms.application-forms': FormsApplicationForms;
       'media-and-documents.collateral': MediaAndDocumentsCollateral;

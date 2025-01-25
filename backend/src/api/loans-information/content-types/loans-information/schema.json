@@ -27,13 +27,43 @@
     "defaultInvestMentInterestRate": {
       "type": "decimal"
     },
-    "threeMonthsMinimumInvestmentAmount": {
+    "threeMonthsMaximumInvestmentAmount": {
       "type": "decimal"
     },
-    "sixMonthsMinimumInvestmentAmount": {
+    "sixMonthsMaximumInvestmentAmount": {
       "type": "decimal"
     },
-    "twelveMonthsMinimumInvestmentAmount": {
+    "twelveMonthsMaximumInvestmentAmount": {
+      "type": "decimal"
+    },
+    "minimumInvestMentAmount": {
+      "type": "decimal"
+    },
+    "minimumInvestMentAmountInUSD": {
+      "type": "decimal"
+    },
+    "defaultUSDInvestMentInterestRate": {
+      "type": "decimal"
+    },
+    "threeMonthsMaximumInvestmentAmountInUSD": {
+      "type": "decimal"
+    },
+    "sixMonthsMaximumInvestmentAmountInUSD": {
+      "type": "decimal"
+    },
+    "twelveMonthsMaximumInvestmentAmountInUSD": {
+      "type": "decimal"
+    },
+    "lateLoanPaymentPenalty": {
+      "type": "decimal"
+    },
+    "earlyInvestmentWithdrawPenalty": {
+      "type": "decimal"
+    },
+    "nineMonthsMaximumInvestmentAmount": {
+      "type": "decimal"
+    },
+    "nineMonthsMaximumInvestmentAmountInUSD": {
       "type": "decimal"
     }
   }
