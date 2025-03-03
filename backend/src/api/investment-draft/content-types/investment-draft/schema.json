@@ -1,0 +1,52 @@
+{
+  "kind": "collectionType",
+  "collectionName": "investment_drafts",
+  "info": {
+    "singularName": "investment-draft",
+    "pluralName": "investment-drafts",
+    "displayName": "InvestmentDrafts",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "amountInvested": {
+      "type": "decimal"
+    },
+    "periodInMonths": {
+      "type": "integer"
+    },
+    "investmentInterestRate": {
+      "type": "decimal"
+    },
+    "clientType": {
+      "type": "enumeration",
+      "enum": [
+        "individual",
+        "company"
+      ],
+      "default": "individual"
+    },
+    "country": {
+      "type": "string"
+    },
+    "projectedReturns": {
+      "type": "decimal"
+    },
+    "currency": {
+      "type": "enumeration",
+      "enum": [
+        "kwacha",
+        "dollar"
+      ]
+    },
+    "client": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "investmentDrafts"
+    }
+  }
+}

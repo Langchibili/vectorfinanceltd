@@ -1,0 +1,37 @@
+{
+  "kind": "collectionType",
+  "collectionName": "investment_withdraws",
+  "info": {
+    "singularName": "investment-withdraw",
+    "pluralName": "investment-withdraws",
+    "displayName": "investment-withdraws",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "payload": {
+      "type": "json"
+    },
+    "investment": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::investment.investment",
+      "inversedBy": "investment_withdraw"
+    },
+    "transactionID": {
+      "type": "string"
+    },
+    "transactionReference": {
+      "type": "string"
+    },
+    "client": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "investmentWithdraws"
+    }
+  }
+}

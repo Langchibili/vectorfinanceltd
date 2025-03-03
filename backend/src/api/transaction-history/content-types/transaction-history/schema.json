@@ -18,7 +18,8 @@
         "loan-application",
         "loan-approval",
         "loan-disbursement",
-        "repayment"
+        "repayment",
+        "investment-deposit"
       ]
     },
     "transactionDate": {
@@ -51,6 +52,12 @@
     },
     "description": {
       "type": "text"
+    },
+    "investment": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::investment.investment",
+      "inversedBy": "transactionHistories"
     }
   }
 }

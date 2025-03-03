@@ -1,0 +1,18 @@
+{
+  "kind": "singleType",
+  "collectionName": "lists",
+  "info": {
+    "singularName": "list",
+    "pluralName": "lists",
+    "displayName": "lists"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "governmentMinistries": {
+      "type": "json"
+    }
+  }
+}

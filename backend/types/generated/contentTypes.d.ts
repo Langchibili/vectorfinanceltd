@@ -775,11 +775,6 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
       'api::notification.notification'
     >;
     business: Attribute.Component<'client-details.business'>;
-    currentInvestment: Attribute.Relation<
-      'plugin::users-permissions.user',
-      'oneToOne',
-      'api::investment.investment'
-    >;
     investments: Attribute.Relation<
       'plugin::users-permissions.user',
       'oneToMany',
@@ -790,6 +785,21 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
       Attribute.DefaultTo<'e-signing'>;
     witnessSignature: Attribute.Media;
     InvestmentProfile: Attribute.Component<'client-details.investment-profile'>;
+    investmentDrafts: Attribute.Relation<
+      'plugin::users-permissions.user',
+      'oneToMany',
+      'api::investment-draft.investment-draft'
+    >;
+    investmentDeposits: Attribute.Relation<
+      'plugin::users-permissions.user',
+      'oneToMany',
+      'api::investment-deposit.investment-deposit'
+    >;
+    investmentWithdraws: Attribute.Relation<
+      'plugin::users-permissions.user',
+      'oneToMany',
+      'api::investment-withdraw.investment-withdraw'
+    >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
@@ -876,6 +886,11 @@ export interface ApiAdminNotificationAdminNotification
       'api::admin-notification.admin-notification',
       'oneToOne',
       'api::notification.notification'
+    >;
+    investment: Attribute.Relation<
+      'api::admin-notification.admin-notification',
+      'oneToOne',
+      'api::investment.investment'
     >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
@@ -1120,16 +1135,29 @@ export interface ApiInvestmentInvestment extends Schema.CollectionType {
       ['airtel-money', 'mtn-money', 'card', 'bank', 'cash']
     >;
     dateInvested: Attribute.DateTime;
-    payment: Attribute.Relation<
-      'api::investment.investment',
-      'oneToOne',
-      'api::admin-notification.admin-notification'
-    >;
     investmentInterestRate: Attribute.Decimal;
     client: Attribute.Relation<
       'api::investment.investment',
       'manyToOne',
       'plugin::users-permissions.user'
+    >;
+    investment_deposit: Attribute.Relation<
+      'api::investment.investment',
+      'oneToOne',
+      'api::investment-deposit.investment-deposit'
+    >;
+    investment_withdraw: Attribute.Relation<
+      'api::investment.investment',
+      'oneToOne',
+      'api::investment-withdraw.investment-withdraw'
+    >;
+    projectedReturns: Attribute.Decimal;
+    currency: Attribute.Enumeration<['kwacha', 'dollar']>;
+    country: Attribute.String;
+    transactionHistories: Attribute.Relation<
+      'api::investment.investment',
+      'oneToMany',
+      'api::transaction-history.transaction-history'
     >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
@@ -1182,6 +1210,160 @@ export interface ApiInvestmentClientInvestmentClient
       'oneToOne',
       'admin::user'
     > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiInvestmentDepositInvestmentDeposit
+  extends Schema.CollectionType {
+  collectionName: 'investment_deposits';
+  info: {
+    singularName: 'investment-deposit';
+    pluralName: 'investment-deposits';
+    displayName: 'investment-deposits';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    payload: Attribute.JSON;
+    investment: Attribute.Relation<
+      'api::investment-deposit.investment-deposit',
+      'oneToOne',
+      'api::investment.investment'
+    >;
+    transactionID: Attribute.String;
+    transactionReference: Attribute.String;
+    client: Attribute.Relation<
+      'api::investment-deposit.investment-deposit',
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::investment-deposit.investment-deposit',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::investment-deposit.investment-deposit',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiInvestmentDraftInvestmentDraft
+  extends Schema.CollectionType {
+  collectionName: 'investment_drafts';
+  info: {
+    singularName: 'investment-draft';
+    pluralName: 'investment-drafts';
+    displayName: 'InvestmentDrafts';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    amountInvested: Attribute.Decimal;
+    periodInMonths: Attribute.Integer;
+    investmentInterestRate: Attribute.Decimal;
+    clientType: Attribute.Enumeration<['individual', 'company']> &
+      Attribute.DefaultTo<'individual'>;
+    country: Attribute.String;
+    projectedReturns: Attribute.Decimal;
+    currency: Attribute.Enumeration<['kwacha', 'dollar']>;
+    client: Attribute.Relation<
+      'api::investment-draft.investment-draft',
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::investment-draft.investment-draft',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::investment-draft.investment-draft',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiInvestmentWithdrawInvestmentWithdraw
+  extends Schema.CollectionType {
+  collectionName: 'investment_withdraws';
+  info: {
+    singularName: 'investment-withdraw';
+    pluralName: 'investment-withdraws';
+    displayName: 'investment-withdraws';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    payload: Attribute.JSON;
+    investment: Attribute.Relation<
+      'api::investment-withdraw.investment-withdraw',
+      'oneToOne',
+      'api::investment.investment'
+    >;
+    transactionID: Attribute.String;
+    transactionReference: Attribute.String;
+    client: Attribute.Relation<
+      'api::investment-withdraw.investment-withdraw',
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::investment-withdraw.investment-withdraw',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::investment-withdraw.investment-withdraw',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiListList extends Schema.SingleType {
+  collectionName: 'lists';
+  info: {
+    singularName: 'list';
+    pluralName: 'lists';
+    displayName: 'lists';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    governmentMinistries: Attribute.JSON;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<'api::list.list', 'oneToOne', 'admin::user'> &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<'api::list.list', 'oneToOne', 'admin::user'> &
       Attribute.Private;
   };
 }
@@ -1682,7 +1864,13 @@ export interface ApiTransactionHistoryTransactionHistory
   };
   attributes: {
     transactionType: Attribute.Enumeration<
-      ['loan-application', 'loan-approval', 'loan-disbursement', 'repayment']
+      [
+        'loan-application',
+        'loan-approval',
+        'loan-disbursement',
+        'repayment',
+        'investment-deposit'
+      ]
     >;
     transactionDate: Attribute.DateTime;
     amount: Attribute.Decimal;
@@ -1698,6 +1886,11 @@ export interface ApiTransactionHistoryTransactionHistory
       'api::loan.loan'
     >;
     description: Attribute.Text;
+    investment: Attribute.Relation<
+      'api::transaction-history.transaction-history',
+      'manyToOne',
+      'api::investment.investment'
+    >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -1809,6 +2002,10 @@ declare module '@strapi/types' {
       'api::form.form': ApiFormForm;
       'api::investment.investment': ApiInvestmentInvestment;
       'api::investment-client.investment-client': ApiInvestmentClientInvestmentClient;
+      'api::investment-deposit.investment-deposit': ApiInvestmentDepositInvestmentDeposit;
+      'api::investment-draft.investment-draft': ApiInvestmentDraftInvestmentDraft;
+      'api::investment-withdraw.investment-withdraw': ApiInvestmentWithdrawInvestmentWithdraw;
+      'api::list.list': ApiListList;
       'api::loan.loan': ApiLoanLoan;
       'api::loan-category.loan-category': ApiLoanCategoryLoanCategory;
       'api::loan-client.loan-client': ApiLoanClientLoanClient;

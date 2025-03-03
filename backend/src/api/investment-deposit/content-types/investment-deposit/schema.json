@@ -1,0 +1,37 @@
+{
+  "kind": "collectionType",
+  "collectionName": "investment_deposits",
+  "info": {
+    "singularName": "investment-deposit",
+    "pluralName": "investment-deposits",
+    "displayName": "investment-deposits",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "payload": {
+      "type": "json"
+    },
+    "investment": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::investment.investment",
+      "inversedBy": "investment_deposit"
+    },
+    "transactionID": {
+      "type": "string"
+    },
+    "transactionReference": {
+      "type": "string"
+    },
+    "client": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "investmentDeposits"
+    }
+  }
+}

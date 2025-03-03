@@ -186,6 +186,7 @@ export default class PersonalLoanApplicationForm extends React.Component{
             if(this.state.loanType === "salaryBased"){
                 return <UpdateSalaryDetailsForm 
                         {...this.props} 
+                        salaryAmount={this.state.salary}
                         handleCreateBlankLoan={this.handleCreateBlankLoan}
                         setLoanInformation={this.setLoanInformation} 
                         handleOpenAddLoanAmountForm={this.handleOpenAddLoanAmountForm}

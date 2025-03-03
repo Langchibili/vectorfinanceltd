@@ -155,7 +155,7 @@ export default class BusinessInformationForm extends React.Component {
         updateObject.businessName = null
     }
     if(!updateObject.businessType){
-      updateObject.businessType = null
+        updateObject.businessType = null
     }
     if(!updateObject.ownershipType){
         updateObject.ownershipType = null

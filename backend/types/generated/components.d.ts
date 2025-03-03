@@ -54,10 +54,10 @@ export interface ClientDetailsSalary extends Schema.Component {
     paySlip: Attribute.Media;
     verificationVideo: Attribute.Media;
     employerName: Attribute.String;
-    companyName: Attribute.String;
     companyLocation: Attribute.String;
     employementVerificationNumber: Attribute.String;
     salaryAmount: Attribute.Decimal;
+    socialSecurityNumber: Attribute.String;
   };
 }
 
@@ -156,6 +156,7 @@ export interface UserProfileClientDetails extends Schema.Component {
     IDfront: Attribute.Media;
     IDback: Attribute.Media;
     idType: Attribute.Enumeration<['nrc', 'passport', 'driving-license']>;
+    idNumber: Attribute.String;
   };
 }
 

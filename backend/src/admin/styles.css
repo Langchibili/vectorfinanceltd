@@ -1,3 +1,6 @@
+/* #strapi nav .cyxgkm{
+    display: none !important;
+} */
 #strapi > div.sc-bdvvtL.bQtzWS > div > nav > div.sc-bdvvtL.sc-kiwPtn.fLcqbp.dWHaaY > ul > li:nth-child(2){
     display: none !important;
 }
@@ -22,3 +25,14 @@
 form[name="npsSurveyForm"]{
     display: none !important;
 }
+/* #strapi > div.sc-bdvvtL.bQtzWS > div > div > div > nav{
+    display: block !important;
+} */
+
+/* #strapi > div.sc-bdvvtL.ehHzEF.sc-bdvvtL.bQtzWS > div > nav > div.sc-bdvvtL.sc-kiwPtn.fLcqbp.dWHaaY > ul > li:nth-child(2){
+    display: none !important;
+}
+#strapi > div.sc-bdvvtL.ehHzEF.sc-bdvvtL.bQtzWS > div > nav > div.sc-bdvvtL.sc-kiwPtn.fLcqbp.dWHaaY > ul > li:nth-child(3){
+    display: none !important;
+} */
+/*sc-bdvvtL sc-gsDKAQ bOQZK cyxgkm*/

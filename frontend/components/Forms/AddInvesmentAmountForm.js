@@ -1,4 +1,4 @@
-import { updateUserAccount } from '@/Functions'
+import { createNewDraftInvestment, updateUserAccount } from '@/Functions'
 import React, { Component } from 'react'
 import Uploader from '../Includes/Uploader/Uploader'
 import { api_url, getJwt } from '@/Constants'
@@ -15,10 +15,13 @@ class AddInvestmentAmountForm extends Component {
       country: 'Zambia',
       currency: 'ZMK',
       isCompany: false,
+      error: null,
       InvestmentProfileId: null,
+      investProfileIsCompany :false,
       certificateOfIncorperation: null,
       isLargeInvestment: false,
-      isFormValid: false,
+      saved: false,
+      saving: false,
       interestRate: this.props.constants.loansInformation.defaultInvestMentInterestRate,
       minimumInvestMentAmount: this.props.constants.loansInformation.minimumInvestMentAmount,
       threeMonthsMaximumInvestmentAmount: this.props.constants.loansInformation.threeMonthsMaximumInvestmentAmount,
@@ -35,15 +38,8 @@ class AddInvestmentAmountForm extends Component {
 
   handleChange = (event) => {
     const { name, value } = event.target
-    this.setState({ [name]: value }, this.calculateReturns)
+    this.setState({ [name]: value, error: null }, this.calculateReturns)
   }
-
-  checkFormValidity = () => {
-     const { amount, country, certificateOfIncorperation } = this.state;
-     const isFormValid = amount && country && certificateOfIncorperation;
-     this.setState({ isFormValid:isFormValid})
-  }
-
 
   handleCountryChange = (country) => {
     const currency = country === 'Zambia' ? 'ZMK' : 'USD'
@@ -53,7 +49,7 @@ class AddInvestmentAmountForm extends Component {
   }
 
   handleCompanyToggle = (isCompany) => {
-    this.setState({ isCompany: isCompany })
+    this.setState({ isCompany: isCompany, error: null })
   }
 
   calculateReturns = () => {
@@ -70,9 +66,44 @@ class AddInvestmentAmountForm extends Component {
     this.setState({ projectedReturns: returns.toFixed(2), isLargeInvestment })
   }
 
-  handleSubmit = (event) => {
-    event.preventDefault()
-    alert(`Investment successfully saved!\nAmount: ${this.state.amount} ${this.state.currency}\nDuration: ${this.state.duration} months\nProjected Returns: ${this.state.projectedReturns}`)
+  handleSubmit = async (event) => {
+       event.preventDefault()
+       const {amount,duration,interestRate,currency,country,projectedReturns,investProfileIsCompany,isCompany,certificateOfIncorperation} = this.state
+       if(investProfileIsCompany){ // cannot add an individual investment to a company investment profile
+        this.setState({
+          error: "Your previous investment was saved as a company Investment, hence you cannot add an individual investment to your account, consider investing as a company or use another account."
+        })
+        return
+       }
+       if(!isCompany && certificateOfIncorperation ){ // check the InvestmentProfile for a certificateOfIncorperation
+        this.setState({
+          error : "you have added a certificate Of Incorperation to this investment profile, to save the investment as an individual, remove the certificate of incorporation or save the inventment as a company by saying yes to - Are you investing as a company?"
+         })
+         return
+       }
+       this.setState({
+        saving: true
+       })
+       const newDraftInvestmentObject = {
+          amountInvested: amount,
+          periodInMonths: duration,
+          investmentInterestRate: interestRate,
+          clientType: isCompany? "company" : "individual",
+          currency: currency === 'ZMK'? "kwacha" : "dollar",
+          country: country,
+          projectedReturns: projectedReturns,
+          client:this.props.loggedInUser.id
+       }
+       const newDraftInvestment = await createNewDraftInvestment({data:newDraftInvestmentObject})
+       if(!newDraftInvestment.hasOwnProperty('error')){
+        const updatedUserAccount = await updateUserAccount({investment_drafts: {connect: [newDraftInvestment.id]}},this.props.loggedInUser.id)
+        if(!updatedUserAccount.hasOwnProperty('error')){  
+           this.setState({
+              saved: true,
+              saving: false
+            })
+          }
+       }
   }
 
   renderMaximumInvestMentPeriod = (amount,country)=>{
@@ -82,26 +113,20 @@ class AddInvestmentAmountForm extends Component {
     const twelveMonthsMaximumInvestmentAmount = country === "Zambia"? this.state.twelveMonthsMaximumInvestmentAmount : this.state.twelveMonthsMaximumInvestmentAmountInUSD
     
     if(parseFloat(amount) < parseFloat(threeMonthsMaximumInvestmentAmount)){
-        console.log(3)
         return 3
     }
     else if(parseFloat(amount) < parseFloat(sixMonthsMaximumInvestmentAmount)){
-        console.log(6)
         return 6
     }
     else if(parseFloat(amount) < parseFloat(nineMonthsMaximumInvestmentAmount)){
-        console.log(9)
         return 9
     }
     else if(parseFloat(amount) < parseFloat(twelveMonthsMaximumInvestmentAmount)){
-        console.log(12)
         return 12
     }
     else if(parseFloat(amount) > parseFloat(twelveMonthsMaximumInvestmentAmount)){
-        console.log(60)
         return 60
     }
-    console.log(threeMonthsMaximumInvestmentAmount)
     return 1
   }
   getInvestmentProfile =  async()=>{
@@ -121,8 +146,6 @@ class AddInvestmentAmountForm extends Component {
               certificateOfIncorperation: files,
               saving: false,
               error: null
-          },()=>{
-              this.checkFormValidity()
           })
       }
       else{
@@ -131,8 +154,6 @@ class AddInvestmentAmountForm extends Component {
               certificateOfIncorperation: newFiles,
               saving: false,
               error: null
-          },()=>{
-              this.checkFormValidity()
           })
       }
     }
@@ -154,8 +175,6 @@ class AddInvestmentAmountForm extends Component {
            })
            this.setState({
             [arrName]: newArray.length < 1? null : newArray
-           },()=>{
-            this.checkFormValidity()
            })
            // remove from the dom
            if(typeof document !== 'undefined'){
@@ -199,12 +218,23 @@ class AddInvestmentAmountForm extends Component {
            }
        })
      }
-      
-
+ 
+  checkIfUserInvestProfileIsCompany = ()=>{
+    const { investments } = this.props.loggedInUser
+    const { InvestmentProfile } = this.props.loggedInUser
+    if(investments && investments[0]){ // check if the user has any investment
+      if(InvestmentProfile && InvestmentProfile.clientType === "company"){ // check the InvestmentProfile
+        this.setState({
+          investProfileIsCompany :true
+         })
+      }
+    }
+  }   
+ 
   async componentDidMount() {
       this.calculateReturns()
+      this.checkIfUserInvestProfileIsCompany()
       let { InvestmentProfile } = this.props.loggedInUser // because the user object has the client details, though no nrc
-      console.log(InvestmentProfile)
       if(!InvestmentProfile){
           const blankInvestmentProfile = {
               clientType: null,
@@ -216,15 +246,13 @@ class AddInvestmentAmountForm extends Component {
               return
           }
       }
-      const user = await this.getInvestmentProfile();
+      const user = await this.getInvestmentProfile()
       InvestmentProfile = user.InvestmentProfile
       // Set default values, ensure nulls are handled
       // Set default values, ensure nulls are handled
       this.setState({
         certificateOfIncorperation: InvestmentProfile?.certificateOfIncorperation || '',
         InvestmentProfileId: InvestmentProfile?.id || null
-      },()=>{
-          this.checkFormValidity(true)
       })
     }
   
@@ -238,6 +266,7 @@ class AddInvestmentAmountForm extends Component {
       country,
       currency,
       isCompany,
+      saved,
       isLargeInvestment,
     } = this.state
 
@@ -326,9 +355,45 @@ class AddInvestmentAmountForm extends Component {
                         <h6>Duration Of Investment {duration} months</h6>
                         <h6>At <strong>{interestRate}%</strong> Interate Rate</h6>
                       </Alert>
-                    <button disabled={isLargeInvestment} type="submit" className="btn btn-primary">
-                    Save Investment
-                    </button>
+                      {
+                        this.state.error? <Alert severity="error" sx={{marginBottom:'5px'}}>{this.state.error}</Alert> : <></>
+                      }
+                      <div style={{ width: "100%", display: "flex", justifyContent: "space-between" }}>
+                        <div style={{ width: "100%" }}>
+                          <button
+                            disabled={this.state.saving}
+                            onClick={()=>{ this.props.handleOpenUpdateClientDetailsForm();this.props.handleFormReopen(); }}
+                            type="button"
+                            className="btn btn-info w-90 mt-3"
+                            id="confirm-btn"
+                            // Submit button logic to be handled separately
+                          >
+                            Previous
+                          </button>
+                        </div>
+                        {this.props.formDisplay === "profile"? <></> :<div style={{ width: "100%", textAlign: "right" }}>
+                          <button
+                            type="button"
+                            className="btn btn-success w-90 mt-3"
+                            id="next-btn"
+                            onClick={this.handleSubmit}
+                          >
+                            {this.state.saving? "Creating..." : "Create"}
+                          </button>
+                        </div>}
+                        {this.props.formDisplay === "profile"? <></> :<div style={{ width: "100%", textAlign: "right" }}>
+                          <button
+                            type="button"
+                            className="btn btn-danger w-90 mt-3"
+                            id="next-btn"
+                            disabled={!saved}
+                            onClick={()=>{this.props.handleOpenAddLoanAmountForm()}}
+                          >
+                            Next
+                          </button>
+                        </div>}
+                    
+                  </div>
                 </div>
               </div>
             </div>

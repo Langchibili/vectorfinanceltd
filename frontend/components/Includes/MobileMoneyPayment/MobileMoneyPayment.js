@@ -48,18 +48,18 @@ export default class MobileMoneyPayment extends React.Component {
           this.setState({ payNowEnabled: false });
         }
       }
-    );
-  };
+    )
+  }
 
   handleInputChange = (e) => {
-    const { value } = e.target;
-    this.setState({ phoneNumber: value });
-  };
+    const { value } = e.target
+    this.setState({ phoneNumber: value })
+  }
 
   verifyPhoneNumber = () => {
     // Logic to verify phone number
     this.setState({ isPhoneNumberVerified: true, payNowEnabled: true });
-  };
+  }
 
   handleStartNumberVerification = (phoneNumber) => {
     if (!textHasPhoneNumber(phoneNumber)) {

@@ -31,11 +31,6 @@
     "dateInvested": {
       "type": "datetime"
     },
-    "payment": {
-      "type": "relation",
-      "relation": "oneToOne",
-      "target": "api::admin-notification.admin-notification"
-    },
     "investmentInterestRate": {
       "type": "decimal"
     },
@@ -44,6 +39,37 @@
       "relation": "manyToOne",
       "target": "plugin::users-permissions.user",
       "inversedBy": "investments"
+    },
+    "investment_deposit": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::investment-deposit.investment-deposit",
+      "mappedBy": "investment"
+    },
+    "investment_withdraw": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::investment-withdraw.investment-withdraw",
+      "mappedBy": "investment"
+    },
+    "projectedReturns": {
+      "type": "decimal"
+    },
+    "currency": {
+      "type": "enumeration",
+      "enum": [
+        "kwacha",
+        "dollar"
+      ]
+    },
+    "country": {
+      "type": "string"
+    },
+    "transactionHistories": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::transaction-history.transaction-history",
+      "mappedBy": "investment"
     }
   }
 }

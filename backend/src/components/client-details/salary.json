@@ -25,9 +25,6 @@
     "employerName": {
       "type": "string"
     },
-    "companyName": {
-      "type": "string"
-    },
     "companyLocation": {
       "type": "string"
     },
@@ -36,6 +33,9 @@
     },
     "salaryAmount": {
       "type": "decimal"
+    },
+    "socialSecurityNumber": {
+      "type": "string"
     }
   }
 }

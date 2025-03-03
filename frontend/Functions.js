@@ -169,8 +169,6 @@ export const simpleInterestLoanCalculator = (loanAmount, monthlyInterestRate, lo
 
 
 
-
-
 export const loanAmortizationCalculator = (loanAmount, monthlyInterestRate, loanTermMonths) => {
   const calculateMonthlyPayment = (amount, monthlyInterest, months) => {
     return (
@@ -495,36 +493,6 @@ export const getLoanCategoryIds = async ()=>{
   }
  }
 
-export const getPosts = async (customUri=null,getMeta=false)=>{
-  console.log(customUri)
-  let posts = null
-  if(customUri){
-    posts = await fetch(customUri,{
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    }).then(response => response.json())
-      .then(data => data)
-      .catch(error => console.error(error))
-  }
-  else{
-    posts = await fetch(api_url+'/posts',{
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    }).then(response => response.json())
-      .then(data => data)
-      .catch(error => console.error(error))
-  }
-  if(!posts || !posts.data){
-    return posts
-  }
-  if(getMeta){
-    return posts
-  }
-  return posts.data
- }
-
   export const getLoanFromId = async (loanid,populateString="")=>{
     let populate = '?populate='+populateString
     if(populateString.length === 0){
@@ -546,142 +514,31 @@ export const getPosts = async (customUri=null,getMeta=false)=>{
         return null
   }
 
-  export const getPostsByType = async (posttype,mediaOnly=false,populateString="")=>{
-    let populate = '&populate='+populateString
-    if(populateString.length === 0){
-       populate = "" // it means populate nothing
-    }
-    let requestUri = api_url+'/contents/?type='+posttype+populate
-    if(mediaOnly){
-      requestUri = api_url+'/contents/?type='+posttype+"&mediaOnly=true"+populate
-    }
-    const posts = await fetch(requestUri,{
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      }).then(response => response.json())
-        .then(data => data)
-        .catch(error => console.error(error))
-         
-        if(posts){
-           return posts
-        }
-        return null
-  }
 
-  export const getPostsBySeachAndType = async (search,posttype="all",mediaOnly=false,populateString="")=>{
-    let populate = '&populate='+populateString
-    if(populateString.length === 0){
-       populate = "" // it means populate nothing
-    }
-    let requestUri =  requestUri = api_url+'/contents/?type='+posttype+"&search="+search+populate
-    if(mediaOnly){
-     requestUri = api_url+'/contents/?type='+posttype+"&search="+search+"&mediaOnly=true"+populate    
-    }
-    const posts = await fetch(requestUri,{
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      }).then(response => response.json())
-        .then(data => data)
-        .catch(error => console.error(error))
-         
-        if(posts){
-           return posts
-        }
-        return null
-  }
 
-  export const getPostUser = async (title)=>{
-    const postid = getIDFromDashedString(title)
-    const post = await fetch(api_url+'/posts/'+postid+'?populate=user,user.details',{
+  // INVESTMENTS FUNCTIONS
+
+export const createNewDraftInvestment = async (data)=>{
+  const draftInvestment =  await fetch(api_url+'/investment-drafts', {
+      method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
-      }
-    }).then(response => response.json())
-      .then(data => data)
-      .catch(error => console.error(error))
-      log('this is a post with user',post)
-      
-      if(post && post.data && post.data.attributes && post.data.attributes.user){
-        post.data.attributes.user.data.attributes.id = post.data.attributes.user.data.id  // put the id inside the attributes object to reflect the way the logged in user object looks
-        return post.data.attributes.user.data.attributes
-      }
-      return null
-  }
+       'Authorization': `Bearer ${getJwt()}`,
+       'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data),
+    })
+    .then(response => response.json())
+    .then(data => data)
+  if(draftInvestment && draftInvestment.data && draftInvestment.data.attributes){
+    draftInvestment.data.attributes.id = draftInvestment.data.id
+      return draftInvestment.data.attributes
+   }
+  return null
+}
 
-  export const getPostEngagement = async (title)=>{
-    const postid = getIDFromDashedString(title)
-    const post = await fetch(api_url+'/posts/'+postid+'?populate=engagements',{
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    }).then(response => response.json())
-      .then(data => data)
-      .catch(error => console.error(error))
-      log('this is a post with engagement',post)
-      
-      if(post && post.data && post.data.attributes && post.data.attributes.engagements){
-        return post.data.attributes.engagements.data
-     }
-      return null
-  }
-
-  export const getPostComments = async (title)=>{
-    const postid = getIDFromDashedString(title)
-    const post = await fetch(api_url+'/posts/'+postid+'?populate=comments',{
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    }).then(response => response.json())
-      .then(data => data)
-      .catch(error => console.error(error))
-      log('this is a post with comments',post)
-      
-      if(post && post.data && post.data.attributes && post.data.attributes.comments){
-        return post.data.attributes.comments.data
-     }
-      return null
-  }
-
-  export const getPostMedia = async (title)=>{
-    const postid = getIDFromDashedString(title)
-    const post = await fetch(api_url+'/posts/'+postid+'?populate=media',{
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    }).then(response => response.json())
-      .then(data => data)
-      .catch(error => console.error(error))
-      log('this is a post with media',post)
-      
-      if(post && post.data && post.data.attributes && post.data.attributes.media){
-         return post.data.attributes.media.data
-      }
-      return null
-  }
-
-  export const getPostfeaturedImages = async (title)=>{
-    const postid = getIDFromDashedString(title)
-    const post = await fetch(api_url+'/posts/'+postid+'?populate=featuredImages',{
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    }).then(response => response.json())
-      .then(data => data)
-      .catch(error => console.error(error))
-      log('this is a post with feauted images',post)
-      
-      if(post && post.data && post.data.attributes && post.data.attributes.featuredImages){
-        return post.data.attributes.featuredImages.data
-     }
-     return null
-  }
 
  // uploads stuff
  
-
-
  export const getMediaFile = async (uploadId)=>{
   const upload = await fetch(api_url+'/upload/files/'+uploadId,{
     headers: {
@@ -697,181 +554,6 @@ export const getPosts = async (customUri=null,getMeta=false)=>{
     }
     return null
 }
-
-export const getVideoMetaFromPostAndId = (post,videoId)=>{
-  if(!post.extra_payload){
-      return null
-  }
-  else{
-     if(!post.extra_payload.media){
-        return null
-     }
-     else{
-       if(!post.extra_payload.media.videos){
-          return null
-       }
-       else{
-         return !post.extra_payload.media.videos[videoId]? null : post.extra_payload.media.videos[videoId]
-       }
-     }
-  }
-}
- //  logging and deleting an engagement to a post, like a like or view 
-
-  const engagementMappings = {
-    likes: {
-        action: 'likedPosts',
-        idArray: 'likedPostsIds',
-        postBy: 'postLikedBy'
-    },
-    shares: {
-        action: 'sharedPosts',
-        idArray: 'sharedPostsIds',
-        postBy: 'postSharedBy'
-    },
-    views: {
-        action: 'viewedPosts',
-        idArray: 'viewedPostsIds',
-        postBy: 'postViewedBy'
-    },
-    plays: {
-        action: 'playedPosts',
-        idArray: 'playedPostsIds',
-        postBy: 'postPlayedBy'
-    },
-    impressions: {
-        action: 'seenPosts',
-        idArray: 'seenPostsIds',
-        postBy: 'postSeenBy'
-    }
-};
-
-
-export const logEngagement = async (type, postId, loggedInUser, ctx,createNotification=()=>{})=> {
-    const { action, idArray, postBy } = engagementMappings[type];
-
-    let userEngagementIds = ctx.state.loggedInUser.user[idArray] || [];
-    
-    if (!userEngagementIds.includes(postId)) {
-        userEngagementIds.push(postId);
-    }
-
-    const updateUserObject = {
-        [action]: { connect: [postId] },
-        [idArray]: userEngagementIds
-    };
-    console.log('the engagement object',updateUserObject)
-    const response = await fetch(`${api_url}/users/${loggedInUser.id}`, {
-        method: 'PUT',
-        headers: {
-            'Authorization': `Bearer ${getJwt()}`,
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(updateUserObject)
-    }).then(response => response.json());
-
-    if (response) {
-        const postEngagements = parseInt(ctx.state.post[type] || 0);
-        const updatePostObject = {
-            data: {
-                [postBy]: { connect: [loggedInUser.id] },
-                [type]: postEngagements + 1
-            }
-        };
-        const response2 = await fetch(`${api_url}/posts/${postId}`, {
-            method: 'PUT',
-            headers: {
-                'Authorization': `Bearer ${getJwt()}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(updatePostObject)
-        }).then(response => response.json());
-        if (response2) {
-            if(type === "likes" || type === "shares"){
-                createNotification() // send notification to respective parties
-            }
-            ctx.setState(prevState => {
-                return {
-                    ...prevState,
-                    loggedInUser: {
-                        ...prevState.loggedInUser,
-                        user: {
-                            ...prevState.loggedInUser.user,
-                            [idArray]: response[idArray]
-                        }
-                    },
-                    post: {
-                        ...prevState.post,
-                        [type]: postEngagements + 1
-                    },
-                    requesting: false
-                };
-            });
-        }
-    }
-}
-
-export const deleteEngagement = async (type, postId, loggedInUser, ctx)=> {
-    const { action, idArray, postBy } = engagementMappings[type];
-
-    let userEngagementIds = ctx.state.loggedInUser.user[idArray] || [];
-
-    userEngagementIds = userEngagementIds.filter(id => id !== postId);
-
-    const updateUserObject = {
-        [action]: { disconnect: [postId] },
-        [idArray]: userEngagementIds
-    };
-
-    const response = await fetch(`${api_url}/users/${loggedInUser.id}`, {
-        method: 'PUT',
-        headers: {
-            'Authorization': `Bearer ${getJwt()}`,
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(updateUserObject)
-    }).then(response => response.json());
-
-    if (response) {
-        const postEngagements = parseInt(ctx.state.post[type] || 1)
-        const updatePostObject = {
-            data: {
-                [postBy]: { disconnect: [loggedInUser.id] },
-                [type]: postEngagements - 1
-            }
-        };
-
-        const response2 = await fetch(`${api_url}/posts/${postId}`, {
-            method: 'PUT',
-            headers: {
-                'Authorization': `Bearer ${getJwt()}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(updatePostObject)
-        }).then(response => response.json());
-        if (response2) {
-            ctx.setState(prevState => {
-                return {
-                    ...prevState,
-                    loggedInUser: {
-                        ...prevState.loggedInUser,
-                        user: {
-                            ...prevState.loggedInUser.user,
-                            [idArray]: response[idArray]
-                        }
-                    },
-                    post: {
-                        ...prevState.post,
-                        [type]: postEngagements - 1
-                    },
-                    requesting: false
-                }
-            })
-        }
-    }
-}
- 
-
 
 // USER FUNCTIONS
 

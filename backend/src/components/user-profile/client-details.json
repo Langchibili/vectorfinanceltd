@@ -46,6 +46,9 @@
         "passport",
         "driving-license"
       ]
+    },
+    "idNumber": {
+      "type": "string"
     }
   }
 }
