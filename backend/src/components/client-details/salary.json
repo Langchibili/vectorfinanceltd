@@ -36,6 +36,14 @@
     },
     "socialSecurityNumber": {
       "type": "string"
+    },
+    "bankStatement": {
+      "type": "media",
+      "multiple": true,
+      "required": false,
+      "allowedTypes": [
+        "files"
+      ]
     }
   }
 }

@@ -82,7 +82,7 @@ export default class UpdateClientDetailsForm extends React.Component {
       IDfront &&
       IDback;
 
-    if (!initialCheck) {ss
+    if (!initialCheck) {
       this.setState({ isFormValid });
     }
     else {

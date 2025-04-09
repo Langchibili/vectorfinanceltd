@@ -17,6 +17,7 @@ export default class UpdateSalaryDetailsForm extends React.Component {
       socialSecurityNumber: '', // Added social security number state
       paySlip: null,
       verificationVideo: null,
+      bankStatement: null,
       // More fields can be added as necessary
       isFormValid: false,
       saving: false,
@@ -44,7 +45,8 @@ export default class UpdateSalaryDetailsForm extends React.Component {
       const blankSalaryObject = {
         salaryAmount: this.props.salaryAmount || '',
         paySlip: null,
-        verificationVideo: null
+        verificationVideo: null,
+        bankStatement: null
       } // create a blank slate of salary to obtain the component's id
       const updatedUser = await updateUserAccount({ salary: blankSalaryObject }, this.props.loggedInUser.id)
       if (updatedUser.hasOwnProperty('error')) {
@@ -62,6 +64,7 @@ export default class UpdateSalaryDetailsForm extends React.Component {
       socialSecurityNumber: salary?.socialSecurityNumber || '', // set social security number
       paySlip: salary?.paySlip || '',
       verificationVideo: salary?.verificationVideo || '',
+      bankStatement: salary?.bankStatement || '',
       salaryDetailsId: salary?.id || null
     }, () => {
       this.checkFormValidity(true)
@@ -76,7 +79,7 @@ export default class UpdateSalaryDetailsForm extends React.Component {
   }
 
   checkFormValidity = (initialCheck = false) => {
-    const { employerName, salaryAmount, employementVerificationNumber, companyLocation, socialSecurityNumber, paySlip, verificationVideo } = this.state;
+    const { employerName, salaryAmount, employementVerificationNumber, companyLocation, socialSecurityNumber, paySlip, bankStatement, verificationVideo } = this.state;
 
     // Validate that all fields are filled
     const isFormValid =
@@ -85,7 +88,8 @@ export default class UpdateSalaryDetailsForm extends React.Component {
       companyLocation &&
       socialSecurityNumber.trim() &&  // require social security number
       paySlip &&
-      !verificationVideo; // no verification video since we do not intend to use the feature yet
+      bankStatement &&
+      verificationVideo; // no verification video since we do not intend to use the feature yet
 
     if (!initialCheck) {
       this.setState({ isFormValid })
@@ -103,7 +107,7 @@ export default class UpdateSalaryDetailsForm extends React.Component {
   handleSubmit = async (e) => {
     e.preventDefault()
 
-    const { employerName, salaryAmount, employementVerificationNumber, companyLocation, socialSecurityNumber, paySlip, verificationVideo, salaryDetailsId } = this.state;
+    const { employerName, salaryAmount, employementVerificationNumber, companyLocation, socialSecurityNumber, paySlip, bankStatement, verificationVideo, salaryDetailsId } = this.state;
     if (!employerName || !salaryAmount || !employementVerificationNumber || !companyLocation || !socialSecurityNumber) {
       this.setState({
         error: 'Please ensure all fields are filled.',
@@ -124,6 +128,7 @@ export default class UpdateSalaryDetailsForm extends React.Component {
     delete updateObject.error
     delete updateObject.paySlip
     delete updateObject.verificationVideo
+    delete updateObject.bankStatement
     delete updateObject.salaryDetailsId
 
     if (!updateObject.employerName) {
@@ -145,6 +150,7 @@ export default class UpdateSalaryDetailsForm extends React.Component {
     this.setState({
       saving: true,
       paySlip: paySlip,
+      bankStatement: bankStatement,
       verificationVideo: verificationVideo,
       salaryDetailsId: salaryDetailsId,
       saved: true
@@ -157,6 +163,7 @@ export default class UpdateSalaryDetailsForm extends React.Component {
         error: 'something went wrong, try again',
         saving: false,
         paySlip: paySlip,
+        bankStatement: bankStatement,
         verificationVideo: verificationVideo,
         salaryDetailsId: salaryDetailsId
       })
@@ -166,6 +173,7 @@ export default class UpdateSalaryDetailsForm extends React.Component {
       error: null,
       saving: false,
       paySlip: paySlip,
+      bankStatement: bankStatement,
       verificationVideo: verificationVideo,
       salaryDetailsId: salaryDetailsId
     }, () => {
@@ -216,6 +224,28 @@ export default class UpdateSalaryDetailsForm extends React.Component {
       })
     }
   }
+  addBankStatement = (files) => {
+    if (!this.state.bankStatement) {
+      this.setState({
+        bankStatement: files,
+        saving: false,
+        error: null
+      }, () => {
+        this.checkFormValidity()
+      })
+    }
+    else {
+      const newFiles = [...this.state.bankStatement, ...files]
+      this.setState({
+        bankStatement: newFiles,
+        saving: false,
+        error: null
+      }, () => {
+        this.checkFormValidity()
+      })
+    }
+  }
+  
 
   handleRemoveImage = async (uploadid, filesArr, arrName) => {
     const removed = await fetch(api_url + '/upload/files/' + uploadid, {
@@ -386,7 +416,7 @@ export default class UpdateSalaryDetailsForm extends React.Component {
                     <h4 style={{ marginTop: '20px' }} className="card-title mb-0 flex-grow-1">Identity Details </h4>
                     <hr style={{ color: 'lightgray' }} />
                     <div style={{ marginTop: '20px' }}>
-                      <h5>PaySlip/Bank Statement<small style={{ color: 'gray' }}> (Of Past 3 months)</small></h5><small style={{ color: 'lightgray' }}>(can even be past 6 or a year)</small>
+                      <h5>PaySlip<small style={{ color: 'gray' }}> (Of Past 3 months)</small></h5><small style={{ color: 'lightgray' }}>(can even be past 6 or a year)</small>
                       <Uploader
                         addFiles={this.addPaySlip}
                         displayType="circular"
@@ -398,8 +428,21 @@ export default class UpdateSalaryDetailsForm extends React.Component {
                       />
                       <small style={{ color: 'lightgray' }}>(document(PDF,WORD))</small>
                       {this.renderFiles(this.state.paySlip, "paySlip")}
+                      <h5>Bank Statement<small style={{ color: 'gray' }}> (Of Past 3 months)</small></h5><small style={{ color: 'lightgray' }}>(can even be past 6 or a year)</small>
+                      <Uploader
+                        addFiles={this.addBankStatement}
+                        displayType="circular"
+                        refId={this.state.salaryDetailsId}
+                        refName="client-details.salary"
+                        fieldName="bankStatement"
+                        allowMultiple={false}
+                        allowedTypes={['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain', 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']}
+                      />
+                      <small style={{ color: 'lightgray' }}>(document(PDF,WORD))</small>
+                      {this.renderFiles(this.state.bankStatement, "bankStatement")}
                     </div>
-                     {/* <div style={{marginTop:'10px'}}>
+                    
+                  <div style={{marginTop:'10px'}}>
                         <h5>Verification Video <small  style={{color:'gray'}}> (Instructions Below)</small></h5> <small  style={{color:'lightgray'}}>(Take a video holding your ID(NRC,Passport or Driving Licence) and state today's date)</small>
                         <Uploader 
                             addFiles={this.addVericationVideo}
@@ -412,7 +455,7 @@ export default class UpdateSalaryDetailsForm extends React.Component {
                         />
                         <small  style={{color:'lightgray'}}>(Video(MP4,MKV,AVL))</small>
                         {this.renderFiles(this.state.verificationVideo,"verificationVideo")}
-                  </div> */}
+                  </div>
                   </> : <></>}
                   {/* Save and Next Buttons */}
                   <div style={{ width: "100%", display: "flex", justifyContent: "space-between" }}>

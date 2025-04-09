@@ -58,6 +58,7 @@ export interface ClientDetailsSalary extends Schema.Component {
     employementVerificationNumber: Attribute.String;
     salaryAmount: Attribute.Decimal;
     socialSecurityNumber: Attribute.String;
+    bankStatement: Attribute.Media;
   };
 }
 
