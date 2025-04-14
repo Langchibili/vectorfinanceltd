@@ -156,20 +156,6 @@ export default function Home() {
                 </div>
                 {/* end auth page content */}
                 {/* footer */}
-                <footer className="footer">
-                  <div className="container">
-                    <div className="row">
-                      <div className="col-lg-12">
-                        <div className="text-center">
-                          <p className="mb-0">
-                            © 2025 Velzon. Crafted with{" "}
-                            <i className="mdi mdi-heart text-danger" /> by Themesbrand
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </footer>
                 {/* end Footer */}
               </div>   
                 </>
@@ -184,12 +170,15 @@ export default function Home() {
     }
     else{
       if(showInvestMentForms){
-              return( <InvestmentForm 
-                      setshowInvestMentForms={setshowInvestMentForms} 
-                      loanCategory="personal"
-                      loggedInUser={loggedInUser.user} 
-                      constants={constants}
-                      />)
+              return( <div className="page-content">
+                         <div className="container-fluid">
+                        <InvestmentForm 
+                          setshowInvestMentForms={setshowInvestMentForms} 
+                          loanCategory="personal"
+                          loggedInUser={loggedInUser.user} 
+                          constants={constants}
+                          />
+                        </div></div>)
       }
       // loans stuff
       const currentLoan = loggedInUser.user.currentLoan

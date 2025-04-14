@@ -17,7 +17,7 @@ export default function BottomNav() {
   return (
     <>
     <div style={{minHeight:'20px'}}></div>
-    <Box sx={{ width: "100%", position:'fixed', bottom:'0'}}>
+    <Box sx={{ zIndex:'10', width: "100%", position:'fixed', bottom:'0'}}>
       <BottomNavigation
         showLabels
         value={value}
