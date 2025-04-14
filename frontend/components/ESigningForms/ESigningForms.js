@@ -6,6 +6,7 @@ import { Zoom } from "@material-ui/core";
 import SaveSignature from "../Includes/SaveSignature/SaveSignature";
 import LoadForm from "./LoadForm";
 import { dateAndTimeNow, logNewAdminNotification, logNewNotification, logNewTransactionHistory, scrolltoTopOFPage, updateLoan, updateUserAccount } from "@/Functions";
+import { Alert } from "@mui/material";
 
 export default class ESigningForms extends React.Component {
   constructor(props) {
@@ -276,6 +277,7 @@ export default class ESigningForms extends React.Component {
     return (
       <Zoom in={true}>
         <div className="row">
+          <Alert severity="info" style={{marginBottom:'15px'}}>Your loan application has been accepted, just a few more steps in order to finalize the process and disburse your funds.</Alert>
           <div className="col-lg-12">
             <div className="card">
               <div className="card-header align-items-center d-flex">
@@ -301,7 +303,7 @@ export default class ESigningForms extends React.Component {
               </div>
             </div>
           </div>
-        </div>
+         </div>
       </Zoom>
     );
   }

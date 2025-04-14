@@ -48,7 +48,17 @@ export default function ApplyForALoanButton(props) {
          {!showForm? <Slide in={!showForm}>
             <button
               className={"btn btn-success mb-4"}
-              style={{margin:'0 auto',backgroundColor:props.color,width: window.innerWidth > 600? "600px" : "100%"}}
+              style={{
+                margin: '0 auto',
+                width: window.innerWidth > 600 ? "600px" : "100%",
+                background: 'radial-gradient(circle, blue 0%, #769476 100%)',
+                color: '#fff', // optional: ensure text is readable
+                border: 'none',
+                borderRadius: '50px', // keep it rounded if desired
+                transition: 'background 0.3s ease-in-out',
+              }}
+              
+              
               onClick={handleShowFormOpen}
             >
             <EditNote/>

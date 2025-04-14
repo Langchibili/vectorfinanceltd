@@ -23,14 +23,14 @@ export default function NextNavBar() {
 
       <NavbarContent className="sm:hidden pr-3" justify="center">
         <NavbarBrand>
-          <img src="/vectorfinancelimitedlogo.jpg" alt="" style={{height:'22px'}}/>
+          <img src="/vectorfinancelimitedplaingreenlogo.png" alt="" style={{height:'22px'}}/>
           <p className="font-bold text-inherit">ACME</p>
         </NavbarBrand>
       </NavbarContent>
 
       <NavbarContent className="hidden sm:flex gap-4" justify="center">
         <NavbarBrand>
-          <img src="/vectorfinancelimitedlogo.jpg" alt="" style={{height:'22px'}}/>
+          <img src="/vectorfinancelimitedplaingreenlogo.png" alt="" style={{height:'22px'}}/>
           <p className="font-bold text-inherit">ACME</p>
         </NavbarBrand>
         <NavbarItem>

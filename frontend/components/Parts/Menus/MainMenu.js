@@ -20,19 +20,19 @@ export default class MainMenu extends React.Component{
                     {/* Dark Logo*/}
                     <a href="index-2.html" className="logo logo-dark">
                     <span className="logo-sm">
-                        <img src="/vectorfinancelimitedlogo.jpg" alt="" style={{height:'22px'}}/>
+                        <img src="/vectorfinancelimitedplaingreenlogo.png" alt="" style={{height:'22px'}}/>
                     </span>
                     <span className="logo-lg">
-                        <img src="/vectorfinancelimitedlogo.jpg" alt="" style={{height:'17px'}} />
+                        <img src="/vectorfinancelimitedplaingreenlogo.png" alt="" style={{height:'17px'}} />
                     </span>
                     </a>
                     {/* Light Logo*/}
                     <a href="index-2.html" className="logo logo-light">
                     <span className="logo-sm">
-                        <img src="/vectorfinancelimitedlogo.jpg" alt="" style={{height:'22px'}} />
+                        <img src="/vectorfinancelimitedplaingreenlogo.png" alt="" style={{height:'22px'}} />
                     </span>
                     <span className="logo-lg">
-                        <img src="/vectorfinancelimitedlogo.jpg" alt=""  style={{height:'17px'}} />
+                        <img src="/vectorfinancelimitedplaingreenlogo.png" alt=""  style={{height:'17px'}} />
                     </span>
                     </a>
                     <button

@@ -16,6 +16,7 @@ export default class LoadForm extends React.Component {
     renderForm = ()=>{
         const form = this.props.form
         const getToSignApplicationFormId  = this.props.toSignApplicationForms.filter(formToSign => formToSign.formName === form.formName)
+        
         if(!getToSignApplicationFormId[0]){
             return <Alert severity="error">Sorry, a problem occured while loading the form, reflesh the page or go back and reflesh the page.</Alert>
         }

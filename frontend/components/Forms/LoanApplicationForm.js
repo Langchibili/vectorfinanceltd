@@ -39,9 +39,13 @@ export default class LoanApplicationForm extends React.Component{
 
     render(){
         return (<>
-                {/* <button  className="btn btn-sm">Back</button> */}
-                <IconButton onClick={this.handleGoBackToLoanCategorySelect}><ArrowBackOutlined/></IconButton>
-                {this.renderApplicationForm()}
+                <div className="page-content">
+                  <div className="container-fluid">
+                  {/* <button  className="btn btn-sm">Back</button> */}
+                    <IconButton onClick={this.handleGoBackToLoanCategorySelect}><ArrowBackOutlined/></IconButton>
+                    {this.renderApplicationForm()}
+                  </div>
+                </div>
               </>)
     }
 }

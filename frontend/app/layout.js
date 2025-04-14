@@ -26,7 +26,7 @@ export default function RootLayout({ children }) {
         <meta content="langtechdev" name="author" />
         {/* App favicon */}
 
-        <link rel="shortcut icon" href="/vectorfinancelimitedlogo.jpg" />
+        <link rel="shortcut icon" href="/vectorfinancelimitedplaingreenlogo.png" />
         {/* jsvectormap css */}
         <link
           href="/theme/libs/jsvectormap/css/jsvectormap.min.css"

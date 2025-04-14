@@ -31,6 +31,150 @@ export default function Home() {
   
   setPage('/')
   scrolltoTopOFPage() // should always show the top of the page as the view point
+  const showApplyButtons = ()=>{
+        return (
+                <>
+                <div className="auth-page-wrapper auth-bg-cover py-5 d-flex justify-content-center align-items-center min-vh-100">
+                <div className="bg-overlay" 
+                   style={{
+                          background:'linear-gradient(to right, #61da6140, #5b4ab7)'
+                    }}/>
+                {/* auth-page content */}
+                <div className="auth-page-content overflow-hidden pt-lg-5">
+                  <div className="container">
+                    <div className="row">
+                      <div className="col-lg-12">
+                        <div className="card overflow-hidden m-0">
+                          <div className="row justify-content-center g-0">
+                            <div>
+                              <div className="p-lg-5 p-4 auth-one-bg h-100">
+                                <div className="bg-overlay" style={{background:'linear-gradient(to right, #41319c26, #4b38b3)'}}/>
+                                <div className="position-relative h-100 d-flex flex-column">
+                                  <div className="mb-4">
+                                    <a href="index-2.html" className="d-block">
+                                      <img
+                                        src="assets/images/logo-light.png"
+                                        alt=""
+                                        height={18}
+                                      />
+                                    </a>
+                                  </div>
+                                  <div className="mt-auto">
+                                    
+                                  <ApplyForALoanButton 
+                                        loanType="personal"
+                                        color="blue" 
+                                        text="APPLY FOR A PERSONAL LOAN" 
+                                        loggedInUser={loggedInUser.user} constants={constants} 
+                                        setShowLoanApplicationForms={setShowLoanApplicationForms}
+                                        setSelectedloanCategory={setSelectedloanCategory}/> 
+                                  <ApplyForALoanButton 
+                                        loanType="business" 
+                                        color="forestgreen" 
+                                        text="APPLY FOR A BUSINESS LOAN" 
+                                        loggedInUser={loggedInUser.user} constants={constants} 
+                                        setShowLoanApplicationForms={setShowLoanApplicationForms}
+                                        setSelectedloanCategory={setSelectedloanCategory}/>
+                                  <ApplyForALoanButton 
+                                        loanType="company" 
+                                        text="APPLY FOR A COMPANY LOAN" 
+                                        loggedInUser={loggedInUser.user} constants={constants} 
+                                        setShowLoanApplicationForms={setShowLoanApplicationForms}
+                                        setSelectedloanCategory={setSelectedloanCategory}/>
+                                  <InvestButton 
+                                        loanType="personal"
+                                        color="blue" 
+                                        text="INVEST WITH US" 
+                                        loggedInUser={loggedInUser.user} constants={constants} 
+                                        setshowInvestMentForms={setshowInvestMentForms}
+                                        setSelectedloanCategory={setSelectedloanCategory}/> 
+                                    <div className="mb-3">
+                                      <i className="ri-double-quotes-l display-4 text-success" />
+                                    </div>
+                                    <div
+                                      id="qoutescarouselIndicators"
+                                      className="carousel slide"
+                                      data-bs-ride="carousel"
+                                    >
+                                      <div className="carousel-indicators">
+                                        <button
+                                          type="button"
+                                          data-bs-target="#qoutescarouselIndicators"
+                                          data-bs-slide-to={0}
+                                          className=""
+                                          aria-label="Slide 1"
+                                        />
+                                        <button
+                                          type="button"
+                                          data-bs-target="#qoutescarouselIndicators"
+                                          data-bs-slide-to={1}
+                                          aria-label="Slide 2"
+                                          className="active"
+                                          aria-current="true"
+                                        />
+                                        <button
+                                          type="button"
+                                          data-bs-target="#qoutescarouselIndicators"
+                                          data-bs-slide-to={2}
+                                          aria-label="Slide 3"
+                                          className=""
+                                        />
+                                      </div>
+                                      <div className="carousel-inner text-center text-white-50 pb-5">
+                                        <div className="carousel-item">
+                                          <p className="fs-15 fst-italic">
+                                          " Our terms and conditions are clear, 
+                                          with no hidden fees or unexpected charges."
+                                          </p>
+                                        </div>
+                                        <div className="carousel-item active">
+                                          <p className="fs-15 fst-italic">
+                                          " Get access to our loans and get financed within 24 hours! "
+                                          </p>
+                                        </div>
+                                        <div className="carousel-item">
+                                          <p className="fs-15 fst-italic">
+                                            " Building long-term trust with our clients is our primary focus. "
+                                          </p>
+                                        </div>
+                                      </div>
+                                    </div>
+                                    {/* end carousel */}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        {/* end card */}
+                      </div>
+                      {/* end col */}
+                    </div>
+                    {/* end row */}
+                  </div>
+                  {/* end container */}
+                </div>
+                {/* end auth page content */}
+                {/* footer */}
+                <footer className="footer">
+                  <div className="container">
+                    <div className="row">
+                      <div className="col-lg-12">
+                        <div className="text-center">
+                          <p className="mb-0">
+                            © 2025 Velzon. Crafted with{" "}
+                            <i className="mdi mdi-heart text-danger" /> by Themesbrand
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </footer>
+                {/* end Footer */}
+              </div>   
+                </>
+        )
+  }
   const renderMainContent = ()=>{
     // investment stuff
     const currentInvestment = loggedInUser.user.currentInvestment
@@ -61,8 +205,7 @@ export default function Home() {
         }
         else if(currentLoan.loanStatus === "accepted"){
           return (<>
-                    <p className="text text-success">Your loan application has been accepted, just a few more steps in order to finalize the process and disburse your funds.</p>
-                    {loggedInUser.user.signingMethod && loggedInUser.user.signingMethod === "e-signing"? <ESigningForms loggedInUser={loggedInUser.user} constants={constants}/> : <FilledForms loggedInUser={loggedInUser.user} constants={constants}/> /* use esigning unless manually input to do otherwise */}
+                    {loggedInUser.user.signingMethod && loggedInUser.user.signingMethod === "e-signing"? <div className="page-content"><div className="container-fluid"><ESigningForms loggedInUser={loggedInUser.user} constants={constants}/></div></div> : <FilledForms loggedInUser={loggedInUser.user} constants={constants}/> /* use esigning unless manually input to do otherwise */}
                  </>)
         }
         else if(currentLoan.loanStatus === "pending-approval"){
@@ -80,34 +223,8 @@ export default function Home() {
                                                     loggedInUser={loggedInUser.user} constants={constants}
                                                     /> : <>
                     <p className="text text-warning">Sorry but we cannot grant you a loan at the moment, apply again if you feel that your eligibility has to be reassessed.</p>
-                    <ApplyForALoanButton 
-                          loanType="personal"
-                          color="blue" 
-                          text="APPLY FOR A PERSONAL LOAN" 
-                          loggedInUser={loggedInUser.user} constants={constants} 
-                          setShowLoanApplicationForms={setShowLoanApplicationForms}
-                          setSelectedloanCategory={setSelectedloanCategory}/> 
-                    <ApplyForALoanButton 
-                          loanType="business" 
-                          color="forestgreen" 
-                          text="APPLY FOR A BUSINESS LOAN" 
-                          loggedInUser={loggedInUser.user} constants={constants} 
-                          setShowLoanApplicationForms={setShowLoanApplicationForms}
-                          setSelectedloanCategory={setSelectedloanCategory}/>
-                    <ApplyForALoanButton 
-                          loanType="company" 
-                          text="APPLY FOR A COMPANY LOAN" 
-                          loggedInUser={loggedInUser.user} constants={constants} 
-                          setShowLoanApplicationForms={setShowLoanApplicationForms}
-                          setSelectedloanCategory={setSelectedloanCategory}/>
-                    <InvestButton 
-                          loanType="personal"
-                          color="blue" 
-                          text="INVEST WITH US" 
-                          loggedInUser={loggedInUser.user} constants={constants} 
-                          setshowInvestMentForms={setshowInvestMentForms}
-                          setSelectedloanCategory={setSelectedloanCategory}/> 
-                  </>
+                   {showApplyButtons()}
+                   </>
           )
         }
         else if(currentLoan.loanStatus === "disbursed"){
@@ -129,33 +246,7 @@ export default function Home() {
                                             loggedInUser={loggedInUser.user} constants={constants}
                                             /> : <>
                     <p className="text text-success">Thank you for completing payment of your loan, you can now apply for another one.</p>
-                    <ApplyForALoanButton 
-                          loanType="personal"
-                          color="blue" 
-                          text="APPLY FOR A PERSONAL LOAN" 
-                          loggedInUser={loggedInUser.user} constants={constants} 
-                          setShowLoanApplicationForms={setShowLoanApplicationForms}
-                          setSelectedloanCategory={setSelectedloanCategory}/> 
-                    <ApplyForALoanButton 
-                          loanType="business" 
-                          color="forestgreen" 
-                          text="APPLY FOR A BUSINESS LOAN" 
-                          loggedInUser={loggedInUser.user} constants={constants} 
-                          setShowLoanApplicationForms={setShowLoanApplicationForms}
-                          setSelectedloanCategory={setSelectedloanCategory}/>
-                    <ApplyForALoanButton 
-                          loanType="company" 
-                          text="APPLY FOR A COMPANY LOAN" 
-                          loggedInUser={loggedInUser.user} constants={constants} 
-                          setShowLoanApplicationForms={setShowLoanApplicationForms}
-                          setSelectedloanCategory={setSelectedloanCategory}/>
-                    <InvestButton 
-                          loanType="personal"
-                          color="blue" 
-                          text="INVEST WITH US" 
-                          loggedInUser={loggedInUser.user} constants={constants} 
-                          setshowInvestMentForms={setshowInvestMentForms}
-                          setSelectedloanCategory={setSelectedloanCategory}/>        
+                    {showApplyButtons()}
                     </>
               )// can apply again though
         }
@@ -164,34 +255,8 @@ export default function Home() {
                           setShowLoanApplicationForms={setShowLoanApplicationForms} 
                           loanCategory={selectedloanCategory}
                           loggedInUser={loggedInUser.user} constants={constants}/> : <>
-                    <ApplyForALoanButton 
-                          loanType="personal"
-                          color="blue" 
-                          text="APPLY FOR A PERSONAL LOAN" 
-                          loggedInUser={loggedInUser.user} constants={constants} 
-                          setShowLoanApplicationForms={setShowLoanApplicationForms}
-                          setSelectedloanCategory={setSelectedloanCategory}/> 
-                    <ApplyForALoanButton 
-                          loanType="business" 
-                          color="forestgreen" 
-                          text="APPLY FOR A BUSINESS LOAN" 
-                          loggedInUser={loggedInUser.user} constants={constants} 
-                          setShowLoanApplicationForms={setShowLoanApplicationForms}
-                          setSelectedloanCategory={setSelectedloanCategory}/>
-                    <ApplyForALoanButton 
-                          loanType="company" 
-                          text="APPLY FOR A COMPANY LOAN" 
-                          loggedInUser={loggedInUser.user} constants={constants} 
-                          setShowLoanApplicationForms={setShowLoanApplicationForms}
-                          setSelectedloanCategory={setSelectedloanCategory}/>
-                    <InvestButton 
-                          loanType="personal"
-                          color="blue" 
-                          text="INVEST WITH US" 
-                          loggedInUser={loggedInUser.user} constants={constants} 
-                          setshowInvestMentForms={setshowInvestMentForms}
-                          setSelectedloanCategory={setSelectedloanCategory}/>    
-                </>
+                     {showApplyButtons()}
+                    </>
           )
         }
         
@@ -203,35 +268,8 @@ export default function Home() {
                     loanCategory={selectedloanCategory}
                     loggedInUser={loggedInUser.user} constants={constants}
                     /> : <>
-                  <ApplyForALoanButton 
-                          loanType="personal"
-                          color="blue" 
-                          text="APPLY FOR A PERSONAL LOAN" 
-                          loggedInUser={loggedInUser.user} constants={constants} 
-                          setShowLoanApplicationForms={setShowLoanApplicationForms}
-                          setSelectedloanCategory={setSelectedloanCategory}/> 
-                    <ApplyForALoanButton 
-                          loanType="business" 
-                          color="forestgreen" 
-                          text="APPLY FOR A BUSINESS LOAN" 
-                          loggedInUser={loggedInUser.user} constants={constants} 
-                          setShowLoanApplicationForms={setShowLoanApplicationForms}
-                          setSelectedloanCategory={setSelectedloanCategory}/>
-                    <ApplyForALoanButton 
-                          loanType="company" 
-                          text="APPLY FOR A COMPANY LOAN" 
-                          loggedInUser={loggedInUser.user} constants={constants} 
-                          setShowLoanApplicationForms={setShowLoanApplicationForms}
-                          setSelectedloanCategory={setSelectedloanCategory}/>
-                    <InvestButton 
-                          loanType="personal"
-                          color="blue" 
-                          text="INVEST WITH US" 
-                          loggedInUser={loggedInUser.user} constants={constants} 
-                          setshowInvestMentForms={setshowInvestMentForms}
-                          setSelectedloanCategory={setSelectedloanCategory}/>       
-                      
-              </>
+                  {showApplyButtons()}
+                 </>
       )
       }
     }
@@ -248,19 +286,26 @@ export default function Home() {
         return renderMainContent()
       }
       else if(parseInt(BottomNavLink) === 1){
-        return <LoanTransactionHistory loggedInUser={loggedInUser.user}/>
+        return (
+          <div className="page-content">
+          <div className="container-fluid">
+            <LoanTransactionHistory loggedInUser={loggedInUser.user}/>
+          </div>
+          </div>
+        )
       }
       else{
-        return <HelpPageDisplay loggedInUser={loggedInUser.user} constants={constants}/>
+        return (
+          <div className="page-content">
+          <div className="container-fluid">
+            <HelpPageDisplay loggedInUser={loggedInUser.user} constants={constants}/>
+          </div>
+         </div>
+        )
       }
     }
   }
   return (
-    <div className="page-content">
-    <div className="container-fluid">
-       {renderPages(BottomNavLink)}
-    </div>
-    {/* container-fluid */}
-  </div>
+    <>{renderPages(BottomNavLink)}</>
   )
 }

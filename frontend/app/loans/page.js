@@ -17,7 +17,7 @@ export default function Loans() {
 
   setPage('/loans')
   scrolltoTopOFPage()
-
+/* comprehenive insurance(third party compesants only the victim | letter of sale), mou with african grey */
   useEffect(() => {
     console.log('currentLoanId',currentLoanId)
     const runUpdateCurrentLoan = async ()=>{

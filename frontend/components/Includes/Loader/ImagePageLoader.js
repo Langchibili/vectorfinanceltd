@@ -7,7 +7,7 @@ export default function ImagePageLoader() {
   return (
     <div className="loading-container">
       <img
-        src="/vectorfinancelimitedlogo.jpg"
+        src="/vectorfinancelimitedplaingreenlogo.png"
         alt="Loading"
         className="loading-image"
       />

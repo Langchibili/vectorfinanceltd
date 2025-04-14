@@ -27,7 +27,7 @@ export default class BootsrapHeader extends React.Component{
         <nav className="navbar bg-body-tertiary fixed-top">
   <div className="container-fluid">
     <a className="navbar-brand" href="#">
-             <img src="/vectorfinancelimitedlogo.jpg" alt="" style={{height:'22px'}}/>
+             <img src="/vectorfinancelimitedplaingreenlogo.png" alt="" style={{height:'22px'}}/>
     </a>
     <button
       className="navbar-toggler"

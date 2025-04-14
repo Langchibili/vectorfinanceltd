@@ -72,7 +72,7 @@ export default function MobileNav(props) {
     <nav className="navbar fixed-top" style={{backgroundColor:'ghostwhite'}}>
     <div className="container-fluid">
         <Link className="navbar-brand" href="/">
-                <img src="/vectorfinancelimitedlogo.jpg" alt="" style={{height:'22px'}}/>
+                <img src="/vectorfinancelimitedplaingreenlogo.png" alt="" style={{height:'22px'}}/>
         </Link>
         <button
         type="button"
