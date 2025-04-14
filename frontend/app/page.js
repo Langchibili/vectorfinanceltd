@@ -51,13 +51,13 @@ export default function Home() {
                                 <div className="bg-overlay" style={{background:'linear-gradient(to right, #41319c26, #4b38b3)'}}/>
                                 <div className="position-relative h-100 d-flex flex-column">
                                   <div className="mb-4">
-                                    <a href="index-2.html" className="d-block">
+                                    {/* <a href="index-2.html" className="d-block">
                                       <img
                                         src="assets/images/logo-light.png"
                                         alt=""
                                         height={18}
                                       />
-                                    </a>
+                                    </a> */}
                                   </div>
                                   <div className="mt-auto">
                                     
@@ -190,7 +190,11 @@ export default function Home() {
           return <CollateralForm loggedInUser={loggedInUser.user} constants={constants}/> 
         }
         else if(currentLoan.loanStatus === "pending-collateral-inspection"){
-          return <Alert  severity="info">Thank you for applying for a loan with us, we are currently processing the loan, an agent will call you to proceed with inspection of your collateral.</Alert>
+          return (<div className="page-content">
+                   <div className="container-fluid">
+                    <Alert  severity="info">Thank you for applying for a loan with us, we are currently processing the loan, an agent will call you to proceed with inspection of your collateral.</Alert>
+                  </div>
+                  </div>)
         }
         else if(currentLoan.loanStatus === "accepted"){
           return (<>
@@ -198,11 +202,19 @@ export default function Home() {
                  </>)
         }
         else if(currentLoan.loanStatus === "pending-approval"){
-          return <p className="text text-info">Thank you for completing the requested steps, we are currently processing the loan, an agent will call you.</p>
+          return (<div className="page-content">
+                    <div className="container-fluid">
+                    <Alert  severity="info">Thank you for completing the requested steps, we are currently processing the loan, an agent will call you.</Alert>
+                  </div>
+                  </div>)
           // show the info on how we are checking the eligibility of the loan
         }
         else if(currentLoan.loanStatus === "approved"){
-          return <p className="text text-success"><strong>Congratulations!! Your loan has been approved, awaiting disbursement of funds.</strong></p>
+          return (<div className="page-content">
+            <div className="container-fluid">
+            <Alert  severity="success">Congratulations!! Your loan has been approved, awaiting disbursement of funds.</Alert>
+          </div>
+          </div>)
         }
         else if(currentLoan.loanStatus === "rejected"){
           // show the user that "they are not eligible for a loan at the moment, but they can apply again. Or contact us."
@@ -211,8 +223,12 @@ export default function Home() {
                                                     loanCategory={selectedloanCategory}
                                                     loggedInUser={loggedInUser.user} constants={constants}
                                                     /> : <>
-                    <p className="text text-warning">Sorry but we cannot grant you a loan at the moment, apply again if you feel that your eligibility has to be reassessed.</p>
-                   {showApplyButtons()}
+                                                    <div className="page-content">
+                                                      <div className="container-fluid">
+                                                      <Alert  severity="warning">Sorry but we cannot grant you a loan at the moment, apply again if you feel that your eligibility has to be reassessed..</Alert>
+                                                    </div>
+                                                    </div>
+                                                  {showApplyButtons()}
                    </>
           )
         }
@@ -222,7 +238,11 @@ export default function Home() {
         else if(currentLoan.loanStatus === "defaulted"){
           return (
                 <>
-                  <p className="text text-danger">It appears your loan has been defaulted, pay the balance in full, lest appropriate legal action be taken.</p>
+                <div className="page-content">
+                  <div className="container-fluid">
+                  <Alert  severity="error">It appears your loan has been defaulted, pay the balance in full, lest appropriate legal action be taken.</Alert>
+                </div>
+                </div>
                   <LoanInformationDisplay loggedInUser={loggedInUser.user} constants={constants}/> 
                 </>
                 ) // handles the displaying of all loan information
@@ -234,8 +254,12 @@ export default function Home() {
                                             loanCategory={selectedloanCategory}
                                             loggedInUser={loggedInUser.user} constants={constants}
                                             /> : <>
-                    <p className="text text-success">Thank you for completing payment of your loan, you can now apply for another one.</p>
-                    {showApplyButtons()}
+                                            <div className="page-content">
+                                              <div className="container-fluid">
+                                              <Alert  severity="success">Thank you for completing payment of your loan, you can now apply for another one.</Alert>
+                                            </div>
+                                           </div>
+                                           {showApplyButtons()}
                     </>
               )// can apply again though
         }

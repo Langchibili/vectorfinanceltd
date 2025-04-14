@@ -106,284 +106,288 @@ export default class LoanInformationDisplay extends React.Component {
       return <div className="col col-md-8 col-lg-6" style={{margin:'0 auto'}}><PaymentsDisplay handleMakePaymentPage={this.handleMakePaymentPage} loggedInUser={this.props.loggedInUser}/></div>
     }
     return <Slide in={true} direction="right">
-          <div className="row">
-        <div className="col">
-          <div className="h-100">
-            <div className="row mb-3 pb-1">
-              <div className="col-12">
-                <div className="d-flex align-items-lg-center flex-lg-row flex-column">
-                  <div className="flex-grow-1">
-                    <h4 className="fs-16 mb-1">Hello, {fullnames}!</h4>
-                    <p className="text-muted mb-0">
-                      Here's information about your loan today.
-                    </p>
-                  </div>
-                  <div className="mt-3 mt-lg-0">
-                    <button onClick={this.handleMakePaymentPage}>
-                      <div className="row g-3 mb-0 align-items-center">
-                        <div className="col-auto">
-                          <button
-                            type="button"
-                            className="btn btn-soft-success shadow-none"
-                          >
-                            <i className="ri-add-circle-line align-middle me-1" />{" "}
-                            Make A Payment
-                          </button>
-                        </div>
-                      </div>
-                      {/*end row*/}
-                    </button>
-                  </div>
-                </div>
-                {/* end card header */}
-              </div>
-              {/*end col*/}
-            </div>
-            {/*end row*/}
-             {/* Funds Information */}
-            <div className="row">
-            <div className="col-xl-12">
-              <div className="card crm-widget">
-                <div className="card-body p-0">
-                  <div className="row row-cols-md-3 row-cols-1">
-                    <div className="col col-lg border-end">
-                      <div className="py-4 px-3">
-                        <h5 className="text-muted text-uppercase fs-13">
-                          Disbursed Amount{" "}
-                          <i className="ri-arrow-up-circle-line text-success fs-18 float-end align-middle" />
-                        </h5>
-                        <div className="d-flex align-items-center">
-                          <div className="flex-shrink-0">
-                          <i className="ri-currency-line display-6 text-muted" />
+           <div className="page-content">
+                <div className="container-fluid">
+                <div className="row">
+                <div className="col">
+                  <div className="h-100">
+                    <div className="row mb-3 pb-1">
+                      <div className="col-12">
+                        <div className="d-flex align-items-lg-center flex-lg-row flex-column">
+                          <div className="flex-grow-1">
+                            <h4 className="fs-16 mb-1">Hello, {fullnames}!</h4>
+                            <p className="text-muted mb-0">
+                              Here's information about your loan today.
+                            </p>
                           </div>
-                          <div className="flex-grow-1 ms-3">
-                            <h2 className="mb-0">
-                              <span className="counter-value" data-target={197}>
-                                {"K"+disbursedAmount}
-                              </span>
-                            </h2>
+                          <div className="mt-3 mt-lg-0">
+                            <button onClick={this.handleMakePaymentPage}>
+                              <div className="row g-3 mb-0 align-items-center">
+                                <div className="col-auto">
+                                  <button
+                                    type="button"
+                                    className="btn btn-soft-success shadow-none"
+                                  >
+                                    <i className="ri-add-circle-line align-middle me-1" />{" "}
+                                    Make A Payment
+                                  </button>
+                                </div>
+                              </div>
+                              {/*end row*/}
+                            </button>
                           </div>
                         </div>
+                        {/* end card header */}
                       </div>
+                      {/*end col*/}
                     </div>
-                    <div className="col col-lg border-end">
-                      <div className="py-4 px-3">
-                        <h5 className="text-muted text-uppercase fs-13">
-                          Repayment Amount{" "}
-                          <i className="ri-arrow-up-circle-line text-info fs-18 float-end align-middle" />
-                        </h5>
-                        <div className="d-flex align-items-center">
-                          <div className="flex-shrink-0">
-                          <i className="ri-currency-line display-6 text-muted" />
+                    {/*end row*/}
+                    {/* Funds Information */}
+                    <div className="row">
+                    <div className="col-xl-12">
+                      <div className="card crm-widget">
+                        <div className="card-body p-0">
+                          <div className="row row-cols-md-3 row-cols-1">
+                            <div className="col col-lg border-end">
+                              <div className="py-4 px-3">
+                                <h5 className="text-muted text-uppercase fs-13">
+                                  Disbursed Amount{" "}
+                                  <i className="ri-arrow-up-circle-line text-success fs-18 float-end align-middle" />
+                                </h5>
+                                <div className="d-flex align-items-center">
+                                  <div className="flex-shrink-0">
+                                  <i className="ri-currency-line display-6 text-muted" />
+                                  </div>
+                                  <div className="flex-grow-1 ms-3">
+                                    <h2 className="mb-0">
+                                      <span className="counter-value" data-target={197}>
+                                        {"K"+disbursedAmount}
+                                      </span>
+                                    </h2>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="col col-lg border-end">
+                              <div className="py-4 px-3">
+                                <h5 className="text-muted text-uppercase fs-13">
+                                  Repayment Amount{" "}
+                                  <i className="ri-arrow-up-circle-line text-info fs-18 float-end align-middle" />
+                                </h5>
+                                <div className="d-flex align-items-center">
+                                  <div className="flex-shrink-0">
+                                  <i className="ri-currency-line display-6 text-muted" />
+                                  </div>
+                                  <div className="flex-grow-1 ms-3">
+                                    <h2 className="mb-0">
+                                      <span className="counter-value" data-target={197}>
+                                        {"K"+repaymentAmount}
+                                      </span>
+                                    </h2>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            {/* end col */}
+                            <div className="col col-lg border-end">
+                              <div className="py-4 px-3">
+                                <h5 className="text-muted text-uppercase fs-13">
+                                  Paid Amount{" "}
+                                  <i className="ri-arrow-up-circle-line text-success fs-18 float-end align-middle" />
+                                </h5>
+                                <div className="d-flex align-items-center">
+                                  <div className="flex-shrink-0">
+                                  <i className="ri-currency-line display-6 text-muted" />
+                                  </div>
+                                  <div className="flex-grow-1 ms-3">
+                                    <h2 className="mb-0">
+                                      <span className="counter-value" data-target={197}>
+                                        {"K"+rePaidAmount}
+                                      </span>
+                                    </h2>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            {/* end col */}
+                            <div className="col col-lg border-end">
+                              <div className="py-4 px-3">
+                                <h5 className="text-muted text-uppercase fs-13">
+                                  UnPaid Balance{" "}
+                                  <i className="ri-arrow-up-circle-line text-danger fs-18 float-end align-middle" />
+                                </h5>
+                                <div className="d-flex align-items-center">
+                                  <div className="flex-shrink-0">
+                                  <i className="ri-currency-line display-6 text-muted" />
+                                  </div>
+                                  <div className="flex-grow-1 ms-3">
+                                    <h2 className="mb-0">
+                                      <span className="counter-value" data-target={197}>
+                                        {"K"+outstandingAmount}
+                                      </span>
+                                    </h2>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="col col-lg border-end">
+                              <div className="py-4 px-3">
+                                <h5 className="text-muted text-uppercase fs-13">
+                                Late Payment Penalty{" "}
+                                  <i className="ri-arrow-up-circle-line text-danger fs-18 float-end align-middle" />
+                                </h5>
+                                <div className="d-flex align-items-center">
+                                  <div className="flex-shrink-0">
+                                    <i className="ri-currency-line display-6 text-muted" />
+                                  </div>
+                                  <div className="flex-grow-1 ms-3">
+                                    <h2 className="mb-0">
+                                      <span className="counter-value" data-target={197}>
+                                        {"K"+latePaymentPenalty}
+                                      </span>
+                                    </h2>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            {/* end col */}
                           </div>
-                          <div className="flex-grow-1 ms-3">
-                            <h2 className="mb-0">
-                              <span className="counter-value" data-target={197}>
-                                {"K"+repaymentAmount}
-                              </span>
-                            </h2>
-                          </div>
+                          {/* end row */}
                         </div>
+                        {/* end card body */}
                       </div>
-                    </div>
-                    {/* end col */}
-                    <div className="col col-lg border-end">
-                      <div className="py-4 px-3">
-                        <h5 className="text-muted text-uppercase fs-13">
-                          Paid Amount{" "}
-                          <i className="ri-arrow-up-circle-line text-success fs-18 float-end align-middle" />
-                        </h5>
-                        <div className="d-flex align-items-center">
-                          <div className="flex-shrink-0">
-                          <i className="ri-currency-line display-6 text-muted" />
-                          </div>
-                          <div className="flex-grow-1 ms-3">
-                            <h2 className="mb-0">
-                              <span className="counter-value" data-target={197}>
-                                {"K"+rePaidAmount}
-                              </span>
-                            </h2>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    {/* end col */}
-                    <div className="col col-lg border-end">
-                      <div className="py-4 px-3">
-                        <h5 className="text-muted text-uppercase fs-13">
-                          UnPaid Balance{" "}
-                          <i className="ri-arrow-up-circle-line text-danger fs-18 float-end align-middle" />
-                        </h5>
-                        <div className="d-flex align-items-center">
-                          <div className="flex-shrink-0">
-                          <i className="ri-currency-line display-6 text-muted" />
-                          </div>
-                          <div className="flex-grow-1 ms-3">
-                            <h2 className="mb-0">
-                              <span className="counter-value" data-target={197}>
-                                {"K"+outstandingAmount}
-                              </span>
-                            </h2>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="col col-lg border-end">
-                      <div className="py-4 px-3">
-                        <h5 className="text-muted text-uppercase fs-13">
-                        Late Payment Penalty{" "}
-                          <i className="ri-arrow-up-circle-line text-danger fs-18 float-end align-middle" />
-                        </h5>
-                        <div className="d-flex align-items-center">
-                          <div className="flex-shrink-0">
-                            <i className="ri-currency-line display-6 text-muted" />
-                          </div>
-                          <div className="flex-grow-1 ms-3">
-                            <h2 className="mb-0">
-                              <span className="counter-value" data-target={197}>
-                                {"K"+latePaymentPenalty}
-                              </span>
-                            </h2>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    {/* end col */}
-                  </div>
-                  {/* end row */}
-                </div>
-                {/* end card body */}
-              </div>
-              {/* end card */}
-            </div>
-            {/* end col */}
-          </div>
-          {/* Funds Information End */}
-           {/* Dates Information */}
-          <div className="row">
-            <div className="col-xl-12">
-              <div className="card crm-widget">
-                <div className="card-body p-0">
-                  <div className="row row-cols-md-3 row-cols-1">
-                    <div className="col col-lg border-end">
-                      <div className="py-4 px-3">
-                        <h5 className="text-muted text-uppercase fs-13">
-                          Disbursement Date{" "}
-                          <i className="ri-arrow-up-circle-line text-info fs-18 float-end align-middle" />
-                        </h5>
-                        <div className="d-flex align-items-center">
-                          <div className="flex-shrink-0">
-                          <i className="ri-time-line display-6 text-muted" />
-                          </div>
-                          <div className="flex-grow-1 ms-3">
-                            <h5 className="mb-0">
-                              <span className="text-muted" data-target={197}>
-                                {this.formatDateTime(disbursementDate)}
-                              </span>
-                            </h5>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="col col-lg border-end">
-                      <div className="py-4 px-3">
-                        <h5 className="text-muted text-uppercase fs-13">
-                          Due Date{" "}
-                          <i className="ri-arrow-up-circle-line text-info fs-18 float-end align-middle" />
-                        </h5>
-                        <div className="d-flex align-items-center">
-                          <div className="flex-shrink-0">
-                          <i className="ri-time-line display-6 text-muted" />
-                          </div>
-                          <div className="flex-grow-1 ms-3">
-                            <h5 className="mb-0">
-                              <span className="text-muted" data-target={197}>
-                                {this.formatDateTime(dueDate)}
-                              </span>
-                            </h5>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    {/* end col */}
-                    <div className="col col-lg border-end">
-                      <div className="py-4 px-3">
-                        <h5 className="text-muted text-uppercase fs-13">
-                          Term{" "}
-                          <i className="ri-arrow-up-circle-line text-info fs-18 float-end align-middle" />
-                        </h5>
-                        <div className="d-flex align-items-center">
-                          <div className="flex-shrink-0">
-                          <i className="ri-time-line display-6 text-muted" />
-                          </div>
-                          <div className="flex-grow-1 ms-3">
-                            <h5 className="mb-0">
-                              <span className="text-muted" data-target={197}>
-                                {loanTerm+" Months"}
-                              </span>
-                            </h5>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    {/* end col */}
-                    <div className="col col-lg border-end">
-                      <div className="py-4 px-3">
-                        <h5 className="text-muted text-uppercase fs-13">
-                          Term Spent{" "}
-                          <i className="ri-arrow-up-circle-line text-info fs-18 float-end align-middle" />
-                        </h5>
-                        <div className="d-flex align-items-center">
-                          <div className="flex-shrink-0">
-                           <i className="ri-time-line display-6 text-muted" />
-                          </div>
-                          <div className="flex-grow-1 ms-3">
-                            <h5 className="mb-0">
-                              <span className="text-muted" data-target={197}>
-                                {spent}
-                              </span>
-                            </h5>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="col col-lg border-end">
-                      <div className="py-4 px-3">
-                        <h5 className="text-muted text-uppercase fs-13">
-                          Term Left{" "}
-                          <i className="ri-arrow-up-circle-line text-info fs-18 float-end align-middle" />
-                        </h5>
-                        <div className="d-flex align-items-center">
-                          <div className="flex-shrink-0">
-                            <i className="ri-time-line display-6 text-muted" />
-                          </div>
-                          <div className="flex-grow-1 ms-3">
-                            <h5 className="mb-0">
-                              <span className="text-muted" data-target={197}>
-                                {left}
-                              </span>
-                            </h5>
-                          </div>
-                        </div>
-                      </div>
+                      {/* end card */}
                     </div>
                     {/* end col */}
                   </div>
-                  {/* end row */}
-                </div>
-                {/* end card body */}
-              </div>
-              {/* end card */}
-            </div>
-            {/* end col */}
-          </div>
+                  {/* Funds Information End */}
+                  {/* Dates Information */}
+                  <div className="row">
+                    <div className="col-xl-12">
+                      <div className="card crm-widget">
+                        <div className="card-body p-0">
+                          <div className="row row-cols-md-3 row-cols-1">
+                            <div className="col col-lg border-end">
+                              <div className="py-4 px-3">
+                                <h5 className="text-muted text-uppercase fs-13">
+                                  Disbursement Date{" "}
+                                  <i className="ri-arrow-up-circle-line text-info fs-18 float-end align-middle" />
+                                </h5>
+                                <div className="d-flex align-items-center">
+                                  <div className="flex-shrink-0">
+                                  <i className="ri-time-line display-6 text-muted" />
+                                  </div>
+                                  <div className="flex-grow-1 ms-3">
+                                    <h5 className="mb-0">
+                                      <span className="text-muted" data-target={197}>
+                                        {this.formatDateTime(disbursementDate)}
+                                      </span>
+                                    </h5>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="col col-lg border-end">
+                              <div className="py-4 px-3">
+                                <h5 className="text-muted text-uppercase fs-13">
+                                  Due Date{" "}
+                                  <i className="ri-arrow-up-circle-line text-info fs-18 float-end align-middle" />
+                                </h5>
+                                <div className="d-flex align-items-center">
+                                  <div className="flex-shrink-0">
+                                  <i className="ri-time-line display-6 text-muted" />
+                                  </div>
+                                  <div className="flex-grow-1 ms-3">
+                                    <h5 className="mb-0">
+                                      <span className="text-muted" data-target={197}>
+                                        {this.formatDateTime(dueDate)}
+                                      </span>
+                                    </h5>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            {/* end col */}
+                            <div className="col col-lg border-end">
+                              <div className="py-4 px-3">
+                                <h5 className="text-muted text-uppercase fs-13">
+                                  Term{" "}
+                                  <i className="ri-arrow-up-circle-line text-info fs-18 float-end align-middle" />
+                                </h5>
+                                <div className="d-flex align-items-center">
+                                  <div className="flex-shrink-0">
+                                  <i className="ri-time-line display-6 text-muted" />
+                                  </div>
+                                  <div className="flex-grow-1 ms-3">
+                                    <h5 className="mb-0">
+                                      <span className="text-muted" data-target={197}>
+                                        {loanTerm+" Months"}
+                                      </span>
+                                    </h5>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            {/* end col */}
+                            <div className="col col-lg border-end">
+                              <div className="py-4 px-3">
+                                <h5 className="text-muted text-uppercase fs-13">
+                                  Term Spent{" "}
+                                  <i className="ri-arrow-up-circle-line text-info fs-18 float-end align-middle" />
+                                </h5>
+                                <div className="d-flex align-items-center">
+                                  <div className="flex-shrink-0">
+                                  <i className="ri-time-line display-6 text-muted" />
+                                  </div>
+                                  <div className="flex-grow-1 ms-3">
+                                    <h5 className="mb-0">
+                                      <span className="text-muted" data-target={197}>
+                                        {spent}
+                                      </span>
+                                    </h5>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="col col-lg border-end">
+                              <div className="py-4 px-3">
+                                <h5 className="text-muted text-uppercase fs-13">
+                                  Term Left{" "}
+                                  <i className="ri-arrow-up-circle-line text-info fs-18 float-end align-middle" />
+                                </h5>
+                                <div className="d-flex align-items-center">
+                                  <div className="flex-shrink-0">
+                                    <i className="ri-time-line display-6 text-muted" />
+                                  </div>
+                                  <div className="flex-grow-1 ms-3">
+                                    <h5 className="mb-0">
+                                      <span className="text-muted" data-target={197}>
+                                        {left}
+                                      </span>
+                                    </h5>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            {/* end col */}
+                          </div>
+                          {/* end row */}
+                        </div>
+                        {/* end card body */}
+                      </div>
+                      {/* end card */}
+                    </div>
+                    {/* end col */}
+                  </div>
 
-            {/* end row*/}
-          </div>{" "}
-          {/* end .h-100*/}
-        </div>{" "}
-        {/* end col */}
-        {/* end col */}
+                    {/* end row*/}
+                  </div>{" "}
+                  {/* end .h-100*/}
+                </div>{" "}
+              {/* end col */}
+              {/* end col */}
+            </div>
+          </div>
       </div>
     </Slide>;
   }

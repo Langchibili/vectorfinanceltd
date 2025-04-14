@@ -16,6 +16,8 @@ export default class LoanInitiatedDisplay extends React.Component {
   }
   render() {
     return <>
+    <div className="page-content">
+        <div className="container-fluid">
           <div className="row">
         <div className="col">
           <div className="h-100">
@@ -35,6 +37,8 @@ export default class LoanInitiatedDisplay extends React.Component {
         </div>{" "}
         {/* end col */}
         {/* end col */}
+      </div>
+      </div>
       </div>
     </>;
   }

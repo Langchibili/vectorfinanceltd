@@ -51,33 +51,37 @@ export default class CollateralForm extends React.Component{
     render(){
         return (
             <Zoom in={true}>
-            <div className="row">
-              <div className="col-lg-12">
-                <div className="card">
-                  <div className="card-header align-items-center d-flex">
-                    <h4 className="card-title mb-0 flex-grow-1">Collateral Details </h4>
-                  </div>
-                  <div className="card-body">
-                       <div className="col-lg-12">
-                            <div className="input-group">
-                              <label className="form-label mr-2">What collateral will you use to get this loan?</label>
-                              <select
-                                className="form-select mb-2"
-                                name="collateralType"
-                                autoComplete="off"
-                                value={this.state.collateralType}
-                                onChange={this.handleInputChange}
-                              >
-                                <option value="">Choose...</option>
-                                <option value="Vehicle">Vehicle</option>
-                                <option value="House">House</option>
-                                <option value="Land">Land</option>
-                              </select>
-                            </div>
-                        </div>
-                     {this.renderForm(this.state.collateralType)}   
+              <div className="page-content">
+              <div className="container-fluid">
+              <div className="row">
+                <div className="col-lg-12">
+                  <div className="card">
+                    <div className="card-header align-items-center d-flex">
+                      <h4 className="card-title mb-0 flex-grow-1">Collateral Details </h4>
+                    </div>
+                    <div className="card-body">
+                        <div className="col-lg-12">
+                              <div className="input-group">
+                                <label className="form-label mr-2">What collateral will you use to get this loan?</label>
+                                <select
+                                  className="form-select mb-2"
+                                  name="collateralType"
+                                  autoComplete="off"
+                                  value={this.state.collateralType}
+                                  onChange={this.handleInputChange}
+                                >
+                                  <option value="">Choose...</option>
+                                  <option value="Vehicle">Vehicle</option>
+                                  <option value="House">House</option>
+                                  <option value="Land">Land</option>
+                                </select>
+                              </div>
+                          </div>
+                      {this.renderForm(this.state.collateralType)}   
+                    </div>
                   </div>
                 </div>
+              </div>
               </div>
             </div>
           </Zoom>
