@@ -351,3 +351,21 @@ the Borrower and will be treated as intended in this agreement.)</p>
   }
   
 }
+
+
+
+// [
+//   "langchibili@gmail.com",
+//   "langsondeveloper@gmail.com",
+//   "chibililangson@gmail.com",
+//   "kanyerere@gmail.com",
+//   "gloria@vectorfinancelimited.com",
+//   "triana@vectorfinancelimited.com"
+// ]
+
+// [
+//   "+260972644552",
+//   "+260954816277",
+//   "+260976494643",
+//   "+260770292909"
+// ]

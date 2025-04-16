@@ -16,7 +16,7 @@ registerPlugin(
 );
 
 export default function Uploader(props) {
-  const maxFileSize = '20MB'; // 10MB limit for upload
+  const maxFileSize = '100MB'; // 10MB limit for upload
 
 
   const handleProcess = async (fieldName, file, metadata, load, error, progress, abort) => {

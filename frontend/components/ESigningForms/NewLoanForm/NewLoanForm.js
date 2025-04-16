@@ -467,7 +467,7 @@ export default class NewLoanForm extends React.Component {
             </p>
 
             {/* Repayment Schedule */}
-            <h4>Schedule 1: Repayment Schedule</h4>
+            {/* <h4>Schedule 1: Repayment Schedule</h4>
               <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '20px' }}>
                 <thead>
                   <tr>
@@ -507,7 +507,7 @@ export default class NewLoanForm extends React.Component {
               <br />
               <b>Initial:</b>{" "}
               <AutoResizingInput style={inputStyle} />
-            </p>
+            </p> */}
           </div>
 
           {/* Buttons */}

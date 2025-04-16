@@ -146,108 +146,116 @@ module.exports = {
             });
         };
 
+        const getFinances = async () => {
+           return await strapi.db.query("api::finance.finance").findOne()
+        }
+
         const setLoanRepaymentAmount = async (loanBefore, loanAfter) => {
             if(!loanBefore){
                 return
             }
-            if(parseInt(loanBefore.outstandingAmount) > 1){ // it means you already approved the loan
+            if(parseInt(loanBefore.outstandingAmount) >= 1){ // it means you already approved the loan
                 return
             }
-          const simpleInterestLoanCalculator = (loanAmount, monthlyInterestRate, loanTermMonths) => {
-                const calculateTotalInterest = (amount, monthlyInterest, months) => {
-                  return (parseFloat(amount) * monthlyInterest * months) / 100;
+            const simpleInterestLoanCalculator = (loanAmount, monthlyInterestRate, loanTermMonths) => {
+                  const calculateTotalInterest = (amount, monthlyInterest, months) => {
+                    return (parseFloat(amount) * monthlyInterest * months) / 100;
+                  };
+                
+                  const calculateTotalPayment = (loanAmount, totalInterest) => {
+                    return parseFloat(loanAmount) + parseFloat(totalInterest);
+                  };
+                
+                  const totalInterest = calculateTotalInterest(loanAmount, monthlyInterestRate, loanTermMonths);
+                  const totalPayment = calculateTotalPayment(loanAmount, totalInterest);
+                  const monthlyPayment = totalPayment / loanTermMonths;
+                
+                  return {
+                    totalInterest: parseFloat(totalInterest).toFixed(2),
+                    totalPayment: parseFloat(totalPayment).toFixed(2),
+                    monthlyPayment: parseFloat(monthlyPayment).toFixed(2),
+                  };
                 };
-              
-                const calculateTotalPayment = (loanAmount, totalInterest) => {
-                  return parseFloat(loanAmount) + parseFloat(totalInterest);
+                
+                
+                
+              const loanAmortizationCalculator = (loanAmount, monthlyInterestRate, loanTermMonths) => {
+                  const calculateMonthlyPayment = (amount, monthlyInterest, months) => {
+                    return (
+                      (amount * monthlyInterest * Math.pow(1 + monthlyInterest, months)) /
+                      (Math.pow(1 + monthlyInterest, months) - 1)
+                    );
+                  };
+                
+                  const calculateTotalPayment = (monthlyPayment, months) => {
+                    return monthlyPayment * months;
+                  };
+                
+                  const calculateProfit = (totalPayment, loanAmount) => {
+                    return totalPayment - loanAmount;
+                  };
+                
+                  const monthlyPayment = calculateMonthlyPayment(loanAmount, monthlyInterestRate / 100, loanTermMonths);
+                  const totalPayment = calculateTotalPayment(monthlyPayment, loanTermMonths);
+                  const totalProfit = calculateProfit(totalPayment, loanAmount);
+                
+                  return {
+                    monthlyPayment: parseFloat(monthlyPayment).toFixed(2),
+                    totalProfit: parseFloat(totalProfit).toFixed(2),
+                    totalPayment: parseFloat(totalPayment).toFixed(2),
+                  };
                 };
-              
-                const totalInterest = calculateTotalInterest(loanAmount, monthlyInterestRate, loanTermMonths);
-                const totalPayment = calculateTotalPayment(loanAmount, totalInterest);
-                const monthlyPayment = totalPayment / loanTermMonths;
-              
-                return {
-                  totalInterest: parseFloat(totalInterest).toFixed(2),
-                  totalPayment: parseFloat(totalPayment).toFixed(2),
-                  monthlyPayment: parseFloat(monthlyPayment).toFixed(2),
-                };
-              };
-              
-              
-              
-             const loanAmortizationCalculator = (loanAmount, monthlyInterestRate, loanTermMonths) => {
-                const calculateMonthlyPayment = (amount, monthlyInterest, months) => {
-                  return (
-                    (amount * monthlyInterest * Math.pow(1 + monthlyInterest, months)) /
-                    (Math.pow(1 + monthlyInterest, months) - 1)
-                  );
-                };
-              
-                const calculateTotalPayment = (monthlyPayment, months) => {
-                  return monthlyPayment * months;
-                };
-              
-                const calculateProfit = (totalPayment, loanAmount) => {
-                  return totalPayment - loanAmount;
-                };
-              
-                const monthlyPayment = calculateMonthlyPayment(loanAmount, monthlyInterestRate / 100, loanTermMonths);
-                const totalPayment = calculateTotalPayment(monthlyPayment, loanTermMonths);
-                const totalProfit = calculateProfit(totalPayment, loanAmount);
-              
-                return {
-                  monthlyPayment: parseFloat(monthlyPayment).toFixed(2),
-                  totalProfit: parseFloat(totalProfit).toFixed(2),
-                  totalPayment: parseFloat(totalPayment).toFixed(2),
-                };
-              };
 
-           
-            const calculateDueDate = (date, loanTerm)=>{
-                    // Parse the initial date
-                    const startDate = new Date(date);
+            
+              const calculateDueDate = (date, loanTerm)=>{
+                      // Parse the initial date
+                      const startDate = new Date(date);
+                      
+                      // Add the loan term in months to the initial date
+                      const dueDate = new Date(startDate);
+                      dueDate.setMonth(startDate.getMonth() + loanTerm);
+                      
+                      // Format the date as 'YYYY-MM-DDTHH:mm:ss.sssZ'
+                      const isoString = dueDate.toISOString();
                     
-                    // Add the loan term in months to the initial date
-                    const dueDate = new Date(startDate);
-                    dueDate.setMonth(startDate.getMonth() + loanTerm);
+                      return isoString;
+              }
                     
-                    // Format the date as 'YYYY-MM-DDTHH:mm:ss.sssZ'
-                    const isoString = dueDate.toISOString();
+              const loan = await getLoan();
+              const finances = getFinances() // the loan financial aspect
+              if (loanBefore.loanStatus === "disbursed") {
+                  let repaymentAmount = null;
+                  if (!loan.loanType) return;
                   
-                    return isoString;
-            }
-                  
-            const loan = await getLoan();
-            if (loanBefore.loanStatus === "approved") {
-                let repaymentAmount = null;
-                if (!loan.loanType) return;
+                  if (loan.loanType.typeName === "salaryBased") { 
+                      const { totalPayment } = loanAmortizationCalculator(loanBefore.loanAmount, loanBefore.interestRate, loanBefore.loanTerm);
+                      repaymentAmount = totalPayment;
+                  } else { // for all asset based loans
+                      const { totalPayment } = simpleInterestLoanCalculator(loanBefore.loanAmount, loanBefore.interestRate, loanBefore.loanTerm);
+                      repaymentAmount = totalPayment;
+                  }
 
-                if (loan.loanType.typeName === "salaryBased") {
-                    const { totalPayment } = loanAmortizationCalculator(loanBefore.loanAmount, loanBefore.interestRate, loanBefore.loanTerm);
-                    repaymentAmount = totalPayment;
-                } else {
-                    const { totalPayment } = simpleInterestLoanCalculator(loanBefore.loanAmount, loanBefore.interestRate, loanBefore.loanTerm);
-                    repaymentAmount = totalPayment;
-                }
+                  if(!loanBefore.id){
+                      return
+                  }
 
-                if(!loanBefore.id){
-                    return
-                }
-
-                if (loanBefore.loanStatus === "approved") {
-                    const updateLoanAmountObject = {
-                        outstandingAmount: parseFloat(repaymentAmount),
-                        repaymentAmount: parseFloat(repaymentAmount),
-                        approvalDate: loanAfter.updatedAt,
-                        disbursedAmount: parseFloat(loanBefore.loanAmount),
-                        disbursementDate: loanAfter.updatedAt,
-                        dueDate: calculateDueDate(loanAfter.updatedAt, loanBefore.loanTerm)
-                    }
-                    
-                     await strapi.db.query('api::loan.loan').update({ where: { id: loanBefore.id }, data: updateLoanAmountObject });
-                } 
-            }
-        };
+                  if (loanBefore.loanStatus === "disbursed") {
+                      const updateLoanAmountObject = {
+                          outstandingAmount: parseFloat(repaymentAmount),
+                          repaymentAmount: parseFloat(repaymentAmount),
+                          approvalDate: loanAfter.updatedAt,
+                          disbursedAmount: parseFloat(loanBefore.loanAmount),
+                          disbursementDate: loanAfter.updatedAt,
+                          dueDate: calculateDueDate(loanAfter.updatedAt, loanBefore.loanTerm)
+                      }
+                      const financesUpdateObject = {
+                        totalAmountLoanedOut: parseFloat(finances.totalAmountLoanedOut) + parseFloat(loanBefore.loanAmount)
+                      }
+                      await strapi.db.query('api::loan.loan').update({ where: { id: loanBefore.id }, data: updateLoanAmountObject });
+                      await strapi.db.query('api::finance.finance').update({ where: { id: 1 }, data: financesUpdateObject }); // id = 0 because it's a single content type
+                  } 
+              }
+          };
 
         await setLoanRepaymentAmount(data, result);
     },
