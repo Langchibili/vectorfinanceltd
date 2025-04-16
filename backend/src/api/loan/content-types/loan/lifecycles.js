@@ -222,7 +222,7 @@ module.exports = {
               }
                     
               const loan = await getLoan();
-              const finances = getFinances() // the loan financial aspect
+              const finances = await getFinances() // the loan financial aspect
               if (loanBefore.loanStatus === "disbursed") {
                   let repaymentAmount = null;
                   if (!loan.loanType) return;
@@ -252,7 +252,7 @@ module.exports = {
                         totalAmountLoanedOut: parseFloat(finances.totalAmountLoanedOut) + parseFloat(loanBefore.loanAmount)
                       }
                       await strapi.db.query('api::loan.loan').update({ where: { id: loanBefore.id }, data: updateLoanAmountObject });
-                      await strapi.db.query('api::finance.finance').update({ where: { id: 1 }, data: financesUpdateObject }); // id = 0 because it's a single content type
+                      await strapi.db.query('api::finance.finance').update({ where: { id: finances.id }, data: financesUpdateObject }); // id = 0 because it's a single content type
                   } 
               }
           };
