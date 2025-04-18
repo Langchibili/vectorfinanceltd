@@ -1012,6 +1012,39 @@ export interface ApiAuthAuth extends Schema.CollectionType {
   };
 }
 
+export interface ApiClientIdClientId extends Schema.SingleType {
+  collectionName: 'client_ids';
+  info: {
+    singularName: 'client-id';
+    pluralName: 'client-ids';
+    displayName: 'clientIdNumbers';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    nrcNumbers: Attribute.JSON;
+    passportNumbers: Attribute.JSON;
+    drivingLicenceNumbers: Attribute.JSON;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::client-id.client-id',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::client-id.client-id',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
 export interface ApiEmailAddressesListEmailAddressesList
   extends Schema.SingleType {
   collectionName: 'email_addresses_lists';
@@ -1997,6 +2030,7 @@ declare module '@strapi/types' {
       'api::app-feature.app-feature': ApiAppFeatureAppFeature;
       'api::approval.approval': ApiApprovalApproval;
       'api::auth.auth': ApiAuthAuth;
+      'api::client-id.client-id': ApiClientIdClientId;
       'api::email-addresses-list.email-addresses-list': ApiEmailAddressesListEmailAddressesList;
       'api::finance.finance': ApiFinanceFinance;
       'api::form.form': ApiFormForm;

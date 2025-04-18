@@ -4,6 +4,7 @@ import { checkUserLogginStatus } from "@/Constants";
 import { updateUserAccount } from "@/Functions";
 import { Slide } from "@material-ui/core";
 import React from "react";
+import WarningSnapBack from "../Includes/SnapBacks/WarningSnapBack";
 
 export default class UpdateDetailsForm extends React.Component {
   constructor(props) {
@@ -19,7 +20,9 @@ export default class UpdateDetailsForm extends React.Component {
       isFormValid: false,
       saving: false,
       saved: false,
-      error:null
+      error:null,
+      openErrorSnapBack: false,
+      errorMessage: ''
     };
   }
 
@@ -121,12 +124,39 @@ export default class UpdateDetailsForm extends React.Component {
     })
   }
 
+  handleOpenErrorSnapBack = ()=>{
+         this.setState({
+           openErrorSnapBack: false 
+         })
+    }
+  
+    handleNextButton = ()=>{
+      const {isFormValid,saved} = this.state
+      if(!isFormValid){
+        this.setState({
+          openErrorSnapBack: true,
+          errorMessage: 'Please ensure all fields are filled and saved before you can proceed.'
+        })
+        return
+      }
+      if(!saved){
+        this.setState({
+          openErrorSnapBack: true,
+          errorMessage: 'Please save the form to proceed.'
+        })
+        return
+      }
+      this.props.handleOpenUpdateClientDetailsForm()
+    }
+  
+
   render() {
     const { firstname, lastname, age, gender, saved, address, dateOfBirth, isFormValid } = this.state;
 
     return (
       <Slide in={true} direction="left">
         <div className="row">
+        {this.state.openErrorSnapBack? <WarningSnapBack handleOpenErrorSnapBack={this.handleOpenErrorSnapBack} errorMessage={this.state.errorMessage}/> : null}
           <div className="col-lg-12">
             <div className="card">
               <div className="card-header align-items-center d-flex">
@@ -249,8 +279,7 @@ export default class UpdateDetailsForm extends React.Component {
                         type="button"
                         className="btn btn-danger w-50 mt-3"
                         id="next-btn"
-                        disabled={!isFormValid || !saved}
-                        onClick={()=>{this.props.handleOpenUpdateClientDetailsForm()}}
+                        onClick={() => { this.handleNextButton() }}
                       >
                         Next
                       </button>

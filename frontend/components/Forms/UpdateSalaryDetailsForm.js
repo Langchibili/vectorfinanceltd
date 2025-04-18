@@ -5,6 +5,7 @@ import { getImage, textHasPhoneNumber, updateUserAccount } from "@/Functions";
 import React from "react";
 import Uploader from "../Includes/Uploader/Uploader";
 import { Slide } from "@material-ui/core";
+import WarningSnapBack from "../Includes/SnapBacks/WarningSnapBack";
 
 export default class UpdateSalaryDetailsForm extends React.Component {
   constructor(props) {
@@ -23,7 +24,9 @@ export default class UpdateSalaryDetailsForm extends React.Component {
       saving: false,
       saved: false,
       salaryDetailsId: null,
-      error: null
+      error: null,
+      openErrorSnapBack: false,
+      errorMessage: ''
     };
   }
 
@@ -310,12 +313,38 @@ export default class UpdateSalaryDetailsForm extends React.Component {
     })
   }
 
+   handleOpenErrorSnapBack = ()=>{
+         this.setState({
+           openErrorSnapBack: false 
+         })
+    }
+  
+    handleNextButton = ()=>{
+      const {isFormValid,saved} = this.state
+      if(!isFormValid){
+        this.setState({
+          openErrorSnapBack: true,
+          errorMessage: 'Please ensure all fields are filled and saved before you can proceed.'
+        })
+        return
+      }
+      if(!saved){
+        this.setState({
+          openErrorSnapBack: true,
+          errorMessage: 'Please save the form to proceed.'
+        })
+        return
+      }
+      this.props.handleCreateBlankLoan()
+    }
+
   render() {
     const { employerName, salaryAmount, saved, employementVerificationNumber, companyLocation, socialSecurityNumber, isFormValid } = this.state;
 
     return (
       <Slide in={true} direction="left">
         <div className="row">
+          {this.state.openErrorSnapBack? <WarningSnapBack handleOpenErrorSnapBack={this.handleOpenErrorSnapBack} errorMessage={this.state.errorMessage}/> : null}
           <div className="col-lg-12">
             <div className="card">
               <div className="card-header align-items-center d-flex">
@@ -481,8 +510,7 @@ export default class UpdateSalaryDetailsForm extends React.Component {
                       type="button"
                       className="btn btn-danger w-90 mt-3"
                       id="next-btn"
-                      disabled={!isFormValid || !saved}
-                      onClick={() => { this.props.handleCreateBlankLoan() }}
+                      onClick={() => { this.handleNextButton() }}
                     >
                       Complete
                     </button>}

@@ -5,6 +5,7 @@ import { getImage, updateUserAccount } from "@/Functions";
 import React from "react";
 import Uploader from "../Includes/Uploader/Uploader";
 import { Slide } from "@material-ui/core";
+import WarningSnapBack from "../Includes/SnapBacks/WarningSnapBack";
 
 export default class UpdateClientDetailsForm extends React.Component {
   constructor(props) {
@@ -20,7 +21,9 @@ export default class UpdateClientDetailsForm extends React.Component {
       saving: false,
       clientDetailsId: null,
       saved: false,
-      error: null
+      error: null,
+      openErrorSnapBack: false,
+      errorMessage: ''
     };
   }
 
@@ -97,7 +100,7 @@ export default class UpdateClientDetailsForm extends React.Component {
 
   handleSubmit = async (e) => {
     e.preventDefault()
-    const { employementStatus, idType, clientDetailsId, IDfront, IDback } = this.state;
+    const { employementStatus, idType, clientDetailsId, IDfront, IDback, saved, isFormValid } = this.state;
     if (!employementStatus || !idType) {
       this.setState({
         error: 'Please ensure all fields are filled.',
@@ -303,12 +306,38 @@ export default class UpdateClientDetailsForm extends React.Component {
     }
   }
 
+  handleOpenErrorSnapBack = ()=>{
+       this.setState({
+         openErrorSnapBack: false 
+       })
+  }
+
+  handleNextButton = ()=>{
+    const {isFormValid,saved} = this.state
+    if(!isFormValid){
+      this.setState({
+        openErrorSnapBack: true,
+        errorMessage: 'Please ensure all fields are filled and saved before you can proceed.'
+      })
+      return
+    }
+    if(!saved){
+      this.setState({
+        openErrorSnapBack: true,
+        errorMessage: 'Please save the form to proceed.'
+      })
+      return
+    }
+    this.props.handleOpenAddLoanAmountForm()
+  }
+
   render() {
     const { employementStatus, idType, saved, isFormValid } = this.state;
 
     return (
       <Slide in={true} direction="left">
         <div className="row">
+          {this.state.openErrorSnapBack? <WarningSnapBack handleOpenErrorSnapBack={this.handleOpenErrorSnapBack} errorMessage={this.state.errorMessage}/> : null}
           <div className="col-lg-12">
             <div className="card">
               {this.renderFormTitle()}
@@ -414,8 +443,7 @@ export default class UpdateClientDetailsForm extends React.Component {
                         type="button"
                         className="btn btn-danger w-90 mt-3"
                         id="next-btn"
-                        disabled={!isFormValid || !saved}
-                        onClick={() => { this.props.handleOpenAddLoanAmountForm() }}
+                        onClick={() => { this.handleNextButton() }}
                       >
                         Next
                       </button>

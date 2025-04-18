@@ -1,0 +1,25 @@
+{
+  "kind": "singleType",
+  "collectionName": "client_ids",
+  "info": {
+    "singularName": "client-id",
+    "pluralName": "client-ids",
+    "displayName": "clientIdNumbers",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "nrcNumbers": {
+      "type": "json"
+    },
+    "passportNumbers": {
+      "type": "json"
+    },
+    "drivingLicenceNumbers": {
+      "type": "json"
+    }
+  }
+}
