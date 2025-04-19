@@ -345,7 +345,7 @@ export default class UpdateVehicleCollateralForm extends React.Component {
         return  <Alert severity="info">By choosing to keep the vehicle, you agree to having us place a <strong>tracker</strong> on your vehicle</Alert>
       }
       else{
-        return <Alert severity="info">By choosing to pack the vehicle with us, you agree to paying an agreed <strong>packing fee</strong>.</Alert>
+        return <Alert severity="info">By choosing to park the vehicle with us, you agree to paying an agreed <strong>parking fee</strong>.</Alert>
       }
     }
     else{
