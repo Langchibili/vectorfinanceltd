@@ -26,6 +26,7 @@
         "pending-collateral-inspection",
         "accepted",
         "pending-approval",
+        "request-approval",
         "approved",
         "rejected",
         "disbursed",

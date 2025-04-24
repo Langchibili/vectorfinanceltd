@@ -1,0 +1,24 @@
+{
+  "kind": "singleType",
+  "collectionName": "app_statuses",
+  "info": {
+    "singularName": "app-status",
+    "pluralName": "app-statuses",
+    "displayName": "AppStatus"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "status": {
+      "type": "enumeration",
+      "enum": [
+        "production",
+        "test",
+        "local"
+      ],
+      "default": "local"
+    }
+  }
+}

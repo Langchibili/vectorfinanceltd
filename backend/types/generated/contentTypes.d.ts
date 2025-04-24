@@ -864,6 +864,50 @@ export interface PluginI18NLocale extends Schema.CollectionType {
   };
 }
 
+export interface ApiAdminAdmin extends Schema.SingleType {
+  collectionName: 'admins';
+  info: {
+    singularName: 'admin';
+    pluralName: 'admins';
+    displayName: 'Admins';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    loanApprovers: Attribute.Relation<
+      'api::admin.admin',
+      'oneToMany',
+      'admin::user'
+    >;
+    loanDisbursers: Attribute.Relation<
+      'api::admin.admin',
+      'oneToMany',
+      'admin::user'
+    >;
+    loanAdministrators: Attribute.Relation<
+      'api::admin.admin',
+      'oneToMany',
+      'admin::user'
+    >;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::admin.admin',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::admin.admin',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
 export interface ApiAdminNotificationAdminNotification
   extends Schema.CollectionType {
   collectionName: 'admin_notifications';
@@ -935,6 +979,37 @@ export interface ApiAppFeatureAppFeature extends Schema.CollectionType {
       Attribute.Private;
     updatedBy: Attribute.Relation<
       'api::app-feature.app-feature',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiAppStatusAppStatus extends Schema.SingleType {
+  collectionName: 'app_statuses';
+  info: {
+    singularName: 'app-status';
+    pluralName: 'app-statuses';
+    displayName: 'AppStatus';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    status: Attribute.Enumeration<['production', 'test', 'local']> &
+      Attribute.DefaultTo<'local'>;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::app-status.app-status',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::app-status.app-status',
       'oneToOne',
       'admin::user'
     > &
@@ -1422,6 +1497,7 @@ export interface ApiLoanLoan extends Schema.CollectionType {
         'pending-collateral-inspection',
         'accepted',
         'pending-approval',
+        'request-approval',
         'approved',
         'rejected',
         'disbursed',
@@ -2026,8 +2102,10 @@ declare module '@strapi/types' {
       'plugin::users-permissions.role': PluginUsersPermissionsRole;
       'plugin::users-permissions.user': PluginUsersPermissionsUser;
       'plugin::i18n.locale': PluginI18NLocale;
+      'api::admin.admin': ApiAdminAdmin;
       'api::admin-notification.admin-notification': ApiAdminNotificationAdminNotification;
       'api::app-feature.app-feature': ApiAppFeatureAppFeature;
+      'api::app-status.app-status': ApiAppStatusAppStatus;
       'api::approval.approval': ApiApprovalApproval;
       'api::auth.auth': ApiAuthAuth;
       'api::client-id.client-id': ApiClientIdClientId;

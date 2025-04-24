@@ -159,7 +159,7 @@ export default class AddLoanAmountForm extends React.Component {
       return (
         <>
           <Alert severity="warning" sx={{ marginBottom: '5px' }}>
-            You can only get up to half the worth of your collateral, that is: <strong>{maxLoanFromCollateral}</strong>
+            You can only get up to half the worth of your collateral, that is K: <strong>{maxLoanFromCollateral}</strong>
           </Alert>
           {this.renderProceedWithLoanButton()}
         </>

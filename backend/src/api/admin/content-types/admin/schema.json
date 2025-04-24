@@ -1,0 +1,30 @@
+{
+  "kind": "singleType",
+  "collectionName": "admins",
+  "info": {
+    "singularName": "admin",
+    "pluralName": "admins",
+    "displayName": "Admins"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "loanApprovers": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "admin::user"
+    },
+    "loanDisbursers": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "admin::user"
+    },
+    "loanAdministrators": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "admin::user"
+    }
+  }
+}
