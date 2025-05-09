@@ -1,11 +1,12 @@
 "use client";
 
 import { api_url, getJwt } from "@/Constants";
-import { getImage, updateUserAccount } from "@/Functions";
+import { checkClientIdStatus, getImage, updateUserAccount } from "@/Functions";
 import React from "react";
 import Uploader from "../Includes/Uploader/Uploader";
 import { Slide } from "@material-ui/core";
 import WarningSnapBack from "../Includes/SnapBacks/WarningSnapBack";
+import { Alert } from "@mui/material";
 
 export default class UpdateClientDetailsForm extends React.Component {
   constructor(props) {
@@ -23,8 +24,10 @@ export default class UpdateClientDetailsForm extends React.Component {
       saved: false,
       error: null,
       openErrorSnapBack: false,
-      errorMessage: ''
-    };
+      errorMessage: '',
+      clientId: null,
+      hasLoan: this.props.loggedInUser.loans && this.props.loggedInUser.loans.length > 0
+    }
   }
 
   getClientDetails = async () => {
@@ -100,14 +103,25 @@ export default class UpdateClientDetailsForm extends React.Component {
 
   handleSubmit = async (e) => {
     e.preventDefault()
-    const { employementStatus, idType, clientDetailsId, IDfront, IDback, saved, isFormValid } = this.state;
+    const { employementStatus, idType, clientDetailsId, idNumber, IDfront, IDback, saved, isFormValid } = this.state;
     if (!employementStatus || !idType) {
       this.setState({
-        error: 'Please ensure all fields are filled.',
+        errorMessage: 'Please ensure all fields are filled.',
+        openErrorSnapBack: true,
         saving: false
       })
       return
     }
+
+    const clientIdStatus = await checkClientIdStatus(idNumber,this.props.loggedInUser.id)
+    if(clientIdStatus === 'id-taken'){
+      this.setState({
+        errorMessage: 'Someone is already using this '+idType,
+        openErrorSnapBack: true
+      })
+      return
+    }
+
     const updateObject = this.state
     delete updateObject.isFormValid
     delete updateObject.saving
@@ -116,10 +130,11 @@ export default class UpdateClientDetailsForm extends React.Component {
     delete updateObject.IDback
     delete updateObject.clientDetailsId
 
-    if (!updateObject.employementStatus) {
+    if(!updateObject.employementStatus){
       updateObject.employementStatus = null
     }
-    if (!updateObject.idType) {
+
+    if(!updateObject.idType){
       updateObject.idType = null
     }
 
@@ -129,9 +144,10 @@ export default class UpdateClientDetailsForm extends React.Component {
       IDback: IDback,
       clientDetailsId: clientDetailsId
     })
+    
     updateObject.id = clientDetailsId
     const updatedUser = await updateUserAccount({ clientDetails: updateObject }, this.props.loggedInUser.id)
-
+    
     if (updatedUser.hasOwnProperty('error')) {
       this.setState({
         error: 'something went wrong, try again',
@@ -152,6 +168,7 @@ export default class UpdateClientDetailsForm extends React.Component {
       this.checkFormValidity()
       console.log(this.state)
     })
+    
   }
 
   addIDfront = (files) => {
@@ -332,8 +349,14 @@ export default class UpdateClientDetailsForm extends React.Component {
   }
 
   render() {
-    const { employementStatus, idType, saved, isFormValid } = this.state;
-
+    const { employementStatus, idType, hasLoan, saved, isFormValid } = this.state;
+    const idAddedStyles = {
+      marginTop:'10px',
+      padding: '10px', 
+      backgroundColor: '#f2f2f2', // Use a light gray color
+      opacity: 0.8, // Reduce opacity for a more subtle effect
+      pointerEvents: 'none', // Disable pointer events on the content
+    }; // if id has been added already and a loan has been created with it
     return (
       <Slide in={true} direction="left">
         <div className="row">
@@ -355,7 +378,7 @@ export default class UpdateClientDetailsForm extends React.Component {
                         name="idType"
                         autoComplete="off"
                         value={idType}
-                        disabled={!this.state.clientDetailsId}
+                        disabled={!this.state.clientDetailsId|| hasLoan}
                         onChange={this.handleInputChange}
                       >
                         <option value="">Choose...</option>
@@ -377,6 +400,7 @@ export default class UpdateClientDetailsForm extends React.Component {
                           className="form-control"
                           id="idNumberInput"
                           name="idNumber"
+                          disabled={hasLoan}
                           autoComplete="off"
                           value={this.state.idNumber}
                           onChange={this.handleInputChange}
@@ -384,6 +408,8 @@ export default class UpdateClientDetailsForm extends React.Component {
                       </div>
                     </div>
                   )}
+                  <div id="identity-documents" style={hasLoan? idAddedStyles : {}}>
+                  {hasLoan? <Alert severity="info" style={{marginBottom:'10px'}}> Connot update Identity details after you have initiated at least 1 loan.</Alert>: <></>}
                   {this.state.clientDetailsId ? <>
                     <div style={{ marginTop: '20px' }}>
                       <h5>Valid ID<small style={{ color: 'gray' }}> (Front Side)</small></h5><small style={{ color: 'lightgray' }}>(NRC or Passport or Driving Licence)</small>
@@ -414,6 +440,7 @@ export default class UpdateClientDetailsForm extends React.Component {
                       {this.renderFiles(this.state.IDback, "IDback")}
                     </div>
                   </> : <></>}
+                </div>
                   {/* Save and Next Buttons */}
                   <div style={{ width: "100%", display: "flex", justifyContent: "space-between" }}>
                     <div style={{ width: "100%" }}>

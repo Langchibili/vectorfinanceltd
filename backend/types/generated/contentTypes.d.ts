@@ -800,6 +800,7 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
       'oneToMany',
       'api::investment-withdraw.investment-withdraw'
     >;
+    idNumber: Attribute.String;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
@@ -1087,21 +1088,21 @@ export interface ApiAuthAuth extends Schema.CollectionType {
   };
 }
 
-export interface ApiClientIdClientId extends Schema.SingleType {
+export interface ApiClientIdClientId extends Schema.CollectionType {
   collectionName: 'client_ids';
   info: {
     singularName: 'client-id';
     pluralName: 'client-ids';
-    displayName: 'clientIdNumbers';
-    description: '';
+    displayName: 'clientIds';
   };
   options: {
     draftAndPublish: true;
   };
   attributes: {
-    nrcNumbers: Attribute.JSON;
-    passportNumbers: Attribute.JSON;
-    drivingLicenceNumbers: Attribute.JSON;
+    idType: Attribute.Enumeration<['nrc', 'passport', 'driving-licence']>;
+    clientId: Attribute.BigInteger;
+    idNumber: Attribute.String;
+    hasLoan: Attribute.Boolean & Attribute.DefaultTo<false>;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;

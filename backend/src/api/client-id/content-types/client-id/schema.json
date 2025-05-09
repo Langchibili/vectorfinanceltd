@@ -1,25 +1,33 @@
 {
-  "kind": "singleType",
+  "kind": "collectionType",
   "collectionName": "client_ids",
   "info": {
     "singularName": "client-id",
     "pluralName": "client-ids",
-    "displayName": "clientIdNumbers",
-    "description": ""
+    "displayName": "clientIds"
   },
   "options": {
     "draftAndPublish": true
   },
   "pluginOptions": {},
   "attributes": {
-    "nrcNumbers": {
-      "type": "json"
+    "idType": {
+      "type": "enumeration",
+      "enum": [
+        "nrc",
+        "passport",
+        "driving-licence"
+      ]
     },
-    "passportNumbers": {
-      "type": "json"
+    "clientId": {
+      "type": "biginteger"
     },
-    "drivingLicenceNumbers": {
-      "type": "json"
+    "idNumber": {
+      "type": "string"
+    },
+    "hasLoan": {
+      "type": "boolean",
+      "default": false
     }
   }
 }

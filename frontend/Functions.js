@@ -439,6 +439,20 @@ export const sendOTP = async (identifier,identifierType) => {
       .catch(error => console.error(error))
 }
 
+export const checkClientIdStatus = async (idNumber,clientId) => {
+  // Make request to resend OTP
+    const clientIdStatus = await fetch(api_url+'/client-ids?idNumber='+idNumber+"&clientId="+clientId,{
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }).then(response => response.json())
+      .then(data => data)
+      .catch(error => console.error(error))
+     if(clientIdStatus && clientIdStatus.status) {
+      return clientIdStatus.status
+     }
+}
+
 export const getLoanCategoryIds = async ()=>{
   const loanCategories = await fetch(api_url+'/loan-categories',{
     headers: {
@@ -474,7 +488,6 @@ export const getLoanCategoryIds = async ()=>{
   }
   return loanTypesIdsObject
  }
-
 
  export const getLoansInformation = async ()=>{
   const loansInformation = await fetch(api_url+'/loans-information',{

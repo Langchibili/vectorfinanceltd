@@ -213,6 +213,9 @@
       "relation": "oneToMany",
       "target": "api::investment-withdraw.investment-withdraw",
       "mappedBy": "client"
+    },
+    "idNumber": {
+      "type": "string"
     }
   }
 }

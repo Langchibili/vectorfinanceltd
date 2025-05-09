@@ -1,6 +1,12 @@
 /* #strapi nav .cyxgkm{
     display: none !important;
 } */
+
+
+
+
+/* CURRENT CUSTOM STYLES */
+
 #strapi > div.sc-bdvvtL.bQtzWS > div > nav > div.sc-bdvvtL.sc-kiwPtn.fLcqbp.dWHaaY > ul > li:nth-child(2){
     display: none !important;
 }
@@ -25,6 +31,10 @@
 form[name="npsSurveyForm"]{
     display: none !important;
 }
+
+/* CURRENT CUSTOM STYLES END */
+
+
 /* #strapi > div.sc-bdvvtL.bQtzWS > div > div > div > nav{
     display: block !important;
 } */
