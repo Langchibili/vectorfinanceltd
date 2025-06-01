@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>ContractOfLandSaleForm</title>
+  <style>
+    body { font-family: sans-serif; line-height: 1.4; padding: 20px; }
+    h2, h3, h4 { text-align: center; margin: 0.5em 0; }
+    p, ol { margin: 0.5em 0; }
+    .signature { margin-top: 2in; }
+    .signature img { max-width: 200px; }
+    .dashed-input {
+      display: inline-block;
+      border-bottom: 1px dashed #3228287a;
+      padding-left: 2px;
+      font-weight: bold;
+      vertical-align: text-top;
+    }
+    ol { padding-left: 20px; }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <h2>CONTRACT OF SALE</h2>
+  <p>Dated the day of <span class="dashed-input">{{dateDay}}</span> {{dateMonth}} {{dateYear}}</p>
+  <p>(Vendor)</p>
+  <p>and</p>
+  <p>VECTOR FINANCE LIMITED (Purchasers)</p>
+
+  <!-- Title Section -->
+  <h3>CONTRACT AND CONDITIONS OF SALE</h3>
+  <p>Relating to: <strong>{{propertyLocation}}</strong></p>
+  <p>LAW ASSOCIATION OF ZAMBIA</p>
+
+  <!-- Agreement Intro -->
+  <p>AN AGREEMENT made the day of <span class="dashed-input">{{agreementDay}}</span> Two Thousand and Twenty Four</p>
+  <p>BETWEEN, in Lusaka in the Republic of Zambia, (hereinafter called the "Vendor") of the one part and VECTOR FINANCE LIMITED, also of Lusaka in the Republic of Zambia (hereinafter called the "Purchaser") of the other part.</p>
+  <p>WHEREBY IT IS AGREED that the Vendor will sell and the Purchaser will purchase the property as referred to in the accompanying particulars at the price set out therein. The Vendor and the Purchaser do, on their respective parts, agree to complete the said purchase on the said terms and conditions.</p>
+  <p>AS WITNESS, the hands of the parties hereto or their duly authorized agents are set on the day and year first above written.</p>
+
+  <!-- Signatures -->
+  <p>SIGNED by <strong>(Vendor)</strong> in the presence of:</p>
+  <p>
+    WITNESS<br/>
+    Name: <span class="dashed-input">{{vendorWitnessName}}</span><br/>
+    Address: <span class="dashed-input">{{vendorWitnessAddress}}</span><br/>
+    <div class="signature">
+      <strong>Signature:</strong><br/>
+      <img src="{{signature}}" alt="Vendor signature"/>
+    </div>
+  </p>
+
+  <p>SIGNED by VECTOR FINANCE LIMITED <strong>(Purchaser)</strong> in the presence of:</p>
+  <p>
+    WITNESS<br/>
+    Name: <span class="dashed-input">{{purchaserWitnessName}}</span><br/>
+    Address: <span class="dashed-input">{{purchaserWitnessAddress}}</span><br/>
+    <div class="signature">
+      <strong>Signature:</strong><br/>
+      <img src="{{witnessSignature}}" alt="Witness signature"/>
+    </div>
+  </p>
+
+  <!-- Particulars Section -->
+  <h4>PARTICULARS</h4>
+  <p>(Description of the Property)</p>
+  <p>{{propertyDescription}}</p>
+
+  <!-- Special Conditions -->
+  <h4>SPECIAL CONDITIONS</h4>
+  <ol>
+    <li>The property is sold subject to the Law Association of Zambia General Conditions of Sale 1997 so far as the same are not inconsistent with or varied by these Special Conditions.</li>
+    <li>The Vendor and the Purchaser are acting on their own behalf.</li>
+    <li>The period fixed for obtaining State's consent and any other necessary license to assign shall be ten (10) days from the date the Vendor obtains the approved and numbered diagrams from the Surveyor General for the proposed subdivision.</li>
+    <li>The date fixed for completion shall be within seven (7) days of the Vendor obtaining the Property Transfer Tax Clearance Certificate from the Zambia Revenue Authority, and such certificate shall be applied for within 7 days of receipt of the State's consent to assign relating to this transaction.</li>
+    <li>The Vendor is selling as the beneficial owner.</li>
+    <li>Title shall commence with the Certificate of Title issued in respect of the property being sold herein.</li>
+    <li>Each party shall bear its own expenses incidental to the negotiation, implementation, and completion of this transaction including any legal costs.</li>
+    <li>Clause 2 of the Law Association of Zambia General Conditions of Sale 1997 shall not apply to this contract as the parties have agreed that the Purchaser shall make payment of the purchase price as follows:
+      <br/>(a) A deposit upon exchange of contract; and
+      <br/>(b) The balance in ZMW within <span class="dashed-input">{{balanceMonths}}</span> months from the date of the contract.
+    </li>
+    <li>At exchange of contract, the Vendor will hand over the approved and numbered survey diagrams and title deeds regarding the portion contracted to be sold to the Purchaser.</li>
+    <li>The property is sold free of any encumbrances.</li>
+    <li>For avoidance of doubt, the Vendor will discharge property transfer tax to the Zambia Revenue Authority, ground rent to the Commissioner of Lands, and council rates to the applicable Council.</li>
+    <li>The Purchaser shall be free to undertake any developments on the property contracted to be sold under this contract before full payment of the purchase price.</li>
+    <li>In the event that completion of the property fails, the Purchaser shall be entitled to a refund of the full amount or, alternatively, the market value of the developments undertaken on the Premises.</li>
+    <li>The Purchaser shall bear the cost of water rectifications if required on the property that is the subject of this contract.</li>
+    <li>The Vendor warrants that it has good title to the property contracted to be sold and that no person or institution has any claims against the property adverse to the rights of the Vendor.</li>
+    <li>No party is relying on any representations, promises, terms, conditions, or obligations—oral or written, express or implied—other than those contained in this agreement.</li>
+    <li>This agreement supersedes all other agreements that may have been entered into, express or implied, oral or written, between the parties prior to or during the negotiation of the transaction.</li>
+    <li>It is agreed that this purchase shall be completed in the name of the Purchaser or in the name of any person or body corporate to be nominated by the Purchaser.</li>
+    <li>This contract is subject to and shall be interpreted in accordance with the Laws of Zambia, and each party submits itself to the jurisdiction of the Courts of Zambia.</li>
+  </ol>
+</body>
+</html>
+
+
+<!--
+{
+  dateDay,               // e.g. "15"
+  dateMonth,             // e.g. "May"
+  dateYear,              // e.g. "2025"
+
+  propertyLocation,      // e.g. "Lusaka"
+
+  agreementDay,          // e.g. "15"
+
+  vendorWitnessName,     // e.g. "Jane Doe"
+  vendorWitnessAddress,  // e.g. "123 Main St"
+  vendorSignature,       // Base64 data-URL string
+
+  purchaserWitnessName,  // e.g. "John Smith"
+  purchaserWitnessAddress,// e.g. "456 Elm Rd"
+  purchaserSignature,    // Base64 data-URL string
+
+  propertyDescription,   // full description text
+
+  balanceMonths          // e.g. "3"
+}
+
+-->

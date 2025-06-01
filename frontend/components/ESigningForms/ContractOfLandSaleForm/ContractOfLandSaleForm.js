@@ -116,7 +116,7 @@ export default class ContractOfLandSaleForm extends React.Component {
     
             yOffset += currentHeight;
           }
-    
+          
           // Save the file locally
           const fileName = `ContractOfLandSaleForm__cid_${this.props.loggedInUser.id}_lid_${this.props.loggedInUser.currentLoan.id}.pdf`;
           pdf.save(fileName);
@@ -168,6 +168,7 @@ export default class ContractOfLandSaleForm extends React.Component {
     }
 
   componentDidMount() {
+    console.log('the ApplicationFormId',this.props.toSignApplicationFormId)
     scrolltoTopOFPage();
   }
 
@@ -356,3 +357,29 @@ export default class ContractOfLandSaleForm extends React.Component {
     );
   }
 }
+
+
+/*
+{
+  dateDay,               // e.g. "15"
+  dateMonth,             // e.g. "May"
+  dateYear,              // e.g. "2025"
+
+  propertyLocation,      // e.g. "Lusaka"
+
+  agreementDay,          // e.g. "15"
+
+  vendorWitnessName,     // e.g. "Jane Doe"
+  vendorWitnessAddress,  // e.g. "123 Main St"
+  vendorSignature,       // Base64 data-URL string
+
+  purchaserWitnessName,  // e.g. "John Smith"
+  purchaserWitnessAddress,// e.g. "456 Elm Rd"
+  purchaserSignature,    // Base64 data-URL string
+
+  propertyDescription,   // full description text
+
+  balanceMonths          // e.g. "3"
+}
+
+*/

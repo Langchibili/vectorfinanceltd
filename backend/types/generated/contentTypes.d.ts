@@ -1226,6 +1226,45 @@ export interface ApiFormForm extends Schema.CollectionType {
   };
 }
 
+export interface ApiFormFillValueFormFillValue extends Schema.CollectionType {
+  collectionName: 'form_fill_values';
+  info: {
+    singularName: 'form-fill-value';
+    pluralName: 'form-fill-values';
+    displayName: 'FormFillValues';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    formName: Attribute.String;
+    values: Attribute.JSON;
+    applicationFormId: Attribute.BigInteger;
+    client: Attribute.Relation<
+      'api::form-fill-value.form-fill-value',
+      'oneToOne',
+      'plugin::users-permissions.user'
+    >;
+    clientId: Attribute.BigInteger;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::form-fill-value.form-fill-value',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::form-fill-value.form-fill-value',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
 export interface ApiInvestmentInvestment extends Schema.CollectionType {
   collectionName: 'investments';
   info: {
@@ -2113,6 +2152,7 @@ declare module '@strapi/types' {
       'api::email-addresses-list.email-addresses-list': ApiEmailAddressesListEmailAddressesList;
       'api::finance.finance': ApiFinanceFinance;
       'api::form.form': ApiFormForm;
+      'api::form-fill-value.form-fill-value': ApiFormFillValueFormFillValue;
       'api::investment.investment': ApiInvestmentInvestment;
       'api::investment-client.investment-client': ApiInvestmentClientInvestmentClient;
       'api::investment-deposit.investment-deposit': ApiInvestmentDepositInvestmentDeposit;

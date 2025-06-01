@@ -1,0 +1,33 @@
+{
+  "kind": "collectionType",
+  "collectionName": "form_fill_values",
+  "info": {
+    "singularName": "form-fill-value",
+    "pluralName": "form-fill-values",
+    "displayName": "FormFillValues",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "formName": {
+      "type": "string"
+    },
+    "values": {
+      "type": "json"
+    },
+    "applicationFormId": {
+      "type": "biginteger"
+    },
+    "client": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "plugin::users-permissions.user"
+    },
+    "clientId": {
+      "type": "biginteger"
+    }
+  }
+}

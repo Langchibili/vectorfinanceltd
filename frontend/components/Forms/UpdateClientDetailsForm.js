@@ -409,7 +409,8 @@ export default class UpdateClientDetailsForm extends React.Component {
                     </div>
                   )}
                   <div id="identity-documents" style={hasLoan? idAddedStyles : {}}>
-                  {hasLoan? <Alert severity="info" style={{marginBottom:'10px'}}> Connot update Identity details after you have initiated at least 1 loan.</Alert>: <></>}
+                  {hasLoan? <Alert severity="warning" style={{marginBottom:'10px'}}> Connot update Identity details after you have initiated at least 1 loan.</Alert>: <></>}
+                  {hasLoan? <Alert severity="info" style={{marginBottom:'10px'}}> To have your details removed or updated, please contact us from the help page.</Alert>: <></>}
                   {this.state.clientDetailsId ? <>
                     <div style={{ marginTop: '20px' }}>
                       <h5>Valid ID<small style={{ color: 'gray' }}> (Front Side)</small></h5><small style={{ color: 'lightgray' }}>(NRC or Passport or Driving Licence)</small>
