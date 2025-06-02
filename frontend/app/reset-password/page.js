@@ -70,7 +70,7 @@ export default function ResetPasswordPage() {
       // On success, Strapi returns { jwt, user }. We simply redirect to login.
       setSuccessMessage('Password reset successful! Redirecting to login…');
       setTimeout(() => {
-        router.push('/login');
+        router.push('/signin');
       }, 2500);
     } catch (err) {
       console.error(err);
@@ -151,5 +151,5 @@ export default function ResetPasswordPage() {
         </div>
       </div>
     </div>
-  );
+  )
 }

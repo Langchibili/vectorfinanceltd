@@ -1828,6 +1828,36 @@ export interface ApiNotificationTemplateNotificationTemplate
   };
 }
 
+export interface ApiPasswordResetPasswordReset extends Schema.CollectionType {
+  collectionName: 'password_resets';
+  info: {
+    singularName: 'password-reset';
+    pluralName: 'password-resets';
+    displayName: 'passwordResets';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    email: Attribute.String;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::password-reset.password-reset',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::password-reset.password-reset',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
 export interface ApiPaymentPayment extends Schema.CollectionType {
   collectionName: 'payments';
   info: {
@@ -2165,6 +2195,7 @@ declare module '@strapi/types' {
       'api::loans-information.loans-information': ApiLoansInformationLoansInformation;
       'api::notification.notification': ApiNotificationNotification;
       'api::notification-template.notification-template': ApiNotificationTemplateNotificationTemplate;
+      'api::password-reset.password-reset': ApiPasswordResetPasswordReset;
       'api::payment.payment': ApiPaymentPayment;
       'api::phone-numbers-list.phone-numbers-list': ApiPhoneNumbersListPhoneNumbersList;
       'api::repayment.repayment': ApiRepaymentRepayment;

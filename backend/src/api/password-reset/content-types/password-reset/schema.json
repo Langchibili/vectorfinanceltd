@@ -1,0 +1,18 @@
+{
+  "kind": "collectionType",
+  "collectionName": "password_resets",
+  "info": {
+    "singularName": "password-reset",
+    "pluralName": "password-resets",
+    "displayName": "passwordResets"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "email": {
+      "type": "string"
+    }
+  }
+}
