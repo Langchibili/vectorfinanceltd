@@ -97,7 +97,7 @@ ${resetLink}
 
 If you did not request this, ignore this email. This link expires in one hour.
 
-— Your Company Name
+— Vector Finance Limited
 `;
 
     // 5) Create the Nodemailer transporter

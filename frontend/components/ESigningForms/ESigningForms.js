@@ -162,7 +162,7 @@ export default class ESigningForms extends React.Component {
        }
   }
   
-  handleRenderNextForm = ()=>{
+  handleRenderNextForm = (completeApplicationFunction)=>{
     const forms = this.state.forms
     if(forms[1]){
       console.log(forms)
@@ -177,9 +177,9 @@ export default class ESigningForms extends React.Component {
       })
     }
     else{ // means this is the very last form so the user can finalize the loan
-      this.setState({
-        isLastForm: true
-      })
+      if(completeApplicationFunction){
+        completeApplicationFunction()
+      } // run the complete the loan application function if this is the last form
     }
   }
   handleRenderPreviousForm = ()=>{
@@ -263,6 +263,7 @@ export default class ESigningForms extends React.Component {
     }
     if(this.state.formToDisplay){
       return <LoadForm 
+                  constants={this.props.constants}
                   handleRenderPreviousForm={this.handleRenderPreviousForm}
                   handleRenderNextForm={this.handleRenderNextForm}
                   handleCompleteLoanApplication={this.handleCompleteLoanApplication}

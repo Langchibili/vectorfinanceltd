@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>LoanAgreementForm</title>
+  <style>
+    body { font-family: sans-serif; line-height: 1.4; padding: 20px; }
+    h1, h2, h3 { text-align: center; margin: 0.5em 0; }
+    p, ol, ul { margin: 0.5em 0; }
+    .dashed-input {
+      display: inline-block;
+      border-bottom: 1px dashed #3228287a;
+      padding-left: 2px;
+      font-weight: bold;
+      vertical-align: text-top;
+      min-width: 2em;
+    }
+    ol, ul { padding-left: 20px; }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <p style="text-align: center;">Dated the {{agreementDateDay}}, day of June, {{agreementDateYearNumber}} </p>
+  <h2 style="text-align: center;">VECTOR FINANCE LIMITED</h2>
+  <h3 style="text-align: center;">AND</h3>
+  <h3 style="text-align: center;">…</h3>
+  <h1 style="text-align: center;">LOAN AGREEMENT</h1> 
+  <p>
+    This Loan Agreement (the “<strong>Agreement</strong>”) is made and effective the
+    <span class="dashed-input">{{agreementDateDay}},</span> day of
+    <span class="dashed-input">{{agreementDateMonth}}</span>
+    <span class="dashed-input">{{agreementDateYearWords}}</span>
+  </p>
+
+  <p>
+    <strong>BETWEEN:</strong><br/>
+     VECTOR FINANCE LIMITED whose registered office is at Plot No. 15 Lagos Road, Room No. FS1-B, Gardenview Properties, Rhodespark, Lusaka, Zambia (Company Reg. No. 120230054327)<br/>
+    (the “<strong>Lender</strong>”)
+  </p>
+
+  <p>
+    <strong>AND:</strong><br/>
+    <span class="dashed-input">{{borrowerName}}</span><br/>
+    <span class="dashed-input">{{borrowerAddress}}</span><br/>
+    (the “<strong>Borrower</strong>”)
+  </p>
+  <!-- WHEREAS Section -->
+  <h3>WHEREAS:</h3>
+   <ol type="A">
+    <li>
+      The Lender is a Private Company Limited by shares, duly incorporated under the Laws of the Republic of Zambia.   
+    </li>
+    <li>
+      The Borrower is a business person/company incorporated under the laws of the Republic of Zambia and is desirous of obtaining a Loan from the Lender.
+    </li>
+    <li>
+      The Lender has agreed to advance to the Borrower the sum of money more particularly detailed herein on the terms and conditions outlined in this Agreement.
+    </li>
+    <li>
+      The Borrower has agreed to pledge their property more particularly described herein as, security for the principal sum plus interest thereon secured by this Agreement, on the terms and conditions contained herein.  
+    </li>
+  </ol>
+
+  <!-- AGREEMENT CLAUSES -->
+  <h3>WHEREBY IT IS AGREED AS FOLLOWS:</h3>
+  <h4>1. INTERPRETATION AND PRELIMINARY</h4>
+  <p>
+    1.1 Headings are for convenience only and shall not affect interpretation.
+  </p>
+  <p>
+    1.2 The contra proferentem rule shall not apply.
+  </p>
+  <p>
+    1.3 In case of conflict between words and numerals, words prevail.
+  </p>
+  <p>
+    1.4 “Person” includes individuals, entities, partnerships, etc.
+  </p>
+  <p>1.5 Defined terms (examples):</p>
+  <ul>
+    <li><strong>“Business Day”</strong>: Any day other than Saturday, Sunday or Zambian public holiday between 8am–5pm.</li>
+    <li><strong>“Disbursement Date”</strong>: The date the Loan (or part thereof) is advanced.</li>
+  </ul>
+  <h4>2. COMMENCEMENT AND DURATION</h4>
+  <p>
+    This Agreement shall commence on the date first above written and continue until all sums owed by the Borrower have been repaid or the Agreement is terminated by the Lender.
+  </p>
+
+  <h4>3. CONDITIONS PRECEDENT</h4>
+  <p><strong>3.1 Initial:</strong> Lender must receive all ownership documentation (title deeds, vehicle registration).</p>
+  <p><strong>3.2 Further:</strong></p>
+  <ul>
+    <li>3.2.1 Warranties and covenants in clauses 8 &amp; 9 must be true on Disbursement Notice and Disbursement Date.</li>
+    <li>3.2.2 No other obligations to Lender must be outstanding or cause default.</li>
+  </ul>
+
+  <h4>4. THE FACILITY</h4>
+  <p>
+    4.1 Lender will advance <span class="dashed-input">{{principalSum}}</span> ZMW (“Principal Sum”) to Borrower.
+  </p>
+  <p>4.2 Payment to Borrower’s account:</p>
+  <p>Bank: <span class="dashed-input">{{bankName}}</span></p>
+  <p>Branch: <span class="dashed-input">{{branchName}}</span></p>
+  <p>Account Number: <span class="dashed-input">{{accountNumber}}</span></p>
+  <p>Sort Code: <span class="dashed-input">{{sortCode}}</span></p>
+  <p>SWIFT Code: <span class="dashed-input">{{swiftCode}}</span></p>
+  <p>Account Name: <span class="dashed-input">{{accountName}}</span></p>
+  <h4>5. REPAYMENT OF THE FACILITY</h4>
+  <p>
+    5.1 Subject to the provisions of this Agreement, the Borrower shall repay the Loan and all accrued interest and other fees and charges thereon within {this.props.loggedInUser.currentLoan.loanTerm} from the date of disbursement, in accordance with the repayment schedule set out in the First Schedule hereto provided that the repayment period may in the sole discretion of the Lender, be extended, which said extension shall be evidenced in writing.
+  </p>
+  <p>
+    5.2 Subject to the written consent of the Lender, the Borrower may, if its/his/her financial capacity permits, repay any installment payment earlier that the date fixed for said repayment provided in in the First Schedule.
+  </p>
+  <p>
+    5.3 All payments made by the Borrower under this Agreement shall be in Zambian Kwacha and in immediately available cleared funds to the Lender into the following bank account:   
+  </p>
+  <p>
+    All payments in ZMW, cleared funds, to:<br/>
+    Bank: Stanbic Bank (Zambia) Limited<br/>
+    Branch: Woodlands<br/>
+    Account Number: 9130006381913<br/>
+    Sort Code: 040030<br/>
+    SWIFT Code: SBICZMLX
+  </p>
+  <p>
+    Late–business‐day payments roll to the next or preceding business day.
+  </p>
+
+  <h4>6. INTEREST</h4>
+  <p>
+    6.1 Interest at 4% per month on daily cleared balance (365-day year). Capitalized if unpaid.
+  </p>
+
+  <h4>7. SECURITY</h4>
+  <p>Secured by the following property details:</p>
+  <ul>
+    <li>Make: <span class="dashed-input">{{securityMake}}</span></li>
+    <li>Model: <span class="dashed-input">{{securityModel}}</span></li>
+    <li>Reg No: <span class="dashed-input">{{securityReg}}</span></li>
+    <li>Colour: <span class="dashed-input">{{securityColour}}</span></li>
+    <li>Year: <span class="dashed-input">{{securityYear}}</span></li>
+    <li>Engine No: <span class="dashed-input">{{securityEngine}}</span></li>
+    <li>Chassis No: <span class="dashed-input">{{securityChassis}}</span></li>
+  </ul>
+  <p>
+    Borrower warrants property is free of encumbrances until full repayment.  Original documents to be deposited with the Lender.
+  </p>
+  <h4>8. WARRANTIES</h4>
+  <ul>
+    <li>The Borrower is the legal and beneficial owner of the property.</li>
+    <li>The Borrower has authority to enter and perform this Agreement.</li>
+    <li>Performance does not exceed any power limits.</li>
+    <li>No conflict with other agreements or laws.</li>
+    <li>Obligations are legal, valid, and enforceable.</li>
+    <li>All material information disclosed is accurate and complete.</li>
+  </ul>
+
+  <h4>9. COVENANTS</h4>
+  <ul>
+    <li>The Borrower shall obtain and maintain all required consents and authorizations.</li>
+    <li>The Borrower shall conduct business diligently and not materially alter it.</li>
+  </ul>
+
+  <h4>10. UNDERTAKINGS</h4>
+  <ul>
+    <li>The Borrower shall pay all sums due under this Agreement.</li>
+    <li>The Borrower shall perform all obligations timeously.</li>
+    <li>The Borrower shall not incur further liabilities affecting repayment without consent.</li>
+    <li>The Borrower shall notify the Lender of any material claims or proceedings.</li>
+    <li>The Borrower shall not encumber or dispose of the property until full repayment.</li>
+  </ul>
+  <h4>11. EVENT OF DEFAULT</h4>
+  <ol>
+    <li>Failure to pay any instalment on its due date.</li>
+    <li>Failure to remedy any breach within ten (10) Business Days of notice.</li>
+    <li>Any warranty or statement proves materially untrue when made.</li>
+    <li>Suspension of payment of liabilities.</li>
+    <li>Entering any arrangement with creditors.</li>
+    <li>Property is destroyed, sold, disposed of, or encumbered.</li>
+    <li>Repudiation of this Agreement.</li>
+    <li>Any event prejudicing ability to repay.</li>
+  </ol>
+  <p>On Event of Default, the Lender may:</p>
+  <ul>
+    <li>Cancel its obligations.</li>
+    <li>Declare the Loan and all accrued interest immediately due.</li>
+    <li>Take possession of the security.</li>
+    <li>Exercise other remedies.</li>
+  </ul>
+  <h4>12. ADDRESS FOR NOTICES</h4>
+  <p><strong>Lender:</strong><br/>
+    Room No. FS1-B<br/>
+    Plot 15 Lagos Road<br/>
+    Gardenview Properties<br/>
+    Rhodespark<br/>
+    Lusaka, Zambia<br/>
+    Email: <span class="dashed-input">{{lenderEmail}}</span>
+  </p>
+  <p><strong>Borrower:</strong><br/>
+    <span class="dashed-input">{{borrowerServiceAddress}}</span><br/>
+    Lusaka, Zambia<br/>
+    Email: <span class="dashed-input">{{borrowerEmail}}</span>
+  </p>
+
+  <h4>13. COSTS, FEES AND OTHER CHARGES</h4>
+  <ul>
+    <li>Drawdown Fees: ZMW 100.00 (once-off upfront).</li>
+    <li>Arrangement Fees: 3% of Loan Amount, monthly, in arrears.</li>
+    <li>Loan Management Fee: 11% of Loan Amount, monthly, in arrears.</li>
+    <li>Insurance Fees (if applicable) added to Principal Sum.</li>
+    <li>Tracker Installation Fees (if applicable) added to Principal Sum.</li>
+    <li>Legal Costs: reimbursable on default.</li>
+  </ul>
+<h4>REPAYMENT SCHEDULE</h4>
+<table style="width:100%; border-collapse:collapse; margin-bottom:20px;">
+  <thead>
+    <tr>
+      <th style="border:1px solid #ccc; padding:8px;">Payment Number</th>
+      <th style="border:1px solid #ccc; padding:8px;">Payment Due-Date</th>
+      <th style="border:1px solid #ccc; padding:8px;">Payment Amount</th>
+      <th style="border:1px solid #ccc; padding:8px;">Principal</th>
+      <th style="border:1px solid #ccc; padding:8px;">Interest plus other fees and charges</th>
+      <th style="border:1px solid #ccc; padding:8px;">Remaining Balance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <!-- twelve blank rows -->
+    <tr><td style="border:1px solid #ccc; padding:8px;">1.</td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td></tr>
+    <tr><td style="border:1px solid #ccc; padding:8px;">2.</td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td></tr>
+    <tr><td style="border:1px solid #ccc; padding:8px;">3.</td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td></tr>
+    <tr><td style="border:1px solid #ccc; padding:8px;">4.</td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td></tr>
+    <tr><td style="border:1px solid #ccc; padding:8px;">5.</td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td></tr>
+    <tr><td style="border:1px solid #ccc; padding:8px;">6.</td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td></tr>
+    <tr><td style="border:1px solid #ccc; padding:8px;">7.</td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td></tr>
+    <tr><td style="border:1px solid #ccc; padding:8px;">8.</td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td></tr>
+    <tr><td style="border:1px solid #ccc; padding:8px;">9.</td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td></tr>
+    <tr><td style="border:1px solid #ccc; padding:8px;">10.</td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td></tr>
+    <tr><td style="border:1px solid #ccc; padding:8px;">11.</td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td></tr>
+    <tr><td style="border:1px solid #ccc; padding:8px;">12.</td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td></tr>
+    <!-- TOTAL row -->
+    <tr>
+      <td colspan="5" style="border:1px solid #ccc; padding:8px; text-align:right;"><strong>TOTAL</strong></td>
+      <td style="border:1px solid #ccc; padding:8px;"></td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>
+
+<!--
+agreementDateDay
+agreementDateMonth
+agreementDateYearWords
+borrowerName
+borrowerAddress
+principalSum
+bankName
+branchName
+accountNumber
+sortCode
+swiftCode
+accountName
+repaymentTerm
+securityMake
+securityModel
+securityReg
+securityColour
+securityYear
+securityEngine
+securityChassis
+lenderEmail
+borrowerServiceAddress
+borrowerEmail
+lenderSignatoryName
+lenderSignatoryTitle
+agreementDateYearNumber
+lenderSignatureUrl
+lenderWitnessName
+lenderWitnessAddress
+lenderWitnessSignatureUrl
+borrowerNameSignature
+borrowerSignatureUrl
+borrowerWitnessName
+borrowerWitnessAddress
+borrowerWitnessSignatureUrl
+-->
+
+
+
+
+
+
+
+
+
+
+
+

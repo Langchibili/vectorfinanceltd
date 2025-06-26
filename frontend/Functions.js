@@ -20,6 +20,77 @@ export const textHasPhoneNumber = (text)=>{
   return phoneNumberRegex.test(text);
 } 
 
+// Utility to convert numbers up to 9999 into English words
+function numberToWords(num) {
+  const ones = ["","One","Two","Three","Four","Five","Six","Seven","Eight","Nine"];
+  const teens = ["Ten","Eleven","Twelve","Thirteen","Fourteen","Fifteen","Sixteen","Seventeen","Eighteen","Nineteen"];
+  const tens = ["","","Twenty","Thirty","Forty","Fifty","Sixty","Seventy","Eighty","Ninety"];
+  
+  function underThousand(n) {
+    let words = "";
+    if (n >= 100) {
+      words += ones[Math.floor(n/100)] + " Hundred ";
+      n %= 100;
+    }
+    if (n >= 10 && n < 20) {
+      words += teens[n-10] + " ";
+    } else if (n >= 20) {
+      words += tens[Math.floor(n/10)] + " ";
+      n %= 10;
+    }
+    if (n > 0 && n < 10) {
+      words += ones[n] + " ";
+    }
+    return words.trim();
+  }
+
+  let result = "";
+  if (num >= 1000) {
+    result += underThousand(Math.floor(num / 1000)) + " Thousand ";
+    num %= 1000;
+  }
+  if (num > 0) {
+    result += underThousand(num);
+  }
+  return result.trim();
+}
+
+// Returns the current day of month
+export function getAgreementDay() {
+  return new Date().getDate();
+}
+
+// Returns the current day of month
+export function getAgreementDaySuffix() {
+  const day = new Date().getDate();
+  // Determine suffix
+  const tens = day % 100;
+  let suffix = "th";
+  if (tens < 11 || tens > 13) {
+    switch (day % 10) {
+      case 1: suffix = "st"; break;
+      case 2: suffix = "nd"; break;
+      case 3: suffix = "rd"; break;
+    }
+  }
+  return suffix
+}
+
+export function getAgreementYearNumber() {
+  return new Date().getFullYear().toString();
+}
+
+// Returns the full month name, e.g. "June"
+export function getAgreementMonth() {
+  return new Date().toLocaleString("en-US", { month: "long" });
+}
+
+// Returns the current year in words, e.g. "Two Thousand Twenty-Five"
+export function getAgreementYearWords() {
+  return numberToWords(new Date().getFullYear());
+}
+
+
 const formatDate = (date) => {
   const month = date.getMonth() + 1; // Months are zero-indexed
   const day = date.getDate();

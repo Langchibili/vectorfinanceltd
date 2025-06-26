@@ -3,8 +3,7 @@
 import * as pdfjsLib from 'pdfjs-dist'
 import { PDFDocument } from 'pdf-lib'
 import { useEffect, useRef, useState } from 'react'
-import SalesAgreementForm from '@/components/ESigningForms/SalesAgreementForm/SalesAgreementForm'
-import NewLoanForm from '@/components/ESigningForms/NewLoanForm/NewLoanForm'
+import GeneralLoanForm from '@/components/ESigningForms/NewLoanForm/GeneralLoanForm'
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = `/pdf.worker.min.mjs`
 
@@ -136,7 +135,7 @@ const LoadPdf = ({ pdfUrl, strapiUploadUrl, authToken }) => {
 
   return (
     <div>
-        <NewLoanForm/>
+        <GeneralLoanForm/>
       {/* <div ref={containerRef} style={{ position: 'relative', width: '100%' }} />
       <button onClick={savePdf} style={{ marginTop: '20px' }}>
         Save PDF

@@ -28,6 +28,9 @@
     },
     "clientId": {
       "type": "biginteger"
+    },
+    "loanId": {
+      "type": "integer"
     }
   }
 }

@@ -95,9 +95,9 @@ module.exports = {
         data: {}, 
         files: [{
           path: tmpFilePath,
-          name: `${result.formName}-${result.id}.pdf`,
+          name: `${result.formName}_clientid_${result.clientId}_lid_${result.loanId}.pdf`,
           type: 'application/pdf',
-          size: pdfBuffer.length,      // prevent NaN
+          size: pdfBuffer.length,    // prevent NaN
         }],
       })
       console.log('[Debug] Media Library entry:', fileEntry.id, fileEntry.url)

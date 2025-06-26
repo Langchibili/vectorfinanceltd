@@ -1,0 +1,1038 @@
+import React from "react";
+import Fab from "@mui/material/Fab";
+import SpeedDial from "@mui/material/SpeedDial";
+import SpeedDialAction from "@mui/material/SpeedDialAction";
+import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import MenuIcon from "@mui/icons-material/Menu";
+import LinkIcon from "@mui/icons-material/Link";
+import { styled } from "@mui/system";
+import { getAgreementDay, getAgreementDaySuffix, getAgreementMonth, getAgreementYearNumber, getAgreementYearWords, scrolltoTopOFPage } from "@/Functions";
+import DisplaySignature from "@/components/Includes/DisplaySignature/DisplaySignature";
+import { api_url, getJwt } from "@/Constants";
+import ErrorSnapBack from "@/components/Includes/SnapBacks/ErrorSnapBack";
+
+// AutoResizingInput component – adjusts its width based on the content.
+class AutoResizingInput extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      value: props.defaultValue || "",
+    };
+    this.inputRef = React.createRef();
+    // create a shared canvas for text measurement
+    if (!AutoResizingInput.canvas) {
+      AutoResizingInput.canvas = document.createElement("canvas");
+      AutoResizingInput.ctx = AutoResizingInput.canvas.getContext("2d");
+    }
+  }
+
+  handleChange = (e) => {
+    const { onChange, name } = this.props;
+    const value = e.target.value;
+    this.setState({ value }, () => {
+      if (onChange) onChange(name, value);
+      this.adjustWidth();
+    });
+  };
+
+  componentDidMount() {
+    this.adjustWidth();
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (
+      prevState.value !== this.state.value ||
+      prevProps.placeholder !== this.props.placeholder
+    ) {
+      this.adjustWidth();
+    }
+  }
+
+  adjustWidth = () => {
+    const input = this.inputRef.current;
+    if (!input) return;
+
+    // get computed style so we match font for measurement
+    const style = window.getComputedStyle(input);
+    const font = `${style.fontSize} ${style.fontFamily}`;
+    AutoResizingInput.ctx.font = font;
+
+    // text to measure: either value or placeholder if empty
+    const text = this.state.value || this.props.placeholder || "";
+    const textWidth = AutoResizingInput.ctx.measureText(text).width;
+
+    // Add some extra padding so text isn't right on the edge
+    const extra = 8; 
+
+    input.style.width = `${textWidth + extra}px`;
+  };
+
+  render() {
+    const { placeholder, defaultValue, style, disabled, name, ...rest } = this.props;
+    return (
+      <input
+        type="text"
+        name={name}
+        {...rest}
+        ref={this.inputRef}
+        style={style}
+        placeholder={placeholder}
+        value={defaultValue? defaultValue : this.state.value}
+        disabled={disabled}
+        onChange={this.handleChange}
+      />
+    );
+  }
+}
+
+
+const StyledFab = styled(Fab)({
+  position: "fixed",
+  bottom: 90,
+  right: 50,
+  zIndex: 1000,
+});
+
+const SectionNav = styled(SpeedDial)({
+  position: "fixed",
+  bottom: 160,
+  right: 50,
+  zIndex: 1000,
+});
+
+
+export default class VehicleLoanForm extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      formSaved: false,
+      uploading: false,
+      error:null, 
+      atBottom: false,
+      formValues: {}, // stores all AutoResizingInput values
+      constants: {
+        agreementDateDay : getAgreementDay(),
+        agreementDateDaySuffix: getAgreementDaySuffix(),
+        agreementDateMonth : getAgreementMonth(),
+        agreementDateYearNumber : getAgreementYearNumber(),
+        agreementDateYearWords : getAgreementYearWords(),
+        principalSum : this.props.loggedInUser.currentLoan.loanAmount
+      }
+    }
+  }
+
+  componentDidMount() {
+    console.log('the props',this.props)
+     if(document !== "undefined"){
+        window.addEventListener("scroll", this.checkScrollPosition);
+        scrolltoTopOFPage();
+     }
+  }
+  componentWillUnmount() {
+    if(document !== "undefined"){
+       window.removeEventListener("scroll", this.checkScrollPosition);
+    }
+  }
+  checkScrollPosition = () => {
+        const scrolledToBottom =
+        window.innerHeight + window.pageYOffset >= document.body.offsetHeight - 2;
+        if (scrolledToBottom !== this.state.atBottom) {
+        this.setState({ atBottom: scrolledToBottom });
+        }
+  };
+
+  scrollHandler = () => {
+    if (this.state.atBottom) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } else {
+      window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+    }
+  };
+  // Generic change handler for inputs
+  handleInputChange = (name, value) => {
+    this.setState(prev => ({
+      error: null,
+      formValues: {
+        ...prev.formValues,
+        [name]: value
+      }
+    }));
+  };
+
+  // Submit all form data to backend
+//   saveFormToAPI = async () => {
+//     const { formValues } = this.state;
+//     const payload = { ...formValues };
+//     console.log('payload',payload)
+//     try {
+//       const response = await fetch(`${api_url}/submit-loan-form`, {
+//         method: "POST",
+//         headers: {
+//           "Content-Type": "application/json",
+//           Authorization: `Bearer ${getJwt()}`
+//         },
+//         body: JSON.stringify(payload)
+//       });
+
+//       if (!response.ok) throw new Error(`Error ${response.status}`);
+//       await response.json();
+//       this.setState({ formSaved: true });
+//     } catch (error) {
+//       console.error("Submission failed:", error);
+//       alert("Failed to submit. Please try again.");
+//     }
+//   };
+
+// Update saveFormToAPI to include constants
+saveFormToAPI = async () => {
+  const { formValues, constants } = this.state;
+  // merge constants (date, principalSum, etc.) with the user-entered values
+  const payload = { 
+    values: {...constants, ...formValues},
+    formName: "VehicleLoanForm",
+    client: this.props.loggedInUser.id,
+    applicationFormId: this.props.toSignApplicationFormId,
+    loanId: this.props.loggedInUser.currentLoan.id
+  }
+  console.log('payload', payload);
+
+  try {
+    this.setState({ uploading: true })
+    const response = await fetch(`${api_url}/form-fill-values`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${getJwt()}`
+      },
+      body: JSON.stringify({data:payload})
+    })
+    .then(response => response.json())
+    .then(data => data)
+    
+    if (response.data && response.data.id){ // gotta update the new form-fill-values record in order to trigger the lifecycle method to process the form
+      const updated = await fetch(`${api_url}/form-fill-values/${response.data.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${getJwt()}`
+        },
+        body: JSON.stringify({data:{clientId: this.props.loggedInUser.id}})
+      })
+      if(updated.ok){
+        this.setState({ formSaved: true, uploading: false },()=>{
+            this.props.handleRenderNextForm(this.props.handleCompleteLoanApplication())
+        })
+      }
+      else{
+        this.setState({
+          uploading: false,
+          error:"An error occured, please reflesh screen and try again. Contact us if this issue persists."
+        })
+      }
+    }
+    else{
+       this.setState({
+         uploading: false,
+         error:"An error occured, please reflesh screen and try again. Contact us if this issue persists."
+       })
+    }
+    
+  } catch (error) {
+    this.setState({
+         uploading: false,
+         error:"An error occured, please reflesh screen and try again. Contact us if this issue persists."
+    })
+    console.error("Submission failed:", error);
+  }
+}
+
+  render() {
+    const inputStyle = {
+      color: "black",
+      fontWeight: "bold",
+      paddingLeft: "2px",
+      borderBottom: "1px solid #3228287a",
+      borderStyle: "dashed",
+      marginBottom: "5px",
+      height: "25px",
+      minWidth: "50px",
+      flexGrow: 1
+    };
+    const tableHeaderStyle = {
+      padding: "8px",
+      border: "1px solid #ccc",
+      backgroundColor: "#f9f9f9",
+      textAlign: "left"
+    };
+
+    const tableCellStyle = {
+      padding: "8px",
+      border: "1px solid #ccc"
+    };
+    const sections = [
+      { icon: <LinkIcon />, name: "Borrower Details", target: "#borrower-details" },
+      { icon: <LinkIcon />, name: "Costs", target: "#costs-and-fees" },
+      { icon: <LinkIcon />, name: "Bank", target: "#facility-terms" },
+      { icon: <LinkIcon />, name: "Email", target: "#email" },
+      { icon: <LinkIcon />, name: "Signatures", target: "#signatures" },
+      // add more as needed, matching id attributes
+    ]
+    
+    const { principalSum, agreementDateDay, agreementDateDaySuffix, agreementDateMonth, agreementDateYearNumber, agreementDateYearWords } = this.state.constants
+    return (
+     <>
+      <div style={{ width: "100%", margin: "0 auto" }}>
+        <div id="content-container" className="content-container">
+          {/* Part 1 */}
+          {this.state.error? <ErrorSnapBack errorMessage={this.state.error}/> : ""}
+          <p style={{textAlign:'center'}}>Dated the <>{agreementDateDay}<span style={{verticalAlign:'super',fontSize:'0.75em'}}>{agreementDateDaySuffix}</span></>, day of {agreementDateMonth + ' '+ agreementDateYearNumber} </p>
+
+          <h2 style={{ textAlign: "center" }}>VECTOR FINANCE LIMITED</h2>
+          <h3 style={{ textAlign: "center" }}>AND</h3>
+          <h3 style={{ textAlign: "center" }}>…</h3>
+
+          <h1 style={{ textAlign: "center", marginBottom:"30px" }}>LOAN AGREEMENT</h1>
+
+          <p>
+             This Loan Agreement (the “<strong>Agreement</strong>”) is made and effective the {agreementDateDay}, day of {agreementDateMonth}, {agreementDateYearWords} and made
+          </p>
+
+          <p id="borrower-details">
+            <strong>BETWEEN:</strong> VECTOR FINANCE LIMITED whose registered office is at Plot No. 15 Lagos Road, Room No. FS1-B, Gardenview Properties, Rhodespark, in the City and Province of Lusaka of the Republic of Zambia with Company Registration Number 120230054327 (the “<strong>The Lender</strong>”)
+          </p>
+
+          <p>
+            <strong>AND:</strong> <AutoResizingInput onChange={this.handleInputChange} placeholder="Enter Your Name" name="borrowerName" style={inputStyle} /> of<br/>
+            <AutoResizingInput onChange={this.handleInputChange} placeholder="Enter Your Address" name="borrowerAddress" style={inputStyle} /> (the “<strong>The Borrower</strong>”).
+            <br/><small>EG: Plot 101, Woodlands, Lusaka, Lusaka Province, Zambia</small>
+          </p>
+          {/* Part 2 */}
+          <h4>WHEREAS:</h4>
+          <ol>
+            <li>
+              A. The Lender is a Private Company Limited by shares, duly incorporated under the Laws of the Republic of Zambia.   
+            </li>
+            <li>
+              B. The Borrower is a business person/company incorporated under the laws of the Republic of Zambia and is desirous of obtaining a Loan from the Lender.
+            </li>
+            <li>
+              C. The Lender has agreed to advance to the Borrower the sum of money more particularly detailed herein on the terms and conditions outlined in this Agreement.
+            </li>
+            <li>
+              D. The Borrower has agreed to pledge their property more particularly described herein as, security for the principal sum plus interest thereon secured by this Agreement, on the terms and conditions contained herein.  
+            </li>
+          </ol>
+
+          <h4>WHEREBY IT IS AGREED AS FOLLOWS:</h4>
+          <h5>1. INTERPRETATION AND PRELIMINARY</h5>
+          <p>
+            1.1 The headings in this Agreement are for convenience and reference only and shall neither be used in the interpretation of, modification nor amplification of the terms of this Agreement nor any of its clauses;
+          </p>
+          <p>
+            1.2 In its interpretation, the contra proferentem rule of construction shall not apply (this Agreement being the product of negotiations between the Parties), nor shall this Agreement be construed against any Party by reason of the extent to which any Party or its professional advisors participated in the preparation of this Agreement;
+          </p>
+          <p>
+            1.3 Where figures are referred to in numerals and in words, and there is any conflict between the two, the words shall prevail, unless the context indicates a contrary intention;
+          </p>
+          <p>
+            1.4 In this Agreement, unless the context otherwise requires an obligation not to do something includes an obligation not to cause or allow that thing to be done;
+          </p>
+          <p>
+            1.5 Reference to “person” includes any legal or natural person, partnership, association, trust, company, joint venture, agency (whether corporate or unincorporated) and a natural person’s personal representatives or successors or permitted assigns.
+          </p>
+          <p>
+            1.6 In this Agreement unless the context otherwise stipulates, the words below shall have the following meanings:
+          </p>
+          <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: 20 }}>
+            <tbody>
+                <tr>
+                <td style={{ verticalAlign: "top", padding: "5px 10px", width: "25%" }}>
+                    “Agreement”
+                </td>
+                <td style={{ verticalAlign: "top", padding: "5px 10px" }}>
+                    Means this Loan Agreement;
+                </td>
+                </tr>
+                <tr>
+                <td style={{ verticalAlign: "top", padding: "5px 10px" }}>
+                    “Business Day”
+                </td>
+                <td style={{ verticalAlign: "top", padding: "5px 10px" }}>
+                    Means a day other than a Saturday, Sunday or public holiday in Zambia
+                    between the hours of 8:00 am to 5:00 pm Zambia;
+                </td>
+                </tr>
+                <tr>
+                <td style={{ verticalAlign: "top", padding: "5px 10px" }}>
+                    “Disbursement Date”
+                </td>
+                <td style={{ verticalAlign: "top", padding: "5px 10px" }}>
+                    Means the date requested by the Borrower for the Loan or part of the
+                    Loan to be advanced or (as the context requires) the date on which such
+                    advance is actually made to the Borrower;
+                </td>
+                </tr>
+                <tr>
+                <td style={{ verticalAlign: "top", padding: "5px 10px" }}>
+                    “Disbursement Notice”
+                </td>
+                <td style={{ verticalAlign: "top", padding: "5px 10px" }}>
+                    Means the request for disbursement of a Loan which must be evidenced in
+                    writing;
+                </td>
+                </tr>
+                <tr>
+                <td style={{ verticalAlign: "top", padding: "5px 10px" }}>“Dispute”</td>
+                <td style={{ verticalAlign: "top", padding: "5px 10px" }}>
+                    Means any dispute, difference of view, disagreement, controversy or
+                    claim arising out of or relating to this Agreement or the interpretation
+                    or performance of its provisions, which the Parties are unable to
+                    resolve amicably or by mutual agreement;
+                </td>
+                </tr>
+                <tr>
+                <td style={{ verticalAlign: "top", padding: "5px 10px" }}>
+                    “Encumbrance”
+                </td>
+                <td style={{ verticalAlign: "top", padding: "5px 10px" }}>
+                    Means any mortgage, claim, charge (fixed or floating), pledge, lien,
+                    hypothecation, guarantee, right of set-off, trust, assignment, right of
+                    first refusal, right of pre-emption, option, restriction or other
+                    encumbrance or any legal or equitable third party right or interest
+                    including any security interest of any kind or any type of preferential
+                    arrangement (or any like agreement or arrangement creating any of the
+                    same or having similar effect);
+                </td>
+                </tr>
+                <tr>
+                <td style={{ verticalAlign: "top", padding: "5px 10px" }}>
+                    “Event of Default”
+                </td>
+                <td style={{ verticalAlign: "top", padding: "5px 10px" }}>
+                    Means any event or circumstance specified as such in Clause 11;
+                </td>
+                </tr>
+                <tr>
+                <td style={{ verticalAlign: "top", padding: "5px 10px" }}>“Facility”</td>
+                <td style={{ verticalAlign: "top", padding: "5px 10px" }}>
+                    Means the Loan Facility described in Clause 4;
+                </td>
+                </tr>
+                <tr>
+                <td style={{ verticalAlign: "top", padding: "5px 10px" }}>“Loan”</td>
+                <td style={{ verticalAlign: "top", padding: "5px 10px" }}>
+                    Means the principal sum advanced or to be advanced to the Borrower
+                    pursuant to this Agreement;
+                </td>
+                </tr>
+                <tr>
+                <td style={{ verticalAlign: "top", padding: "5px 10px" }}>
+                    “Loan Maturity Date”
+                </td>
+                <td style={{ verticalAlign: "top", padding: "5px 10px" }}>
+                    Means the date upon which the final Loan payment together with all
+                    accrued interest becomes due as set out in the First Schedule hereto;
+                </td>
+                </tr>
+                <tr>
+                <td style={{ verticalAlign: "top", padding: "5px 10px" }}>
+                    “Loan Period”
+                </td>
+                <td style={{ verticalAlign: "top", padding: "5px 10px" }}>
+                    Means the period commencing on the date of this Agreement and ending on
+                    the day on which all amounts outstanding under the Agreement have been
+                    repaid in full;
+                </td>
+                </tr>
+                <tr>
+                <td style={{ verticalAlign: "top", padding: "5px 10px" }}>
+                    “Repayment Date”
+                </td>
+                <td style={{ verticalAlign: "top", padding: "5px 10px" }}>
+                    Means the dates as set out in the First Schedule hereto.
+                </td>
+                </tr>
+            </tbody>
+          </table>
+
+          {/* Part 3 */}
+            <h4>2. COMMENCEMENT AND DURATION</h4>
+            <p>
+                2.1 This Agreement shall commence on the day and year first before written
+                and shall continue in force until such a time as all sums owed by the
+                Borrower in terms of the Agreement have been repaid, together with all
+                charges and interest, or until such a time as this Agreement is terminated
+                by the Lender.
+            </p>
+            <h4>3. CONDITIONS PRECEDENT</h4>
+            <p>
+                <strong>3.1 Initial conditions precedent</strong>
+                <br />
+                The obligations of the Lender under this Agreement are subject to the
+                condition precedent that the Lender has received all of the ownership
+                documentation (i.e. Title deeds, Vehicle Registration Documents) in relation
+                to the security provided herein.
+            </p>
+            <p>
+                <strong>3.2 Further conditions precedent</strong>
+            </p>
+            <p>
+                3.2.1 No Disbursement Notice may be given by the Borrower unless the
+                following further conditions precedent have been satisfied by the Borrower,
+                in a form and substance satisfactory to the Lender, which the Lender has
+                notified to the Borrower:
+            </p>
+            <ol id="facility-terms">
+                <li> A. 
+                On both the date of the Disbursement Notice and the Disbursement Date, the
+                warranties and covenants in Clause 8 and 9 respectively (Warranties and
+                Covenants), deemed to be repeated on those dates, are true in all material
+                respects and will be true in all material respects immediately after the
+                Loan is advanced and in accordance with the terms of this Agreement; and
+                </li>
+                <li> B. 
+                On both the date of the Disbursement Notice and the Disbursement Date, no
+                money is outstanding or due to the Lender by the Borrower pursuant to any
+                other written agreement and/or no default would result from the advance of
+                the Loan.
+                </li>
+            </ol>
+                    <>
+            <h4>4. THE FACILITY</h4>
+            <p>
+                <strong>4.1</strong> Subject to the terms and conditions of this Agreement,
+                the Lender shall make available to the Borrower a Loan in an amount of ZMW {principalSum}, (hereinafter referred to as the “Principal Sum”).
+            </p>
+            <p>
+            <strong>4.2</strong> The sums in 4.1 above, shall be paid into the
+            Borrower’s Bank Account:
+        </p>
+        </>
+          <p>Bank: <AutoResizingInput onChange={this.handleInputChange} name="bankName" style={inputStyle} /></p>
+          <p>Branch: <AutoResizingInput onChange={this.handleInputChange} name="branchName" style={inputStyle} /></p>
+          <p>Account Number: <AutoResizingInput onChange={this.handleInputChange} name="accountNumber" style={inputStyle} /></p>
+          <p>Sort Code: <AutoResizingInput onChange={this.handleInputChange} name="sortCode" style={inputStyle} /></p>
+          <p>Swift Code: <AutoResizingInput onChange={this.handleInputChange} name="swiftCode" style={inputStyle} /></p>
+          <p>Bank Account Name: <AutoResizingInput onChange={this.handleInputChange} name="accountName" style={inputStyle} /></p>
+          <p>Phone number: <AutoResizingInput onChange={this.handleInputChange} name="bankPhone" style={inputStyle} /></p>
+          {/* Part 4 */}
+           <>
+            <p>
+                5.1 Subject to the provisions of this Agreement, the Borrower shall repay
+                the Loan and all accrued interest and other fees and charges thereon within
+                loanTerm from the date of disbursement, in accordance with the repayment
+                schedule set out in the First Schedule hereto provided that the repayment
+                period may in the sole discretion of the Lender, be extended, which said
+                extension shall be evidenced in writing.
+            </p>
+            <p>
+                5.2 Subject to the written consent of the Lender, the Borrower may, if
+                its/his/her financial capacity permits, repay any installment payment
+                earlier that the date fixed for said repayment provided in in the First
+                Schedule.
+            </p>
+            <p>
+                5.3 All payments made by the Borrower under this Agreement shall be in
+                Zambian Kwacha and in immediately available cleared funds to the Lender into
+                the following bank account:
+            </p>
+            <p>
+                All payments in ZMW, cleared funds, to:
+                <br />
+                Bank: Stanbic Bank (Zambia) Limited
+                <br />
+                Branch: Woodlands
+                <br />
+                Account Number: 9130006381913
+                <br />
+                Sort Code: 040030
+                <br />
+                SWIFT Code: SBICZMLX
+            </p>
+            <p>
+                5.4 All payments made by the Borrower under this Agreement shall be made in
+                full, without set-off, counter claim or condition and free and clear of and
+                without any bank charges, deduction or withholding (whether on account of
+                tax or otherwise).
+            </p>
+            <p>
+                5.5 If any payment becomes due on a day that is not a Business Day, the due
+                date of such payment will be extended to the next succeeding Business Day,
+                or if that Business Day falls in the following calendar month, such due date
+                shall be the immediately preceding Business Day.
+            </p>
+            <h4>6. INTEREST</h4>
+            <p>
+                6.1 Interest shall accrue on the outstanding balance of the Loan at the rate
+                of 4% (four percent) per month. Interest shall be calculated on the daily
+                cleared balance outstanding on the Borrower’s account on the basis of a
+                365-day year, irrespective of whether or not the year in question is a leap
+                year (as varied from time to time). Such interest will be capitalized if not
+                paid on the due date.
+            </p>
+            <h4>7. SECURITY</h4>
+            <p>
+                7.1 The Principal Sum plus interest together with all the Borrower's
+                obligations and liabilities under this Agreement, including without
+                limitation, any derived liability whatsoever of the Borrower towards the
+                Lender in connection with this Agreement, shall at all times during the Loan
+                Period be secured by the properties listed below:
+            </p>
+            </>
+
+          <ul style={{ paddingLeft: "20px" }}>
+            <li>Make: <AutoResizingInput onChange={this.handleInputChange} name="securityMake" style={inputStyle} /></li>
+            <li>Model: <AutoResizingInput onChange={this.handleInputChange} name="securityModel" style={inputStyle} /></li>
+            <li>RegNo: <AutoResizingInput onChange={this.handleInputChange} name="securityRegNo" style={inputStyle} /></li>
+            <li>Colour: <AutoResizingInput onChange={this.handleInputChange} name="securityColour" style={inputStyle} /></li>
+            <li>Year of Make: <AutoResizingInput onChange={this.handleInputChange} name="securityYear" style={inputStyle} /></li>
+            <li>Engine No: <AutoResizingInput onChange={this.handleInputChange} name="securityEngineNo" style={inputStyle} /></li>
+            <li>Chasis No: <AutoResizingInput onChange={this.handleInputChange} name="securityChasisNo" style={inputStyle} /></li>
+          </ul>
+          <>
+            <p>(a) … (hereinafter collectively referred to as the “the Property”).</p>
+            <p>
+                7.2 The Borrower hereby warrants that as at the date of this Agreement, the
+                property is free from any and all encumbrances and shall remain as such
+                until the Principal Sum plus interest and other fees and charges thereon
+                secured, under this agreement is repaid by the Borrower and any and all
+                outstanding obligations of the Borrower, pursuant to this Agreement have
+                been discharged.
+            </p>
+            <p>
+                7.3 Upon execution of this Agreement, the Borrower shall deposit the
+                original documents relating to the ownership of the Property including but
+                not limited to Certificates of Title and/or Vehicle Registration Documents,
+                at the Lender’s registered office.
+            </p>
+            <h4>8. WARRANTIES</h4>
+            <p>
+                8.1 The Borrower makes the warranties set out in clause 8 to the Lender on
+                the date of this Agreement:
+            </p>
+            <p>8.1.1 The Borrower is the Legal and beneficial owner of the Property;</p>
+            <p>
+                8.1.2 The Borrower has the power to enter into, deliver, perform, and has
+                taken all necessary action to authorize its entry into delivery and
+                performance of this Agreement and the transactions contemplated by it;
+            </p>
+            <p>
+                8.1.3 That no limit on its powers will be exceeded as a result of the
+                borrowing contemplated by the creation of the security contemplated to be
+                created in connection with this Agreement;
+            </p>
+            <p>
+                8.1.4 The entry into and performance of, and the transactions contemplated
+                by this Agreement do not and will not contravene or conflict with any
+                agreement or instrument binding on the Borrower or its/his/her asset;
+            </p>
+            <p>
+                8.1.5 The entry into and performance of, and the transactions contemplated
+                by this Agreement do not and will not contravene or conflict with any law or
+                regulation or judicial or official order, applicable to the Borrower;
+            </p>
+            <p>
+                8.1.6 The Borrower’s obligations under this Agreement are legal, valid,
+                binding and enforceable in accordance with its terms; and
+            </p>
+            <p>
+                8.1.7 The Borrower has disclosed to the Lender before the date of this
+                Agreement all information relating to it and the transaction, that is
+                material to be known by the Lender (in the context of a Loan for a similar
+                amount and on similar terms to the facility) and the information is accurate
+                and complete in all material respects.
+            </p>
+            <h4>9. COVENANTS</h4>
+            <p>
+                9.1 The Borrower covenants with the Lender that as at the date of this
+                Agreement until all its obligations and liabilities hereunder have been
+                discharged:
+            </p>
+            <p>
+                9.1.1 The Borrower shall promptly obtain all consents or authorisations,
+                necessary (and do all that is needed to maintain them in full force and
+                effect) under any law or regulation to enable it to perform its obligations
+                under this Agreement; and
+            </p>
+            <p>
+                9.1.2 The Borrower shall carry on and conduct its business in a diligent,
+                proper and efficient manner and will not make any material alteration to the
+                general nature or scope of its business as carried on at the commencement
+                date of this Agreement.
+            </p>
+            <h4>10. UNDERTAKINGS</h4>
+            <p>
+                10.1 During the subsistence of this Agreement, the Borrower gives the
+                following undertakings:
+            </p>
+            <p>
+                10.1.1 That the Borrower shall pay all sums due as agreed in this Agreement;
+            </p>
+            <p>
+                10.1.2 That the Borrower shall comply with, fulfill, and perform timeously
+                all its obligations in terms of this Agreement;
+            </p>
+            <p>
+                10.1.3 The Borrower shall not incur any other liabilities which said
+                liability will affect its ability to pay the Loan amount plus interest
+                herein, without the Lender’s prior written consent;
+            </p>
+            <p>
+                10.1.4 That the Borrower shall immediately send, or ensure that is sent, to
+                the Lender details of any material litigation, arbitration, or
+                administrative proceedings instituted against them, or details of any
+                material claims asserted against them, or of any dispute with any Government
+                or regulatory body or law enforcement agency, which may affect their ability
+                to comply with their obligations under this Agreement; and
+            </p>
+            <p>
+                10.1.5 The Borrower will not encumber or dispose of the Property until the
+                Loan amount and all accrued interest thereon has been settled in full.
+            </p>
+            <h4>11. EVENT OF DEFAULT</h4>
+            <p>
+                11.1 Each of the events or circumstances set out in this clause will
+                constitute an Event of Default:
+            </p>
+            <p>
+                11.1.1 The Borrower shall be in default if he/she/it does not pay on the due
+                date any instalment payable by him/her/it under this Agreement in the manner
+                set out under the First Schedule.
+            </p>
+            <p>
+                11.1.2 The Borrower fails (other than by failing to pay) to comply with any
+                provisions of this Agreement and (if the Lender considers, acting
+                reasonably, that the default is capable of remedy) such default is not
+                remedied within ten (10) Business Days or earlier of:
+            </p>
+            <ol>
+                <li>
+                 A. The Lender notifying the Borrower of the default and the remedy required;
+                and
+                </li>
+                <li>B. The Borrower becoming aware of the default.</li>
+            </ol>
+            <p>
+                11.1.3 Any representation, warranty or statement made, repeated or deemed
+                made by the Borrower in, or pursuant to this Agreement is (or proves to have
+                been) incomplete, untrue, incorrect or misleading in any material respect
+                when made, repeated or deemed made;
+            </p>
+            <p>
+                11.1.4 The Borrower stops or suspends payment of any of its liabilities
+                under this Agreement;
+            </p>
+            <p>
+                11.1.5 The Borrower commences negotiations, or enters into any composition,
+                compromise, assignment or arrangement with one or more of its creditors
+                (excluding the Lender) with a view to rescheduling any of its indebtedness
+                (because of actual or anticipated financial difficulties);
+            </p>
+            <p>
+                11.1.6 If the Property is destroyed, sold, disposed of, alienated, attached
+                or restrained in any manner;
+            </p>
+            <p>
+                11.1.7 The Borrower repudiates or rescinds or shows an intention to
+                repudiate or rescind this Agreement; and
+            </p>
+            <p>
+                11.1.8 If any circumstance or event occurs which would or is likely to
+                prejudice or adversely affect in any manner the capacity of the Borrower to
+                repay any sums due and payable herein or any part thereof.
+            </p>
+            <p>
+                11.2 On and at any time after the occurrence of an Event of default, the
+                Lender may by notice to the Borrower:
+            </p>
+            <ol>
+                <li>
+                A. Cancel all outstanding obligations of the Lender under the Agreement
+                whereupon they shall immediately be cancelled;
+                </li>
+                <li>
+                B. Declare that the Loan and all accrued interest thereon and all other
+                amounts accrued or outstanding under this Agreement are due and payable on
+                demand;
+                </li>
+                <li>
+                TC. ake possession of the security so created whether by itself or through
+                any of the Recovery Agents or Attorneys as may be appointed; and/or
+                </li>
+                <li>
+                D. Take any other action as it may deem fit for recovery of its dues and
+                enforcement of the securities.
+                </li>
+            </ol>
+            <h4>12. ADDRESS</h4>
+            </>
+            <p>
+            12.1 The Parties choose the addresses mentioned in clause 12.2 below as their respective
+            address for service of all notices, letters and documents under or in connection with this
+            Agreement. A Party can change its address for service by giving notice and the change
+            will be effective from the date of receipt or deemed receipt by the Party to whom it was
+            sent.
+            </p>
+
+            <p><strong>12.2 Addresses</strong></p>
+            <p>(a) The Lender:<br/>
+            Room No. FS1-B<br/>
+            Plot 15 Lagos Road<br/>
+            Gardenview Properties<br/>
+            Rhodespark<br/>
+            Lusaka<br/>
+            Zambia.<br/>
+            Email: info@vectorfinancelimited.com
+            </p>
+          <p id="email">(b) The Borrower:</p>
+          <p style={{ paddingLeft: "20px" }}>
+            <AutoResizingInput disabled={true} defaultValue={this.state.formValues.borrowerName} placeholder="Enter Your address" onChange={this.handleInputChange} name="borrowerAddress" style={inputStyle} />
+            <br/>
+            Email: <AutoResizingInput onChange={this.handleInputChange} placeholder="Enter Your Email Address" name="borrowerEmail" style={inputStyle} />
+          </p>
+          {/* Part 7 */}
+          <p>
+        12.3 Any notice or communication required or permitted to be given of this Agreement
+        shall be valid and effective only if in writing and in English.
+        </p>
+        <p>
+        12.4 Any such notice or communication addressed as provided herein shall be deemed
+        to be given or made as follows:
+        </p>
+        <ol id="costs-and-fees">
+        <li>A. If in person or by courier, when delivered;</li>
+        <li>B. If by electronic mail, at the time the e-mail was sent (provided that a notice of
+        non-delivery has not been received); and</li>
+        <li>C. Provided that any such notice or communication is received on a business day,
+        and within business hours.</li>
+        </ol>
+
+        <h4>13. COSTS, FEES AND OTHER CHARGES</h4>
+        <p>13.1 The Borrower shall pay to the Lender:</p>
+        <ol>
+        <li>A. Drawdown Fees: A drawdown fee of ZMW 100.00 (Once off fee to be paid upfront).</li>
+        <li>B. Arrangement Fees: Arrangement fee at 3% of the Loan Amount calculated monthly (To be paid in arrears on the due date).</li>
+        <li>C. Loan Management Fee: A Loan management fee at 11% of the Loan Amount calculated monthly (To be paid in arrears on the due date).</li>
+        </ol>
+        <p>13.2 The Lender may require the Borrower to pay the following fees:</p>
+        <ol>
+        <li>A. Insurance Fees: Where Insurance is applicable e.g. asset backed Loan with security offsite, the Borrower shall bear the full cost of insurance of the property subject to this Agreement and if paid by Lender, the said payment shall be made directly to the insurance company and shall be added to the total Loan and shall constitute the Principal Sum;</li>
+        <li>B. Tracker Installation Fees: Where asset tracking is applicable e.g. offsite movable security, the Borrower shall avail the asset or property subject to this Agreement for Tracker installation at the Borrower’s own cost, and if paid by the Lender, the said payment will be made directly to Tracking company and will constitute the Principal Sum. The Borrower agrees that tempering with the tracking device in any way shall constitute an event of default upon which the Lender may exercise its right to terminate the Agreement and demand immediate and full settlement of all outstanding sums; and</li>
+        <li>C. Legal Costs: In the event of default, the Borrower shall reimburse the Lender for all legal costs incurred in recovering any outstanding amount that is due under this Agreement, including the costs of registration of this Agreement and any other security or other documents relating to this Agreement for purposes of enforcement.</li>
+        </ol>
+
+        <h4>14. WAIVER</h4>
+        <p>
+        14.1 No delay or omission to exercise any right, power or remedy accruing to the Lender upon any
+        breach or default of the Borrower under this Agreement shall impair any such right, power
+        or remedy of the Lender nor shall it be construed to be a waiver of any such breach or
+        default.
+        </p>
+        <p>
+        14.2 Any waiver, permission, consent or approval on the part of the Lender in respect of any
+        breach and/or default under this Agreement or any provisions or condition of this
+        Agreement must be in writing and shall be effective only to the extent in such writing
+        specifically.
+        </p>
+
+        <h4>15. SUPERSEDING</h4>
+        <p>
+        15.1 This Agreement supersedes in its totality any prior contemporaneous agreements (oral or in
+        print, express or implied) between the Parties concerning the subject matter herein.
+        </p>
+
+        <h4>16. CONFIDENTIALITY</h4>
+        <p>
+        16.1 Each Party to this Agreement undertakes to not disclose, directly or indirectly, to any person
+        the contents of this Agreement or the terms of settlement unless:
+        </p>
+        <ol>
+        <li>A. Required to be disclosed by a Court of Law of any relevant jurisdiction;</li>
+        <li>B. Prior written consent of the other Party has been obtained; or</li>
+        <li>C. The information has come into the public domain through no fault of a Party, provided that such disclosure shall be notified to the other Party thereafter.</li>
+        </ol>
+        <p>
+        16.2 The obligations of the Parties not to disclose confidential information shall be without limit and
+        are irrevocable. The Parties shall desist from making or publishing any statements or
+        comments whether in writing or otherwise concerning each other arising from the facts of
+        the Claim. A Party in breach shall be liable for any damage caused arising directly or
+        indirectly from the said breach.
+        </p>
+
+        <h4>17. SEVERANCE</h4>
+        <p>
+        17.1 Notwithstanding anything contained in any provision of this Agreement, if any provision is held
+        or found to be void, invalid, or otherwise unenforceable, such provision shall be deemed to
+        be severed from this Agreement to the extent only that it is void, invalid, or unenforceable
+        but the remainder of any such provision in this Agreement shall remain valid and
+        enforceable to the extent that they can be given effect without the invalid portions of the
+        provisions.
+        </p>
+
+        <h4>18. DISPUTE RESOLUTION</h4>
+        <p>
+        18.1 Any claim or dispute arising under, out of or in connection with this Agreement shall be
+        resolved amicably by the Parties, failure which, the Parties shall refer the dispute to a Court
+        of Competent jurisdiction within Zambia.
+        </p>
+
+        <h4>19. NO STIPULATION</h4>
+        <p>
+        19.1 No part of this Agreement shall constitute a stipulation in favour of any person who is not a
+        Party to the Agreement, unless the provision in question expressly provides that it does
+        constitute a stipulation.
+        </p>
+
+        <h4>20. WHOLE AGREEMENT</h4>
+        <p>
+        20.1 This Agreement constitutes the entire contract between the Parties and no warranties or
+        representations or promises or undertakings have been given or made by either Party to
+        the other except those recorded in this Agreement.
+        </p>
+        <p>
+        20.2 No variation of this Agreement shall be valid unless reduced in writing and signed by or on
+        behalf of all Parties.
+        </p>
+
+        <h4>21. GOVERNING LAW</h4>
+        <p>
+        21.1 This Agreement shall be construed and interpreted in all respects in accordance with the
+        Laws of the Republic of Zambia.
+        </p>
+
+        <h4>22. SIGNATURE</h4>
+        <p>
+        22.1 The Parties record that it is not required for this Agreement to be valid and enforceable that a
+        Party shall initial the pages of this Agreement and/or have its signature of this Agreement
+        verified by a witness.
+        </p>
+
+        <h4>23. BINDING EFFECT</h4>
+        <p>
+        23.1 This Agreement shall be binding upon the Parties, their respective heirs, successors, assigns
+        and personal representatives and is enforceable against any Third Parties in accordance
+        with the terms and obligations thereof.
+        </p>
+
+        <p>AS WITNESS the hands of the Parties hereto or their duly authorized agents the day and year first before written.</p>
+
+          <p>
+            Signed by the said <AutoResizingInput onChange={this.handleInputChange} name="vendorSignatoryName" style={inputStyle} /> for and on behalf of VECTOR FINANCE LIMITED
+          </p>
+          <p>In the presence of:</p>
+          <p id="signatures">
+            Director: <AutoResizingInput onChange={this.handleInputChange} name="vendorDirectorName" style={inputStyle} />
+          </p>
+
+          <p>
+            Client’s Name: <AutoResizingInput disabled={true} defaultValue={this.state.formValues.borrowerName} onChange={this.handleInputChange} name="borrowerName" style={inputStyle} />
+          </p>
+          <p>
+            Client’s <DisplaySignature for="me" signature={this.props.signature}/>
+          </p>
+
+          <p>In the presence of:</p>
+          <p>
+            WITNESS<br />
+            Name: <AutoResizingInput onChange={this.handleInputChange} name="borrowerWitnessName" style={inputStyle} /><br />
+            Address: <AutoResizingInput onChange={this.handleInputChange} name="borrowerWitnessName" style={inputStyle} /><br />
+            Occupation: <AutoResizingInput onChange={this.handleInputChange} name="borrowerWitnessOccupation" style={inputStyle} /><br />
+            Client’s <DisplaySignature placeholder="Enter Your Name" for="witness" witnessSignature={this.props.witnessSignature}/><br/>
+            Date: <><span>{agreementDateMonth} </span>{agreementDateDay}<span style={{verticalAlign:'super',fontSize:'0.75em'}}>{agreementDateDaySuffix}</span> <span>{agreementDateYearNumber}</span> </>
+          </p>
+
+          <h4>REPAYMENT SCHEDULE</h4>
+          <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: "20px" }}>
+            <thead>
+              <tr>
+                <th style={tableHeaderStyle}>Payment Number</th>
+                <th style={tableHeaderStyle}>Payment Due Date</th>
+                <th style={tableHeaderStyle}>Payment Amount</th>
+                <th style={tableHeaderStyle}>Principal</th>
+                <th style={tableHeaderStyle}>Interest & Fees</th>
+                <th style={tableHeaderStyle}>Remaining Balance</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[...Array(12).keys()].map((_, index) => (
+                <tr key={index}>
+                  <td style={tableCellStyle}>{index + 1}</td>
+                  <td style={tableCellStyle}>
+                    <AutoResizingInput onChange={this.handleInputChange} name={`schedule[${index}].dueDate`} />
+                  </td>
+                  <td style={tableCellStyle}>
+                    <AutoResizingInput onChange={this.handleInputChange} name={`schedule[${index}].amount`} />
+                  </td>
+                  <td style={tableCellStyle}>
+                    <AutoResizingInput onChange={this.handleInputChange} name={`schedule[${index}].principal`} />
+                  </td>
+                  <td style={tableCellStyle}>
+                    <AutoResizingInput onChange={this.handleInputChange} name={`schedule[${index}].interestFees`} />
+                  </td>
+                  <td style={tableCellStyle}>
+                    <AutoResizingInput onChange={this.handleInputChange} name={`schedule[${index}].remainingBalance`} />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          <p>APPENDIX</p>
+        </div>
+
+        <div style={{ display: "flex", justifyContent: "space-between", marginTop: "20px" }}>
+          <button
+            className="btn btn-success"
+            onClick={() => this.props.handleRenderPreviousForm()}
+          >
+            Previous
+          </button>
+          <button
+              className="btn btn-danger"
+              disabled={this.state.uploading}
+              onClick={this.saveFormToAPI}
+            >
+               {this.state.uploading? "Submitting..." : "Submit"}
+            </button>
+        </div>
+      </div>
+      {/* Scroll-toggle FAB */}
+        <StyledFab
+          color="primary"
+          onClick={this.scrollHandler}
+          aria-label={this.state.atBottom ? "Scroll to top" : "Scroll to bottom"}
+        >
+          {this.state.atBottom ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+        </StyledFab>
+
+        {/* Section-nav SpeedDial */}
+        <SectionNav
+          ariaLabel="Navigate sections"
+          icon={<MenuIcon />}
+          direction="up"
+        >
+          {sections.map((sec) => (
+            <SpeedDialAction
+              key={sec.name}
+              icon={sec.icon}
+              tooltipTitle={sec.name}
+              onClick={() => {
+                const el = document.querySelector(sec.target);
+                if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+              }}
+              tooltipOpen
+              FabProps={{
+                sx: {
+                  bgcolor: "rgba(255,255,255,0.8)",
+                  "&:hover": { bgcolor: "rgba(255,255,255,1)" },
+                },
+              }}
+            />
+          ))}
+        </SectionNav>
+     </>
+    )
+  }
+}

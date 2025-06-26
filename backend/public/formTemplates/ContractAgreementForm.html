@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>SalesAgreementForm</title>
+  <style>
+    body { font-family: sans-serif; line-height: 1.4; padding: 20px; }
+    h2, h4 { text-align: center; margin: 0.5em 0; }
+    p { margin: 0.5em 0; }
+    .dashed-input {
+      display: inline-block;
+      border-bottom: 1px dashed #3228287a;
+      padding-left: 2px;
+      font-weight: bold;
+      vertical-align: text-top;
+    }
+    .signature { margin: 1em 0; }
+    .signature img { max-width: 200px; }
+  </style>
+</head>
+<body>
+  <h2>VEHICLE SALES AGREEMENT</h2>
+
+  <!-- Agreement Opening -->
+  <p>
+    THIS VEHICLE SALES AGREEMENT is made this
+    <span class="dashed-input">${agreementDay}</span>
+    day of
+    <span class="dashed-input">${agreementMonth}</span>,
+    <span class="dashed-input">${agreementYear}</span>,
+    by and among
+  </p>
+  <p>(<span class="dashed-input">${sellerName}</span> hereinafter known as "Seller") and</p>
+  <p>(<span class="dashed-input">${buyerName}</span> hereinafter known as "Buyer").</p>
+  <p>Buyer and Seller shall collectively be known herein as "the Parties".</p>
+
+  <!-- Background -->
+  <h4>BACKGROUND</h4>
+  <p>Whereas, Seller desires to sell the vehicle described below, known herein as the "Acquired Vehicle",</p>
+  <p>and Whereas, Buyer desires to purchase the Acquired Vehicle under the terms set forth below;</p>
+
+  <!-- Terms and Conditions -->
+  <h4>TERMS AND CONDITIONS</h4>
+
+  <!-- Section A -->
+  <p><strong>A. Description of Acquired Vehicle.</strong></p>
+  <p>1. Make: <span class="dashed-input">${vehicleMake}</span></p>
+  <p>2. Model: <span class="dashed-input">${vehicleModel}</span></p>
+  <p>3. Body Type: <span class="dashed-input">${bodyType}</span></p>
+  <p>4. Body Color: <span class="dashed-input">${bodyColor}</span></p>
+  <p>5. Year: <span class="dashed-input">${vehicleYear}</span></p>
+  <p>6. Chassis Number: <span class="dashed-input">${chassisNumber}</span></p>
+  <p>7. Registration Number: <span class="dashed-input">${registrationNumber}</span></p>
+
+  <!-- Section B -->
+  <p><strong>B. Consideration.</strong></p>
+  <p>
+    1. Purchase Price. The total purchase price to be paid by Buyer to Seller for the Acquired Vehicle is K
+    <span class="dashed-input">${purchasePriceWords}</span>
+    (ZMW
+    <span class="dashed-input">${purchasePriceNumber}</span>
+    ).
+  </p>
+
+  <!-- Section C -->
+  <p><strong>C. Delivery of Acquired Vehicle and Conveyance of Title.</strong></p>
+  <p>
+    1. Delivery. Seller shall deliver the Acquired Vehicle at
+    <span class="dashed-input">${deliveryLocation}</span>
+    on or before
+    <span class="dashed-input">${deliveryDate}</span>.
+  </p>
+  <p>
+    2. Title. Seller shall convey title to Buyer upon full receipt of the agreed consideration.
+  </p>
+
+  <!-- Section D -->
+  <p><strong>D. Representations, Warranties, and Disclosures.</strong></p>
+  <p>
+    1. Warranties. This vehicle is sold "AS IS" without any express or implied warranties.
+  </p>
+
+  <!-- Section E -->
+  <p>
+    <strong>E. Severability.</strong> If any provision hereof is found invalid, the remainder shall remain in force.
+  </p>
+
+  <!-- Section F -->
+  <p>
+    <strong>F. Modification.</strong> This Agreement may only be modified by a written and signed instrument.
+  </p>
+
+  <!-- Section G -->
+  <p>
+    <strong>G. Acknowledgements.</strong> Each Party acknowledges having read and understood this Agreement.
+  </p>
+
+  <!-- Signature Blocks -->
+  <div class="signature">
+    <p><strong>SELLER</strong></p>
+    <p>Name: <span class="dashed-input">${sellerName}</span></p>
+    <p>NRC: <span class="dashed-input">${sellerNRC}</span></p>
+    <p>
+      Signature:<br/>
+      <img src="${sellerSignature}" alt="Seller signature" />
+    </p>
+    <p>Date: <span class="dashed-input">${sellerSignatureDate}</span></p>
+  </div>
+
+  <div class="signature">
+    <p><strong>BUYER</strong></p>
+    <p>Name: <span class="dashed-input">${buyerName}</span></p>
+    <p>NRC: <span class="dashed-input">${buyerNRC}</span></p>
+    <p>
+      Signature:<br/>
+      <img src="${buyerSignature}" alt="Buyer signature" />
+    </p>
+    <p>Date: <span class="dashed-input">${buyerSignatureDate}</span></p>
+  </div>
+
+  <div class="signature">
+    <p><strong>WITNESS</strong></p>
+    <p>Name: <span class="dashed-input">${witnessName}</span></p>
+    <p>
+      Signature:<br/>
+      <img src="${witnessSignature}" alt="Witness signature" />
+    </p>
+    <p>Date: <span class="dashed-input">${witnessDate}</span></p>
+  </div>
+</body>
+</html>
+
+<!-- {
+  agreementDay,            // e.g. "15"
+  agreementMonth,          // e.g. "May"
+  agreementYear,           // e.g. "2025"
+
+  sellerName,              // e.g. "Alice Doe"
+  buyerName,               // e.g. "Bob Smith"
+
+  vehicleMake,             // e.g. "Toyota"
+  vehicleModel,            // e.g. "Corolla"
+  bodyType,                // e.g. "Sedan"
+  bodyColor,               // e.g. "White"
+  vehicleYear,             // e.g. "2020"
+  chassisNumber,           // e.g. "ABC123456789"
+  registrationNumber,      // e.g. "AB-1234"
+
+  purchasePriceWords,      // e.g. "One Hundred Thousand"
+  purchasePriceNumber,     // e.g. "100,000"
+
+  deliveryLocation,        // e.g. "Seller's premises"
+  deliveryDate,            // e.g. "2025-06-30"
+
+  sellerNRC,               // e.g. "12345678"
+  sellerSignature,         // Base64 data-URL
+  sellerSignatureDate,     // e.g. "2025-05-14"
+
+  buyerNRC,                // e.g. "87654321"
+  buyerSignature,          // Base64 data-URL
+  buyerSignatureDate,      // e.g. "2025-05-14"
+
+  witnessName,             // e.g. "Chris Lee"
+  witnessSignature,        // Base64 data-URL
+  witnessDate              // e.g. "2025-05-14"
+}
+-->

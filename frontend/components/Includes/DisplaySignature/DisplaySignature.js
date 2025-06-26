@@ -3,8 +3,8 @@ import { backEndUrl } from "@/Constants"
 const DisplaySignature = (props) => {
         const witnessSignature = props.witnessSignature
         const signature = props.signature
-        console.log(witnessSignature)
-        console.log(signature)
+        // console.log(witnessSignature)
+        // console.log(signature)
         async function getBase64Image(url) {
             const response = await fetch(url)
             if (!response.ok) {
@@ -21,7 +21,7 @@ const DisplaySignature = (props) => {
         async function loadImage() {
             try {
             const base64Image = await getBase64Image(props.for === "witness"? backEndUrl + witnessSignature.url :  backEndUrl + signature.url)
-            console.log(base64Image)
+            // console.log(base64Image)
             // Use the Base64 image as the source for an <img> element
             if(props.for === "witness"){
                 document.getElementById('witness-image').src = base64Image
@@ -30,7 +30,7 @@ const DisplaySignature = (props) => {
                 document.getElementById('image').src = base64Image
             }
             } catch (error) {
-            console.error('Error fetching image:', error)
+                console.error('Error fetching image:', error)
             }
         }
       

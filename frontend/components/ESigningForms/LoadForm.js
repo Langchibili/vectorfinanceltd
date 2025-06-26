@@ -3,11 +3,11 @@
 import React from "react";
 import { Zoom } from "@material-ui/core";
 import { Alert } from "@mui/material";
-import NewLoanForm from "./NewLoanForm/NewLoanForm";
-import SalesAgreementForm from "./SalesAgreementForm/SalesAgreementForm";
 import ContractOfLandSaleForm from "./ContractOfLandSaleForm/ContractOfLandSaleForm";
 import LoanGuarantorForm from "./LoanGuarantorForm/LoanGuarantorForm";
 import { scrolltoTopOFPage } from "@/Functions";
+import VehicleLoanForm from "./NewLoanForm/VehicleLoanForm";
+import GeneralLoanForm from "./NewLoanForm/GeneralLoanForm";
 
 export default class LoadForm extends React.Component {
     componentDidMount(){
@@ -20,11 +20,11 @@ export default class LoadForm extends React.Component {
         if(!getToSignApplicationFormId[0]){
             return <Alert severity="error">Sorry, a problem occured while loading the form, reflesh the page or go back and reflesh the page.</Alert>
         }
-        if(form.formName === "newLoanForm"){
-            return <NewLoanForm {...this.props} toSignApplicationFormId={getToSignApplicationFormId[0].id}/>
+        if(form.formName === "GeneralLoanForm"){
+            return <GeneralLoanForm {...this.props} toSignApplicationFormId={getToSignApplicationFormId[0].id}/>
         }
-        else if(form.formName === "salesAgreementForm"){
-            return <SalesAgreementForm {...this.props} toSignApplicationFormId={getToSignApplicationFormId[0].id}/>
+        else if(form.formName === "VehicleLoanForm"){
+            return <VehicleLoanForm {...this.props} toSignApplicationFormId={getToSignApplicationFormId[0].id}/>
         }
         else if(form.formName === "contractOfLandSaleForm"){
             return <ContractOfLandSaleForm {...this.props} toSignApplicationFormId={getToSignApplicationFormId[0].id}/>

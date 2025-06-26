@@ -1247,6 +1247,7 @@ export interface ApiFormFillValueFormFillValue extends Schema.CollectionType {
       'plugin::users-permissions.user'
     >;
     clientId: Attribute.BigInteger;
+    loanId: Attribute.Integer;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
