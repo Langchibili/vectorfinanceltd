@@ -20,7 +20,9 @@ export default class ESigningForms extends React.Component {
       showSignatureForm: false,
       getWitnessSignature: false,
       signature: this.props.loggedInUser.signature,
-      witnessSignature: this.props.loggedInUser.witnessSignature
+      initials : this.props.loggedInUser.initials,
+      witnessSignature: this.props.loggedInUser.witnessSignature,
+      witnessInitials : this.props.loggedInUser.witnessInitials
     }
   }
 
@@ -38,7 +40,7 @@ export default class ESigningForms extends React.Component {
     } catch (error) {
       this.setState({ error: "Failed to load forms." });
     }
-  };
+  }
 
   getApplicationForms= async()=>{
     const userWithUpdatedForms = await fetch(api_url+'/users/me?populate=applicationForms.signedForm', {
@@ -63,7 +65,6 @@ export default class ESigningForms extends React.Component {
  }
 
  createApplicationForms = async (forms)=>{
-  console.log(this.props.loggedInUser)
    if(this.props.loggedInUser.applicationForms.length > 0){
      if(this.props.loggedInUser.applicationForms.length !== forms.length){
          const newFormsToFill = this.props.loggedInUser.applicationForms.map((form)=>{
@@ -227,10 +228,21 @@ export default class ESigningForms extends React.Component {
        signature:signature
     })
  }
-
+ 
+ handleInitialsSave = (initials)=>{
+    this.setState({
+       initials:initials
+    })
+ }
+ 
  handleWitnessSignatureSave = (signature)=>{
    this.setState({
        witnessSignature:signature
+   })
+ }
+ handleWitnessInitialsSave = (witnessInitials)=>{
+   this.setState({
+       witnessInitials:witnessInitials
    })
  }
 
@@ -252,10 +264,14 @@ export default class ESigningForms extends React.Component {
     if(this.state.showSignatureForm){
       return <SaveSignature 
                   handleSignatureSave={this.handleSignatureSave}
+                  handleInitialsSave={this.handleInitialsSave}
                   handleWitnessSignatureSave={this.handleWitnessSignatureSave}
+                  handleWitnessInitialsSave={this.handleWitnessInitialsSave}
                   handleShowWitnessSignatureForm={this.handleShowWitnessSignatureForm}
                   getWitnessSignature={this.state.getWitnessSignature} 
                   signature={this.state.signature}
+                  initials={this.state.initials}
+                  witnessInitials={this.state.witnessInitials}
                   witnessSignature={this.state.witnessSignature}
                   loggedInUser={this.props.loggedInUser} 
                   handleShowFormsToSignPage={this.handleShowFormsToSignPage} 

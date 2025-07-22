@@ -1,0 +1,28 @@
+{
+  "kind": "collectionType",
+  "collectionName": "repayment_schedules",
+  "info": {
+    "singularName": "repayment-schedule",
+    "pluralName": "repayment-schedules",
+    "displayName": "RepaymentSchedule",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "loan": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::loan.loan",
+      "inversedBy": "repaymentSchedule"
+    },
+    "Schedule": {
+      "displayName": "Schedule",
+      "type": "component",
+      "repeatable": true,
+      "component": "loan-details.schedule"
+    }
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "collectionName": "components_loan_details_schedules",
+  "info": {
+    "displayName": "Schedule",
+    "icon": "bulletList",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "dueDateInWords": {
+      "type": "string"
+    },
+    "dueDate": {
+      "type": "datetime"
+    },
+    "principalDue": {
+      "type": "decimal"
+    },
+    "interestDue": {
+      "type": "decimal"
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": [
+        "pending",
+        "partial",
+        "paid",
+        "late"
+      ]
+    },
+    "paidAmount": {
+      "type": "decimal"
+    },
+    "paidAt": {
+      "type": "datetime"
+    },
+    "lateFee": {
+      "type": "decimal"
+    },
+    "repayments": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::repayment.repayment"
+    }
+  }
+}

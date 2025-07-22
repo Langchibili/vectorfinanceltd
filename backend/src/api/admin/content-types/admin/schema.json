@@ -4,7 +4,8 @@
   "info": {
     "singularName": "admin",
     "pluralName": "admins",
-    "displayName": "Admins"
+    "displayName": "Admins",
+    "description": ""
   },
   "options": {
     "draftAndPublish": true
@@ -22,6 +23,11 @@
       "target": "admin::user"
     },
     "loanAdministrators": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "admin::user"
+    },
+    "adminNotificationsAccount": {
       "type": "relation",
       "relation": "oneToMany",
       "target": "admin::user"

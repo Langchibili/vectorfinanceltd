@@ -3,7 +3,7 @@
 import EmailOtpVerificationForm from "@/components/Forms/EmailOtpVerificationForm";
 import PhoneOtpVerificationForm from "@/components/Forms/PhoneOtpVerificationForm";
 import { submitCreateUserRequest } from "@/Constants";
-import { dynamicConfig, scrolltoTopOFPage, sendOTP, textHasPhoneNumber, updateUserAccount, validateEmail } from "@/Functions";
+import { dynamicConfig, getReferrerFromReferralCode, scrolltoTopOFPage, sendOTP, textHasPhoneNumber, updateUserAccount, validateEmail } from "@/Functions";
 import { saveJwt } from "@/Secrets";
 import { Slide } from "@material-ui/core";
 import { Alert } from "@mui/material";
@@ -20,6 +20,7 @@ export default function Signup() {
   const lastNameRef = useRef(null);
   const phoneRef = useRef(null);
   const passwordRef = useRef(null);
+  const referralCodeRef = useRef(null)
   
 
   // State for error messages
@@ -28,6 +29,8 @@ export default function Signup() {
   const [emailOtpVerified,setEmailOtpVerified] = useState(false)
   const [beginOtpVerification,setBeginOtpVerification] = useState(true)
   const [loading,setLoading] = useState(false)
+  const [showPassword, setShowPassword] = useState(false);
+
   const [errors, setErrors] = useState({
     email: "",
     firstName: "",
@@ -43,6 +46,7 @@ export default function Signup() {
     const lastName = lastNameRef.current.value.trim();
     const phone = phoneRef.current.value.trim();
     const password = passwordRef.current.value.trim();
+
 
     let isValid = true;
     const newErrors = { email: "", firstName: "", lastName: "", phone: "", password: "" };
@@ -92,7 +96,14 @@ export default function Signup() {
 
   // Handle form submit (You will add the actual submit logic)
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    e.preventDefault()
+    const referralCode = referralCodeRef.current.value.trim();
+    const validatereferralcode = await validateReferralCode(referralCode)
+    
+    if(!validatereferralcode){
+      setServerError("Please enter a valid reference code, or remove it entirely.")
+      return
+    }
     if(!numberOtpVerified){
       setServerError("Please verify your email address")
       return
@@ -101,11 +112,13 @@ export default function Signup() {
       setServerError("Please verify your email address")
       return
     }
+    
     const email = emailRef.current.value.trim();
     const firstName = firstNameRef.current.value.trim();
     const lastName = lastNameRef.current.value.trim();
     const phone = phoneRef.current.value.trim();
     const password = passwordRef.current.value.trim();
+    
     const requestObject = {
         username: phone,
         email:email,
@@ -123,8 +136,10 @@ export default function Signup() {
      
        else{
           saveJwt(response.jwt)
+          const referrer = await getReferrer(referralCode) // get user who referred this user
           const userUpdateObject = {
                   fullnames: firstName+" "+lastName,
+                  referredBy: referrer.id,
                   "details":{
                       firstname: firstName,
                       lastname: lastName,
@@ -146,6 +161,31 @@ export default function Signup() {
     }
   }
 
+  const getReferrer = async (referralCode)=>{
+        return await getReferrerFromReferralCode(referralCode)
+  }
+  
+          
+  const getDefaultReferralCode = ()=>{
+       if(typeof document !== "undefined"){
+        if(localStorage.getItem('referralCode')){
+          return localStorage.getItem('referralCode')
+        }
+       }
+       return ''
+  }
+
+  const validateReferralCode = async (referralCode)=>{
+       const referredBy = await getReferrerFromReferralCode(referralCode)
+       if(referralCode === ''){
+          return true
+       }
+       if(!referredBy){
+          return false
+       }
+       return true
+  }
+  
   const handleBeginOtpVerification = (e)=>{
     e.preventDefault()
     if(validateForm()){
@@ -169,9 +209,8 @@ export default function Signup() {
   const renderPhoneOtpVerificationForm = ()=>{
     if(phoneRef.current && textHasPhoneNumber(phoneRef.current.value.trim())){
        return (
-        <> <h5>Verify Your Number</h5>
+        <> <hr/> <h5>Verify Your Number</h5>
             <PhoneOtpVerificationForm action={()=>{setNumberOtpVerified(true)}} phoneNumber={phoneRef.current.value.trim()}/> 
-            <hrs/>
          </>
        )
     }
@@ -180,12 +219,14 @@ export default function Signup() {
   const renderEmailOtpVerificationForm = ()=>{
     if(emailRef.current && validateEmail(emailRef.current.value.trim())){
        return (
-        <> <h5>Verify Your Email Address</h5>
+        <> <hr/><h5>Verify Your Email Address</h5>
             <EmailOtpVerificationForm action={()=>{setEmailOtpVerified(true)}} email={emailRef.current.value.trim()}/> 
-          </>
+            <br/>
+        </>
        )
     }
   }
+
 
   scrolltoTopOFPage()
   return (
@@ -272,7 +313,7 @@ export default function Signup() {
                           </div>
                           <div className="mb-3">
                             <label className="form-label" htmlFor="password-input">
-                              Password
+                              Password <span className="text-danger">*</span>
                             </label>
                             <div className="position-relative auth-pass-inputgroup">
                               <input
@@ -283,18 +324,38 @@ export default function Signup() {
                                 ref={passwordRef}
                               />
                               <button
-                                className="btn btn-link position-absolute end-0 top-0 text-decoration-none shadow-none text-muted password-addon"
-                                type="button"
-                                id="password-addon"
-                              >
-                                <i className="ri-eye-fill align-middle" />
-                              </button>
+                                  type="button"
+                                  className="btn btn-link position-absolute end-0 top-0 text-decoration-none shadow-none text-muted password-addon"
+                                  onClick={() =>
+                                    setShowPassword((prev) => !prev)
+                                  }
+                                  style={{ zIndex: 2 }}
+                                >
+                                  <i
+                                    className={
+                                      showPassword
+                                        ? "ri-eye-off-fill align-middle"
+                                        : "ri-eye-fill align-middle"
+                                    }
+                                  />
+                                </button>
                               {errors.password && <div className="invalid-feedback">{errors.password}</div>}
                             </div>
                           </div>
                           
-                          {!numberOtpVerified? <><br/><hr/>{renderPhoneOtpVerificationForm()}</> : <Alert severity="success" sx={{marginBottom:'10px'}}>Phone Number Verified</Alert>}
-                          {!emailOtpVerified? <><br/><hr/>{renderEmailOtpVerificationForm()}</> : <Alert severity="success" sx={{marginBottom:'10px'}}>Email Address Verified</Alert>}
+                          {!numberOtpVerified? <><br/>{renderPhoneOtpVerificationForm()}</> : <Alert severity="success" sx={{marginBottom:'10px'}}>Phone Number Verified</Alert>}
+                          {!emailOtpVerified? <><br/>{renderEmailOtpVerificationForm()}</> : <Alert severity="success" sx={{marginBottom:'10px'}}>Email Address Verified</Alert>}
+                          <label htmlFor="referral-code" className="form-label">
+                              Referral Code: <span className="text-info">(leave blank if you don't have a code)</span>
+                          </label>
+                          <input
+                                type="text"
+                                className={`form-control pe-5 password-input ${errors.password ? 'is-invalid' : ''}`}
+                                placeholder="Enter Code"
+                                id="password-input"
+                                defaultValue={getDefaultReferralCode()}
+                                ref={referralCodeRef}
+                              />
                           <div className="mb-4">
                                 <p className="mb-0 fs-12 text-muted fst-italic">
                                 By registering you agree to the VectorFinance{" "}

@@ -1,0 +1,38 @@
+{
+  "kind": "singleType",
+  "collectionName": "admin_initials",
+  "info": {
+    "singularName": "admin-initial",
+    "pluralName": "admin-initials",
+    "displayName": "adminInitials",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "director": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "ceo": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "directorFullNames": {
+      "type": "string"
+    },
+    "ceoFullNames": {
+      "type": "string"
+    }
+  }
+}

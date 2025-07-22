@@ -100,6 +100,15 @@ export default function RootLayout({ children }) {
 
 const HeaderPart = ()=>{
   const loggedInUser = useUser()
+  if(loggedInUser && loggedInUser.user){
+    if(loggedInUser.user.username === "director"  || loggedInUser.user.username === "ceo"){
+    if(typeof document !== "undefined"){
+      if(window.location.pathname !== "/admin"){
+         window.location = "/logout" // admin user cannot access normal account unless with normal account 
+      }
+    }
+  }
+  }
   return (<>
               {/* Main Header | Only visible to logged in users */}
               {loggedInUser.status? <MobileNav loggedInUser={loggedInUser.user} userIsLoggedIn={loggedInUser.status}/> : <></>}

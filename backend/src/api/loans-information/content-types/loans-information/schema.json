@@ -65,6 +65,129 @@
     },
     "nineMonthsMaximumInvestmentAmountInUSD": {
       "type": "decimal"
+    },
+    "collateralLoanInterestType": {
+      "type": "enumeration",
+      "enum": [
+        "simple",
+        "compound"
+      ],
+      "default": "simple"
+    },
+    "collateralLoanInterestCalculation": {
+      "type": "enumeration",
+      "enum": [
+        "monthly",
+        "annually"
+      ],
+      "default": "monthly"
+    },
+    "referallPayoutCalculationMethod": {
+      "type": "enumeration",
+      "enum": [
+        "onDisbursement",
+        "onEachPayment",
+        "onLoanFulfillment"
+      ],
+      "default": "onLoanFulfillment"
+    },
+    "referralPercentage": {
+      "type": "integer"
+    },
+    "interestInOneWeek": {
+      "type": "integer"
+    },
+    "interestInTwoWeeks": {
+      "type": "integer"
+    },
+    "interestInThreeWeeks": {
+      "type": "integer"
+    },
+    "referralPercentInOneWeek": {
+      "type": "integer"
+    },
+    "referralPercentInTwoWeeks": {
+      "type": "integer"
+    },
+    "referralPercentInThreeWeeks": {
+      "type": "integer"
+    },
+    "arrangementFee": {
+      "type": "integer"
+    },
+    "loanManagementFee": {
+      "type": "integer"
+    },
+    "drawdownFee": {
+      "type": "integer"
+    },
+    "upFrontRefferalRate": {
+      "type": "integer"
+    },
+    "referralWIthdrawPeriod": {
+      "type": "enumeration",
+      "enum": [
+        "Weekly",
+        "Monthly",
+        "Yearly",
+        "OnLoanCompletion"
+      ]
+    },
+    "SalaryLoanInterestCalculation": {
+      "type": "enumeration",
+      "enum": [
+        "monthly",
+        "yearly"
+      ],
+      "default": "monthly"
+    },
+    "salaryLoanInterestType": {
+      "type": "enumeration",
+      "enum": [
+        "amortization ",
+        "compound"
+      ],
+      "default": "amortization "
+    },
+    "allowSalaryLoans": {
+      "type": "enumeration",
+      "enum": [
+        "yes",
+        "no"
+      ],
+      "default": "yes"
+    },
+    "allowAssetBasedLoans": {
+      "type": "enumeration",
+      "enum": [
+        "yes",
+        "no"
+      ],
+      "default": "yes"
+    },
+    "allowInvestments": {
+      "type": "enumeration",
+      "enum": [
+        "yes",
+        "no"
+      ],
+      "default": "yes"
+    },
+    "allowReferrals": {
+      "type": "enumeration",
+      "enum": [
+        "yes",
+        "no"
+      ],
+      "default": "yes"
+    },
+    "referralRateType": {
+      "type": "enumeration",
+      "enum": [
+        "flat",
+        "percentage"
+      ],
+      "default": "percentage"
     }
   }
 }

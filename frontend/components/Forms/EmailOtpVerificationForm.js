@@ -74,6 +74,8 @@ export default class EmailOtpVerificationForm extends Component {
         
     if(!response){
         this.setState({
+            submitting: false,
+            submittingText: 'Verify Otp',
             errorExists: true,
             error: 'invalid OTP!'
         })
@@ -81,6 +83,8 @@ export default class EmailOtpVerificationForm extends Component {
     }
     else if(!response.verificationStatus){
         this.setState({
+            submitting: false,
+            submittingText: 'Verify Otp',
             errorExists: true,
             error: 'invalid OTP!'
         })
@@ -126,12 +130,12 @@ export default class EmailOtpVerificationForm extends Component {
         <input onChange={this.handleOTPChange} className="form-control mb-2" type="text" placeholder="Enter 6 digit Code" value={otp}/>
         </div>
         <button disabled={this.state.submitting} className="btn bg-white text-primary btn-block mb-2" onClick={this.verifyOTP}>{this.state.submittingText}</button>
+        {this.state.errorExists? <Alert severity='warning'>{this.state.error}</Alert> : <></>}
         <p>Time remaining to resend Code: {countdown} seconds</p>
         <button className="btn bg-white text-primary btn-block" onClick={this.resendOTP} disabled={resendDisabled}>
           Resend OTP
         </button>
         <br/>
-        {this.state.errorExists? <Alert severity='warning'>{this.state.error}</Alert> : <></>}
       </div>
     )
   }

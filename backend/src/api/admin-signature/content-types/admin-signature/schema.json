@@ -1,0 +1,32 @@
+{
+  "kind": "singleType",
+  "collectionName": "admin_signatures",
+  "info": {
+    "singularName": "admin-signature",
+    "pluralName": "admin-signatures",
+    "displayName": "adminSignatures",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "director": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "ceo": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "images"
+      ]
+    }
+  }
+}

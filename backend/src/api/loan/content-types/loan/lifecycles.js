@@ -1,78 +1,15 @@
 'use strict';
-
-const axios = require('axios');
-const nodemailer = require('nodemailer');
+const  { SendSmsNotification,SendEmailNotification }  = require('../../../../services/messages')
+const  { calculateLoan }  = require('../../../../services/intererestCalculation')
+const  { createSchedule }  = require('../../../../services/repaymentSchedule')
+const { getAdminUserEmailsAndNumbers } = require('../../../../services/getAdminUserEmailsAndNumbers')
 
 
 const getAppStatus = async () => {
   return await strapi.db.query("api::app-status.app-status").findOne();
 }
 
-const getAdminUserEmailsAndNumbers = async () => {
-  const admin = await strapi.db.query("api::admin.admin").findOne({
-    populate: ['loanApprovers', 'loanDisbursers', 'loanAdministrators']
-  })
-
-  return {
-    loanApproverEmails: admin.loanApprovers.map(u => u.email).filter(Boolean),
-    loanDisburserEmails: admin.loanDisbursers.map(u => u.email).filter(Boolean),
-    loanAdministratorEmails: admin.loanAdministrators.map(u => u.email).filter(Boolean),
-
-    loanApproverNumbers: admin.loanApprovers.map(u => u.username).filter(Boolean),
-    loanDisburserNumbers: admin.loanDisbursers.map(u => u.username).filter(Boolean),
-    loanAdministratorNumbers: admin.loanAdministrators.map(u => u.username).filter(Boolean)
-  }
-} 
-
-const simpleInterestLoanCalculator = (loanAmount, monthlyInterestRate, loanTermMonths) => {
-  const calculateTotalInterest = (amount, monthlyInterest, months) => {
-    return (parseFloat(amount) * monthlyInterest * months) / 100;
-  }
-
-  const calculateTotalPayment = (loanAmount, totalInterest) => {
-    return parseFloat(loanAmount) + parseFloat(totalInterest);
-  }
-
-  const totalInterest = calculateTotalInterest(loanAmount, monthlyInterestRate, loanTermMonths);
-  const totalPayment = calculateTotalPayment(loanAmount, totalInterest);
-  const monthlyPayment = totalPayment / loanTermMonths;
-
-  return {
-    totalInterest: parseFloat(totalInterest).toFixed(2),
-    totalPayment: parseFloat(totalPayment).toFixed(2),
-    monthlyPayment: parseFloat(monthlyPayment).toFixed(2),
-  };
-};
-
-
-
-const loanAmortizationCalculator = (loanAmount, monthlyInterestRate, loanTermMonths) => {
-  const calculateMonthlyPayment = (amount, monthlyInterest, months) => {
-    return (
-      (amount * monthlyInterest * Math.pow(1 + monthlyInterest, months)) /
-      (Math.pow(1 + monthlyInterest, months) - 1)
-    );
-  };
-
-  const calculateTotalPayment = (monthlyPayment, months) => {
-    return monthlyPayment * months;
-  };
-
-  const calculateProfit = (totalPayment, loanAmount) => {
-    return totalPayment - loanAmount;
-  };
-
-  const monthlyPayment = calculateMonthlyPayment(loanAmount, monthlyInterestRate / 100, loanTermMonths);
-  const totalPayment = calculateTotalPayment(monthlyPayment, loanTermMonths);
-  const totalProfit = calculateProfit(totalPayment, loanAmount);
-
-  return {
-    monthlyPayment: parseFloat(monthlyPayment).toFixed(2),
-    totalProfit: parseFloat(totalProfit).toFixed(2),
-    totalPayment: parseFloat(totalPayment).toFixed(2),
-  };
-};
-            
+     
 const calculateDueDate = (date, loanTerm)=>{
     // Parse the initial date
     const startDate = new Date(date);
@@ -87,52 +24,6 @@ const calculateDueDate = (date, loanTerm)=>{
     return isoString;
 }
 
-const SendSmsNotification = (phoneNumber,notificationBody)=>{
-    axios.post(process.env.SMSGATEWAYURL+"/send-sms", {
-      apiKey: process.env.SMSGATEWAYAPIKEY,
-      username: process.env.SMSGATEWAYAPIUSERNAME,
-      recipients: [phoneNumber], // array of recipients
-      message: notificationBody,
-      from: process.env.SMSGATEWAYAPICALLERID
-    }, {
-    headers: {
-        'Content-Type': 'application/json'
-    }
-    })
-    .then(response => {
-      console.log('SMS sent successfully:', response.data);
-    })
-    .catch(error => {
-      console.error('Error sending SMS:', error);
-    });
-    console.log('sending sms notification',phoneNumber,notificationBody)
-}
-
-const SendEmailNotification = (email,notificationBody)=>{
-    // Configure transport options
-    const transporter = nodemailer.createTransport({
-      service: process.env.EMAILSERVICENAME, // Or specify an SMTP host
-      auth: {
-        user: process.env.NOTIFICATIONSEMAILSERVICEUSERNAME,
-        pass: process.env.NOTIFICATIONSEMAILSERVICEPASSWORD
-       }
-    })
-
-    // Send email
-    transporter.sendMail({
-      from: process.env.NOTIFICATIONSEMAILSERVICEUSERNAME,
-      to: email,
-      subject: 'Message from Vector Finance Limited',
-      text: notificationBody
-    }, (error, info) => {
-    if (error) {
-      console.log('Error sending email:', error);
-    } else {
-      console.log('Email sent:', info.response);
-    }
-    });
-    console.log('sending email notification',email,notificationBody)
-}
 
 const returnNineDigitNumber = (phoneNumber) =>{
     return phoneNumber.replace(/\D/g, '').slice(-9)
@@ -180,7 +71,7 @@ module.exports = {
                 where: { id: params.data.id },
                 populate: ['loanType','client']
             });
-        };
+        }
 
         const getFinances = async () => {
            return await strapi.db.query("api::finance.finance").findOne()
@@ -218,7 +109,6 @@ module.exports = {
                   })
                   return
               }
-            
               if (loanBefore.loanStatus === "disbursed") {
                   let repaymentAmount = null;
                   if (!loan.loanType) { 
@@ -228,12 +118,11 @@ module.exports = {
                   if(parseInt(loanBefore.outstandingAmount) >= 1){ // it means you already approved the loan
                     return
                   }
-
                   if (loan.loanType.typeName === "salaryBased") { 
-                      const { totalPayment } = loanAmortizationCalculator(loanBefore.loanAmount, loanBefore.interestRate, loanBefore.loanTerm);
+                      const { totalPayment } =  await calculateLoan({amount:loanBefore.loanAmount,termMonths:loanBefore.loanTerm,loanType:{typeName : 'salaryBased'}})
                       repaymentAmount = totalPayment;
                   } else { // for all asset based loans
-                      const { totalPayment } = simpleInterestLoanCalculator(loanBefore.loanAmount, loanBefore.interestRate, loanBefore.loanTerm);
+                      const { totalPayment } =  await calculateLoan({amount:loanBefore.loanAmount, termMonths:loanBefore.loanTerm, loanType:{typeName : 'assetBased'}})
                       repaymentAmount = totalPayment;
                   }
 
@@ -241,25 +130,27 @@ module.exports = {
                       return
                   }
 
-                  if (loanBefore.loanStatus === "disbursed") {
-                      const updateLoanAmountObject = {
-                          outstandingAmount: parseFloat(repaymentAmount),
-                          repaymentAmount: parseFloat(repaymentAmount),
-                          approvalDate: loanAfter.updatedAt,
-                          disbursedAmount: parseFloat(loanBefore.loanAmount),
-                          disbursementDate: loanAfter.updatedAt,
-                          dueDate: calculateDueDate(loanAfter.updatedAt, loanBefore.loanTerm)
-                      }
-                      const financesUpdateObject = {
-                        totalAmountLoanedOut: parseFloat(finances.totalAmountLoanedOut) + parseFloat(loanBefore.loanAmount)
-                      }
-                      await strapi.db.query('api::loan.loan').update({ where: { id: loanBefore.id }, data: updateLoanAmountObject });
-                      if(appStatus.status === 'production'){// only update the finance part of loans if in production
-                         await strapi.db.query('api::finance.finance').update({ where: { id: finances.id }, data: financesUpdateObject }); // id = 0 because it's a single content type
-                         //SendEmailNotification(loan.client.email,"Congratulations! Your loan has been disbursed. Go to portal.vectorfinancelimited.com and check out your dashboard.")
-                      }
+                  if(!loanBefore.paymentScheduleCreated){
+                      createSchedule(params.data.id) // create a repayment schedule
+                  }
+                  const updateLoanAmountObject = {
+                      outstandingAmount: parseFloat(repaymentAmount),
+                      repaymentAmount: parseFloat(repaymentAmount),
+                      approvalDate: loanAfter.updatedAt,
+                      disbursedAmount: parseFloat(loanBefore.loanAmount),
+                      disbursementDate: loanAfter.updatedAt,
+                      dueDate: calculateDueDate(loanAfter.updatedAt, loanBefore.loanTerm)
+                  }
+                  const financesUpdateObject = {
+                    totalAmountLoanedOut: parseFloat(finances.totalAmountLoanedOut) + parseFloat(loanBefore.loanAmount)
+                  }
+                  await strapi.db.query('api::loan.loan').update({ where: { id: loanBefore.id }, data: updateLoanAmountObject });
+                  if(appStatus.status === 'production'){// only update the finance part of loans if in production
+                      await strapi.db.query('api::finance.finance').update({ where: { id: finances.id }, data: financesUpdateObject }); // id = 0 because it's a single content type
+                      //SendEmailNotification(loan.client.email,"Congratulations! Your loan has been disbursed. Go to portal.vectorfinancelimited.com and check out your dashboard.")
+                  }
                       
-                  } 
+                  
               }
           };
 

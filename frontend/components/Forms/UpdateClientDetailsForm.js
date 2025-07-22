@@ -147,7 +147,6 @@ export default class UpdateClientDetailsForm extends React.Component {
     
     updateObject.id = clientDetailsId
     const updatedUser = await updateUserAccount({ clientDetails: updateObject }, this.props.loggedInUser.id)
-    
     if (updatedUser.hasOwnProperty('error')) {
       this.setState({
         error: 'something went wrong, try again',
@@ -346,6 +345,7 @@ export default class UpdateClientDetailsForm extends React.Component {
       return
     }
     this.props.handleOpenAddLoanAmountForm()
+    updateUserAccount({identityDetailsUpdated:true},this.props.loggedInUser.id) //updating the basic details update status to true
   }
 
   render() {

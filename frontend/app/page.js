@@ -29,6 +29,8 @@ export default function Home() {
   const constants = useConstants()
   const { setPage } = usePage()
   
+  //console.log('constants',constants)
+
   setPage('/')
   scrolltoTopOFPage() // should always show the top of the page as the view point
   const showApplyButtons = ()=>{

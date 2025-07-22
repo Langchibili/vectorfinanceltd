@@ -1,54 +1,7 @@
+/* This controller handles online payments via any of the integrated payment gateways */
 const { createCoreController } = require('@strapi/strapi').factories;
-const axios = require('axios');
-const nodemailer = require('nodemailer');
-
-
-const SendSmsNotification = (phoneNumber,notificationBody)=>{
-    axios.post(process.env.SMSGATEWAYURL+"/send-sms", {
-        apiKey: process.env.SMSGATEWAYAPIKEY,
-        username: process.env.SMSGATEWAYAPIUSERNAME,
-        recipients: [phoneNumber], // array of recipients
-        message: notificationBody,
-        from: process.env.SMSGATEWAYAPICALLERID
-    }, {
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    })
-    .then(response => {
-        console.log('SMS sent successfully:', response.data);
-    })
-    .catch(error => {
-        console.error('Error sending SMS:', error);
-    });
-    console.log('sending sms notification',phoneNumber,notificationBody)
-}
-
-const SendEmailNotification = (email,notificationBody)=>{
-    // Configure transport options
-    const transporter = nodemailer.createTransport({
-        service: process.env.EMAILSERVICENAME, // Or specify an SMTP host
-        auth: {
-        user: process.env.EMAILSERVICEUSERNAME,
-        pass: process.env.EMAILSERVICEPASSWORD
-        }
-    })
-    
-    // Send email
-    transporter.sendMail({
-        from: process.env.EMAILSERVICEUSERNAME,
-        to: email,
-        subject: 'Message from Vector Finance Limited',
-        text: notificationBody
-    }, (error, info) => {
-        if (error) {
-        console.log('Error sending email:', error);
-        } else {
-        console.log('Email sent:', info.response);
-        }
-    });
-    console.log('sending email notification',email,notificationBody)
-}
+const  { SendSmsNotification,SendEmailNotification }  = require('../../../services/messages')
+const { recordPayment } = require('../../../services/repaymentSchedule');
 
 const getLoan = async (id) => {
     return await strapi.db.query("api::loan.loan").findOne({
@@ -96,8 +49,12 @@ const handlePaymentSuccessful = async (data,payload)=>{
     if(outstandingAmount === repaymentAmount){
         repaymentType = "full-payment"
     }
+    const loanUpdateData = {outstandingAmount:newOutStandingAmount}
+    if(parseFloat(newOutStandingAmount) <= 0){
+        loanUpdateData.loanStatus = "completed"
+    }
     // update the loan by subtracting the paid amount from the oustandingAmount
-    const updatedLoan = await strapi.db.query('api::loan.loan').update({ where: { id: loanId }, data: {outstandingAmount:newOutStandingAmount} });
+    const updatedLoan = await strapi.db.query('api::loan.loan').update({ where: { id: loanId }, data: loanUpdateData })
     // create a payment log of the transaction's json payload
     const createdPayment = await strapi.db.query("api::payment.payment").create({data:{payload:payload,publishedAt:new Date()}})
     // create a replayment record
@@ -131,6 +88,10 @@ const handlePaymentSuccessful = async (data,payload)=>{
     const createdRepayment = await strapi.db.query("api::repayment.repayment").create({data:repaymentObject})
     const createdTransactionHistory = await strapi.db.query("api::transaction-history.transaction-history").create({data:transactionHistoryObject})
     // update the user account by adding a repayment to it
+    // record payment to the loan's schedule
+    
+    recordPayment(loanId, parseFloat(repaymentAmount).toFixed(2), paymentDate, createdRepayment.id)
+    
     await strapi.db.query('plugin::users-permissions.user').update({ where: { id:client.id }, data: {repayment: {connect:[createdRepayment.id]},transactionHistories: {connect: [createdTransactionHistory.id]}} });
     // finally push the notification of the payment to the client and admin users
     SendSmsNotification(clientNumber,"Your Payment to the loan with id: #"+loanId+" has been received. Go to the portal and check your current loan balance. Thank you.")

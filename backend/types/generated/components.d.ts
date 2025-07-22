@@ -78,6 +78,30 @@ export interface FormsApplicationForms extends Schema.Component {
   };
 }
 
+export interface LoanDetailsSchedule extends Schema.Component {
+  collectionName: 'components_loan_details_schedules';
+  info: {
+    displayName: 'Schedule';
+    icon: 'bulletList';
+    description: '';
+  };
+  attributes: {
+    dueDateInWords: Attribute.String;
+    dueDate: Attribute.DateTime;
+    principalDue: Attribute.Decimal;
+    interestDue: Attribute.Decimal;
+    status: Attribute.Enumeration<['pending', 'partial', 'paid', 'late']>;
+    paidAmount: Attribute.Decimal;
+    paidAt: Attribute.DateTime;
+    lateFee: Attribute.Decimal;
+    repayments: Attribute.Relation<
+      'loan-details.schedule',
+      'oneToMany',
+      'api::repayment.repayment'
+    >;
+  };
+}
+
 export interface MediaAndDocumentsCollateral extends Schema.Component {
   collectionName: 'components_media_and_documents_collaterals';
   info: {
@@ -184,6 +208,7 @@ declare module '@strapi/types' {
       'client-details.investment-profile': ClientDetailsInvestmentProfile;
       'client-details.salary': ClientDetailsSalary;
       'forms.application-forms': FormsApplicationForms;
+      'loan-details.schedule': LoanDetailsSchedule;
       'media-and-documents.collateral': MediaAndDocumentsCollateral;
       'media-and-documents.house': MediaAndDocumentsHouse;
       'media-and-documents.land': MediaAndDocumentsLand;

@@ -1,0 +1,33 @@
+{
+  "kind": "collectionType",
+  "collectionName": "referral_earnings",
+  "info": {
+    "singularName": "referral-earning",
+    "pluralName": "referral-earnings",
+    "displayName": "referralEarnings",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "loan": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::loan.loan"
+    },
+    "amount": {
+      "type": "string"
+    },
+    "referral": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::referral.referral",
+      "inversedBy": "referralEarnings"
+    },
+    "description": {
+      "type": "text"
+    }
+  }
+}

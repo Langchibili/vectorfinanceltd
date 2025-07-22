@@ -35,9 +35,6 @@
       ],
       "default": "initiated"
     },
-    "repaymentSchedule": {
-      "type": "json"
-    },
     "loanTerm": {
       "type": "integer"
     },
@@ -150,6 +147,16 @@
     },
     "repaymentAmount": {
       "type": "decimal"
+    },
+    "repaymentSchedule": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::repayment-schedule.repayment-schedule",
+      "mappedBy": "loan"
+    },
+    "paymentScheduleCreated": {
+      "type": "boolean",
+      "default": false
     }
   }
 }

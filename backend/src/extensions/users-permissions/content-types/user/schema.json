@@ -216,6 +216,56 @@
     },
     "idNumber": {
       "type": "string"
+    },
+    "referral": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::referral.referral",
+      "mappedBy": "user"
+    },
+    "basicDetailsUpdated": {
+      "type": "boolean",
+      "default": false
+    },
+    "identityDetailsUpdated": {
+      "type": "boolean",
+      "default": false
+    },
+    "referredUsers": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "referredBy"
+    },
+    "referredBy": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "plugin::users-permissions.user",
+      "mappedBy": "referredUsers"
+    },
+    "initials": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "witnessInitials": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "signedDocuments": {
+      "allowedTypes": [
+        "images",
+        "files"
+      ],
+      "type": "media",
+      "multiple": true
     }
   }
 }

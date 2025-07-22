@@ -310,6 +310,90 @@ export const getImage = (image, size = "normal", use = "normal") => {
     }
 }
 
+export const saveReferralCode = ()=>{
+  // Only run in the browser
+  if (typeof window === 'undefined') return null
+
+  // Parse ?code=... from URL
+  const params = new URLSearchParams(window.location.search)
+  const code = params.get('code')
+  if (!code) return null
+  localStorage.setItem("referralCode",code)
+}
+
+export const getReferrerFromReferralCode = async (code) => {
+  if (!code) return null
+  try {
+    // Fetch referral record filtered by its code, populating the user relation
+    const url = `${api_url}/referrals` +
+      `?filters[referralCode][$eq]=${encodeURIComponent(code)}` +
+      `&populate=user`
+    
+    const response = await fetch(url, {
+      headers: { 
+        'Content-Type': 'application/json'
+       }
+    })
+    const json = await response.json()
+    const entry = json.data?.[0]
+    if (!entry) return null
+
+    // entry.attributes.user.data is the full user object
+    return entry.attributes.user.data || null
+  } catch (err) {
+    console.error('Error fetching referrer by code:', err)
+    return null
+  }
+}
+
+
+export const getContentCount = async ({
+  contentName,
+  contentToFilterById = null,
+  idField = "user",
+  status = "published",
+  orderByFieldName = "id",
+  orderType = "desc",
+}) => {
+  try {
+      // Construct the base URL
+      let url = `${api_url}/${contentName}?pagination[limit]=0&pagination[withCount]=true&sort=${orderByFieldName}:${orderType}`
+
+      // Add filtering for contentToFilterById if provided
+      if (contentToFilterById) {
+          url += `&filters[${idField}][id][$eq]=${contentToFilterById}`
+      }
+
+      // Add status filter only if the content is 'posts'
+      if (contentName === "posts" && status) {
+          url += `&filters[status][$eq]=${status}`
+      }
+
+      // Fetch the data
+      const response = await fetch(url, {
+          headers: {
+              "Content-Type": "application/json",
+              'Authorization': `Bearer ${getJwt()}`
+          },
+      })
+
+      const data = await response.json()
+
+      // Return the count if meta and pagination exist
+      if (data?.meta?.pagination) {
+          return data.meta.pagination.total
+      }
+      if(data){
+        return data.length
+      }
+      // Fallback if count is not available
+      return null
+  } catch (error) {
+      console.error("Error fetching content count:", error)
+      return null
+  }
+}
+
   
  
   export const updateUserAccount = async (updateObject,userId,customJwt=null)=>{
@@ -353,6 +437,68 @@ export const getImage = (image, size = "normal", use = "normal") => {
     .then(data => data)
   }
   
+// REFERRAL STUFF
+export const createReferralAccount = async (userId)=>{
+    const referralAccount = await fetch(api_url+'/referrals/', {
+      method: 'POST',
+      headers: {
+       'Authorization': `Bearer ${getJwt()}`,
+       'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({data:{referralCode:"ref"+userId}}),
+    })
+    .then(response => response.json())
+    .then(data => data)
+    if(referralAccount && referralAccount.data && referralAccount.data.attributes){
+        updateUserAccount({referral: referralAccount.data.id},userId)
+     }
+}
+
+export const getReferralsById = async (referralId,populateString="")=>{
+    let populate = '?populate='+populateString
+    if(populateString.length === 0){
+       populate = "" // it means populate nothing
+    }
+    const referral = await fetch(api_url+'/referrals/'+referralId+populate,{
+        headers: {
+          'Authorization': `Bearer ${getJwt()}`,
+          'Content-Type': 'application/json'
+        }
+      }).then(response => response.json())
+        .then(data => data)
+        .catch(error => console.error(error))
+         
+        if(referral && referral.data && referral.data.attributes){
+           referral.data.attributes.id = referral.data.id
+           return referral.data.attributes
+        }
+        return null
+  }
+
+
+  export const updateReferralCode = async (data,referralId)=>{
+    const referral =  await fetch(api_url+'/referrals/'+referralId, {
+        method: 'PUT',
+        headers: {
+        'Authorization': `Bearer ${getJwt()}`,
+        'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data),
+      })
+      .then(response => response.json())
+      .then(data => data)
+    if(referral && referral.data && referral.data.attributes){
+        referral.data.attributes.id = referral.data.id
+        return referral.data.attributes
+    }
+    if(referral && referral.error && referral.error.message === "This attribute must be unique"){
+       return referral // expose the object with the error object inside it
+    }
+    return null
+}
+
+
+
 // LOAN FUNCTIONS
 
 export const createNewLoan = async (data)=>{
@@ -574,6 +720,45 @@ export const getLoanCategoryIds = async ()=>{
   }
   else{
     return loansInformation
+  }
+ }
+
+ export const getAdminInitials = async ()=>{
+  const adminInitials = await fetch(api_url+'/admin-initial?populate=*',{
+    headers: {
+      'Authorization': `Bearer ${getJwt()}`,
+      'Content-Type': 'application/json'
+    }
+  }).then(response => response.json())
+    .then(data => data)
+    .catch(error => console.error(error))
+  if(adminInitials && adminInitials.data && adminInitials.data.attributes){
+     const ceoFullNames  = adminInitials.data.attributes.ceoFullNames || null
+     const directorFullNames = adminInitials.data.attributes.directorFullNames || null
+     const directorInitials  = adminInitials.data.attributes.director?.data?.attributes || null
+     const ceoInitials = adminInitials.data.attributes.ceo?.data?.attributes || null
+     return {directorInitials,ceoInitials,ceoFullNames,directorFullNames}
+  }
+  else{
+    return null
+  }
+ }
+  export const getAdminSignature = async ()=>{
+  const adminSignature = await fetch(api_url+'/admin-signature?populate=*',{
+    headers: {
+      'Authorization': `Bearer ${getJwt()}`,
+      'Content-Type': 'application/json'
+    }
+  }).then(response => response.json())
+    .then(data => data)
+    .catch(error => console.error(error))
+  if(adminSignature && adminSignature.data && adminSignature.data.attributes){
+     const directorSignature  = adminSignature.data.attributes.director?.data?.attributes || null
+     const ceoSignature = adminSignature.data.attributes.ceo?.data?.attributes || null
+     return {directorSignature,ceoSignature}
+  }
+  else{
+    return null
   }
  }
 

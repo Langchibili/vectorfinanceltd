@@ -1,0 +1,18 @@
+{
+  "kind": "singleType",
+  "collectionName": "get_repayment_schedules",
+  "info": {
+    "singularName": "get-repayment-schedule",
+    "pluralName": "get-repayment-schedules",
+    "displayName": "getRepaymentSchedule"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "about": {
+      "type": "blocks"
+    }
+  }
+}

@@ -801,6 +801,26 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
       'api::investment-withdraw.investment-withdraw'
     >;
     idNumber: Attribute.String;
+    referral: Attribute.Relation<
+      'plugin::users-permissions.user',
+      'oneToOne',
+      'api::referral.referral'
+    >;
+    basicDetailsUpdated: Attribute.Boolean & Attribute.DefaultTo<false>;
+    identityDetailsUpdated: Attribute.Boolean & Attribute.DefaultTo<false>;
+    referredUsers: Attribute.Relation<
+      'plugin::users-permissions.user',
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+    referredBy: Attribute.Relation<
+      'plugin::users-permissions.user',
+      'oneToMany',
+      'plugin::users-permissions.user'
+    >;
+    initials: Attribute.Media;
+    witnessInitials: Attribute.Media;
+    signedDocuments: Attribute.Media;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
@@ -871,6 +891,7 @@ export interface ApiAdminAdmin extends Schema.SingleType {
     singularName: 'admin';
     pluralName: 'admins';
     displayName: 'Admins';
+    description: '';
   };
   options: {
     draftAndPublish: true;
@@ -891,6 +912,11 @@ export interface ApiAdminAdmin extends Schema.SingleType {
       'oneToMany',
       'admin::user'
     >;
+    adminNotificationsAccount: Attribute.Relation<
+      'api::admin.admin',
+      'oneToMany',
+      'admin::user'
+    >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -902,6 +928,40 @@ export interface ApiAdminAdmin extends Schema.SingleType {
       Attribute.Private;
     updatedBy: Attribute.Relation<
       'api::admin.admin',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiAdminInitialAdminInitial extends Schema.SingleType {
+  collectionName: 'admin_initials';
+  info: {
+    singularName: 'admin-initial';
+    pluralName: 'admin-initials';
+    displayName: 'adminInitials';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    director: Attribute.Media;
+    ceo: Attribute.Media;
+    directorFullNames: Attribute.String;
+    ceoFullNames: Attribute.String;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::admin-initial.admin-initial',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::admin-initial.admin-initial',
       'oneToOne',
       'admin::user'
     > &
@@ -948,6 +1008,38 @@ export interface ApiAdminNotificationAdminNotification
       Attribute.Private;
     updatedBy: Attribute.Relation<
       'api::admin-notification.admin-notification',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiAdminSignatureAdminSignature extends Schema.SingleType {
+  collectionName: 'admin_signatures';
+  info: {
+    singularName: 'admin-signature';
+    pluralName: 'admin-signatures';
+    displayName: 'adminSignatures';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    director: Attribute.Media;
+    ceo: Attribute.Media;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::admin-signature.admin-signature',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::admin-signature.admin-signature',
       'oneToOne',
       'admin::user'
     > &
@@ -1266,6 +1358,37 @@ export interface ApiFormFillValueFormFillValue extends Schema.CollectionType {
   };
 }
 
+export interface ApiGetRepaymentScheduleGetRepaymentSchedule
+  extends Schema.SingleType {
+  collectionName: 'get_repayment_schedules';
+  info: {
+    singularName: 'get-repayment-schedule';
+    pluralName: 'get-repayment-schedules';
+    displayName: 'getRepaymentSchedule';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    about: Attribute.Blocks;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::get-repayment-schedule.get-repayment-schedule',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::get-repayment-schedule.get-repayment-schedule',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
 export interface ApiInvestmentInvestment extends Schema.CollectionType {
   collectionName: 'investments';
   info: {
@@ -1547,7 +1670,6 @@ export interface ApiLoanLoan extends Schema.CollectionType {
       ]
     > &
       Attribute.DefaultTo<'initiated'>;
-    repaymentSchedule: Attribute.JSON;
     loanTerm: Attribute.Integer;
     applicationDate: Attribute.DateTime;
     approvalDate: Attribute.DateTime;
@@ -1617,6 +1739,12 @@ export interface ApiLoanLoan extends Schema.CollectionType {
     salaryPercentage: Attribute.Decimal;
     disbursedAmount: Attribute.Decimal;
     repaymentAmount: Attribute.Decimal;
+    repaymentSchedule: Attribute.Relation<
+      'api::loan.loan',
+      'oneToOne',
+      'api::repayment-schedule.repayment-schedule'
+    >;
+    paymentScheduleCreated: Attribute.Boolean & Attribute.DefaultTo<false>;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -1736,6 +1864,48 @@ export interface ApiLoansInformationLoansInformation extends Schema.SingleType {
     earlyInvestmentWithdrawPenalty: Attribute.Decimal;
     nineMonthsMaximumInvestmentAmount: Attribute.Decimal;
     nineMonthsMaximumInvestmentAmountInUSD: Attribute.Decimal;
+    collateralLoanInterestType: Attribute.Enumeration<['simple', 'compound']> &
+      Attribute.DefaultTo<'simple'>;
+    collateralLoanInterestCalculation: Attribute.Enumeration<
+      ['monthly', 'annually']
+    > &
+      Attribute.DefaultTo<'monthly'>;
+    referallPayoutCalculationMethod: Attribute.Enumeration<
+      ['onDisbursement', 'onEachPayment', 'onLoanFulfillment']
+    > &
+      Attribute.DefaultTo<'onLoanFulfillment'>;
+    referralPercentage: Attribute.Integer;
+    interestInOneWeek: Attribute.Integer;
+    interestInTwoWeeks: Attribute.Integer;
+    interestInThreeWeeks: Attribute.Integer;
+    referralPercentInOneWeek: Attribute.Integer;
+    referralPercentInTwoWeeks: Attribute.Integer;
+    referralPercentInThreeWeeks: Attribute.Integer;
+    arrangementFee: Attribute.Integer;
+    loanManagementFee: Attribute.Integer;
+    drawdownFee: Attribute.Integer;
+    upFrontRefferalRate: Attribute.Integer;
+    referralWIthdrawPeriod: Attribute.Enumeration<
+      ['Weekly', 'Monthly', 'Yearly', 'OnLoanCompletion']
+    >;
+    SalaryLoanInterestCalculation: Attribute.Enumeration<
+      ['monthly', 'yearly']
+    > &
+      Attribute.DefaultTo<'monthly'>;
+    salaryLoanInterestType: Attribute.Enumeration<
+      ['amortization ', 'compound']
+    > &
+      Attribute.DefaultTo<'amortization '>;
+    allowSalaryLoans: Attribute.Enumeration<['yes', 'no']> &
+      Attribute.DefaultTo<'yes'>;
+    allowAssetBasedLoans: Attribute.Enumeration<['yes', 'no']> &
+      Attribute.DefaultTo<'yes'>;
+    allowInvestments: Attribute.Enumeration<['yes', 'no']> &
+      Attribute.DefaultTo<'yes'>;
+    allowReferrals: Attribute.Enumeration<['yes', 'no']> &
+      Attribute.DefaultTo<'yes'>;
+    referralRateType: Attribute.Enumeration<['flat', 'percentage']> &
+      Attribute.DefaultTo<'percentage'>;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -1926,6 +2096,100 @@ export interface ApiPhoneNumbersListPhoneNumbersList extends Schema.SingleType {
   };
 }
 
+export interface ApiReferralReferral extends Schema.CollectionType {
+  collectionName: 'referrals';
+  info: {
+    singularName: 'referral';
+    pluralName: 'referrals';
+    displayName: 'referral';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    user: Attribute.Relation<
+      'api::referral.referral',
+      'oneToOne',
+      'plugin::users-permissions.user'
+    >;
+    referralCode: Attribute.String & Attribute.Unique;
+    referredUsers: Attribute.Relation<
+      'api::referral.referral',
+      'oneToMany',
+      'plugin::users-permissions.user'
+    >;
+    referredUsersLoans: Attribute.Relation<
+      'api::referral.referral',
+      'oneToMany',
+      'api::loan.loan'
+    >;
+    referralEarnings: Attribute.Relation<
+      'api::referral.referral',
+      'oneToMany',
+      'api::referral-earning.referral-earning'
+    >;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::referral.referral',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::referral.referral',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiReferralEarningReferralEarning
+  extends Schema.CollectionType {
+  collectionName: 'referral_earnings';
+  info: {
+    singularName: 'referral-earning';
+    pluralName: 'referral-earnings';
+    displayName: 'referralEarnings';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    loan: Attribute.Relation<
+      'api::referral-earning.referral-earning',
+      'oneToOne',
+      'api::loan.loan'
+    >;
+    amount: Attribute.String;
+    referral: Attribute.Relation<
+      'api::referral-earning.referral-earning',
+      'manyToOne',
+      'api::referral.referral'
+    >;
+    description: Attribute.Text;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::referral-earning.referral-earning',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::referral-earning.referral-earning',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
 export interface ApiRepaymentRepayment extends Schema.CollectionType {
   collectionName: 'repayments';
   info: {
@@ -1979,6 +2243,43 @@ export interface ApiRepaymentRepayment extends Schema.CollectionType {
       Attribute.Private;
     updatedBy: Attribute.Relation<
       'api::repayment.repayment',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiRepaymentScheduleRepaymentSchedule
+  extends Schema.CollectionType {
+  collectionName: 'repayment_schedules';
+  info: {
+    singularName: 'repayment-schedule';
+    pluralName: 'repayment-schedules';
+    displayName: 'RepaymentSchedule';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    loan: Attribute.Relation<
+      'api::repayment-schedule.repayment-schedule',
+      'oneToOne',
+      'api::loan.loan'
+    >;
+    Schedule: Attribute.Component<'loan-details.schedule', true>;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::repayment-schedule.repayment-schedule',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::repayment-schedule.repayment-schedule',
       'oneToOne',
       'admin::user'
     > &
@@ -2174,7 +2475,9 @@ declare module '@strapi/types' {
       'plugin::users-permissions.user': PluginUsersPermissionsUser;
       'plugin::i18n.locale': PluginI18NLocale;
       'api::admin.admin': ApiAdminAdmin;
+      'api::admin-initial.admin-initial': ApiAdminInitialAdminInitial;
       'api::admin-notification.admin-notification': ApiAdminNotificationAdminNotification;
+      'api::admin-signature.admin-signature': ApiAdminSignatureAdminSignature;
       'api::app-feature.app-feature': ApiAppFeatureAppFeature;
       'api::app-status.app-status': ApiAppStatusAppStatus;
       'api::approval.approval': ApiApprovalApproval;
@@ -2184,6 +2487,7 @@ declare module '@strapi/types' {
       'api::finance.finance': ApiFinanceFinance;
       'api::form.form': ApiFormForm;
       'api::form-fill-value.form-fill-value': ApiFormFillValueFormFillValue;
+      'api::get-repayment-schedule.get-repayment-schedule': ApiGetRepaymentScheduleGetRepaymentSchedule;
       'api::investment.investment': ApiInvestmentInvestment;
       'api::investment-client.investment-client': ApiInvestmentClientInvestmentClient;
       'api::investment-deposit.investment-deposit': ApiInvestmentDepositInvestmentDeposit;
@@ -2199,7 +2503,10 @@ declare module '@strapi/types' {
       'api::password-reset.password-reset': ApiPasswordResetPasswordReset;
       'api::payment.payment': ApiPaymentPayment;
       'api::phone-numbers-list.phone-numbers-list': ApiPhoneNumbersListPhoneNumbersList;
+      'api::referral.referral': ApiReferralReferral;
+      'api::referral-earning.referral-earning': ApiReferralEarningReferralEarning;
       'api::repayment.repayment': ApiRepaymentRepayment;
+      'api::repayment-schedule.repayment-schedule': ApiRepaymentScheduleRepaymentSchedule;
       'api::send-notification.send-notification': ApiSendNotificationSendNotification;
       'api::transaction-history.transaction-history': ApiTransactionHistoryTransactionHistory;
       'api::type.type': ApiTypeType;

@@ -46,7 +46,7 @@ let apiurl, backendUrl, clienturl
  
 
 if(environment === 'local'){
-  /*localhost: */  clienturl = 'http://localhost:3002'
+  /*localhost: */  clienturl = 'http://localhost:3004'
 }
 else if(environment === 'live'){
   /*liveserver1: */ clienturl = 'https://portal.vectorfinancelimited.com' // for production's sake

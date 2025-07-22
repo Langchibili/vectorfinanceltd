@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Fab from "@mui/material/Fab";
 import SpeedDial from "@mui/material/SpeedDial";
 import SpeedDialAction from "@mui/material/SpeedDialAction";
@@ -7,10 +7,13 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import MenuIcon from "@mui/icons-material/Menu";
 import LinkIcon from "@mui/icons-material/Link";
 import { styled } from "@mui/system";
-import { getAgreementDay, getAgreementDaySuffix, getAgreementMonth, getAgreementYearNumber, getAgreementYearWords, scrolltoTopOFPage } from "@/Functions";
+import { getAgreementDay, getAgreementDaySuffix, getAgreementMonth, getAgreementYearNumber, getAgreementYearWords, scrolltoTopOFPage, validateEmail } from "@/Functions";
 import DisplaySignature from "@/components/Includes/DisplaySignature/DisplaySignature";
 import { api_url, getJwt } from "@/Constants";
 import ErrorSnapBack from "@/components/Includes/SnapBacks/ErrorSnapBack";
+import { useUser } from "@/Contexts/UserContext";
+import { useConstants } from "@/Contexts/ConstantsContext";
+import { Info } from "@material-ui/icons";
 
 // AutoResizingInput component – adjusts its width based on the content.
 class AutoResizingInput extends React.Component {
@@ -33,11 +36,13 @@ class AutoResizingInput extends React.Component {
     this.setState({ value }, () => {
       if (onChange) onChange(name, value);
       this.adjustWidth();
+      this.adjustColor()
     });
   };
 
   componentDidMount() {
     this.adjustWidth();
+    this.adjustColor()
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -46,9 +51,21 @@ class AutoResizingInput extends React.Component {
       prevProps.placeholder !== this.props.placeholder
     ) {
       this.adjustWidth();
+      this.adjustColor()
     }
   }
 
+  adjustColor = ()=>{
+    const input = this.inputRef.current;
+    if (!input) return;
+    const style = window.getComputedStyle(input);
+    if(input.value.length < 1 && !this.props.unrequired){
+      input.style.borderColor = "red"
+    }
+    else{
+       input.style.borderColor = "none"
+    }
+  }
   adjustWidth = () => {
     const input = this.inputRef.current;
     if (!input) return;
@@ -105,7 +122,6 @@ const SectionNav = styled(SpeedDial)({
 export default class GeneralLoanForm extends React.Component {
   constructor(props) {
     super(props);
-
     this.state = {
       formSaved: false,
       uploading: false,
@@ -113,6 +129,7 @@ export default class GeneralLoanForm extends React.Component {
       atBottom: false,
       propertyType: "",     // land | house | other
       formValues: {}, // stores all AutoResizingInput values
+      signatures: {},
       constants: {
         agreementDateDay : getAgreementDay(),
         agreementDateDaySuffix: getAgreementDaySuffix(),
@@ -130,6 +147,11 @@ export default class GeneralLoanForm extends React.Component {
         window.addEventListener("scroll", this.checkScrollPosition);
         scrolltoTopOFPage();
      }
+  }
+  saveSignatures = (signatures)=>{
+     this.setState({
+        signatures: signatures
+     })
   }
   componentWillUnmount() {
     if(document !== "undefined"){
@@ -179,6 +201,7 @@ export default class GeneralLoanForm extends React.Component {
   handlePropertyTypeChange = (e) => {
     const propertyType = e.target.value;
     this.setState(prev => ({
+      error: null,
       propertyType,
       formValues: {
         ...prev.formValues,
@@ -213,11 +236,81 @@ export default class GeneralLoanForm extends React.Component {
 //   };
 
 // Update saveFormToAPI to include constants
+validateForm = (formValues) => {
+  // 1. Ensure all core fields exist and have truthy values
+  const coreFields = [
+    "accountNumber",
+    "bankAccountName",
+    "bankName",
+    "bankPhone",
+    "borrowerAddress",
+    "borrowerEmail",
+    "borrowerName",
+    "borrowerWitnessName",
+    "borrowerWitnessOccupation",
+    "branchName",
+    "plotNumber",
+    "propertyName",
+    "sortCode",
+    "swiftCode"
+  ];
+
+  for (const field of coreFields) {
+    if (
+      !Object.prototype.hasOwnProperty.call(formValues, field) ||
+      formValues[field] === null ||
+      formValues[field] === undefined ||
+      String(formValues[field]).trim() === ""
+    ) {
+      return false;
+    }
+  }
+
+  // 2. If propertyName is "land" or "house", check extra fields
+  const prop = String(formValues.propertyName).toLowerCase();
+  if (prop === "land" || prop === "house") {
+    const extraFields = [
+      "location",
+      "plotNumber",
+      "plotSize"
+    ];
+
+    for (const field of extraFields) {
+      if (
+        !Object.prototype.hasOwnProperty.call(formValues, field) ||
+        formValues[field] === null ||
+        formValues[field] === undefined ||
+        String(formValues[field]).trim() === ""
+      ) {
+        return false;
+      }
+    }
+  }
+
+  // If we got here, everything required is present
+  return true;
+}
+
 saveFormToAPI = async () => {
-  const { formValues, constants } = this.state;
+  const { formValues, constants, signatures } = this.state;
+  console.log("formValues",formValues)
+  
+  if(!this.validateForm(formValues)){
+    this.setState({
+      error:"Make sure all highlighted fields are entered."
+    })
+    return // make sure that all required fields are input
+  }
+  if(formValues.borrowerEmail && !validateEmail(formValues.borrowerEmail)){
+      this.setState({
+      error:"Please enter a valid email address."
+    })
+    return // make sure that all required fields are input
+  }
+  
   // merge constants (date, principalSum, etc.) with the user-entered values
   const payload = { 
-    values: {...constants, ...formValues},
+    values: {...constants, ...formValues, ...signatures},
     formName: "GeneralLoanForm",
     client: this.props.loggedInUser.id,
     applicationFormId: this.props.toSignApplicationFormId,
@@ -311,6 +404,8 @@ saveFormToAPI = async () => {
     return (
      <>
       <div style={{ width: "100%", margin: "0 auto" }}>
+        {this.state.error? <ErrorSnapBack errorMessage={this.state.error}/> : null}
+        <GetSignatures saveSignatures={this.saveSignatures}/>
         <div id="content-container" className="content-container">
           {this.state.error? <ErrorSnapBack errorMessage={this.state.error}/> : ""}
           {/* Part 1 */}
@@ -334,7 +429,7 @@ saveFormToAPI = async () => {
           <p>
             <strong>AND:</strong> <AutoResizingInput onChange={this.handleInputChange} placeholder="Enter Your Name" name="borrowerName" style={inputStyle} /> of<br/>
             <AutoResizingInput onChange={this.handleInputChange} placeholder="Enter Your Address" name="borrowerAddress" style={inputStyle} /> (the “<strong>The Borrower</strong>”).
-            <br/><small>EG: Plot 101, Woodlands, Lusaka, Lusaka Province, Zambia</small>
+            <br/><small><Info style={{fontSize:'13px'}}/> EG: Plot 101, Woodlands, Lusaka, Lusaka Province, Zambia</small>
           </p>
           {/* Part 2 */}
           <h4>WHEREAS:</h4>
@@ -1005,11 +1100,11 @@ saveFormToAPI = async () => {
         <p>AS WITNESS the hands of the Parties hereto or their duly authorized agents the day and year first before written.</p>
 
           <p>
-            Signed by the said <AutoResizingInput onChange={this.handleInputChange} name="vendorSignatoryName" style={inputStyle} /> for and on behalf of VECTOR FINANCE LIMITED
+            Signed by the said <AutoResizingInput unrequired={true} disabled={true} onChange={this.handleInputChange} name="vendorSignatoryName" style={inputStyle} /> for and on behalf of VECTOR FINANCE LIMITED
           </p>
           <p>In the presence of:</p>
           <p id="signatures">
-            Director: <AutoResizingInput onChange={this.handleInputChange} name="vendorDirectorName" style={inputStyle} />
+            Director: <AutoResizingInput unrequired={true} disabled={true} onChange={this.handleInputChange} name="vendorDirectorName" style={inputStyle} />
           </p>
 
           <p>
@@ -1123,3 +1218,23 @@ saveFormToAPI = async () => {
   }
 }
 
+
+const GetSignatures = ({saveSignatures})=>{
+  const loggedInUser = useUser()
+  const constants = useConstants()
+  useEffect(()=>{
+    saveSignatures({
+      lenderWitnessName:constants?.adminInitials?.ceoInitials?.ceoFullNames || "",
+      directorName:constants?.adminInitials?.directorInitials?.directorFullNames || "",
+      signature: loggedInUser?.user?.signature?.url || null,
+      initials : loggedInUser?.user?.initials?.url || null,
+      witnessSignature: loggedInUser?.user?.witnessSignature?.url || null,
+      witnessInitials : loggedInUser?.user?.witnessInitials?.url || null,
+      directorSignature: constants?.adminSignatures?.directorSignature?.url || null,
+      ceoSignature: constants?.adminSignatures?.ceoSignature?.url || null,
+      directorInitials: constants?.adminInitials?.directorInitials?.url || null,
+      ceoInitials: constants?.adminInitials?.ceoInitials?.url || null
+     })
+  },[])
+  return <></>
+}

@@ -39,7 +39,20 @@ module.exports = {
         .query('plugin::users-permissions.user')
         .findOne({
           where: { id: clientId },
-          populate: ['signature', 'witnessSignature'],
+          populate: ['signature', 'witnessSignature','initials','witnessInitials'],
+        })
+      const adminSignatures = await strapi
+        .query('api::admin-signature.admin-signature')
+        .findOne({
+          where: { id: 1 },
+          populate: ['director','ceo'],
+        })
+
+      const adminInitials = await strapi
+        .query('api::admin-initial.admin-initial')
+        .findOne({
+          where: { id: 1 },
+          populate: ['director','ceo'],
         })
 
      
@@ -57,8 +70,14 @@ module.exports = {
       }
 
       // **Pinpoint insertion**: convert both signature fields here
-      const signatureDataURI        = await fileToDataURI(user.signature)
+      const signatureDataURI = await fileToDataURI(user.signature)
       const witnessSignatureDataURI = await fileToDataURI(user.witnessSignature)
+      const initialsDataURI  = await fileToDataURI(user.initials)
+      const witnessInitialsDataURI = await fileToDataURI(user.witnessInitials)
+      const directorSignatureDataURI = await fileToDataURI(adminSignatures.director)
+      const ceoSignatureDataURI = await fileToDataURI(adminSignatures.ceo)
+      const directorInitialsDataURI = await fileToDataURI(adminInitials.director)
+      const ceoInitialsDataURI = await fileToDataURI(adminInitials.ceo)
       console.log('[Debug] signatureDataURI length:', signatureDataURI.length)
       console.log('[Debug] witnessSignatureDataURI length:', witnessSignatureDataURI.length)
 
@@ -67,15 +86,29 @@ module.exports = {
       // ─────────────────────────────────────────────────────────────
       const context = {
         ...result.values,
-        signature:        signatureDataURI,
+        signature: signatureDataURI,
         witnessSignature: witnessSignatureDataURI,
+        initials: initialsDataURI,
+        witnessInitials: witnessInitialsDataURI,
+        directorSignature: directorSignatureDataURI,
+        ceoSignature: ceoSignatureDataURI,
+        directorInitials: directorInitialsDataURI,
+        ceoInitials: ceoInitialsDataURI,
       }
       const html = template(context)
       console.log('[Debug] Generated HTML length:', html.length)
 
 
       // 5. Generate PDF buffer
-      const browser = await puppeteer.launch({ headless: true })
+      // const browser = await puppeteer.launch({ headless: true })
+      const browser = await puppeteer.launch({
+        headless: true,   // or false, as you need
+        args: [
+          "--no-sandbox",
+          "--disable-setuid-sandbox",
+          // (you can keep any other flags you already had)
+        ],
+      })
       const page = await browser.newPage()
       await page.setContent(html, { waitUntil: 'networkidle0' })
       const pdfBuffer = await page.pdf({

@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react'
 import ImagePageLoader from '@/components/Includes/Loader/ImagePageLoader'
-import { getLoanCategoryIds, getLoansInformation, getLoanTypesIds } from '@/Functions'
+import { getAdminInitials, getAdminSignature, getLoanCategoryIds, getLoansInformation, getLoanTypesIds } from '@/Functions'
 
 // Create a context
 const ConstantsContext = createContext(null)
@@ -16,9 +16,11 @@ export function ConstantsProvider({ children }) {
         const constantsObject = {
             loanCategoriesIds : await getLoanCategoryIds(),
             loanTypesIds : await getLoanTypesIds(),
-            loansInformation : await getLoansInformation()
+            loansInformation : await getLoansInformation(),
+            adminSignatures : await getAdminSignature(),
+            adminInitials : await getAdminInitials()
         }
-        
+        console.log('constantsObject',constantsObject)
         setConstants(constantsObject)
       } catch (error) {
         console.error('Error fetching logged in user:', error)

@@ -147,6 +147,7 @@ export default class UpdateDetailsForm extends React.Component {
         return
       }
       this.props.handleOpenUpdateClientDetailsForm()
+      updateUserAccount({basicDetailsUpdated:true},this.props.loggedInUser.id) //updating the basic details update status to true
     }
   
 
