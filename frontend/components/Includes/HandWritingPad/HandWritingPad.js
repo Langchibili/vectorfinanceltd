@@ -20,15 +20,17 @@ const HandWritingPad = (props) => {
 
   // Resize canvas based on screen size for responsiveness
   useEffect(() => {
-    if (props.loggedInUser?.signature?.url) {
+    console.log('props', props)
+    if(props.handleSignatureSave){
+      if (props.loggedInUser?.signature?.url) {
         const newImage = backEndUrl + props.loggedInUser.signature.url
         if (newImage !== handwritingImage) { // Prevent redundant updates
           setSignatureImage(newImage)
           setHandwritingImage(newImage)
         }
-      
+      }
     }
-    if (props.handleInitialsSave) {
+    else if (props.handleInitialsSave) {
       if (props.loggedInUser?.initials?.url) {
         const newImage = backEndUrl + props.loggedInUser.initials.url
         if (newImage !== handwritingImage) { // Prevent redundant updates
@@ -37,7 +39,7 @@ const HandWritingPad = (props) => {
         }
       } 
     }
-   if (props.handleWitnessSignatureSave) {
+   else if (props.handleWitnessSignatureSave) {
       if (props.loggedInUser?.witnessSignature?.url) {
         const newImage = backEndUrl + props.loggedInUser.witnessSignature.url
         if (newImage !== handwritingImage) { // Prevent redundant updates
@@ -46,7 +48,7 @@ const HandWritingPad = (props) => {
         }
       }
     } 
-    if (props.handleWitnessInitialsSave) {
+    else if (props.handleWitnessInitialsSave) {
       if (props.loggedInUser?.witnessInitials?.url) {
         const newImage = backEndUrl + props.loggedInUser.witnessInitials.url
         if (newImage !== handwritingImage) { // Prevent redundant updates
@@ -55,7 +57,7 @@ const HandWritingPad = (props) => {
         }
       }
     } 
-    if (props.handleDirectorSignatureSave) {
+    else if (props.handleDirectorSignatureSave) {
       if (props.constants?.adminSignatures?.directorSignature?.url) {
         const newImage = backEndUrl + props.constants.adminSignatures.directorSignature.url
         if (newImage !== handwritingImage) { // Prevent redundant updates
@@ -64,7 +66,7 @@ const HandWritingPad = (props) => {
         }
       }
     } 
-    if (props.handleDirectorInitialsSave) {
+    else if (props.handleDirectorInitialsSave) {
       if (props.constants?.adminInitials?.directorInitials?.url) {
         const newImage = backEndUrl + props.constants.adminInitials.directorInitials.url
         if (newImage !== handwritingImage) { // Prevent redundant updates
@@ -74,7 +76,7 @@ const HandWritingPad = (props) => {
       }
     } 
     
-    if (props.handleCeoSignatureSave) {
+    else if (props.handleCeoSignatureSave) {
       if (props.constants?.adminSignatures?.ceoSignature?.url) {
         const newImage = backEndUrl + props.constants.adminSignatures.ceoSignature.url
         if (newImage !== handwritingImage) { // Prevent redundant updates
@@ -102,7 +104,17 @@ const HandWritingPad = (props) => {
     context.lineCap = 'round'
     context.lineWidth = brushSize
     context.strokeStyle = brushColor
-  }, [props.handleWitnessSignatureSave, props.loggedInUser, brushSize, brushColor])
+  }, [
+      props.handleInitialsSave,
+      props.handleWitnessSignatureSave,
+      props.handleWitnessInitialsSave,
+      props.handleDirectorSignatureSave,
+      props.handleDirectorInitialsSave,
+      props.handleCeoSignatureSave,
+      props.handleCeoInitialsSave,
+      props.loggedInUser, 
+      brushSize, 
+      brushColor])
  
   // Get touch/mouse position relative to the canvas
   const getCanvasCoordinates = (e) => {
@@ -141,31 +153,31 @@ const HandWritingPad = (props) => {
     const canvas = canvasRef.current
     const dataURL = canvas.toDataURL('image/png') // Get the image data
     setHandwritingImage(dataURL) // Update state with the data URL
-    console.log("props",props)
-    if (props.handleSignatureSave) {
-        setSignatureImage(dataURL)
-    }
     if (props.handleInitialsSave) {
         setInitialsImage(dataURL)
     }
-    if (props.handleWitnessSignatureSave) {
+    else if (props.handleWitnessSignatureSave) {
         setWitnessSignatureImage(dataURL)
     }
-    if (props.handleWitnessInitialsSave) {
+    else if (props.handleWitnessInitialsSave) {
         setWitnessInitialsImage(dataURL)
     }
-    if (props.handleDirectorSignatureSave) {
+    else if (props.handleDirectorSignatureSave) {
         setDirectorSignatureImage(dataURL)
     }
-    if (props.handleDirectorInitialsSave) {
+    else if (props.handleDirectorInitialsSave) {
         setDirectorInitialsImage(dataURL)
     }
-    if (props.handleCeoSignatureSave) {
-       setCeoInitialsImage(dataURL)
+    else if (props.handleCeoSignatureSave) {
+       setCeoSignatureImage(dataURL)
     }
-    if (props.handleCeoInitialsSave) {
+    else if (props.handleCeoInitialsSave) {
        setCeoInitialsImage(dataURL)
     } 
+    else {
+        /// if props.handleSignatureSave) 
+        setSignatureImage(dataURL)
+    }
     // Convert base64 to a blob
     const blob = await fetch(dataURL).then(res => res.blob())
     let formData = new FormData()
@@ -231,29 +243,30 @@ const HandWritingPad = (props) => {
 
       if (response.ok) {
         const result = await response.json()
-        if (props.handleSignatureSave) {
-            props.handleSignatureSave(result[0])
-        }
-        if (props.handleInitialsSave) {
-            props.handleInitialsSave(result[0])
-        }
-        if (props.handleWitnessSignatureSave) {
-            props.handleWitnessSignatureSave(result[0])
-        }
-        if (props.handleWitnessInitialsSave) {
-            props.handleWitnessInitialsSave(result[0])
-        }
-        if (props.handleDirectorSignatureSave) {
-            props.handleDirectorSignatureSave(result[0])
-        } 
-        if (props.handleDirectorInitialsSave) {
-            props.handleDirectorInitialsSave(result[0])
-        }
-        if (props.handleCeoSignatureSave) {
-            props.handleCeoSignatureSave(result[0])
-        }
         if (props.handleCeoInitialsSave) {
             props.handleCeoInitialsSave(result[0])
+        }
+        else if (props.handleInitialsSave) {
+            props.handleInitialsSave(result[0])
+        }
+        else if (props.handleWitnessSignatureSave) {
+            props.handleWitnessSignatureSave(result[0])
+        }
+        else if (props.handleWitnessInitialsSave) {
+            props.handleWitnessInitialsSave(result[0])
+        }
+        else if (props.handleDirectorSignatureSave) {
+            props.handleDirectorSignatureSave(result[0])
+        } 
+        else if (props.handleDirectorInitialsSave) {
+            props.handleDirectorInitialsSave(result[0])
+        }
+        else if (props.handleCeoSignatureSave) {
+            props.handleCeoSignatureSave(result[0])
+        }
+        else{
+            // props.handleSignatureSave
+            props.handleSignatureSave(result[0])
         }
         console.log('API Response:', result)
       }
@@ -270,30 +283,32 @@ const HandWritingPad = (props) => {
   const saveHandwriting = () => {
     const canvas = canvasRef.current
     const dataURL = canvas.toDataURL('image/png')
-    if (props.handleSignatureSave) {
-        props.handleSignatureSave(dataURL)
-    }
+    
     if (props.handleInitialsSave) {
         props.handleInitialsSave(dataURL)
     }
-    if (props.handleWitnessSignatureSave) {
+    else if (props.handleWitnessSignatureSave) {
         props.handleWitnessSignatureSave(dataURL)
     }
-    if (props.handleWitnessInitialsSave) {
+    else if (props.handleWitnessInitialsSave) {
         props.handleWitnessInitialsSave(dataURL)
     }
-    if (props.handleDirectorSignatureSave) {
+    else if (props.handleDirectorSignatureSave) {
         props.handleDirectorSignatureSave(dataURL)
     }
-    if (props.handleDirectorInitialsSave) {
+    else if (props.handleDirectorInitialsSave) {
         props.handleDirectorInitialsSave(dataURL)
     }
-    if (props.handleCeoSignatureSave) {
+    else if (props.handleCeoSignatureSave) {
         props.handleCeoSignatureSave(dataURL)
     }
-    if (props.handleCeoInitialsSave) {
+    else if (props.handleCeoInitialsSave) {
         props.handleCeoInitialsSave(dataURL)
     } 
+    else{
+        // props.handleSignatureSave
+        props.handleSignatureSave(dataURL)
+    }
     setHandwritingImage(dataURL) // save handwriting in order to show it on the screen
     saveHandwritingToAPI() // save to the backend
   }
@@ -305,134 +320,79 @@ const HandWritingPad = (props) => {
     setHandwritingImage(null)
   }
 
-const renderSignature = () => {
-  // Director
-  if (props.handleDirectorSignatureSave) {
-    return directorSignatureImage ? (
+const renderSignatureAndInitials = () => {
+  // Director Signature
+  if (props.handleDirectorSignatureSave && directorSignatureImage) {
+    return (
       <div>
         <h4>Director's Signature</h4>
         <img
           src={directorSignatureImage}
           alt="Director's Signature"
-          style={{ border: '1px solid #000', backgroundColor: '#fff' }}
+          style={{ border: '1px solid #000', backgroundColor: '#fff', margin:'0 auto' }}
         />
       </div>
-    ) : null
+    )
   }
 
-  // CEO
-  if (props.handleCeoSignatureSave) {
-    return ceoSignatureImage ? (
+  // CEO Signature
+  if (props.handleCeoSignatureSave && ceoSignatureImage) {
+    return (
       <div>
         <h4>CEO's Signature</h4>
         <img
           src={ceoSignatureImage}
           alt="CEO's Signature"
-          style={{ border: '1px solid #000', backgroundColor: '#fff' }}
+          style={{ border: '1px solid #000', backgroundColor: '#fff', margin:'0 auto' }}
         />
       </div>
-    ) : null
+    )
   }
 
-  // Generic with witness
-  if (props.handleWitnessSignatureSave) {
-    // show applicant's first, then witness
-    // if (signatureImage) {
-    //   return (
-    //     <div>
-    //       <h4>Your Signature</h4>
-    //       <img
-    //         src={signatureImage}
-    //         alt="Signature"
-    //         style={{ border: '1px solid #000', backgroundColor: '#fff' }}
-    //       />
-    //     </div>
-    //   )
-    // }
-    if (witnessSignatureImage) {
-      return (
-        <div>
-          <h4>Witness's Signature</h4>
-          <img
-            src={witnessSignatureImage}
-            alt="Witness's Signature"
-            style={{ border: '1px solid #000', backgroundColor: '#fff' }}
-          />
-        </div>
-      )
-    }
-    return null
+  // Witness Signature
+  if (props.handleWitnessSignatureSave && witnessSignatureImage) {
+    return (
+      <div>
+        <h4>Witness's Signature</h4>
+        <img
+          src={witnessSignatureImage}
+          alt="Witness's Signature"
+          style={{ border: '1px solid #000', backgroundColor: '#fff',margin:'0 auto' }}
+        />
+      </div>
+    )
   }
 
-  // Pure generic
-  return signatureImage ? (
-    <div>
-      <h4>Signature</h4>
-      <img
-        src={signatureImage}
-        alt="Signature"
-        style={{ border: '1px solid #000', backgroundColor: '#fff' }}
-      />
-    </div>
-  ) : null
-}
-
-const renderInitials = () => {
-  // Director
-  if (props.handleDirectorInitialsSave) {
-    return directorInitialsImage ? (
+  // Director Initials
+  if (props.handleDirectorInitialsSave && directorInitialsImage) {
+    return (
       <div>
         <h4>Director's Initials</h4>
         <img
           src={directorInitialsImage}
           alt="Director's Initials"
-          style={{ border: '1px solid #000', backgroundColor: '#fff' }}
+          style={{ border: '1px solid #000', backgroundColor: '#fff', margin:'0 auto' }}
         />
       </div>
-    ) : null
+    )
   }
 
-  // CEO
-  if (props.handleCeoInitialsSave) {
-    return ceoInitialsImage ? (
+  // CEO Initials
+  if (props.handleCeoInitialsSave && ceoInitialsImage) {
+    return (
       <div>
         <h4>CEO's Initials</h4>
         <img
           src={ceoInitialsImage}
           alt="CEO's Initials"
-          style={{ border: '1px solid #000', backgroundColor: '#fff' }}
+          style={{ border: '1px solid #000', backgroundColor: '#fff', margin:'0 auto' }}
         />
       </div>
-    ) : null
+    )
   }
 
-  // Generic with witness
+  // Applicant or Witness Initials
   if (props.handleWitnessInitialsSave) {
-    // show applicant's first, then witness
-    if (initialsImage) {
-      return (
-        <div>
-          <h4>Your Initials</h4>
-          <img
-            src={initialsImage}
-            alt="Initials"
-            style={{ border: '1px solid #000', backgroundColor: '#fff' }}
-          />
-        </div>
-      )
-    }
-    if (initialsImage) {
-      return (
-        <div>
-          <h4>Your Initials</h4>
-          <img
-            src={initialsImage}
-            alt="Your Initials"
-            style={{ border: '1px solid #000', backgroundColor: '#fff' }}
-          />
-        </div>
-      )
-    }
     if (witnessInitialsImage) {
       return (
         <div>
@@ -440,43 +400,64 @@ const renderInitials = () => {
           <img
             src={witnessInitialsImage}
             alt="Witness's Initials"
-            style={{ border: '1px solid #000', backgroundColor: '#fff' }}
+            style={{ border: '1px solid #000', backgroundColor: '#fff', margin:'0 auto' }}
           />
         </div>
       )
     }
-    return null
   }
 
-  // Pure generic
-  return initialsImage ? (
-    <div>
-      <h4>Initials</h4>
-      <img
-        src={initialsImage}
-        alt="Initials"
-        style={{ border: '1px solid #000', backgroundColor: '#fff' }}
-      />
-    </div>
-  ) : null
+  // Fallback: Generic Signature or Initials
+  if (props.handleSignatureSave && signatureImage) {
+    return (
+      <div>
+        <h4>Signature</h4>
+        <img
+          src={signatureImage}
+          alt="Signature"
+          style={{ 
+             border: '1px solid #000',
+             backgroundColor: '#fff',
+             margin:'0 auto'
+             }}
+        />
+      </div>
+    )
+  }
+
+  if (props.handleInitialsSave && initialsImage) {
+    return (
+      <div>
+        <h4>Initials</h4>
+        <img
+          src={initialsImage}
+          alt="Initials"
+          style={{ border: '1px solid #000', backgroundColor: '#fff',margin:'0 auto' }}
+        />
+      </div>
+    )
+  }
+
+  return null
 }
 
-const renderTitle = () => {
+
+const renderTitle = (align) => {
   if (props.handleDirectorSignatureSave) {
-    return <h3 style={{ textAlign: 'left' }}>Director’s Signature</h3>
+    return <h3 style={{ textAlign: align }}>Director’s Signature</h3>
   }
   if (props.handleDirectorInitialsSave) {
-    return <h3 style={{ textAlign: 'left' }}>Director’s Initials</h3>
+    return <h3 style={{ textAlign: align }}>Director’s Initials</h3>
   }
   if (props.handleCeoSignatureSave) {
-    return <h3 style={{ textAlign: 'left' }}>CEO’s Signature</h3>
+    return <h3 style={{ textAlign: align }}>CEO’s Signature</h3>
   }
   if (props.handleCeoInitialsSave) {
-    return <h3 style={{ textAlign: 'left' }}>CEO’s Initials</h3>
+    return <h3 style={{ textAlign: align }}>CEO’s Initials</h3>
   }
   if (props.handleWitnessSignatureSave) {
     return (
-      <h3 style={{ textAlign: 'left' }}>
+      <h3 style={{ textAlign: align }}>
         A Witness’s Signature
         <small> (should be entered by the witness, not you)</small>
       </h3>
@@ -484,17 +465,17 @@ const renderTitle = () => {
   }
   if (props.handleWitnessInitialsSave) {
     return (
-      <h3 style={{ textAlign: 'left' }}>
+      <h3 style={{ textAlign: align }}>
         A Witness’s Initials
         <small> (should be entered by the witness, not you)</small>
       </h3>
     )
   }
   if (props.handleSignatureSave) {
-    return <h3 style={{ textAlign: 'left' }}>Write Your Signature</h3>
+    return <h3 style={{ textAlign: align }}>Write Your Signature</h3>
   }
   if (props.handleInitialsSave) {
-    return <h3 style={{ textAlign: 'left' }}>Write Your Initials</h3>
+    return <h3 style={{ textAlign: align }}>Write Your Initials</h3>
   }
   return null
 }
@@ -502,11 +483,13 @@ const renderTitle = () => {
 
 
   return (
-    <div style={{ textAlign: 'center', position: 'fixed', width: '100%' , margin:'0 auto'}}>
-      {renderTitle()}
+    <div style={{ textAlign: 'center', width: '100%', position: isDrawing? 'fixed':'static', left:0, right: 0, margin:'0 auto'}}>
+      {renderTitle('center')}
       <canvas
         ref={canvasRef}
         style={{
+          margin:'0 auto',
+          textAlign:'center',
           border: '1px solid #ccc',
           backgroundColor: '#f5f5f5',
           touchAction: 'none', // Prevent touch gestures from interfering
@@ -519,7 +502,7 @@ const renderTitle = () => {
         onTouchMove={draw}
         onTouchEnd={stopDrawing}
       ></canvas>
-      <div style={{ margin: '10px',textAlign:'left' }}>
+      <div style={{ margin: '10px',textAlign:'center' }}>
         <label>
           Brush Size:
           <input
@@ -545,7 +528,8 @@ const renderTitle = () => {
           <Button onClick={clearCanvas} variant="outlined" color='secondary' sx={{marginLeft:'10px'}}>Clear</Button>
         </div>
       </div>
-      {/* {handwritingImage && (
+      {/*
+      {handwritingImage && (
         <div key={props.handleWitnessSignatureSave? 'witness' : 'signature'}>
           <h4>Saved Handwriting:</h4>
           <img
@@ -557,9 +541,9 @@ const renderTitle = () => {
             }}
           />
         </div>
-      )} */}
-     {renderSignature()}
-     {renderInitials()}
+      )} 
+      */}
+     <div style={{marginBottom:'80px'}}>{renderSignatureAndInitials()}</div>
     </div>
   )
 }

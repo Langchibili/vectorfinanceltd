@@ -9,15 +9,44 @@
     p, ol, ul { margin: 0.5em 0; }
     .dashed-input {
       display: inline-block;
-      border-bottom: 1px dashed #3228287a;
       padding-left: 2px;
       font-weight: bold;
       min-width: 2em;
     }
     ol, ul { padding-left: 20px; }
+    @media print {
+      body {
+        /* make sure there’s room for the footer */
+        margin-bottom: 50px;
+      }
+
+      .page-footer {
+        position: fixed;
+        bottom: 10px;   /* distance from page bottom */
+        right: 10px;    /* distance from page right edge */
+        width: auto;
+        height: auto;
+        /* will appear on every printed/PDF page */
+      }
+
+      .footer‑initials {
+        /* pick a height that looks good – e.g. 24px */
+        height: 24px;
+        /* maintain aspect ratio */
+        width: auto;
+      }
+  }
   </style>
 </head>
 <body>
+    <div class="page-footer">
+    Initials: <img
+      src="{{initials}}"
+      alt="Initials"
+      class="footer‑initials"
+    />
+  </div>
+
     <header style="height: 1000px;line-height: 4;">
       <!-- Header -->
       <p style="text-align: center;">Dated the <span>{{agreementDateDay}}</span><span style='vertical-align:super;font-size:0.75em;'>{{agreementDateDaySuffix}}</span>, day of June, {{agreementDateYearNumber}} </p>
@@ -34,7 +63,6 @@
       <span class="dashed-input">{{agreementDateMonth}}</span>
       <span class="dashed-input">{{agreementDateYearWords}}</span>
     </p>
-  
   <p>
     <strong>BETWEEN:</strong><br/>
      VECTOR FINANCE LIMITED whose registered office is at Plot No. 15 Lagos Road, Room No. FS1-B, Gardenview Properties, Rhodespark, Lusaka, Zambia (Company Reg. No. 120230054327)<br/>
@@ -177,7 +205,7 @@ Borrower a Loan in an amount of ZMW {{principalSum}} Zambian Kwacha] (hereinafte
   <p>Account Number: <span class="dashed-input">{{accountNumber}}</span></p>
   <p>Sort Code: <span class="dashed-input">{{sortCode}}</span></p>
   <p>SWIFT Code: <span class="dashed-input">{{swiftCode}}</span></p>
-  <p>Account Name: <span class="dashed-input">{{accountName}}</span></p>
+  <p>Account Name: <span class="dashed-input">{{bankAccountName}}</span></p>
   <p>Phone number: <span class="dashed-input">{{bankPhone}}</span></p>
   <h4>5. REPAYMENT OF THE FACILITY</h4>
 <p>
@@ -227,13 +255,22 @@ not paid on the due date.
 </p>
 
 <h4>7. SECURITY</h4>
-<p>
-7.1 The Principal Sum plus interest together with all the Borrower's obligations and liabilities under
-this Agreement, including without limitation, any derived liability whatsoever of the Borrower
-towards the Lender in connection with this Agreement, shall at all times during the Loan
-Period be secured by the properties listed below:
-</p>
-
+The Principal Sum plus interest together with all the Borrower's obligations and liabilities under
+this Agreement, including without limitation, any derived liability whatsoever of the
+Borrower towards the Lender in connection with this Agreement, shall at all times during
+the Loan Period be secured by the properties listed below:
+<br/><p><span class="dashed-input">{{propertyName}}</span></p>
+{{#if isLand}}
+ <br/>
+  <p><span class="dashed-input">{{plotNumber}}</span></p><br/>
+  <p><span class="dashed-input">{{plotSize}}</span></p><br/>
+  <p><span class="dashed-input">{{location}}</span></p><br/>
+{{else if isHouse}}
+ <br/>
+  <p><span class="dashed-input">{{plotNumber}}</span></p><br/>
+  <p><span class="dashed-input">{{plotSize}}</span></p><br/>
+  <p><span class="dashed-input">{{location}}</span></p><br/>  
+{{else if isVehicle}}
   <ul>
     <li>Make: <span class="dashed-input">{{securityMake}}</span></li>
     <li>Model: <span class="dashed-input">{{securityModel}}</span></li>
@@ -243,7 +280,8 @@ Period be secured by the properties listed below:
     <li>Engine No: <span class="dashed-input">{{securityEngineNo}}</span></li>
     <li>Chassis No: <span class="dashed-input">{{securityChasisNo}}</span></li>
   </ul>
-<p>(a) … (hereinafter collectively referred to as the “the Property”).</p>
+{{/if}}
+<p>(a) {{propertyName}} (hereinafter collectively referred to as the “the Property”).</p>
 <p>7.2 The Borrower hereby warrants that as at the date of this Agreement, the property is free from any and all encumbrances and shall remain as such until the Principal Sum plus interest and other fees and charges thereon secured, under this agreement is repaid by the Borrower and any and all outstanding obligations of the Borrower, pursuant to this Agreement have been discharged.</p>
 <p>7.3 Upon execution of this Agreement, the Borrower shall deposit the original documents relating to the ownership of the Property including but not limited to Certificates of Title and/or Vehicle Registration Documents, at the Lender’s registered office.</p>
 
@@ -443,14 +481,22 @@ with the terms and obligations thereof.
 <p>AS WITNESS the hands of the Parties hereto or their duly authorized agents the day and year first before written.</p>
 
 <p>
-SIGNED by the said) {{lenderWitnessName}} For and on behalf of VECTOR FINANCE LIMITED<br/>
+SIGNED by the said {{lenderWitnessName}} For and on behalf of VECTOR FINANCE LIMITED)<br/>
+signature; <img src="{{ceoSignature}}" alt="Vendor Witness signature"/><br/>
+initials; <img style="height: 20px;" src="{{ceoInitials}}" alt="Vendor Witness signature"/><br/>
+<br/>
 In the presence of:<br/>
-Director) ………………………………………<br/>
-Client’s Name {{borrowerName}}.<br/>
-Client’s signature; <img src="{{signature}}" alt="Vendor signature"/><br/>
+DIRECTOR FOR VECTOR FINANCE LIMITED)<br/>
+Director’s Name {{directorName}};<br/>
+Director's signature; <img src="{{directorSignature}}" alt="Director signature"/><br/>
+Director's initials; <img style="height: 20px;" src="{{directorInitials}}" alt="Director signature"/><br/>
+<hr/>
+CLIENT)<br/>
+Client’s Name {{borrowerName}};<br/>
+Client’s signature; <img src="{{signature}}" alt="Borrower signature"/><br/>
 In the presence of:<br/>
-WITNESS<br/>
-Name: {{borrowerWitnessName}}.<br/>
+WITNESS)<br/>
+Name: {{borrowerWitnessName}};<br/>
 Address: {{borrowerWitnessAddress}}.<br/>
 Occupation: {{borrowerWitnessOccupation}}.<br/>
 Witness’s signature; <img src="{{witnessSignature}}" alt="Witness signature"/><br/>

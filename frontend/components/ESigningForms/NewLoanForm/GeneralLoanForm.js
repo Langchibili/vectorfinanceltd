@@ -13,7 +13,7 @@ import { api_url, getJwt } from "@/Constants";
 import ErrorSnapBack from "@/components/Includes/SnapBacks/ErrorSnapBack";
 import { useUser } from "@/Contexts/UserContext";
 import { useConstants } from "@/Contexts/ConstantsContext";
-import { Info } from "@material-ui/icons";
+import { Gavel, Info } from "@material-ui/icons";
 
 // AutoResizingInput component – adjusts its width based on the content.
 class AutoResizingInput extends React.Component {
@@ -106,17 +106,17 @@ class AutoResizingInput extends React.Component {
 
 const StyledFab = styled(Fab)({
   position: "fixed",
-  bottom: 90,
-  right: 50,
+  bottom: 150,
+  right: 20,
   zIndex: 1000,
-});
+})
 
 const SectionNav = styled(SpeedDial)({
   position: "fixed",
-  bottom: 160,
-  right: 50,
+  bottom: 220,
+  right: 20,
   zIndex: 1000,
-});
+})
 
 
 export default class GeneralLoanForm extends React.Component {
@@ -211,30 +211,6 @@ export default class GeneralLoanForm extends React.Component {
     }))
 }
 
-  // Submit all form data to backend
-//   saveFormToAPI = async () => {
-//     const { formValues } = this.state;
-//     const payload = { ...formValues };
-//     console.log('payload',payload)
-//     try {
-//       const response = await fetch(`${api_url}/submit-loan-form`, {
-//         method: "POST",
-//         headers: {
-//           "Content-Type": "application/json",
-//           Authorization: `Bearer ${getJwt()}`
-//         },
-//         body: JSON.stringify(payload)
-//       });
-
-//       if (!response.ok) throw new Error(`Error ${response.status}`);
-//       await response.json();
-//       this.setState({ formSaved: true });
-//     } catch (error) {
-//       console.error("Submission failed:", error);
-//       alert("Failed to submit. Please try again.");
-//     }
-//   };
-
 // Update saveFormToAPI to include constants
 validateForm = (formValues) => {
   // 1. Ensure all core fields exist and have truthy values
@@ -249,7 +225,6 @@ validateForm = (formValues) => {
     "borrowerWitnessName",
     "borrowerWitnessOccupation",
     "branchName",
-    "plotNumber",
     "propertyName",
     "sortCode",
     "swiftCode"
@@ -287,6 +262,29 @@ validateForm = (formValues) => {
     }
   }
 
+  // 3. If propertyName is "vehicle", check vehicle-specific fields
+ else if (prop === "vehicle") {
+  const vehicleFields = [
+    "securityMake",
+    "securityModel",
+    "securityReg",
+    "securityColour",
+    "securityYear",
+    "securityEngine",
+    "securityChassis"
+  ];
+
+  for (const field of vehicleFields) {
+    if (
+      !Object.prototype.hasOwnProperty.call(formValues, field) ||
+      formValues[field] === null ||
+      formValues[field] === undefined ||
+      String(formValues[field]).trim() === ""
+    ) {
+      return false;
+    }
+  }
+}
   // If we got here, everything required is present
   return true;
 }
@@ -308,6 +306,10 @@ saveFormToAPI = async () => {
     return // make sure that all required fields are input
   }
   
+  // in case of property name being other (to get the propery name only, from propertyName: some name)
+  if(['land','house', 'vehicle'].includes(formValues.propertyName)){
+    formValues.propertyName = "Property Name: "+formValues.propertyName
+  }
   // merge constants (date, principalSum, etc.) with the user-entered values
   const payload = { 
     values: {...constants, ...formValues, ...signatures},
@@ -395,6 +397,7 @@ saveFormToAPI = async () => {
       { icon: <LinkIcon />, name: "Borrower Details", target: "#borrower-details" },
       { icon: <LinkIcon />, name: "Costs", target: "#costs-and-fees" },
       { icon: <LinkIcon />, name: "Bank", target: "#facility-terms" },
+      { icon: <Gavel />, name: "Property", target: "#property" },
       { icon: <LinkIcon />, name: "Email", target: "#email" },
       { icon: <LinkIcon />, name: "Signatures", target: "#signatures" },
       // add more as needed, matching id attributes
@@ -695,7 +698,7 @@ saveFormToAPI = async () => {
                 year (as varied from time to time). Such interest will be capitalized if not
                 paid on the due date.
             </p>
-            <h4>7. SECURITY</h4>
+            <h4 id="property">7. SECURITY</h4>
             <p>
                 7.1 The Principal Sum plus interest together with all the Borrower's
                 obligations and liabilities under this Agreement, including without
@@ -711,53 +714,121 @@ saveFormToAPI = async () => {
             <select
               value={this.state.propertyType}
               onChange={this.handlePropertyTypeChange}
-              style={{ marginBottom: "8px" }}
+              style={{ marginBottom: "8px", border:'2px solid red', borderRadius:'2px'}}
             >
               <option value="">Select one…</option>
+              <option value="vehicle">Vehicle</option>
               <option value="land">Land</option>
               <option value="house">House</option>
               <option value="other">Other</option>
             </select>
           </label>
 
-          {["land", "house"].includes(this.state.propertyType) && (
-            <ul>
-              <li>
-                Property Name:{" "}
-                <AutoResizingInput
-                  name="propertyName"
-                  defaultValue={"Property Name: "+this.state.propertyType /* this is because no change event is being triggered, so propertyName has to be set here */}
-                  readOnly
-                  style={inputStyle}
-                />
-              </li>
-              <li>
-                Plot Number:{" "}
-                <AutoResizingInput
-                  name="plotNumber"
-                  onChange={this.handleInputChange}
-                  style={inputStyle}
-                />
-              </li>
-              <li>
-                Plot Size (in hectares):{" "}
-                <AutoResizingInput
-                  name="plotSize"
-                  onChange={this.handleInputChange}
-                  style={inputStyle}
-                />
-              </li>
-              <li>
-                Location:{" "}
-                <AutoResizingInput
-                  name="location"
-                  onChange={this.handleInputChange}
-                  style={inputStyle}
-                />
-              </li>
-            </ul>
-          )}
+         {["land", "house"].includes(this.state.propertyType) && (
+        <ul>
+          <li>
+            Property Name:{" "}
+            <AutoResizingInput
+              name="propertyName"
+              defaultValue={"Property Name: " + this.state.propertyType}
+              readOnly
+              style={inputStyle}
+            />
+          </li>
+          <li>
+            Plot Number:{" "}
+            <AutoResizingInput
+              name="plotNumber"
+              onChange={this.handleInputChange}
+              style={inputStyle}
+            />
+          </li>
+          <li>
+            Plot Size (in hectares):{" "}
+            <AutoResizingInput
+              name="plotSize"
+              onChange={this.handleInputChange}
+              style={inputStyle}
+            />
+          </li>
+          <li>
+            Location:{" "}
+            <AutoResizingInput
+              name="location"
+              onChange={this.handleInputChange}
+              style={inputStyle}
+            />
+          </li>
+        </ul>
+      )}
 
+{this.state.propertyType === "vehicle" && (
+  <ul>
+    <li>
+      Make:{" "}
+      <AutoResizingInput
+        name="securityMake"
+        onChange={this.handleInputChange}
+        placeholder="Enter vehicle make"
+        style={inputStyle}
+      />
+    </li>
+    <li>
+      Model:{" "}
+      <AutoResizingInput
+        name="securityModel"
+        onChange={this.handleInputChange}
+        placeholder="Enter vehicle model"
+        style={inputStyle}
+      />
+    </li>
+    <li>
+      Reg No:{" "}
+      <AutoResizingInput
+        name="securityReg"
+        onChange={this.handleInputChange}
+        placeholder="Enter registration no."
+        style={inputStyle}
+      />
+    </li>
+    <li>
+      Colour:{" "}
+      <AutoResizingInput
+        name="securityColour"
+        onChange={this.handleInputChange}
+        placeholder="Enter vehicle colour"
+        style={inputStyle}
+      />
+    </li>
+    <li>
+      Year:{" "}
+      <AutoResizingInput
+        name="securityYear"
+        onChange={this.handleInputChange}
+        placeholder="Enter manufacture year"
+        style={inputStyle}
+      />
+    </li>
+    <li>
+      Engine No:{" "}
+      <AutoResizingInput
+        name="securityEngine"
+        onChange={this.handleInputChange}
+        placeholder="Enter engine no."
+        style={inputStyle}
+      />
+    </li>
+    <li>
+      Chassis No:{" "}
+      <AutoResizingInput
+        name="securityChassis"
+        onChange={this.handleInputChange}
+        placeholder="Enter chassis no."
+        style={inputStyle}
+      />
+    </li>
+  </ul>
+)}
           {this.state.propertyType === "other" && (
             <ul>
               <li>
@@ -1124,7 +1195,7 @@ saveFormToAPI = async () => {
             Date: <><span>{agreementDateMonth} </span>{agreementDateDay}<span style={{verticalAlign:'super',fontSize:'0.75em'}}>{agreementDateDaySuffix}</span> <span>{agreementDateYearNumber}</span> </>
           </p>
 
-          <h4>REPAYMENT SCHEDULE</h4>
+          {/* <h4>REPAYMENT SCHEDULE</h4>
           <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: "20px" }}>
             <thead>
               <tr>
@@ -1160,10 +1231,10 @@ saveFormToAPI = async () => {
             </tbody>
           </table>
 
-          <p>APPENDIX</p>
+          <p>APPENDIX</p> */}
         </div>
 
-        <div style={{ display: "flex", justifyContent: "space-between", marginTop: "20px" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", marginTop: "20px",marginBottom:'20px' }}>
           <button
             className="btn btn-success"
             onClick={() => this.props.handleRenderPreviousForm()}

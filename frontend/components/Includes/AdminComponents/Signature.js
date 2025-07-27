@@ -30,8 +30,7 @@ export default class Signature extends React.Component {
                 usage="Signature"
                 handleDirectorSignatureSave={this.handleDirectorSignatureSave}
                 handleCeoSignatureSave={this.handleCeoSignatureSave}
-                directorSignature={this.state.directorSignature}
-                ceoSignature={this.state.ceoSignature}
+                constants={this.props.constants}
                 loggedInUser={this.props.loggedInUser} />
         )
     }

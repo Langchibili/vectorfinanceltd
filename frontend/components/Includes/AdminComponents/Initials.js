@@ -24,15 +24,13 @@ export default class Initials extends React.Component {
 
     render() {
         const { role } = this.props
-        console.log("role", role)
         return (
             <SaveSignature
                 credentialsFor={role}
                 usage="Initials"
                 handleDirectorInitialsSave={this.handleDirectorInitialsSave}
                 handleCeoInitialsSave={this.handleCeoInitialsSave}
-                directorInitials={this.state.directorInitials}
-                ceoInitials={this.state.ceoInitials}
+                constants={this.props.constants}
                 loggedInUser={this.props.loggedInUser} />
         )
     }

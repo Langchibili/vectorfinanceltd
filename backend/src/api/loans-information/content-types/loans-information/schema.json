@@ -188,6 +188,14 @@
         "percentage"
       ],
       "default": "percentage"
+    },
+    "allowOtherAssetsOtherThanVehiclesAndLand": {
+      "type": "boolean",
+      "default": true
+    },
+    "allowOnlinePayments": {
+      "type": "boolean",
+      "default": true
     }
   }
 }

@@ -259,11 +259,28 @@ The Principal Sum plus interest together with all the Borrower's obligations and
 this Agreement, including without limitation, any derived liability whatsoever of the
 Borrower towards the Lender in connection with this Agreement, shall at all times during
 the Loan Period be secured by the properties listed below:
-<br/><p><span class="dashed-input">Property Name: {{propertyName}}</span></p><br/>
-<p><span class="dashed-input">{{plotNumber}}</span></p><br/>
-<p><span class="dashed-input">{{plotSize}}</span></p><br/>
-<p><span class="dashed-input">{{location}}</span></p><br/>
-
+<br/><p><span class="dashed-input">{{propertyName}}</span></p>
+{{#if isLand}}
+ <br/>
+  <p><span class="dashed-input">{{plotNumber}}</span></p><br/>
+  <p><span class="dashed-input">{{plotSize}}</span></p><br/>
+  <p><span class="dashed-input">{{location}}</span></p><br/>
+{{else if isHouse}}
+ <br/>
+  <p><span class="dashed-input">{{plotNumber}}</span></p><br/>
+  <p><span class="dashed-input">{{plotSize}}</span></p><br/>
+  <p><span class="dashed-input">{{location}}</span></p><br/>  
+{{else if isVehicle}}
+  <ul>
+    <li>Make: <span class="dashed-input">{{securityMake}}</span></li>
+    <li>Model: <span class="dashed-input">{{securityModel}}</span></li>
+    <li>Reg No: <span class="dashed-input">{{securityReg}}</span></li>
+    <li>Colour: <span class="dashed-input">{{securityColour}}</span></li>
+    <li>Year: <span class="dashed-input">{{securityYear}}</span></li>
+    <li>Engine No: <span class="dashed-input">{{securityEngineNo}}</span></li>
+    <li>Chassis No: <span class="dashed-input">{{securityChasisNo}}</span></li>
+  </ul>
+{{/if}}
 <p>(a) {{propertyName}} (hereinafter collectively referred to as the “the Property”).</p>
 <p>7.2 The Borrower hereby warrants that as at the date of this Agreement, the property is free from any and all encumbrances and shall remain as such until the Principal Sum plus interest and other fees and charges thereon secured, under this agreement is repaid by the Borrower and any and all outstanding obligations of the Borrower, pursuant to this Agreement have been discharged.</p>
 <p>7.3 Upon execution of this Agreement, the Borrower shall deposit the original documents relating to the ownership of the Property including but not limited to Certificates of Title and/or Vehicle Registration Documents, at the Lender’s registered office.</p>
@@ -472,7 +489,7 @@ In the presence of:<br/>
 DIRECTOR FOR VECTOR FINANCE LIMITED)<br/>
 Director’s Name {{directorName}};<br/>
 Director's signature; <img src="{{directorSignature}}" alt="Director signature"/><br/>
-Director's initials; <img style="font-size: 20px;" src="{{directorInitials}}" alt="Director signature"/><br/>
+Director's initials; <img style="height: 20px;" src="{{directorInitials}}" alt="Director signature"/><br/>
 <hr/>
 CLIENT)<br/>
 Client’s Name {{borrowerName}};<br/>

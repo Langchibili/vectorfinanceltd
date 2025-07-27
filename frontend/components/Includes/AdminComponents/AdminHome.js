@@ -122,8 +122,8 @@ export default class AdminHome extends React.Component {
                       disabled={loading}
                     >
                       <option value="" disabled>Choose...</option>
-                      <option value="Director">Director</option>
-                      <option value="CEO">CEO</option>
+                      <option value="director">Director</option>
+                      <option value="ceo">CEO</option>
                     </select>
                   </div>
                   <div className="mb-3">

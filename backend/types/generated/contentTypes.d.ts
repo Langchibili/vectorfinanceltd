@@ -1906,6 +1906,9 @@ export interface ApiLoansInformationLoansInformation extends Schema.SingleType {
       Attribute.DefaultTo<'yes'>;
     referralRateType: Attribute.Enumeration<['flat', 'percentage']> &
       Attribute.DefaultTo<'percentage'>;
+    allowOtherAssetsOtherThanVehiclesAndLand: Attribute.Boolean &
+      Attribute.DefaultTo<true>;
+    allowOnlinePayments: Attribute.Boolean & Attribute.DefaultTo<true>;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;

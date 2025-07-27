@@ -32,6 +32,20 @@ module.exports = {
         `${result.formName}.html`
       )
       const raw = await fs.readFile(templatePath, 'utf-8')
+      /**
+  //  * Simple equality test: {{#if (eq a b)}}…{{/if}}
+  //  */
+  // Handlebars.registerHelper('eq', (a, b) => a === b)
+
+  // /**
+  //  * Boolean OR: {{#if (or a b)}}…{{/if}}
+  //  * You can even pass more than two args: (or a b c)
+  //  */
+  // Handlebars.registerHelper('or', function(...args) {
+  //   // last argument is the Handlebars options object
+  //   args.pop()
+  //   return args.some(Boolean)
+  // })
       const template = Handlebars.compile(raw)
 
       // 3. Fetch user + signatures
@@ -54,7 +68,6 @@ module.exports = {
           where: { id: 1 },
           populate: ['director','ceo'],
         })
-
      
       // ─────────────────────────────────────────────────────────────
       // 4️⃣ Convert signature media to inlined data URIs
@@ -86,6 +99,8 @@ module.exports = {
       // ─────────────────────────────────────────────────────────────
       const context = {
         ...result.values,
+        lenderWitnessName: adminInitials.ceoFullNames,
+        directorName: adminInitials.directorFullNames,
         signature: signatureDataURI,
         witnessSignature: witnessSignatureDataURI,
         initials: initialsDataURI,
@@ -94,6 +109,9 @@ module.exports = {
         ceoSignature: ceoSignatureDataURI,
         directorInitials: directorInitialsDataURI,
         ceoInitials: ceoInitialsDataURI,
+        isLand:   result.values.propertyName === 'Property Name: land' || result.values.propertyName === 'land',
+        isHouse:  result.values.propertyName === 'Property Name: house'  || result.values.propertyName === 'house',
+        isVehicle:result.values.propertyName === 'Property Name: vehicle'  || result.values.propertyName === 'vehicle'
       }
       const html = template(context)
       console.log('[Debug] Generated HTML length:', html.length)
@@ -156,7 +174,7 @@ module.exports = {
       existing.push(fileEntry.id)
       forms[idx].signedForm = existing
       console.log('[Debug] New signedForm array:', forms[idx].signedForm)
-
+      
       // 9. Persist updated applicationForms
       await strapi.entityService.update(
         'plugin::users-permissions.user',
@@ -164,11 +182,17 @@ module.exports = {
         { data: { applicationForms: forms } }
       )
       console.log('[Debug] Persisted updated applicationForms for user', clientId)
+      // push the file into the loanAgreementDocuments aspect of the loan
+      await strapi.entityService.update('api::loan.loan', result.loanId, {
+      data: {
+        // if loanAgreementDocuments is a _multiple_ media field:
+        loanAgreementDocuments:[ fileEntry.id ]
+      }
+    })
 
     } catch (err) {
       console.error('[Error] afterUpdate failed:', err)
       throw err
-
     } finally {
       // 10. Clean up temp file
       if (tmpFilePath) {
