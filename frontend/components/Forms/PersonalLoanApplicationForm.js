@@ -77,7 +77,7 @@ export default class PersonalLoanApplicationForm extends React.Component{
         delete createLoanObject.openBusinessInformationForm
         delete createLoanObject.stateSaved
         delete createLoanObject.monthlyPayment
-        delete createLoanObject.totalProfit
+        delete createLoanObject.totalInterest
         delete createLoanObject.approvedLoanAmount
         delete createLoanObject.isProceed
         delete createLoanObject.maxLoanTerm

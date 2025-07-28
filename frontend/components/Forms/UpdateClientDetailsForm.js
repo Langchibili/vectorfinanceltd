@@ -42,6 +42,12 @@ export default class UpdateClientDetailsForm extends React.Component {
   }
 
   async componentDidMount() {
+    console.log("this.props.constants",this.props.constants)
+    if(this.props.constants.loansInformation.allowSalaryLoans && this.props.constants.loansInformation.allowSalaryLoans === "no"){
+       this.setState({
+        employementStatus: "self-employed"
+       })
+    }
     let { clientDetails } = this.props.loggedInUser; // because the user object has the client details, though no nrc
     if (!clientDetails) {
       const blankDetailsObject = {
@@ -293,7 +299,7 @@ export default class UpdateClientDetailsForm extends React.Component {
               onChange={handleInputChange}
             >
               <option value="">Choose...</option>
-              <option value="employed">Employed</option>
+              {this.props.constants.loansInformation.allowSalaryLoans && this.props.constants.loansInformation.allowSalaryLoans === "no"? null : <option value="employed">Employed</option>}
               <option value="self-employed">Self-Employed</option>
               <option value="unemployed">UnEmployed</option>
             </select>

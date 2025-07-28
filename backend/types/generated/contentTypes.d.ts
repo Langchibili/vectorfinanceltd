@@ -1745,12 +1745,45 @@ export interface ApiLoanLoan extends Schema.CollectionType {
       'api::repayment-schedule.repayment-schedule'
     >;
     paymentScheduleCreated: Attribute.Boolean & Attribute.DefaultTo<false>;
+    acceptanceDate: Attribute.DateTime;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<'api::loan.loan', 'oneToOne', 'admin::user'> &
       Attribute.Private;
     updatedBy: Attribute.Relation<'api::loan.loan', 'oneToOne', 'admin::user'> &
+      Attribute.Private;
+  };
+}
+
+export interface ApiLoanApprovalStepLoanApprovalStep
+  extends Schema.CollectionType {
+  collectionName: 'loan_approval_steps';
+  info: {
+    singularName: 'loan-approval-step';
+    pluralName: 'loan-approval-steps';
+    displayName: 'Loan Approval Steps';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    for: Attribute.String;
+    details: Attribute.Blocks;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::loan-approval-step.loan-approval-step',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::loan-approval-step.loan-approval-step',
+      'oneToOne',
+      'admin::user'
+    > &
       Attribute.Private;
   };
 }
@@ -1889,13 +1922,13 @@ export interface ApiLoansInformationLoansInformation extends Schema.SingleType {
       ['Weekly', 'Monthly', 'Yearly', 'OnLoanCompletion']
     >;
     SalaryLoanInterestCalculation: Attribute.Enumeration<
-      ['monthly', 'yearly']
+      ['monthly', 'annually']
     > &
       Attribute.DefaultTo<'monthly'>;
     salaryLoanInterestType: Attribute.Enumeration<
-      ['amortization ', 'compound']
+      ['amortization', 'compound']
     > &
-      Attribute.DefaultTo<'amortization '>;
+      Attribute.DefaultTo<'amortization'>;
     allowSalaryLoans: Attribute.Enumeration<['yes', 'no']> &
       Attribute.DefaultTo<'yes'>;
     allowAssetBasedLoans: Attribute.Enumeration<['yes', 'no']> &
@@ -1906,9 +1939,14 @@ export interface ApiLoansInformationLoansInformation extends Schema.SingleType {
       Attribute.DefaultTo<'yes'>;
     referralRateType: Attribute.Enumeration<['flat', 'percentage']> &
       Attribute.DefaultTo<'percentage'>;
-    allowOtherAssetsOtherThanVehiclesAndLand: Attribute.Boolean &
-      Attribute.DefaultTo<true>;
-    allowOnlinePayments: Attribute.Boolean & Attribute.DefaultTo<true>;
+    allowOtherAssetsOtherThanVehiclesAndLand: Attribute.Enumeration<
+      ['yes', 'no']
+    > &
+      Attribute.DefaultTo<'yes'>;
+    allowOnlinePayments: Attribute.Enumeration<['yes', 'no']> &
+      Attribute.DefaultTo<'yes'>;
+    allowedSalaryPercentageLimit: Attribute.Integer & Attribute.DefaultTo<40>;
+    minutesBeforeLoanDisbursement: Attribute.Integer & Attribute.DefaultTo<15>;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -2498,6 +2536,7 @@ declare module '@strapi/types' {
       'api::investment-withdraw.investment-withdraw': ApiInvestmentWithdrawInvestmentWithdraw;
       'api::list.list': ApiListList;
       'api::loan.loan': ApiLoanLoan;
+      'api::loan-approval-step.loan-approval-step': ApiLoanApprovalStepLoanApprovalStep;
       'api::loan-category.loan-category': ApiLoanCategoryLoanCategory;
       'api::loan-client.loan-client': ApiLoanClientLoanClient;
       'api::loans-information.loans-information': ApiLoansInformationLoansInformation;

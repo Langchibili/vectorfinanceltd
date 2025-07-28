@@ -1,0 +1,21 @@
+{
+  "kind": "collectionType",
+  "collectionName": "loan_approval_steps",
+  "info": {
+    "singularName": "loan-approval-step",
+    "pluralName": "loan-approval-steps",
+    "displayName": "Loan Approval Steps"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "for": {
+      "type": "string"
+    },
+    "details": {
+      "type": "blocks"
+    }
+  }
+}

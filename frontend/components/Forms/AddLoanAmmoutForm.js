@@ -1,6 +1,6 @@
 "use client";
 
-import { loanAmortizationCalculator, simpleInterestLoanCalculator } from "@/Functions";
+import { calculateLoan } from "@/Functions";
 import { Slide } from "@material-ui/core";
 import { Alert } from "@mui/material";
 import React from "react";
@@ -11,8 +11,8 @@ export default class AddLoanAmountForm extends React.Component {
     this.state = {
       loanAmount: '',
       totalPayment: 0,
-      onPayroll: this.props.loanCategory === "personal" ? '' : 'no',
-      salaryDeduction: this.props.loanCategory === "personal" ? '' : 'no',
+      onPayroll: this.props.loanCategory === "personal"? '' : 'no',
+      salaryDeduction: this.props.loanCategory === "personal"? '' : 'no',
       loanCategory: '',
       loanType: '',
       loanPurpose: '',
@@ -23,7 +23,7 @@ export default class AddLoanAmountForm extends React.Component {
       isFormValid: false,
       stateSaved: false,
       monthlyPayment: 0,
-      totalProfit: 0,
+      totalInterest: 0,
       approvedLoanAmount: 0,
       error: null,
       salary: '',
@@ -46,13 +46,19 @@ export default class AddLoanAmountForm extends React.Component {
           ? parseFloat(value)
           : value;
       }
-    });
+    })
 
+    // If you have made it such that salary loans are disabled for the time being
+    if (this.props.constants.loansInformation.allowSalaryLoans && this.props.constants.loansInformation.allowSalaryLoans === "no") {
+      newState.onPayroll = 'no';
+      newState.salaryDeduction = 'no';
+    }
     // If loanCategory is not personal, force onPayroll and salaryDeduction to 'no'
     if (this.props.loanCategory !== 'personal') {
       newState.onPayroll = 'no';
       newState.salaryDeduction = 'no';
     }
+    
 
     // Apply newState and validate
     this.setState(newState, this.checkFormValidity);
@@ -65,19 +71,21 @@ export default class AddLoanAmountForm extends React.Component {
       if (name !== 'loanPurposeDetails') {
         localStorage.setItem(`vectorFin_${name}`, value);
       }
-    });
+    })
   }
 
   checkFormValidity = () => {
-    let { loanAmount, onPayroll, loanType, salaryDeduction, loanPurpose, loanTerm, salary, collateralValue } = this.state;
+    let { loanAmount, onPayroll, loanType, interestRate, salaryDeduction, loanPurpose, loanTerm, salary, maxLoanTerm, collateralValue } = this.state;
     let loanCategory = '';
     let isFormValid = false;
-
+    
     // Determine category & type
     if (onPayroll === 'yes') {
       if (salaryDeduction === 'yes') {
         loanCategory = 'salaryLoans';
         loanType = 'salaryBased';
+        interestRate = this.props.constants.loansInformation.defaultSalaryLoanInterestRate,
+        maxLoanTerm = this.props.constants.loansInformation.defaultSalaryLoanTerm
       } else {
         loanCategory = 'assetLoans';
         loanType = null;
@@ -93,20 +101,20 @@ export default class AddLoanAmountForm extends React.Component {
       isFormValid = false;
     }
 
-    this.setState({ isFormValid, loanCategory, loanType }, this.calculateLoanDetails);
+    this.setState({ isFormValid, loanCategory, loanType, maxLoanTerm, interestRate }, this.calculateLoanDetails);
   }
 
-  calculateLoanDetails = () => {
+  calculateLoanDetails = async () => {
     const { loanAmount, loanTerm, interestRate, onPayroll, salaryDeduction, salary, collateralValue } = this.state;
     let rate = interestRate;
 
     if (onPayroll === 'yes' && salaryDeduction === 'yes') {
       rate = this.props.constants.loansInformation.defaultSalaryLoanInterestRate;
-      const { monthlyPayment, totalProfit, totalPayment } = loanAmortizationCalculator(loanAmount, rate, loanTerm);
+      const { monthlyPayment, totalInterest, totalPayment } =  await calculateLoan({amount:loanAmount,termMonths:loanTerm,loanType:'salaryBased'})
       const salaryPercentage = (monthlyPayment / salary) * 100;
-      this.setState({ monthlyPayment, totalProfit, totalPayment, approvedLoanAmount: loanAmount, salaryPercentage, interestRate: rate });
+      this.setState({ monthlyPayment, totalInterest, totalPayment, approvedLoanAmount: loanAmount, salaryPercentage, interestRate: rate });
     } else {
-      const { monthlyPayment, totalPayment } = simpleInterestLoanCalculator(loanAmount, rate, loanTerm);
+      const { monthlyPayment, totalPayment } =  await calculateLoan({amount:loanAmount,termMonths:loanTerm,loanType:'assetBased'})
       const salaryPercentage = (monthlyPayment / salary) * 100;
       this.setState({ monthlyPayment, totalPayment, approvedLoanAmount: loanAmount, salaryPercentage, interestRate: rate });
     }
@@ -125,18 +133,19 @@ export default class AddLoanAmountForm extends React.Component {
     this.props.setLoanInformation(this.state);
     this.setState({ isFormValid: true, stateSaved: true }, () => {
       this.props.handleOpenBusinessInformationForm();
-    });
-  };
+    })
+  }
   
 
   renderSalaryWarning = () => {
-    const { collateralValue, loanAmount, totalPayment, loanTerm, onPayroll, salaryDeduction } = this.state;
+    const { salary, salaryPercentage, collateralValue, loanAmount, totalPayment, loanTerm, onPayroll, salaryDeduction } = this.state;
     const loanAmt = parseFloat(loanAmount);
     const collateralVal = parseFloat(collateralValue);
     const showLoanInfo = loanAmt > 0;
     const maxLoanFromCollateral = collateralVal / 2;
     const collateralRequired = salaryDeduction === "no" || onPayroll === "no";
-  
+    const isSalaryLoanType = onPayroll === 'yes' && salaryDeduction === 'yes'
+
     const collateralAlert = (
       <Alert severity="info" sx={{ marginBottom: '5px', fontWeight: 'bold' }}>
         Please note that you shall be required to leave a collateral in form of a vehicle, land or house title deeds at our headquarters, it should be worth 2 times the amount you are requesting.
@@ -153,9 +162,20 @@ export default class AddLoanAmountForm extends React.Component {
         </Alert>
       </>
     );
-  
+    if(isSalaryLoanType){
+      if(salary <= 0 || parseInt(salaryPercentage) > (this.props.constants.loansInformation.allowedSalaryPercentageLimit ||40)){
+            return (
+                <>
+                <Alert severity="warning" sx={{marginBottom: '5px'}}>You cannot get a loan which requires monthly payments of over 40% of your salary</Alert>
+                <Alert severity="info" sx={{marginBottom: '5px'}}>Consider reducing the amount or increasing the repayment period</Alert>
+                <Alert severity="info" sx={{marginBottom: '5px'}}><strong>Tip:</strong>Consider applying for a lesser amount with your salary then apply for a business loan as well, that is if you have other sources of income</Alert>
+                </>
+           )
+      }
+    }
     // Check if loan exceeds 50% of collateral
-    if (collateralVal > 0 && loanAmt > maxLoanFromCollateral) {
+    // if (collateralVal > 0 && loanAmt > maxLoanFromCollateral) { // old checks
+    else {
       return (
         <>
           <Alert severity="warning" sx={{ marginBottom: '5px' }}>
@@ -180,7 +200,7 @@ export default class AddLoanAmountForm extends React.Component {
           )}
           {this.renderProceedWithLoanButton()}
         </>
-      );
+      )
     }
   
     // If everything is valid and within limits
@@ -375,7 +395,9 @@ export default class AddLoanAmountForm extends React.Component {
                 <div className="live-preview">
                   <div className="row gy-4">
                   {/* Payroll Question */}
-                  {this.props.loanCategory !== "personal"? <></> : <div className="col-lg-12">
+                  {this.props.loanCategory !== "personal"? 
+                    <></> : this.props.constants.loansInformation.allowSalaryLoans && this.props.constants.loansInformation.allowSalaryLoans === "no"? 
+                    <></> : <div className="col-lg-12">
                       <div className="input-group">
                         <label className="form-label mr-2">Are you on payroll (Government or Company)?</label>
                         <select
@@ -393,8 +415,10 @@ export default class AddLoanAmountForm extends React.Component {
                     </div>}
 
                   {/* Salary or Collateral Section */}
-                  {this.props.loanCategory === 'personal' && onPayroll === 'yes' && (
-                    <div className="col-lg-12">
+                  {this.props.loanCategory === 'personal' && onPayroll === 'yes'?
+                    this.props.constants.loansInformation.allowSalaryLoans && this.props.constants.loansInformation.allowSalaryLoans === "no" ?
+                    <></> :
+                     <div className="col-lg-12">
                       <div className="input-group">
                         <label className="form-label mr-2">
                           Do you want this loan’s monthly payment to be deducted from your salary?
@@ -410,8 +434,8 @@ export default class AddLoanAmountForm extends React.Component {
                           <option value="no">No</option>
                         </select>
                       </div>
-                    </div>
-                  )}
+                    </div> : <></>
+                  }
 
                   { /* for non‑personal loans always, or if personal but not deducting */ }
                   {(this.props.loanCategory !== 'personal' ||

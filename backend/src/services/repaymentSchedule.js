@@ -49,9 +49,9 @@ async function createSchedule(loanId) {
     // Build schedule array
     const Schedule = []
     for (let i = 1; i <= termMonths; i++) {
-      const dueDateObj = new Date(disbursementDate)
+      const dueDateObj = new Date()
       dueDateObj.setMonth(dueDateObj.getMonth() + i)
-
+      
       const interestDue = parseFloat((totalInterest / termMonths).toFixed(2))
       const principalDue = parseFloat((monthlyPayment - interestDue).toFixed(2))
 

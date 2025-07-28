@@ -218,55 +218,82 @@ export const handleCountsDisplay = (counts) => { // formating counts like: likes
     return text;
 }
 
-export const simpleInterestLoanCalculator = (loanAmount, monthlyInterestRate, loanTermMonths) => {
-  const calculateTotalInterest = (amount, monthlyInterest, months) => {
-    return (parseFloat(amount) * monthlyInterest * months) / 100;
-  };
 
-  const calculateTotalPayment = (loanAmount, totalInterest) => {
-    return parseFloat(loanAmount) + parseFloat(totalInterest);
-  };
-
-  const totalInterest = calculateTotalInterest(loanAmount, monthlyInterestRate, loanTermMonths);
-  const totalPayment = calculateTotalPayment(loanAmount, totalInterest);
-  const monthlyPayment = totalPayment / loanTermMonths;
+function simpleInterestLoanCalculator({ principal, ratePercent, termMonths }) {
+  const totalInterest = (principal * ratePercent * termMonths) / 100
+  const totalPayment = principal + totalInterest
+  const monthlyPayment = totalPayment / termMonths
 
   return {
     totalInterest: parseFloat(totalInterest).toFixed(2),
     totalPayment: parseFloat(totalPayment).toFixed(2),
-    monthlyPayment: parseFloat(monthlyPayment).toFixed(2),
-  };
-};
+    monthlyPayment: parseFloat(monthlyPayment).toFixed(2)
+  }
+}
 
-
-
-export const loanAmortizationCalculator = (loanAmount, monthlyInterestRate, loanTermMonths) => {
-  const calculateMonthlyPayment = (amount, monthlyInterest, months) => {
-    return (
-      (amount * monthlyInterest * Math.pow(1 + monthlyInterest, months)) /
-      (Math.pow(1 + monthlyInterest, months) - 1)
-    );
-  };
-
-  const calculateTotalPayment = (monthlyPayment, months) => {
-    return monthlyPayment * months;
-  };
-
-  const calculateProfit = (totalPayment, loanAmount) => {
-    return totalPayment - loanAmount;
-  };
-
-  const monthlyPayment = calculateMonthlyPayment(loanAmount, monthlyInterestRate / 100, loanTermMonths);
-  const totalPayment = calculateTotalPayment(monthlyPayment, loanTermMonths);
-  const totalProfit = calculateProfit(totalPayment, loanAmount);
+/**
+ * Pure compound interest (no amortization)
+ */
+function compoundInterest({ principal, ratePercent, termPeriods }) {
+  const r = ratePercent / 100
+  const n = termPeriods
+  const totalPayment = principal * Math.pow(1 + r, n)
+  const totalInterest = totalPayment - principal
 
   return {
-    monthlyPayment: parseFloat(monthlyPayment).toFixed(2),
-    totalProfit: parseFloat(totalProfit).toFixed(2),
-    totalPayment: parseFloat(totalPayment).toFixed(2),
-  };
-};
+    totalInterest: parseFloat(totalInterest).toFixed(2),
+    totalPayment: parseFloat(totalPayment).toFixed(2)
+  }
+}
 
+/**
+ * Amortization schedule calculator
+ */
+function loanAmortizationCalculator({ principal, annualRatePercent, termMonths, periodsPerYear = 12 }) {
+  const r = annualRatePercent / 100 / periodsPerYear
+  const n = termMonths
+  const payment =
+    (principal * r * Math.pow(1 + r, n)) /
+    (Math.pow(1 + r, n) - 1)
+  const totalPayment = payment * n
+  const totalInterest = totalPayment - principal
+  return {
+    monthlyPayment: parseFloat(payment).toFixed(2),
+    totalInterest: parseFloat(totalInterest).toFixed(2),
+    totalPayment: parseFloat(totalPayment).toFixed(2)
+  }
+}
+
+export const calculateLoan  = async ({ amount, loanType, termMonths = null })=> {
+  const settings = await getLoansInformation()
+  const isSalary = loanType === 'salaryBased'
+  const defaultRate = isSalary
+    ? settings.defaultSalaryLoanInterestRate
+    : settings.defaultCollaterallLoanInterestRate
+  const defaultTerm = isSalary
+    ? settings.defaultSalaryLoanTerm
+    : settings.defaultCollaterallLoanTerm
+  const term = termMonths || defaultTerm
+
+  const interestType = isSalary
+    ? settings.salaryLoanInterestType || 'amortization'
+    : settings.collateralLoanInterestType || 'simple'
+  const interestCalc = isSalary
+    ? settings.SalaryLoanInterestCalculation || 'monthly'
+    : settings.collateralLoanInterestCalculation || 'monthly'
+
+  if (interestType === 'simple') {
+    const ratePerPeriod = interestCalc === 'monthly' ? defaultRate : defaultRate / 12
+    return simpleInterestLoanCalculator({ principal: amount, ratePercent: ratePerPeriod, termMonths: term })
+  }
+
+  if (interestType === 'amortization') {
+    const annualRate = interestCalc === 'annually' ? defaultRate : defaultRate * 12
+    return loanAmortizationCalculator({ principal: amount, annualRatePercent: annualRate, termMonths: term })
+  }
+  const ratePerPeriod = interestCalc === 'monthly' ? defaultRate : defaultRate / 12
+  return compoundInterest({ principal: amount, ratePercent: ratePerPeriod, termPeriods: term })
+}
 
 export const getImage = (image, size = "normal", use = "normal") => {
     // Default URLs for profile pictures and cover photos

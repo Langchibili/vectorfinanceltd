@@ -157,6 +157,9 @@
     "paymentScheduleCreated": {
       "type": "boolean",
       "default": false
+    },
+    "acceptanceDate": {
+      "type": "datetime"
     }
   }
 }

@@ -137,17 +137,17 @@
       "type": "enumeration",
       "enum": [
         "monthly",
-        "yearly"
+        "annually"
       ],
       "default": "monthly"
     },
     "salaryLoanInterestType": {
       "type": "enumeration",
       "enum": [
-        "amortization ",
+        "amortization",
         "compound"
       ],
-      "default": "amortization "
+      "default": "amortization"
     },
     "allowSalaryLoans": {
       "type": "enumeration",
@@ -190,12 +190,28 @@
       "default": "percentage"
     },
     "allowOtherAssetsOtherThanVehiclesAndLand": {
-      "type": "boolean",
-      "default": true
+      "type": "enumeration",
+      "enum": [
+        "yes",
+        "no"
+      ],
+      "default": "yes"
     },
     "allowOnlinePayments": {
-      "type": "boolean",
-      "default": true
+      "type": "enumeration",
+      "enum": [
+        "yes",
+        "no"
+      ],
+      "default": "yes"
+    },
+    "allowedSalaryPercentageLimit": {
+      "type": "integer",
+      "default": 40
+    },
+    "minutesBeforeLoanDisbursement": {
+      "type": "integer",
+      "default": 15
     }
   }
 }
