@@ -369,7 +369,7 @@ export default class BusinessInformationForm extends React.Component {
                           onChange={this.handleInputChange}
                         >
                           <option value="">Choose...</option>
-                          <option value="sole-proprietorship">Sole Proprietorship</option>
+                          <option value="sole-proprietorship">Sole Trader</option>
                           <option value="partnership">Partnership</option>
                           <option value="limited-company">Limited Company (LLC)</option>
                           <option value="corporation">Corporation</option>

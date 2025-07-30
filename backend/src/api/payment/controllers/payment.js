@@ -92,7 +92,7 @@ const handlePaymentSuccessful = async (data,payload)=>{
     
     recordPayment(loanId, parseFloat(repaymentAmount).toFixed(2), paymentDate, createdRepayment.id)
     
-    await strapi.db.query('plugin::users-permissions.user').update({ where: { id:client.id }, data: {repayment: {connect:[createdRepayment.id]},transactionHistories: {connect: [createdTransactionHistory.id]}} });
+    await strapi.db.query('plugin::users-permissions.user').update({ where: { id:client.id }, data: {repayments: {connect:[createdRepayment.id]},transactionHistories: {connect: [createdTransactionHistory.id]}} });
     // finally push the notification of the payment to the client and admin users
     SendSmsNotification(clientNumber,"Your Payment to the loan with id: #"+loanId+" has been received. Go to the portal and check your current loan balance. Thank you.")
     SendEmailNotification(client.email,"Your Payment to the loan with id: #"+loanId+" has been received. Go to the portal and check your current loan balance. Thank you.")

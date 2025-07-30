@@ -6,6 +6,7 @@ import UpdateVehicleCollateralForm from "./UpdateVehicleCollateralForm";
 import UpdateHouseCollateralForm from "./UpdateHouseCollateralForm";
 import { Alert } from "@mui/material";
 import { Fade, Zoom } from "@material-ui/core";
+import UpdateOtherCollateralForm from "./UpdateOtherCollateralForm";
 
 export default class CollateralForm extends React.Component{
     constructor(props){
@@ -33,6 +34,10 @@ export default class CollateralForm extends React.Component{
        } 
        else if(collateralType === "Land"){
             return <UpdateLandCollateralForm 
+            {...this.props}/>
+       }
+       else if(collateralType === "Other"){
+            return <UpdateOtherCollateralForm
             {...this.props}/>
        }
        else{
@@ -74,6 +79,7 @@ export default class CollateralForm extends React.Component{
                                   <option value="Vehicle">Vehicle</option>
                                   <option value="House">House</option>
                                   <option value="Land">Land</option>
+                                  <option value="Other">Other</option>
                                 </select>
                               </div>
                           </div>

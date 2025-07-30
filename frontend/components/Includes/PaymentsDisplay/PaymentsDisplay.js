@@ -99,7 +99,7 @@ export default class PaymentsDisplay extends React.Component {
                                     </div>
                                     {/*end row*/}
                                     <div className="row" style={{padding:'10px 0px'}}>
-                                    <button
+                                    {this.props.constants.loansInformation.allowOnlinePayments === "yes"? <button
                                         style={{
                                             backgroundColor: '#28a745',
                                             color: '#fff',
@@ -129,7 +129,7 @@ export default class PaymentsDisplay extends React.Component {
                                         <CreditCard/>
                                         Mobile Money & Card Payments
                                         <ArrowForward/>
-                                    </button>
+                                    </button> : <Alert severity="warning" sx={{marginTop:'10px'}}>Online payments are temporarily unavailable, use other payment methods instead. </Alert>}
 
                                     <div style={{marginTop:'10px'}} className="text text-center"><h2>or</h2></div>
                                     <Alert severity="info" sx={{marginTop:'10px'}}>Pay manually and send us a proof of payment as instructed below. </Alert>

@@ -811,6 +811,50 @@ export const getLoanCategoryIds = async ()=>{
   }
 
 
+export const getLoansFromClientId = async (clientId, populate = '') => {
+  // Build the URL with basic filtering and sorting
+  let url = `${api_url}/loans?filters[client][id][$eq]=${clientId}&sort=id:desc`
+  if (populate) {
+    url += `&populate=${populate}`
+  }
+
+  try {
+    const res = await fetch(url, {
+      headers: {
+        'Authorization': `Bearer ${getJwt()}`,
+        'Content-Type': 'application/json',
+      },
+    })
+    const json = await res.json()
+
+    if (json.data && Array.isArray(json.data)) {
+      return json.data.map(item => {
+        return { id: item.id, ...item.attributes }
+      })
+    }
+
+    return []
+  } catch (err) {
+    console.error('Error fetching loans:', err)
+    return []
+  }
+}
+
+ export const getLoanRepaymentSchedule = async (loanId)=>{
+    const schedule = await fetch(api_url+'/get-repayment-schedule?loanId='+loanId,{
+        headers: {
+          'Authorization': `Bearer ${getJwt()}`,
+          'Content-Type': 'application/json'
+        }
+      }).then(response => response.json())
+        .then(data => data)
+        .catch(error => console.error(error))
+         
+        if(schedule && schedule.data && schedule.data.attributes){
+           return schedule.data.attributes.data
+        }
+        return null
+  }
 
   // INVESTMENTS FUNCTIONS
 

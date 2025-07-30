@@ -5,7 +5,9 @@ import { Box, Card, CardContent, Typography, TextField, Stack, Button, IconButto
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
 import { useBottomNav } from '@/Contexts/BottomNavContext'
 import { api_url, clientUrl, getJwt } from '@/Constants'
-import { getContentCount, getReferralsById, updateReferralCode } from '@/Functions'
+import { getContentCount, getReferralsById, scrolltoTopOFPage, updateReferralCode } from '@/Functions'
+import UpdateDetailsForm from '@/components/Forms/UpdateDetailsForm'
+import { Slide } from '@material-ui/core'
 
 export default function ReferralHomePage({ loggedInUser }) {
   const [referral, setReferral] = useState(null)
@@ -16,6 +18,7 @@ export default function ReferralHomePage({ loggedInUser }) {
   const { setBottomNavLink } = useBottomNav()
   const [totalReferrals, setTotalReferrals] = useState(0)
   const [totalEarnings, setTotalEarnings] = useState(0)
+  const [basicDetailsUpdated, setBasicDetailsUpdated] = useState(loggedInUser?.basicDetailsUpdated || false)
 
   useEffect(() => {
     const fetchReferral = async () => {
@@ -106,14 +109,18 @@ export default function ReferralHomePage({ loggedInUser }) {
     }
   }
  
+ const handleNextClick = ()=>{
+     scrolltoTopOFPage()
+     setBasicDetailsUpdated(true)
+ } 
 
-  if (!loggedInUser.basicDetailsUpdated) {
+  if (!basicDetailsUpdated) {
     return (
       <>
         <MuiAlert severity="info" sx={{ mb: 2 }}>
           First update your basic information to access your referral account.
         </MuiAlert>
-        <UpdateDetailsForm {...{ loggedInUser }} />
+        <UpdateDetailsForm {...{ loggedInUser }} handleOpenUpdateClientDetailsForm={handleNextClick} />
       </>
     )
   }
@@ -122,7 +129,8 @@ export default function ReferralHomePage({ loggedInUser }) {
   if (error) return <MuiAlert severity="error">{error}</MuiAlert>
 
   return (
-    <Box>
+    <Slide in={true} direction="right">
+      <Box>
       <Card sx={{ mb: 1 }}>
         <CardContent>
           <Typography variant="h6" gutterBottom>
@@ -197,5 +205,7 @@ export default function ReferralHomePage({ loggedInUser }) {
         </MuiAlert>
       </Snackbar>
     </Box>
+    </Slide>
+    
   )
 }

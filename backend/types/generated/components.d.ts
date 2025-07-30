@@ -112,7 +112,7 @@ export interface MediaAndDocumentsCollateral extends Schema.Component {
     collateralType: Attribute.Enumeration<
       ['vehicle', 'land', 'house', 'electronic', 'other']
     >;
-    otherCollateralDocuments: Attribute.Media;
+    CollateralMedia: Attribute.Media;
     collateralCondition: Attribute.Enumeration<['new', 'used', 'good', 'ok']>;
     vehicle: Attribute.Component<'media-and-documents.vehicle'>;
     land: Attribute.Component<'media-and-documents.land'>;
@@ -121,6 +121,7 @@ export interface MediaAndDocumentsCollateral extends Schema.Component {
     >;
     inspectionDate: Attribute.DateTime;
     house: Attribute.Component<'media-and-documents.house'>;
+    otherCollateralName: Attribute.String;
   };
 }
 

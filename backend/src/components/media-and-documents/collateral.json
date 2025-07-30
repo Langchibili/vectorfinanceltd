@@ -16,15 +16,13 @@
         "other"
       ]
     },
-    "otherCollateralDocuments": {
+    "CollateralMedia": {
       "type": "media",
       "multiple": true,
       "required": false,
       "allowedTypes": [
-        "images",
-        "files",
         "videos",
-        "audios"
+        "files"
       ]
     },
     "collateralCondition": {
@@ -64,6 +62,9 @@
       "type": "component",
       "repeatable": false,
       "component": "media-and-documents.house"
+    },
+    "otherCollateralName": {
+      "type": "string"
     }
   }
 }

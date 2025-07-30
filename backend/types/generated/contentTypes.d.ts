@@ -736,9 +736,9 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
       'oneToMany',
       'api::loan.loan'
     >;
-    repayment: Attribute.Relation<
+    repayments: Attribute.Relation<
       'plugin::users-permissions.user',
-      'oneToOne',
+      'oneToMany',
       'api::repayment.repayment'
     >;
     loans: Attribute.Relation<
@@ -1947,6 +1947,8 @@ export interface ApiLoansInformationLoansInformation extends Schema.SingleType {
       Attribute.DefaultTo<'yes'>;
     allowedSalaryPercentageLimit: Attribute.Integer & Attribute.DefaultTo<40>;
     minutesBeforeLoanDisbursement: Attribute.Integer & Attribute.DefaultTo<15>;
+    autoSendMessageOnLoanAcceptance: Attribute.Enumeration<['yes', 'no']> &
+      Attribute.DefaultTo<'yes'>;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -2261,11 +2263,6 @@ export interface ApiRepaymentRepayment extends Schema.CollectionType {
       'manyToOne',
       'api::loan.loan'
     >;
-    client: Attribute.Relation<
-      'api::repayment.repayment',
-      'oneToOne',
-      'plugin::users-permissions.user'
-    >;
     proofOfpayment: Attribute.Media;
     payment: Attribute.Relation<
       'api::repayment.repayment',
@@ -2273,6 +2270,11 @@ export interface ApiRepaymentRepayment extends Schema.CollectionType {
       'api::payment.payment'
     >;
     transactionReference: Attribute.String;
+    client: Attribute.Relation<
+      'api::repayment.repayment',
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;

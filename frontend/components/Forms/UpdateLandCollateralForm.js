@@ -6,6 +6,7 @@ import React from "react";
 import Uploader from "../Includes/Uploader/Uploader";
 import { Slide } from "@material-ui/core";
 import WarningSnapBack from "../Includes/SnapBacks/WarningSnapBack";
+import CollateralMedia from "../Includes/CollateralMedia/CollateralMedia";
 
 export default class UpdateLandCollateralForm extends React.Component {
   constructor(props) {
@@ -24,13 +25,16 @@ export default class UpdateLandCollateralForm extends React.Component {
       location: '',
       saved: false,
       openErrorSnapBack: false,
-      errorMessage: ''
+      errorMessage: '',
+      collateralMedia: {
+        'landscape image': null
+      }
     }
   }
 
 
   async componentDidMount() {
-    const { collateral } = await getLoanFromId(this.props.loggedInUser.currentLoan.id,"collateral.land.titleDeed"); 
+    const { collateral } = await getLoanFromId(this.props.loggedInUser.currentLoan.id,"collateral.land.titleDeed,collateral.CollateralMedia"); 
     const newLandObject = {
                 hectors: null,
                 plotNumber: null,
@@ -48,13 +52,16 @@ export default class UpdateLandCollateralForm extends React.Component {
         // create a blank slate of collateral to obtain the component's id
         const updatedLoan = await updateLoan(newCollaterallObject,this.props.loggedInUser.currentLoan.id)
         if(!updatedLoan.hasOwnProperty('error')){
-            const { collateral } = await getLoanFromId(this.props.loggedInUser.currentLoan.id,"collateral.land.titleDeed"); 
+            const { collateral } = await getLoanFromId(this.props.loggedInUser.currentLoan.id,"collateral.land.titleDeed,collateral.CollateralMedia"); 
             const {land} = collateral // get the vehicle component from the collateral component
             this.setState({
                 collateralId: collateral?.id,
                 landId: collateral?.land.id,
                 collateralType: collateral?.collateralType || '',
                 titleDeed: land?.titleDeed.data || '',
+                collateralMedia: {
+                  'landscape image': collateral?.CollateralMedia?.data?.[0] ?? null
+                },
                 hectors: land?.hectors || '',
                 plotNumber: land?.plotNumber || '',
                 location: land?.location || ''
@@ -78,6 +85,9 @@ export default class UpdateLandCollateralForm extends React.Component {
                         landId: collateral?.land.id,
                         collateralType: collateral?.collateralType || '',
                         titleDeed: land?.titleDeed.data || '',
+                        collateralMedia: {
+                          'landscape image': collateral?.CollateralMedia?.data?.[0] ?? null
+                        },
                         hectors: land?.hectors || '',
                         plotNumber: land?.plotNumber || '',
                         location: land?.location || ''
@@ -91,6 +101,9 @@ export default class UpdateLandCollateralForm extends React.Component {
                     landId: collateral?.land.id,
                     collateralType: collateral?.collateralType || '',
                     titleDeed: land?.titleDeed.data || '',
+                    collateralMedia: {
+                      'landscape image': collateral?.CollateralMedia?.data?.[0] ?? null
+                    },
                     hectors: land?.hectors || '',
                     plotNumber: land?.plotNumber || '',
                     location: land?.location || ''
@@ -109,14 +122,16 @@ export default class UpdateLandCollateralForm extends React.Component {
   }
 
   checkFormValidity = (initialCheck=false) => {
-    const { hectors, plotNumber, location, titleDeed} = this.state;
+    const { hectors, plotNumber, location, titleDeed, collateralMedia } = this.state;
+    const collateralMediaSet = collateralMedia['landscape image']
 
     // Validate that all fields are filled
     const isFormValid =
       hectors.trim() &&
       plotNumber.trim() &&
       location &&
-      titleDeed 
+      titleDeed &&
+      collateralMediaSet
       if(!initialCheck){
         this.setState({ isFormValid });
       }
@@ -128,6 +143,37 @@ export default class UpdateLandCollateralForm extends React.Component {
           this.setState({ isFormValid})
         }
     }
+  }
+  handleAddCollateralMedia = (side, files) => {
+      this.setState(prev => ({
+        collateralMedia: {
+          ...prev.collateralMedia,
+          [side]: prev.collateralMedia[side] ? [...prev.collateralMedia[side], ...files] : files
+        },
+        saved: false,
+        error: null
+      }));
+  }
+
+   handleRemoveCollateralMedia = async (side, uploadId) => {
+           const removed = await fetch(api_url+'/upload/files/'+uploadId,{
+            method: 'DELETE',
+            headers: {
+              'Authorization': `Bearer ${getJwt()}`,
+              'Content-Type': 'application/json'
+            }
+          }).then(response => response.json())
+            .then(data => data)
+            .catch(error => console.error(error))
+            
+          if(removed){
+            this.setState(prev => ({
+             collateralMedia: {
+              ...prev.collateralMedia,
+              [side]: null
+            }
+          }))
+          }
   }
 
   handleSubmit = async (e)=>{
@@ -368,7 +414,7 @@ handleOpenErrorSnapBack = ()=>{
   }
 
   render() {
-    const { hectors, plotNumber, location, saved, isFormValid } = this.state;
+    const { hectors, plotNumber, location, saved, isFormValid , collateralId, collateralMedia } = this.state;
 
     return (
         <Slide in={true} direction="up">
@@ -451,6 +497,15 @@ handleOpenErrorSnapBack = ()=>{
                         />
                         <small  style={{color:'lightgray'}}>(document(PDF,IMAGE,WORD))</small>
                         {this.renderFiles(this.state.titleDeed,"titleDeed")}
+                        <hr style={{ margin: '30px 0', color: 'lightgray' }} />
+                       Land Photos (<small>take a landscape picture of the land | phone flipped</small>)
+                      <CollateralMedia
+                        mediaSlots={[ 'landscape image']}
+                        media={collateralMedia}
+                        onAdd={this.handleAddCollateralMedia}
+                        onRemove={this.handleRemoveCollateralMedia}
+                        refId={collateralId}
+                      />
                   </div>
                   </> : <></>}
                   {/* Save and Next Buttons */}

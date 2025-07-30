@@ -24,7 +24,6 @@ module.exports = {
       console.log(`Repayment or related loan not found for repayment ID ${repayment.id}`);
       return
     }
-    console.log("fullRepayment",fullRepayment)
     const loan = fullRepayment.loan;
     const client = loan.client;
     const repaymentAmt = parseFloat(fullRepayment.repaymentAmount);
@@ -44,12 +43,12 @@ module.exports = {
     })
     
     // record payment to the loan's schedule
-    recordPayment(loanId, repaymentAmt.toFixed(2), fullRepayment.paymentDate, repayment.id)
+    recordPayment(loanId, repaymentAmt.toFixed(2), new Date(), repayment.id)
     // Create a transaction history entry
-    await strapi.db.query('api::transaction-history.transaction-history').create({
+    const createdTransactionHistory = await strapi.db.query('api::transaction-history.transaction-history').create({
       data: {
         transactionType: 'repayment',
-        transactionDate: fullRepayment.paymentDate,
+        transactionDate: new Date(),
         amount: repaymentAmt.toFixed(2),
         description: `Payment to loan #${loanId}, amount: ${repaymentAmt.toFixed(2)}`,
         loan: { connect: [loanId] },
@@ -59,6 +58,7 @@ module.exports = {
     
     // Send notifications to client
     if (client) {
+      await strapi.db.query('plugin::users-permissions.user').update({ where: { id:client.id }, data: {repayments: {connect:[repayment.id]},transactionHistories: {connect: [createdTransactionHistory.id]}} });
       const msg = `Your payment of ${repaymentAmt.toFixed(2)} to loan #${loanId} has been received. Your new balance is ${newOutstanding}.`;
       if (client.username) {
         SendSmsNotification(client.username, msg);

@@ -212,6 +212,14 @@
     "minutesBeforeLoanDisbursement": {
       "type": "integer",
       "default": 15
+    },
+    "autoSendMessageOnLoanAcceptance": {
+      "type": "enumeration",
+      "enum": [
+        "yes",
+        "no"
+      ],
+      "default": "yes"
     }
   }
 }

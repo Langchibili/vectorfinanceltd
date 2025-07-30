@@ -6,6 +6,7 @@ import React from "react";
 import Uploader from "../Includes/Uploader/Uploader";
 import { Slide } from "@material-ui/core";
 import WarningSnapBack from "../Includes/SnapBacks/WarningSnapBack";
+import CollateralMedia from "../Includes/CollateralMedia/CollateralMedia";
 
 export default class UpdateHouseCollateralForm extends React.Component {
   constructor(props) {
@@ -24,13 +25,17 @@ export default class UpdateHouseCollateralForm extends React.Component {
       location: '',
       saved: false,
       openErrorSnapBack: false,
-      errorMessage: ''
+      errorMessage: '',
+      collateralMedia: {
+        front: null,
+        back: null
+      }
     }
   }
 
 
   async componentDidMount() {
-    const { collateral } = await getLoanFromId(this.props.loggedInUser.currentLoan.id,"collateral.house.titleDeed"); 
+    const { collateral } = await getLoanFromId(this.props.loggedInUser.currentLoan.id,"collateral.house.titleDeed,collateral.CollateralMedia"); 
     const newLandObject = {
                 dimensions: null,
                 plotNumber: null,
@@ -48,13 +53,19 @@ export default class UpdateHouseCollateralForm extends React.Component {
         // create a blank slate of collateral to obtain the component's id
         const updatedLoan = await updateLoan(newCollaterallObject,this.props.loggedInUser.currentLoan.id)
         if(!updatedLoan.hasOwnProperty('error')){
-            const { collateral } = await getLoanFromId(this.props.loggedInUser.currentLoan.id,"collateral.house.titleDeed"); 
+            const { collateral } = await getLoanFromId(this.props.loggedInUser.currentLoan.id,"collateral.house.titleDeed,collateral.CollateralMedia"); 
             const {house} = collateral // get the vehicle component from the collateral component
             this.setState({
                 collateralId: collateral?.id,
                 houseId: collateral?.house.id,
                 collateralType: collateral?.collateralType || '',
                 titleDeed: house?.titleDeed.data || '',
+                collateralMedia: {
+                  front: collateral?.CollateralMedia?.data?.[0] ?? null,
+                  back: collateral?.CollateralMedia?.data?.[1] ?? null,
+                  right: collateral?.CollateralMedia?.data?.[2] ?? null,
+                  left: collateral?.CollateralMedia?.data?.[3] ?? null
+                },
                 dimensions: house?.dimensions || '',
                 plotNumber: house?.plotNumber || '',
                 location: house?.location || ''
@@ -71,13 +82,19 @@ export default class UpdateHouseCollateralForm extends React.Component {
                 
                 const updatedLoan = await updateLoan(newCollaterallObject,this.props.loggedInUser.currentLoan.id)
                 if(!updatedLoan.hasOwnProperty('error')){
-                   const { collateral } = await getLoanFromId(this.props.loggedInUser.currentLoan.id,"collateral.house.titleDeed"); 
+                   const { collateral } = await getLoanFromId(this.props.loggedInUser.currentLoan.id,"collateral.house.titleDeed,collateral.CollateralMedia"); 
                    console.log(collateral)
                     this.setState({
                         collateralId: collateral?.id,
                         houseId: collateral?.house.id,
                         collateralType: collateral?.collateralType || '',
                         titleDeed: house?.titleDeed.data || '',
+                        collateralMedia: {
+                          front: collateral?.CollateralMedia?.data?.[0] ?? null,
+                          back: collateral?.CollateralMedia?.data?.[1] ?? null,
+                          right: collateral?.CollateralMedia?.data?.[2] ?? null,
+                          left: collateral?.CollateralMedia?.data?.[3] ?? null
+                        },
                         dimensions: house?.dimensions || '',
                         plotNumber: house?.plotNumber || '',
                         location: house?.location || ''
@@ -91,6 +108,12 @@ export default class UpdateHouseCollateralForm extends React.Component {
                     houseId: collateral?.house.id,
                     collateralType: collateral?.collateralType || '',
                     titleDeed: house?.titleDeed.data || '',
+                    collateralMedia: {
+                      front: collateral?.CollateralMedia?.data?.[0] ?? null,
+                      back: collateral?.CollateralMedia?.data?.[1] ?? null,
+                      right: collateral?.CollateralMedia?.data?.[2] ?? null,
+                      left: collateral?.CollateralMedia?.data?.[3] ?? null
+                    },
                     dimensions: house?.dimensions || '',
                     plotNumber: house?.plotNumber || '',
                     location: house?.location || ''
@@ -109,14 +132,16 @@ export default class UpdateHouseCollateralForm extends React.Component {
   }
 
   checkFormValidity = (initialCheck=false) => {
-    const { dimensions, plotNumber, location, titleDeed} = this.state;
+    const { dimensions, plotNumber, location, titleDeed, collateralMedia } = this.state;
+    const collateralMediaSet = collateralMedia.front && collateralMedia.back
 
     // Validate that all fields are filled
     const isFormValid =
       dimensions.trim() &&
       plotNumber.trim() &&
       location &&
-      titleDeed 
+      titleDeed && 
+      collateralMediaSet;
       if(!initialCheck){
         this.setState({ isFormValid });
       }
@@ -129,6 +154,39 @@ export default class UpdateHouseCollateralForm extends React.Component {
         }
     }
   }
+
+   handleAddCollateralMedia = (side, files) => {
+      this.setState(prev => ({
+        collateralMedia: {
+          ...prev.collateralMedia,
+          [side]: prev.collateralMedia[side] ? [...prev.collateralMedia[side], ...files] : files
+        },
+        saved: false,
+        error: null
+      }));
+    }
+
+    handleRemoveCollateralMedia = async (side, uploadId) => {
+         const removed = await fetch(api_url+'/upload/files/'+uploadId,{
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${getJwt()}`,
+            'Content-Type': 'application/json'
+          }
+        }).then(response => response.json())
+          .then(data => data)
+          .catch(error => console.error(error))
+          
+        if(removed){
+          this.setState(prev => ({
+           collateralMedia: {
+            ...prev.collateralMedia,
+            [side]: null
+          }
+        }))
+        }
+      }
+  
 
   handleSubmit = async (e)=>{
      e.preventDefault()
@@ -368,7 +426,7 @@ handleOpenErrorSnapBack = ()=>{
   }
 
   render() {
-    const { dimensions, plotNumber, location, saved, isFormValid } = this.state;
+    const { dimensions, plotNumber, location, saved, isFormValid, collateralId, collateralMedia } = this.state;
 
     return (
         <Slide in={true} direction="up">
@@ -451,6 +509,16 @@ handleOpenErrorSnapBack = ()=>{
                         />
                         <small  style={{color:'lightgray'}}>(document(PDF,IMAGE,WORD))</small>
                         {this.renderFiles(this.state.titleDeed,"titleDeed")}
+                         {/* Collateral Media */}
+                      <hr style={{ margin: '30px 0', color: 'lightgray' }} />
+                      <h5>House Photos</h5>
+                      <CollateralMedia
+                        mediaSlots={[ 'front', 'back']}
+                        media={collateralMedia}
+                        onAdd={this.handleAddCollateralMedia}
+                        onRemove={this.handleRemoveCollateralMedia}
+                        refId={collateralId}
+                      />
                   </div>
                   </> : <></>}
                   {/* Save and Next Buttons */}

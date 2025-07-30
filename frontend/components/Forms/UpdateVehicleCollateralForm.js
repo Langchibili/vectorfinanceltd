@@ -1,9 +1,10 @@
 "use client";
 
 import { api_url, backEndUrl, getJwt } from "@/Constants";
-import { dateAndTimeNow, getImage, getLoanFromId, logNewAdminNotification, logNewNotification, logNewTransactionHistory, textHasPhoneNumber, updateLoan, updateUserAccount } from "@/Functions";
+import { dateAndTimeNow, getImage, getLoanFromId, logNewAdminNotification, logNewNotification, logNewTransactionHistory, updateLoan, updateUserAccount } from "@/Functions";
 import React from "react";
 import Uploader from "../Includes/Uploader/Uploader";
+import CollateralMedia from "../Includes/CollateralMedia/CollateralMedia";
 import { Alert } from "@mui/material";
 import { Slide } from "@material-ui/core";
 import WarningSnapBack from "../Includes/SnapBacks/WarningSnapBack";
@@ -13,265 +14,154 @@ export default class UpdateVehicleCollateralForm extends React.Component {
     super(props);
     this.state = {
       collateralType: '',
-      // More fields can be added as necessary
       isFormValid: false,
       saving: false,
       collateralId: '',
       vehicleId: null,
-      error:null,
+      error: null,
       whitebook: null,
       numberPlate: '',
       packed: '',
       saved: false,
       openErrorSnapBack: false,
-      errorMessage: ''
+      errorMessage: '',
+      // new collateral media slots
+      collateralMedia: {
+        front: null,
+        back: null,
+        right: null,
+        left: null
+      }
     }
   }
 
-
   async componentDidMount() {
-    const { collateral } = await getLoanFromId(this.props.loggedInUser.currentLoan.id,"collateral.vehicle.whitebook"); 
-    const newVehicleObject = {
-                numberPlate: null,
-                packed: null
-    }
-    const newCollaterallObject = {
-        data:{
-            collateral: {
-                collateralType: "vehicle",
-                vehicle: newVehicleObject
-            }
+    const { collateral } = await getLoanFromId(this.props.loggedInUser.currentLoan.id, "collateral.vehicle.whitebook,collateral.CollateralMedia");
+    // existing logic for initializing whitebook and vehicle fields...
+    const newVehicleObject = { numberPlate: null, packed: null };
+    const newCollaterallObject = { data: { collateral: { collateralType: "vehicle", vehicle: newVehicleObject } } };
+    if (!collateral) {
+      const updatedLoan = await updateLoan(newCollaterallObject, this.props.loggedInUser.currentLoan.id);
+      if (!updatedLoan || !updatedLoan.error) {
+        const { collateral: fresh } = await getLoanFromId(this.props.loggedInUser.currentLoan.id, "collateral.vehicle.whitebook,collateral.CollateralMedia");
+        const { vehicle } = fresh;
+        console.log('fresh?.CollateralMedia',fresh.CollateralMedia)
+        this.setState({
+          collateralId: fresh.id,
+          vehicleId: vehicle.id,
+          collateralType: fresh.collateralType || '',
+          whitebook: vehicle.whitebook?.data || '',
+          collateralMedia: {
+            front: fresh?.CollateralMedia?.data?.[0] ?? null,
+            back: fresh?.CollateralMedia?.data?.[1] ?? null,
+            right: fresh?.CollateralMedia?.data?.[2] ?? null,
+            left: fresh?.CollateralMedia?.data?.[3] ?? null
+          },
+          numberPlate: vehicle.numberPlate || '',
+          packed: vehicle.packed || ''
+        })
+      }
+    } else {
+      const { vehicle } = collateral;
+      if (!vehicle) {
+        newCollaterallObject.data.collateral.id = collateral.id;
+        newCollaterallObject.data.collateral.collateralType = collateral.collateralType;
+        const updatedLoan = await updateLoan(newCollaterallObject, this.props.loggedInUser.currentLoan.id);
+        if (!updatedLoan.error) {
+          const { collateral: fresh } = await getLoanFromId(this.props.loggedInUser.currentLoan.id, "collateral.vehicle.whitebook");
+          const { vehicle: veh } = fresh;
+          this.setState({
+            collateralId: fresh.id,
+            vehicleId: veh.id,
+            collateralType: fresh.collateralType || '',
+            whitebook: veh.whitebook?.data || '',
+            collateralMedia: {
+              front: fresh?.CollateralMedia?.data?.[0] ?? null,
+              back: fresh?.CollateralMedia?.data?.[1] ?? null,
+              right: fresh?.CollateralMedia?.data?.[2] ?? null,
+              left: fresh?.CollateralMedia?.data?.[3] ?? null
+            },
+            numberPlate: veh.numberPlate || '',
+            packed: veh.packed || ''
+          });
         }
-    }
-    if(!collateral){
-      console.log(newCollaterallObject)
-      console.log(this.props.loggedInUser.currentLoan.id)
-        // create a blank slate of collateral to obtain the component's id
-        const updatedLoan = await updateLoan(newCollaterallObject,this.props.loggedInUser.currentLoan.id)
-        console.log(updatedLoan)
-        if(!updatedLoan || !updatedLoan.hasOwnProperty('error')){
-            const { collateral } = await getLoanFromId(this.props.loggedInUser.currentLoan.id,"collateral.vehicle.whitebook"); 
-            const {vehicle} = collateral // get the vehicle component from the collateral component
-            this.setState({
-                collateralId: collateral?.id,
-                vehicleId: collateral?.vehicle.id,
-                collateralType: collateral?.collateralType || '',
-                whitebook: vehicle?.whitebook.data || '',
-                numberPlate: vehicle?.numberPlate || '',
-                packed: vehicle?.packed || ''
-            })
-            return
-        }
-    }
-    else{
-      console.log(newCollaterallObject)
-      console.log(this.props.loggedInUser.currentLoan.id)
-            const {vehicle} = collateral // get the vehicle component from the collateral component
-            if(!vehicle){
-                newCollaterallObject.data.collateral.id = collateral.id // update only the existing collateral object
-                newCollaterallObject.data.collateral.collateralType = collateral.collateralType // return the existing value
-                
-                const updatedLoan = await updateLoan(newCollaterallObject,this.props.loggedInUser.currentLoan.id)
-                if(!updatedLoan.hasOwnProperty('error')){
-                   const { collateral } = await getLoanFromId(this.props.loggedInUser.currentLoan.id,"collateral.vehicle.whitebook"); 
-                   console.log(collateral)
-                    this.setState({
-                        collateralId: collateral?.id,
-                        vehicleId: collateral?.vehicle.id,
-                        collateralType: collateral?.collateralType || '',
-                        whitebook: vehicle?.whitebook.data || '',
-                        numberPlate: vehicle?.numberPlate || '',
-                        packed: vehicle?.packed || ''
-                    })
-                    return
-                }
-            }
-            else{ // if they all exist, then just put the pre-exising object their
-                this.setState({
-                    collateralId: collateral?.id,
-                    vehicleId: collateral?.vehicle.id,
-                    collateralType: collateral?.collateralType || '',
-                    whitebook: vehicle?.whitebook.data || '',
-                    numberPlate: vehicle?.numberPlate || '',
-                    packed: vehicle?.packed || ''
-                },()=>{
-                    this.checkFormValidity(true)
-                })
-            }
+      } else {
+        this.setState({
+          collateralId: collateral.id,
+          vehicleId: collateral.vehicle.id,
+          collateralType: collateral.collateralType || '',
+          whitebook: vehicle.whitebook?.data || '',
+          collateralMedia: {
+            front: collateral?.CollateralMedia?.data?.[0] ?? null,
+            back: collateral?.CollateralMedia?.data?.[1] ?? null,
+            right: collateral?.CollateralMedia?.data?.[2] ?? null,
+            left: collateral?.CollateralMedia?.data?.[3] ?? null
+          },
+          numberPlate: vehicle.numberPlate || '',
+          packed: vehicle.packed || ''
+        }, () => this.checkFormValidity(true));
+      }
     }
   }
 
   handleInputChange = (e) => {
-    //new Date(details.dateOfBirth).toLocaleDateString('en-US')
     const { name, value } = e.target;
-    // Update state based on field name
-    this.setState({ [name]: !value? '' : value, saved: false }, this.checkFormValidity)
+    this.setState({ [name]: value || '', saved: false }, this.checkFormValidity);
   }
 
-  checkFormValidity = (initialCheck=false) => {
-    const { numberPlate, packed, whitebook } = this.state;
-   console.log(this.state)
-    // Validate that all fields are filled
-    const isFormValid = numberPlate.trim() && packed && whitebook 
-    
-      if(!initialCheck){
-          this.setState({ isFormValid })
-      }
-      else{
-          if(isFormValid){
-            this.setState({ isFormValid:true, saved: true})
-          }
-          else{
-            this.setState({ isFormValid})
-          }
-      }
-  }
-
-  handleSubmit = async (e)=>{
-     e.preventDefault()
-     const { numberPlate, packed, whitebook, collateralId, vehicleId } = this.state;
-     if(!numberPlate || !packed){
-        this.setState({
-            error: 'Please ensure all fields are filled.',
-            saving: false
-        })
-        return
-     }
-    //  if(!textHasPhoneNumber(numberPlate)){
-    //     this.setState({
-    //         error: 'Please enter a valid plot number.',
-    //         saving: false
-    //     })
-    //     return
-    //  }
-    const updateObject = {
-        data:{
-            collateral: {
-                id: this.state.collateralId,
-                vehicle: {
-                    id: this.state.vehicleId,
-                    numberPlate: this.state.numberPlate,
-                    packed: this.state.packed
-                }
-            }
-        }
+  checkFormValidity = (initialCheck = false) => {
+    const { numberPlate, packed, whitebook, collateralMedia } = this.state;
+    const collateralMediaSet = collateralMedia.front && collateralMedia.back && collateralMedia.left && collateralMedia.right
+    const isFormValid = numberPlate.trim() && packed && whitebook && collateralMediaSet;
+    if (!initialCheck) {
+      this.setState({ isFormValid });
+    } else {
+      this.setState({ isFormValid, saved: isFormValid });
     }
-     delete updateObject.isFormValid
-     delete updateObject.saving
-     delete updateObject.error
-     delete updateObject.whitebook
-     delete updateObject.collateralId
-     delete updateObject.vehicleId
-     delete updateObject.numberPlate
-     delete updateObject.packed
-     
+  }
 
-     if(!updateObject.data.collateral.vehicle.numberPlate){
-        updateObject.data.collateral.vehicle.numberPlate = null
-     }
-     if(!updateObject.data.collateral.vehicle.packed){
-        updateObject.data.collateral.vehicle.packed = null
-     }
-     
-     console.log(updateObject)
-     this.setState({
-        saving: true,
-        whitebook: whitebook,
-        collateralId: collateralId,
-        vehicleId: vehicleId
-     })
-     const updatedLoan = await updateLoan(updateObject,this.props.loggedInUser.currentLoan.id)
-   
-     if(updatedLoan.hasOwnProperty('error')){
-        this.setState({
-            error: 'something went wrong, try again',
-            saving: false,
-            whitebook: whitebook,
-            collateralId: collateralId
-        })
-        return
-     }
-     this.setState({
-        error: null,
-        saving: false,
-        whitebook: whitebook,
-        collateralId: collateralId,
-        saved: true
-    },()=>{
-        this.checkFormValidity()
-    })
+  handleSubmit = async (e) => {
+    e.preventDefault();
+    const { numberPlate, packed, collateralId, vehicleId } = this.state;
+    if (!numberPlate || !packed) {
+      this.setState({ error: 'Please ensure all fields are filled.', saving: false });
+      return;
+    }
+    const updateObject = {
+      data: {
+        collateral: {
+          id: collateralId,
+          vehicle: { id: vehicleId, numberPlate, packed }
+        }
+      }
+    };
+    this.setState({ saving: true, error: null });
+    const updatedLoan = await updateLoan(updateObject, this.props.loggedInUser.currentLoan.id);
+    if (updatedLoan.error) {
+      this.setState({ error: 'Something went wrong, try again.', saving: false });
+      return;
+    }
+    this.setState({ saving: false, saved: true }, this.checkFormValidity);
   }
 
   addWhiteBook = (files) => {
-    if(!this.state.whitebook){
-        this.setState({
-            whitebook: files,
-            saving: false,
-            error: null
-        },()=>{
-            this.checkFormValidity()
-        })
-    }
-    else{
-        const newFiles = [...this.state.whitebook,...files]
-        this.setState({
-            whitebook: newFiles,
-            saving: false,
-            error: null
-        },()=>{
-            this.checkFormValidity()
-        })
-    }
+    this.setState(prev => ({ whitebook: prev.whitebook ? [...prev.whitebook, ...files] : files, saved: false, error: null }), this.checkFormValidity);
   }
-  
-  handleFinishLoanApplication = async ()=>{
-    const updatedLoan = await updateLoan({data: {loanStatus: 'pending-collateral-inspection',loanType : { connect: [this.props.constants.loanTypesIds.vehicleCollateralLoans] }}},this.props.loggedInUser.currentLoan.id)
-    if(!updatedLoan.hasOwnProperty('error')){
-      const applicationDate =  dateAndTimeNow()
-      const transactionHistoryObject = {
-          transactionType: "loan-application",
-          transactionDate: applicationDate,
-          amount: updatedLoan.loanAmount,
-          description: "Initiation of the loan, with id #"+updatedLoan.id+ ", and amount K"+updatedLoan.loanAmount,
-          loan: {connect: [updatedLoan.id]}
-      }
-      const notificationObject = {
-          title: "A new asset loan of vehicle collateral, with id "+updatedLoan.id+ ", and amount K"+updatedLoan.loanAmount+" has been initiated on VectorFin",
-          type: "alert"
-      }
-      const transactionHistory = await logNewTransactionHistory({data:transactionHistoryObject})
-      const newNotitifcation = await logNewNotification({data:notificationObject})
-      if(!transactionHistory.hasOwnProperty('error')){
-        const userUpdateObject = {
-            transactionHistories: {connect: [transactionHistory.id]},
-            activities: {connect: [newNotitifcation.id]}
-        }
-        const updatedUserAccount = await updateUserAccount(userUpdateObject,this.props.loggedInUser.id)
-        if(!updatedUserAccount.hasOwnProperty('error')){
-            const AdminNotificationBody = {
-                loan: {connect: [updatedLoan.id]},
-                notification: {connect: [newNotitifcation.id]}
-            }
-            const newAdminNotification = await logNewAdminNotification({data:AdminNotificationBody})
-            if(!newAdminNotification.hasOwnProperty('error')){
-              window.location = "/"
-            }
-        }
-    }
-      
-   }
-   else{
-      // send a notification then redirect user
-      this.setState({
-        error: 'something went wrong, try again',
-        saving: false
-       })
-   }
-}
 
+  // handlers for the new collateral media
+  handleAddCollateralMedia = (side, files) => {
+    this.setState(prev => ({
+      collateralMedia: {
+        ...prev.collateralMedia,
+        [side]: prev.collateralMedia[side] ? [...prev.collateralMedia[side], ...files] : files
+      },
+      saved: false,
+      error: null
+    }));
+  }
 
-  handleRemoveImage = async (uploadid,filesArr,arrName)=>{
-    const removed = await fetch(api_url+'/upload/files/'+uploadid,{
+  handleRemoveCollateralMedia = async (side, uploadId) => {
+     const removed = await fetch(api_url+'/upload/files/'+uploadId,{
       method: 'DELETE',
       headers: {
         'Authorization': `Bearer ${getJwt()}`,
@@ -280,23 +170,18 @@ export default class UpdateVehicleCollateralForm extends React.Component {
     }).then(response => response.json())
       .then(data => data)
       .catch(error => console.error(error))
-     if(removed){
-       // remove from state
-       const newArray = filesArr.filter((file)=>{
-           return file.id !== uploadid
-       })
-       this.setState({
-        [arrName]: newArray.length < 1? null : newArray
-       },()=>{
-        this.checkFormValidity()
-       })
-       // remove from the dom
-       if(typeof document !== 'undefined'){
-         document.getElementById("#"+uploadid).style.display = "none"
-       }
-     } 
-}
+      
+    if(removed){
+      this.setState(prev => ({
+       collateralMedia: {
+        ...prev.collateralMedia,
+        [side]: null
+      }
+    }))
+    }
+  }
 
+  // existing methods: handleFinishLoanApplication, handleOpenErrorSnapBack, handleNextButton, handleRemoveImage, renderFiles, renderPackingWarning...
   renderFiles = (files,arrName)=>{
     if(!files){
         return <></>
@@ -339,6 +224,33 @@ export default class UpdateVehicleCollateralForm extends React.Component {
     })
   }
 
+  handleRemoveImage = async (uploadid,filesArr,arrName)=>{
+    const removed = await fetch(api_url+'/upload/files/'+uploadid,{
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${getJwt()}`,
+        'Content-Type': 'application/json'
+      }
+    }).then(response => response.json())
+      .then(data => data)
+      .catch(error => console.error(error))
+     if(removed){
+       // remove from state
+       const newArray = filesArr.filter((file)=>{
+           return file.id !== uploadid
+       })
+       this.setState({
+        [arrName]: newArray.length < 1? null : newArray
+       },()=>{
+        this.checkFormValidity()
+       })
+       // remove from the dom
+       if(typeof document !== 'undefined'){
+         document.getElementById("#"+uploadid).style.display = "none"
+       }
+     } 
+  }
+
   renderPackingWarning = ()=>{
     if(this.state.packed){
       if(this.state.packed === "no"){
@@ -357,9 +269,54 @@ export default class UpdateVehicleCollateralForm extends React.Component {
          this.setState({
            openErrorSnapBack: false 
          })
+  }
+
+    handleFinishLoanApplication = async ()=>{
+    const updatedLoan = await updateLoan({data: {loanStatus: 'pending-collateral-inspection',loanType : { connect: [this.props.constants.loanTypesIds.vehicleCollateralLoans] }}},this.props.loggedInUser.currentLoan.id)
+    if(!updatedLoan.hasOwnProperty('error')){
+      const applicationDate =  dateAndTimeNow()
+      const transactionHistoryObject = {
+          transactionType: "loan-application",
+          transactionDate: applicationDate,
+          amount: updatedLoan.loanAmount,
+          description: "Initiation of the loan, with id #"+updatedLoan.id+ ", and amount K"+updatedLoan.loanAmount,
+          loan: {connect: [updatedLoan.id]}
+      }
+      const notificationObject = {
+          title: "A new asset loan of vehicle collateral, with id "+updatedLoan.id+ ", and amount K"+updatedLoan.loanAmount+" has been initiated on VectorFin",
+          type: "alert"
+      }
+      const transactionHistory = await logNewTransactionHistory({data:transactionHistoryObject})
+      const newNotitifcation = await logNewNotification({data:notificationObject})
+      if(!transactionHistory.hasOwnProperty('error')){
+        const userUpdateObject = {
+            transactionHistories: {connect: [transactionHistory.id]},
+            activities: {connect: [newNotitifcation.id]}
+        }
+        const updatedUserAccount = await updateUserAccount(userUpdateObject,this.props.loggedInUser.id)
+        if(!updatedUserAccount.hasOwnProperty('error')){
+            const AdminNotificationBody = {
+                loan: {connect: [updatedLoan.id]},
+                notification: {connect: [newNotitifcation.id]}
+            }
+            const newAdminNotification = await logNewAdminNotification({data:AdminNotificationBody})
+            if(!newAdminNotification.hasOwnProperty('error')){
+              window.location = "/"
+            }
+        }
     }
+      
+   }
+   else{
+      // send a notification then redirect user
+      this.setState({
+        error: 'something went wrong, try again',
+        saving: false
+       })
+   }
+ }
   
-    handleNextButton = ()=>{
+  handleNextButton = ()=>{
       const {isFormValid,saved} = this.state
       if(!isFormValid){
         this.setState({
@@ -376,102 +333,106 @@ export default class UpdateVehicleCollateralForm extends React.Component {
         return
       }
       this.handleFinishLoanApplication()
-    }
+  }
 
   render() {
-    const { numberPlate, packed, isFormValid, saved } = this.state;
+    const { numberPlate, packed, collateralId, vehicleId, whitebook, collateralMedia } = this.state;
 
     return (
-      <Slide in={true} direction="up">
+      <Slide in direction="up">
         <div className="row">
-        {this.state.openErrorSnapBack? <WarningSnapBack handleOpenErrorSnapBack={this.handleOpenErrorSnapBack} errorMessage={this.state.errorMessage}/> : null}
+          {this.state.openErrorSnapBack && (
+            <WarningSnapBack handleOpenErrorSnapBack={this.handleOpenErrorSnapBack} errorMessage={this.state.errorMessage} />
+          )}
           <div className="col-lg-12">
             <div className="card">
               <div className="card-header align-items-center d-flex">
-                <h4 className="card-title mb-0 flex-grow-1">Vehicle Details </h4>
+                <h4 className="card-title mb-0 flex-grow-1">Vehicle Details</h4>
               </div>
               <div className="card-body">
                 <div className="live-preview">
+                  {/* Vehicle inputs */}
                   <div className="row gy-4">
-                  <div className="col-xxl-3 col-md-6 col-lg-12">
-                      <div>
-                        <label htmlFor="numberPlate" className="form-label">
-                         Vehicle Number Plate
-                        </label>
-                        <input
-                          className="form-control"
-                          id="numberPlate"
-                          name="numberPlate"
-                          type="text"
-                          autoComplete="off"
-                          disabled={!this.state.vehicleId}
-                          value={numberPlate}
-                          onChange={this.handleInputChange}
-                        />
-                      </div>
+                    <div className="col-xxl-3 col-md-6 col-lg-12">
+                      <label htmlFor="numberPlate" className="form-label">Vehicle Number Plate</label>
+                      <input
+                        id="numberPlate"
+                        name="numberPlate"
+                        className="form-control"
+                        type="text"
+                        disabled={!vehicleId}
+                        value={numberPlate}
+                        onChange={this.handleInputChange}
+                      />
                     </div>
                     <div className="col-lg-12">
-                        <div className="input-group">
-                          <label className="form-label mr-2">Do you want to pack the vehicle with us or keep it?</label>
-                          <select
-                            disabled={!this.state.vehicleId}
-                            className="form-select"
-                            name="packed"
-                            autoComplete="off"
-                            value={packed}
-                            onChange={this.handleInputChange}
-                          >
-                            <option value="">Choose...</option>
-                            <option value="yes">Yes</option>
-                            <option value="no">No</option>
-                          </select>
-                        </div>
+                      <label className="form-label">Pack vehicle or keep it?</label>
+                      <select
+                        name="packed"
+                        className="form-select"
+                        disabled={!vehicleId}
+                        value={packed}
+                        onChange={this.handleInputChange}
+                      >
+                        <option value="">Choose...</option>
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                      </select>
                     </div>
-                  {this.renderPackingWarning()} 
+                    {this.renderPackingWarning()}
                   </div>
-                
-                  {this.state.vehicleId? <>
-                  <hr style={{color:'lightgray'}}/>
-                  <div style={{marginTop:'20px'}}>
-                        <h5>Copy Of Whitebook<small  style={{color:'gray'}}> </small></h5><small  style={{color:'lightgray'}}></small>
-                        <Uploader 
-                            addFiles={this.addWhiteBook}
-                            displayType="circular"
-                            refId={this.state.vehicleId}
-                            refName="media-and-documents.vehicle"
-                            fieldName="whitebook"
-                            allowMultiple={false}
-                            allowedTypes={['image/*', 'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain', 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']}
-                        />
-                        <small  style={{color:'lightgray'}}>(document(PDF,IMAGE,WORD))</small>
-                        {this.renderFiles(this.state.whitebook,"whitebook")}
-                  </div>
-                  </> : <></>}
-                  {/* Save and Next Buttons */}
-                  <div style={{ width: "100%", display: "flex", justifyContent: "space-between" }}>
-                    <button
-                      disabled={this.state.saving}
-                      onClick={this.handleSubmit}
-                      type="button"
-                      className="btn btn-success w-90 mt-3"
-                      id="confirm-btn"
-                    >
-                      {this.state.saving? "saving..." : 'save'}
-                    </button>
 
-                    
+                  {vehicleId && (
+                    <>
+                      {/* Whitebook Uploader */}
+                      <hr style={{ color: 'lightgray' }} />
+                      <h5>Copy Of Whitebook</h5>
+                      <Uploader
+                        addFiles={this.addWhiteBook}
+                        displayType="circular"
+                        refId={vehicleId}
+                        refName="media-and-documents.vehicle"
+                        fieldName="whitebook"
+                        allowMultiple={false}
+                        allowedTypes={[ 'image/*', 'application/pdf' /* etc */ ]}
+                      />
+                      {this.renderFiles(whitebook, 'whitebook')}
+
+                      {/* Collateral Media */}
+                      <hr style={{ margin: '30px 0', color: 'lightgray' }} />
+                      <h5>Vehicle Collateral Media</h5>
+                      <CollateralMedia
+                        mediaSlots={[ 'front', 'back', 'right', 'left' ]}
+                        media={collateralMedia}
+                        onAdd={this.handleAddCollateralMedia}
+                        onRemove={this.handleRemoveCollateralMedia}
+                        refId={collateralId}
+                      />
+                    </>
+                  )}
+
+                  {/* Actions */}
+                  <div className="d-flex justify-content-between mt-4">
                     <button
                       type="button"
-                      className="btn btn-danger w-90 mt-3"
-                      id="next-btn"
-                      onClick={() => { this.handleNextButton() }}
+                      className="btn btn-success w-90"
+                      onClick={this.handleSubmit}
+                      disabled={this.state.saving}
+                    >
+                      {this.state.saving ? 'Saving...' : 'Save'}
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-danger w-90"
+                      onClick={this.handleNextButton}
                     >
                       Complete
                     </button>
-                    
                   </div>
-                 {this.state.error? <p className="text text-danger">{this.state.error}</p> : <></>}
-                 <p className="text text-warning mt-2">Note that all the information you provide here is kept strictly confidential, and it's solely meant for verification and loan eligibility determination purposes</p>
+                  {this.state.error && <p className="text text-danger mt-2">{this.state.error}</p>}
+                  <p className="text text-warning mt-2">
+                    Note that all the information you provide here is kept strictly confidential...
+                  </p>
                 </div>
               </div>
             </div>
@@ -481,5 +442,3 @@ export default class UpdateVehicleCollateralForm extends React.Component {
     );
   }
 }
-//  id
-//  sign a letter of sale

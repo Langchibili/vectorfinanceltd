@@ -4,22 +4,34 @@ import { Fade, Slide, Zoom } from "@material-ui/core";
 import Link from "next/link";
 import React from "react";
 import PaymentsDisplay from "../PaymentsDisplay/PaymentsDisplay";
+import { getLoanRepaymentSchedule } from "@/Functions";
+import RepaymentSchedule from "./RepaymentSchedule";
 
 export default class LoanInformationDisplay extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-        showPaymentsPage: false
+        showPaymentsPage: false,
+        repaymentSchedule: null
     }
   }
 
   async componentDidMount() {
+    const {currentLoan} = this.props.loggedInUser
+    const repaymentSchedule = await getLoanRepaymentSchedule(currentLoan.id)
+    this.setState({
+      repaymentSchedule: repaymentSchedule
+    })
   // loan due date,
   // months till loan is due
   // days till loan is due
   // 
   }
 
+  handleMakePayment = ()=>{
+    this.handleMakePaymentPage()
+  }
+  
   formatDateTime(isoString) {
     // Create a Date object from the ISO string
     const date = new Date(isoString);
@@ -82,7 +94,7 @@ export default class LoanInformationDisplay extends React.Component {
   
     return {
       spent: `${monthsSpent} months ${daysSpent} days`,
-      left: `${monthsLeft} months ${daysLeft} days`
+      left: `${monthsLeft} months ${Math.abs(daysLeft)} days`
     }
   }
 
@@ -105,7 +117,7 @@ export default class LoanInformationDisplay extends React.Component {
     if(this.state.showPaymentsPage){
       return (<div className="page-content">
               <div className="container-fluid">
-                  <div className="col col-md-8 col-lg-6" style={{margin:'0 auto'}}><PaymentsDisplay handleMakePaymentPage={this.handleMakePaymentPage} loggedInUser={this.props.loggedInUser}/></div>
+                  <div className="col col-md-8 col-lg-6" style={{margin:'0 auto'}}><PaymentsDisplay handleMakePaymentPage={this.handleMakePaymentPage} loggedInUser={this.props.loggedInUser} constants={this.props.constants}/></div>
               </div>
             </div>)
       
@@ -392,6 +404,7 @@ export default class LoanInformationDisplay extends React.Component {
               {/* end col */}
               {/* end col */}
             </div>
+            {this.state.repaymentSchedule?<RepaymentSchedule schedule={this.state.repaymentSchedule} onMakePayment={this.handleMakePayment}/> : null}
           </div>
       </div>
     </Slide>;

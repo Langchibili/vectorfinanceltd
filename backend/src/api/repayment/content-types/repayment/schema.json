@@ -67,12 +67,6 @@
       "target": "api::loan.loan",
       "inversedBy": "repayments"
     },
-    "client": {
-      "type": "relation",
-      "relation": "oneToOne",
-      "target": "plugin::users-permissions.user",
-      "inversedBy": "repayment"
-    },
     "proofOfpayment": {
       "type": "media",
       "multiple": true,
@@ -90,6 +84,12 @@
     },
     "transactionReference": {
       "type": "string"
+    },
+    "client": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "repayments"
     }
   }
 }

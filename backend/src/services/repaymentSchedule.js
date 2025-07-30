@@ -166,7 +166,7 @@ async function recordPayment(loanId, amount, paymentDate, repaymentId) {
       const principalPlusInterest = parseFloat(item.principalDue + item.interestDue)
       if (newPaid >= principalPlusInterest + lateFeeCleared) {
         item.status = 'paid'
-        item.paidAt = new Date(paymentDate).toISOString()
+        item.paidAt = paymentDate? new Date(paymentDate).toISOString() : new Date()
       } else {
         // if it was late, remain late; otherwise partial
         item.status = (item.status === 'late') ? 'late' : 'partial'

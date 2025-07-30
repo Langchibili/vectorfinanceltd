@@ -2,7 +2,7 @@
 
 import { usePage } from '@/Contexts/PageContext'
 import { useUser } from '@/Contexts/UserContext'
-import { scrolltoTopOFPage, updateUserAccount } from '@/Functions'
+import { getLoansFromClientId, scrolltoTopOFPage, updateUserAccount } from '@/Functions'
 import { Slide, Button, Stack, Alert } from '@mui/material'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -11,18 +11,26 @@ export default function Loans() {
   const loggedInUser = useUser()
   const { setPage } = usePage()
   const router = useRouter()  // the router stuff
-  const loans = loggedInUser.user?.loans || []
   const currentLoan = loggedInUser.user?.currentLoan || []
+  const [loans,setLoans] = useState([])
   const [currentLoanId, setCurrentLoanId] = useState(null)
 
   setPage('/loans')
   scrolltoTopOFPage()
 /* comprehenive insurance(third party compesants only the victim | letter of sale), mou with african grey */
+  
+  useEffect(()=>{
+    const runGetLoans = async () =>{
+          const loans = await getLoansFromClientId(loggedInUser.user.id)
+          setLoans(loans)
+    }
+   runGetLoans()
+  },[loggedInUser.user])
+
   useEffect(() => {
-    console.log('currentLoanId',currentLoanId)
     const runUpdateCurrentLoan = async ()=>{
         if(loggedInUser && loggedInUser.user){
-            if(!loggedInUser.user.loans){
+         if(!loggedInUser.user){
                 window.location = '/'
                 //router.push('/?reflesh')
             }

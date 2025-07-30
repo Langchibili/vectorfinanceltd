@@ -98,9 +98,9 @@
       "relation": "oneToMany",
       "target": "api::loan.loan"
     },
-    "repayment": {
+    "repayments": {
       "type": "relation",
-      "relation": "oneToOne",
+      "relation": "oneToMany",
       "target": "api::repayment.repayment",
       "mappedBy": "client"
     },
@@ -260,12 +260,13 @@
       ]
     },
     "signedDocuments": {
+      "type": "media",
+      "multiple": true,
+      "required": false,
       "allowedTypes": [
         "images",
         "files"
-      ],
-      "type": "media",
-      "multiple": true
+      ]
     }
   }
 }

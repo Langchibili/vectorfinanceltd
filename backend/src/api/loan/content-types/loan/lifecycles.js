@@ -55,27 +55,71 @@ module.exports = {
         const { params } = event
         const updatedById = params?.data?.updatedBy
         const loan = params?.data
+        const loanId = params.where?.id
+        const getLoanClient = async (id) => {
+            return await strapi.db.query("api::loan.loan").findOne({
+              where: { id },
+              populate: {
+                // populate the client relation…
+                client: {
+                  // …and inside client, populate its many-to-many formsToFill
+                  populate: {
+                    formsToFill: true
+                  }
+                }
+              }
+            });
+        };
+        const { client }  = await getLoanClient(loanId)
+        console.log("forms",client.formsToFill.length)
         if (updatedById) { // id of admin user account which wants to update
           const adminUser = await strapi.query('admin::user').findOne({  where: { id: updatedById } })
           const { loanApproverEmails } = await getAdminUserEmailsAndNumbers()
           const { loanDisburserEmails } = await getAdminUserEmailsAndNumbers()
-          const { minutesBeforeLoanDisbursement } = await strapi.db.query("api::loans-information.loans-information").findOne()
-          console.log("loan",loan)
+          
+          const { minutesBeforeLoanDisbursement, autoSendMessageOnLoanAcceptance } = await strapi.db.query("api::loans-information.loans-information").findOne()
           // If current status is already approved or disbursed, block the update
+          if (loan.loanStatus === "request-approval") {
+              if(client.formsToFill.length < 1){
+                const notificationBody = "You cannot request for approval of this loan before adding forms for the client to fill when approved, please ensure that you add a form to the formsToFill field on the user's record (the client)."
+                SendEmailNotification(adminUser.email,notificationBody)
+                throw new Error('Loan cannot be changed to request approval')
+              }
+          }
           if (loan.loanStatus === "accepted") {
-              params.data.acceptanceDate = new Date() // you should add the date of when it's been accepted
+            // only users allowed to disburse loans can disburse them.
+            if(!loanApproverEmails.includes(adminUser.email)){ 
+              const notificationBody = "You cannot accept loans, please change the loan status to request-approval or use an account that has the priviledge to accept or approve."
+              SendEmailNotification(adminUser.email,notificationBody)
+              throw new Error('Loan cannot be accepted by user')
+            }
+            // cannot accept a loan that has no forms to fill on it
+            if(client.formsToFill.length < 1){
+              const notificationBody = "You cannot accept this loan before adding forms for the client to fill, please ensure that you add a form to the formsToFill field on the user(client's) record."
+              SendEmailNotification(adminUser.email,notificationBody)
+              throw new Error('Loan cannot be accepted')
+            }
+            params.data.acceptanceDate = new Date() // you should add the date of when it's been accepted
+            // send a message to client that the they should sign documents if auto messages have been allowed on loan acceptance
+            if(autoSendMessageOnLoanAcceptance && autoSendMessageOnLoanAcceptance === "yes"){
+                const notificationBody = "Your loan request with vector finance limited has been processed, as a final step before we disburse you the funds, we require that you fill some important documents, we have sent you some forms to fill on your portal account. Thank you for choosing VectorFin."
+                SendEmailNotification(adminUser.email,notificationBody)
+            }
           }
           if (loan.loanStatus === "approved") {
-            if(!loanApproverEmails.includes(adminUser.email)){ // only users allowed to disburse loans can disburse them.
+            // only users allowed to disburse loans can disburse them.
+            if(!loanApproverEmails.includes(adminUser.email)){ 
               const notificationBody = "You cannot approve loans, please change the loan status to request-approval or use an account that has the priviledge to approve."
               SendEmailNotification(adminUser.email,notificationBody)
-              throw new Error('Loan cannot be updated by user')
+              throw new Error('Loan cannot be approved by user')
             }
-            if(!loan.acceptanceDate){ // loan must be accepted first before attempting to approve it.
+            // loan must be accepted first before attempting to approve it.
+            if(!loan.acceptanceDate){ 
               const notificationBody = "You cannot approve this loan before the client signs the loan form, make sure the loan status is first set to accepted before you can approve."
               SendEmailNotification(adminUser.email,notificationBody)
               throw new Error('Loan cannot be approved before being accepted')
             }
+            // this is to stop the loan officer or loan approving officer from approving the loan and hence changing the loan status before the client signs the documents
             if(getMinutesDifference(loan.acceptanceDate, new Date()) < (minutesBeforeLoanDisbursement || 15)){
               const notificationBody = "Please wait a few minutes before you can change the loan status to approved, this is such that the client has enough time to sign the loan documents"
               SendEmailNotification(adminUser.email,notificationBody)
@@ -89,12 +133,14 @@ module.exports = {
               SendEmailNotification(adminUser.email,notificationBody)
               throw new Error('Loan cannot be disbursed by user')
             }
-            if(!loan.approvalDate){ // loan must be accepted first before attempting to approve it.
+            // loan must be accepted first before attempting to approve it.
+            if(!loan.approvalDate){ 
               const notificationBody = "You cannot change this loan's status to disbursed before the loan has been approved, make sure the loan's status is first set to approved before you may proceed to disbursemt."
               SendEmailNotification(adminUser.email,notificationBody)
               throw new Error('Loan cannot be disbursed before being approved')
             }
-            if(!loan.acceptanceDate){ // loan must be accepted first before attempting to approve it.
+            // loan must be accepted first before attempting to approve it.
+            if(!loan.acceptanceDate){ 
               const notificationBody = "You cannot change this loan's status to disbursed before the loan has been accepted, make sure the loan's status is first set to accepted before you may proceed to disbursemt."
               SendEmailNotification(adminUser.email,notificationBody)
               throw new Error('Loan cannot be disbursed before being accepted')
@@ -116,7 +162,7 @@ module.exports = {
             return await strapi.db.query("api::loan.loan").findOne({
                 where: { id: params.data.id },
                 populate: ['loanType','client']
-            });
+            })
         }
 
         const getFinances = async () => {

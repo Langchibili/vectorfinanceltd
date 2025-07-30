@@ -163,10 +163,10 @@ export default class AddLoanAmountForm extends React.Component {
       </>
     );
     if(isSalaryLoanType){
-      if(salary <= 0 || parseInt(salaryPercentage) > (this.props.constants.loansInformation.allowedSalaryPercentageLimit ||40)){
+      if(salary <= 0 || parseInt(salaryPercentage) > (this.props.constants.loansInformation.allowedSalaryPercentageLimit || 40)){
             return (
                 <>
-                <Alert severity="warning" sx={{marginBottom: '5px'}}>You cannot get a loan which requires monthly payments of over 40% of your salary</Alert>
+                <Alert severity="warning" sx={{marginBottom: '5px'}}>You cannot get a loan which requires monthly payments of over {this.props.constants.loansInformation.allowedSalaryPercentageLimit || 40}% of your salary</Alert>
                 <Alert severity="info" sx={{marginBottom: '5px'}}>Consider reducing the amount or increasing the repayment period</Alert>
                 <Alert severity="info" sx={{marginBottom: '5px'}}><strong>Tip:</strong>Consider applying for a lesser amount with your salary then apply for a business loan as well, that is if you have other sources of income</Alert>
                 </>
@@ -178,10 +178,11 @@ export default class AddLoanAmountForm extends React.Component {
     else {
       return (
         <>
-          <Alert severity="warning" sx={{ marginBottom: '5px' }}>
+          {loanAmount > maxLoanFromCollateral? <><Alert severity="warning" sx={{ marginBottom: '5px' }}>
             You can only get up to half the worth of your collateral, that is K: <strong>{maxLoanFromCollateral}</strong>
-          </Alert>
-          {this.renderProceedWithLoanButton()}
+          </Alert> 
+          <Alert severity="info" sx={{marginBottom: '5px'}}>If you have other assets, you can request another loan with the other asset as well.</Alert> </>:
+           this.renderProceedWithLoanButton()}
         </>
       );
     }
@@ -343,6 +344,7 @@ export default class AddLoanAmountForm extends React.Component {
         <option value="Vehicle">Vehicle</option>
         <option value="Land">Land</option>
         <option value="House">House</option>
+        <option value="House">Other</option>
       </select>
     </div>
     <div className="col-lg-12">

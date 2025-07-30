@@ -178,9 +178,9 @@ export default class ESigningForms extends React.Component {
       })
     }
     else{ // means this is the very last form so the user can finalize the loan
-      if(completeApplicationFunction){
+      if (typeof completeApplicationFunction === 'function') {
         completeApplicationFunction()
-      } // run the complete the loan application function if this is the last form
+      }// run the complete the loan application function if this is the last form
     }
   }
   handleRenderPreviousForm = ()=>{
