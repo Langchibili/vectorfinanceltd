@@ -11,6 +11,7 @@ import { Info, Logout } from '@mui/icons-material';
 import { AccountCircleRounded, Business, ContactSupport, Home, Money, PersonAdd } from '@material-ui/icons';
 import { useRouter } from 'next/navigation'
 import Link from 'next/link';
+import { useConstants } from '@/Contexts/ConstantsContext';
 
 export default function MobileNav(props) {
   const [state, setState] = React.useState({
@@ -45,6 +46,8 @@ export default function MobileNav(props) {
 
 
   const router = useRouter()  // the router stuff
+  const constants = useConstants()
+  const refferalLinks = constants.loansInformation.allowReferrals && constants.loansInformation.allowReferrals === "yes"? [['Referrals','/referrals']] : []
   const list = (anchor) => (
     <Box
       sx={{ width: anchor === 'top' || anchor === 'bottom' ? 'auto' : 250 }}
@@ -53,7 +56,7 @@ export default function MobileNav(props) {
       onKeyDown={toggleDrawer(anchor, false)}
     >
       <List>
-        {[['Loans','/loans'],['Referrals','/referrals'],['Home','/'],['Profile(For Individuals)','/profile'], ['Profile(For Businesses)','/business-profile'],['Contact Us','https://vectorfinancelimited.com/contact-us/'], ['About Us','https://vectorfinancelimited.com/about-us/'], ['Logout','/logout']].map((text, index) => (
+        {[['Loans','/loans'],...refferalLinks,['Home','/'],['Profile(For Individuals)','/profile'], ['Profile(For Businesses)','/business-profile'],['Contact Us','https://vectorfinancelimited.com/contact-us/'], ['About Us','https://vectorfinancelimited.com/about-us/'], ['Logout','/logout']].map((text, index) => (
           window.location.pathname === "/" && text[0] === "Home"? '' :
           <ListItem key={text[0]} disablePadding onClick={(e)=>{router.push(text[1]); /*props.handlePageChange(e)*/}}>
             <ListItemButton>

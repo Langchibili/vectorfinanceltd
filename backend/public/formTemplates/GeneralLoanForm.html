@@ -52,7 +52,7 @@
       <p style="text-align: center;">Dated the <span>{{agreementDateDay}}</span><span style='vertical-align:super;font-size:0.75em;'>{{agreementDateDaySuffix}}</span>, day of June, {{agreementDateYearNumber}} </p>
       <h2 style="text-align: center;">VECTOR FINANCE LIMITED</h2>
       <h3 style="text-align: center;">AND</h3>
-      <h3 style="text-align: center;">…</h3>
+      <h3 style="text-align: center;"><strong>{{fullname}}</strong></h3>
       <hr style="width:100%;margin:0 auto;height:3px;background-color: black;"/>
       <h1 style="text-align: center;">LOAN AGREEMENT</h1> 
       <hr style="width:100%;margin:0 auto;height:3px;background-color: black;"/>
@@ -162,7 +162,7 @@
       </tr>
     </tbody>
   </table>
-  <h4>2. COMMENCEMENT AND DURATION</h4>
+<h4>2. COMMENCEMENT AND DURATION</h4>
 <p>
 2.1 This Agreement shall commence on the day and year first before written and shall continue in
 force until such a time as all sums owed by the Borrower in terms of the Agreement have
@@ -203,8 +203,8 @@ Borrower a Loan in an amount of ZMW {{principalSum}} Zambian Kwacha] (hereinafte
   <p>Bank: <span class="dashed-input">{{bankName}}</span></p>
   <p>Branch: <span class="dashed-input">{{branchName}}</span></p>
   <p>Account Number: <span class="dashed-input">{{accountNumber}}</span></p>
-  <p>Sort Code: <span class="dashed-input">{{sortCode}}</span></p>
-  <p>SWIFT Code: <span class="dashed-input">{{swiftCode}}</span></p>
+  <p>Branch Code: <span class="dashed-input">{{branchCode}}</span></p>
+  <!-- <p>SWIFT Code: <span class="dashed-input">{{swiftCode}}</span></p> -->
   <p>Account Name: <span class="dashed-input">{{bankAccountName}}</span></p>
   <p>Phone number: <span class="dashed-input">{{bankPhone}}</span></p>
   <h4>5. REPAYMENT OF THE FACILITY</h4>
@@ -229,7 +229,7 @@ immediately available cleared funds to the Lender into the following bank accoun
     All payments in ZMW, cleared funds, to:<br/>
     Bank: Stanbic Bank (Zambia) Limited<br/>
     Branch: Woodlands<br/>
-    Account Number: 9130006381913<br/>
+    Account Number: 913006381913<br/>
     Sort Code: 040030<br/>
     SWIFT Code: SBICZMLX
   </p>
@@ -247,7 +247,7 @@ Business Day.
 
 <h4>6. INTEREST</h4>
 <p>
-6.1 Interest shall accrue on the outstanding balance of the Loan at the rate of 4% (four percent) per
+6.1 Interest shall accrue on the outstanding balance of the Loan at the rate of {{interestRate}}% ({{interestRateInWords}} percent) per
 month. Interest shall be calculated on the daily cleared balance outstanding on the
 Borrower’s account on the basis of a 365-day year, irrespective of whether or not the year
 in question is a leap year (as varied from time to time). Such interest will be capitalized if
@@ -497,6 +497,7 @@ Client’s signature; <img src="{{signature}}" alt="Borrower signature"/><br/>
 In the presence of:<br/>
 WITNESS)<br/>
 Name: {{borrowerWitnessName}};<br/>
+Phone Number: {{borrowerWitnessPhoneNumber}};<br/>
 Address: {{borrowerWitnessAddress}}.<br/>
 Occupation: {{borrowerWitnessOccupation}}.<br/>
 Witness’s signature; <img src="{{witnessSignature}}" alt="Witness signature"/><br/>

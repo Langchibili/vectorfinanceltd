@@ -12,6 +12,8 @@ import InvestButton from "@/components/Includes/InvestButton/InvestButton";
 import LoanInformationDisplay from "@/components/Includes/LoanInformationDisplay/LoanInformationDisplay";
 import LoanInitiatedDisplay from "@/components/Includes/LoanInitiatedDisplay/LoanInitiatedDisplay";
 import LoanTransactionHistory from "@/components/Includes/LoanTransactionHistory/LoanTransactionHistory";
+import ListStyleLoanApplicationDisplay from "@/components/LoanApplicationDisplay/ListStyleLoanApplicationDisplay";
+import LoanApplicationDisplay from "@/components/LoanApplicationDisplay/LoanApplicationDisplay";
 import { useBottomNav } from "@/Contexts/BottomNavContext";
 import { useConstants } from "@/Contexts/ConstantsContext";
 import { usePage } from "@/Contexts/PageContext";
@@ -62,34 +64,22 @@ export default function Home() {
                                     </a> */}
                                   </div>
                                   <div className="mt-auto">
-                                    
-                                  <ApplyForALoanButton 
-                                        loanType="personal"
-                                        color="blue" 
-                                        text="APPLY FOR A PERSONAL LOAN" 
+                                    {/* <LoanApplicationDisplay 
                                         loggedInUser={loggedInUser.user} constants={constants} 
                                         setShowLoanApplicationForms={setShowLoanApplicationForms}
-                                        setSelectedloanCategory={setSelectedloanCategory}/> 
-                                  <ApplyForALoanButton 
-                                        loanType="business" 
-                                        color="forestgreen" 
-                                        text="APPLY FOR A BUSINESS LOAN" 
+                                        setSelectedloanCategory={setSelectedloanCategory}/> */}
+                                  <ListStyleLoanApplicationDisplay
                                         loggedInUser={loggedInUser.user} constants={constants} 
                                         setShowLoanApplicationForms={setShowLoanApplicationForms}
                                         setSelectedloanCategory={setSelectedloanCategory}/>
-                                  <ApplyForALoanButton 
-                                        loanType="company" 
-                                        text="APPLY FOR A COMPANY LOAN" 
-                                        loggedInUser={loggedInUser.user} constants={constants} 
-                                        setShowLoanApplicationForms={setShowLoanApplicationForms}
-                                        setSelectedloanCategory={setSelectedloanCategory}/>
+                                  {constants.loansInformation.allowInvestments && constants.loansInformation.allowInvestments === "yes"? 
                                   <InvestButton 
                                         loanType="personal"
                                         color="blue" 
                                         text="INVEST WITH US" 
                                         loggedInUser={loggedInUser.user} constants={constants} 
                                         setshowInvestMentForms={setshowInvestMentForms}
-                                        setSelectedloanCategory={setSelectedloanCategory}/> 
+                                        setSelectedloanCategory={setSelectedloanCategory}/> : null}
                                     <div className="mb-3">
                                       <i className="ri-double-quotes-l display-4 text-success" />
                                     </div>

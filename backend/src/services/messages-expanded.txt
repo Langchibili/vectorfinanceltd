@@ -1,0 +1,67 @@
+const axios = require('axios');
+const nodemailer = require('nodemailer');
+
+const getAppStatus = async () => {
+  return await strapi.db.query("api::app-status.app-status").findOne();
+}
+
+const SendSmsNotification = async (phoneNumber,notificationBody)=>{
+    const appStatus = await getAppStatus()
+    const numbersArray = await strapi.db.query("api::phone-numbers-list.phone-numbers-list").findOne();
+ 
+    const adminPhoneNumbers = appStatus.status === "production"? phoneNumber : numbersArray.adminNumbers
+    
+    axios.post(process.env.SMSGATEWAYURL+"/send-sms", {
+        apiKey: process.env.SMSGATEWAYAPIKEY,
+        username: process.env.SMSGATEWAYAPIUSERNAME,
+        recipients: [phoneNumber], // array of recipients
+        message: notificationBody,
+        from: process.env.SMSGATEWAYAPICALLERID
+    }, {
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        console.log('SMS sent successfully:', response.data);
+    })
+    .catch(error => {
+        console.error('Error sending SMS:', error);
+    });
+    console.log('sending sms notification',phoneNumber,notificationBody)
+}
+
+const SendEmailNotification = async (email,notificationBody)=>{
+    const appStatus = await getAppStatus()
+    const numbersArray = await strapi.db.query("api::phone-numbers-list.phone-numbers-list").findOne();
+    const emailsArray = await strapi.db.query("api::email-addresses-list.email-addresses-list").findOne();
+   
+    const adminPhoneNumbers = appStatus.status === "production"? loanApproverNumbers : numbersArray.adminNumbers
+    const adminEmailAddress = appStatus.status === "production"? loanApproverEmails : emailsArray.adminEmailAddresses
+    
+    // Configure transport options
+    const transporter = nodemailer.createTransport({
+        service: process.env.EMAILSERVICENAME, // Or specify an SMTP host
+        auth: {
+        user: process.env.EMAILSERVICEUSERNAME,
+        pass: process.env.EMAILSERVICEPASSWORD
+        }
+    })
+    
+    // Send email
+    transporter.sendMail({
+        from: process.env.EMAILSERVICEUSERNAME,
+        to: email,
+        subject: 'Message from Vector Finance Limited',
+        text: notificationBody
+    }, (error, info) => {
+        if (error) {
+        console.log('Error sending email:', error);
+        } else {
+        console.log('Email sent:', info.response);
+        }
+    });
+    console.log('sending email notification',email,notificationBody)
+}
+
+module.exports = {SendSmsNotification,SendEmailNotification}

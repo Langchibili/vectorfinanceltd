@@ -201,6 +201,17 @@ module.exports = {
                   })
                   return
               }
+              if (loanBefore.loanStatus === "approved") {
+                  const {loanAdministratorEmails, adminNotificationsEmails} = await getAdminUserEmailsAndNumbers()
+                  const notificationBody = "The loan with id #"+loanBefore.id + " has been approved." 
+                  loanAdministratorEmails.forEach(email => {
+                      SendEmailNotification(email,notificationBody)
+                  })
+                  adminNotificationsEmails.forEach(email => {
+                      SendEmailNotification(email,notificationBody)
+                  })
+              }
+              
               if (loanBefore.loanStatus === "disbursed") {
                   let repaymentAmount = null;
                   if (!loan.loanType) { 
@@ -241,7 +252,14 @@ module.exports = {
                       //SendEmailNotification(loan.client.email,"Congratulations! Your loan has been disbursed. Go to portal.vectorfinancelimited.com and check out your dashboard.")
                   }
                       
-                  
+                  const { loanAdministratorEmails, adminNotificationsEmails } = await getAdminUserEmailsAndNumbers()
+                  const notificationBody = "The loan with id #"+loanBefore.id + " has been disbursed." 
+                  loanAdministratorEmails.forEach(email => {
+                      SendEmailNotification(email,notificationBody)
+                  })
+                  adminNotificationsEmails.forEach(email => {
+                      SendEmailNotification(email,notificationBody)
+                  })
               }
           };
 

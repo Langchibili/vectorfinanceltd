@@ -7,7 +7,7 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import MenuIcon from "@mui/icons-material/Menu";
 import LinkIcon from "@mui/icons-material/Link";
 import { styled } from "@mui/system";
-import { getAgreementDay, getAgreementDaySuffix, getAgreementMonth, getAgreementYearNumber, getAgreementYearWords, scrolltoTopOFPage, validateEmail } from "@/Functions";
+import { getAgreementDay, getAgreementDaySuffix, getAgreementMonth, getAgreementYearNumber, getAgreementYearWords, naturalNumberToWords, scrolltoTopOFPage, validateEmail } from "@/Functions";
 import DisplaySignature from "@/components/Includes/DisplaySignature/DisplaySignature";
 import { api_url, getJwt } from "@/Constants";
 import ErrorSnapBack from "@/components/Includes/SnapBacks/ErrorSnapBack";
@@ -136,8 +136,12 @@ export default class GeneralLoanForm extends React.Component {
         agreementDateMonth : getAgreementMonth(),
         agreementDateYearNumber : getAgreementYearNumber(),
         agreementDateYearWords : getAgreementYearWords(),
-        principalSum : this.props.loggedInUser.currentLoan.loanAmount
-      }
+        interestRate: this.props.loggedInUser.currentLoan.interestRate,
+        interestRateInWords: naturalNumberToWords(this.props.loggedInUser.currentLoan.interestRate),
+        loanTerm: this.props.loggedInUser.currentLoan.loanTerm,
+        principalSum : this.props.loggedInUser.currentLoan.loanAmount,
+        fullname: this.props.loggedInUser?.details?.firstname || "" + " "+ this.props.loggedInUser?.details?.lastname || " "
+       }
     }
   }
 
@@ -224,10 +228,10 @@ validateForm = (formValues) => {
     "borrowerName",
     "borrowerWitnessName",
     "borrowerWitnessOccupation",
+    "borrowerWitnessPhoneNumber",
     "branchName",
     "propertyName",
-    "sortCode",
-    "swiftCode"
+    "branchCode"
   ];
 
   for (const field of coreFields) {
@@ -270,8 +274,8 @@ validateForm = (formValues) => {
     "securityReg",
     "securityColour",
     "securityYear",
-    "securityEngine",
-    "securityChassis"
+    "securityEngineNo",
+    "securityChasisNo"
   ];
 
   for (const field of vehicleFields) {
@@ -403,7 +407,7 @@ saveFormToAPI = async () => {
       // add more as needed, matching id attributes
     ]
     
-    const { principalSum, agreementDateDay, agreementDateDaySuffix, agreementDateMonth, agreementDateYearNumber, agreementDateYearWords } = this.state.constants
+    const { fullname, principalSum, loanTerm, interestRate, interestRateInWords, agreementDateDay, agreementDateDaySuffix, agreementDateMonth, agreementDateYearNumber, agreementDateYearWords } = this.state.constants
     return (
      <>
       <div style={{ width: "100%", margin: "0 auto" }}>
@@ -417,7 +421,7 @@ saveFormToAPI = async () => {
 
           <h2 style={{ textAlign: "center" }}>VECTOR FINANCE LIMITED</h2>
           <h3 style={{ textAlign: "center" }}>AND</h3>
-          <h3 style={{ textAlign: "center" }}>…</h3>
+          <h3 style={{ textAlign: "center" }}><strong>{fullname}</strong></h3>
 
           <h1 style={{ textAlign: "center", marginBottom:"30px" }}>LOAN AGREEMENT</h1>
 
@@ -639,8 +643,8 @@ saveFormToAPI = async () => {
           <p>Bank: <AutoResizingInput onChange={this.handleInputChange} name="bankName" style={inputStyle} /></p>
           <p>Branch: <AutoResizingInput onChange={this.handleInputChange} name="branchName" style={inputStyle} /></p>
           <p>Account Number: <AutoResizingInput onChange={this.handleInputChange} name="accountNumber" style={inputStyle} /></p>
-          <p>Sort Code: <AutoResizingInput onChange={this.handleInputChange} name="sortCode" style={inputStyle} /></p>
-          <p>Swift Code: <AutoResizingInput onChange={this.handleInputChange} name="swiftCode" style={inputStyle} /></p>
+          <p>Branch Code: <AutoResizingInput onChange={this.handleInputChange} name="branchCode" style={inputStyle} /></p>
+          {/* <p>Swift Code: <AutoResizingInput onChange={this.handleInputChange} name="swiftCode" style={inputStyle} /></p> */}
           <p>Bank Account Name: <AutoResizingInput onChange={this.handleInputChange} name="bankAccountName" style={inputStyle} /></p>
           <p>Phone number: <AutoResizingInput onChange={this.handleInputChange} name="bankPhone" style={inputStyle} /></p>
           {/* Part 4 */}
@@ -648,7 +652,7 @@ saveFormToAPI = async () => {
             <p>
                 5.1 Subject to the provisions of this Agreement, the Borrower shall repay
                 the Loan and all accrued interest and other fees and charges thereon within
-                loanTerm from the date of disbursement, in accordance with the repayment
+                {loanTerm} from the date of disbursement, in accordance with the repayment
                 schedule set out in the First Schedule hereto provided that the repayment
                 period may in the sole discretion of the Lender, be extended, which said
                 extension shall be evidenced in writing.
@@ -692,7 +696,7 @@ saveFormToAPI = async () => {
             <h4>6. INTEREST</h4>
             <p>
                 6.1 Interest shall accrue on the outstanding balance of the Loan at the rate
-                of 4% (four percent) per month. Interest shall be calculated on the daily
+                of {interestRate}% ({interestRateInWords} percent) per month. Interest shall be calculated on the daily
                 cleared balance outstanding on the Borrower’s account on the basis of a
                 365-day year, irrespective of whether or not the year in question is a leap
                 year (as varied from time to time). Such interest will be capitalized if not
@@ -812,7 +816,7 @@ saveFormToAPI = async () => {
     <li>
       Engine No:{" "}
       <AutoResizingInput
-        name="securityEngine"
+        name="securityEngineNo"
         onChange={this.handleInputChange}
         placeholder="Enter engine no."
         style={inputStyle}
@@ -821,7 +825,7 @@ saveFormToAPI = async () => {
     <li>
       Chassis No:{" "}
       <AutoResizingInput
-        name="securityChassis"
+        name="securityChasisNo"
         onChange={this.handleInputChange}
         placeholder="Enter chassis no."
         style={inputStyle}
@@ -1029,7 +1033,7 @@ saveFormToAPI = async () => {
             </p>
 
             <p><strong>12.2 Addresses</strong></p>
-            <p>(a) The Lender:<br/>
+            <p id="email">(a) The Lender:<br/>
             Room No. FS1-B<br/>
             Plot 15 Lagos Road<br/>
             Gardenview Properties<br/>
@@ -1038,7 +1042,7 @@ saveFormToAPI = async () => {
             Zambia.<br/>
             Email: info@vectorfinancelimited.com
             </p>
-          <p id="email">(b) The Borrower:</p>
+          <p>(b) The Borrower:</p>
           <p style={{ paddingLeft: "20px" }}>
             <AutoResizingInput disabled={true} defaultValue={this.state.formValues.borrowerName} placeholder="Enter Your address" onChange={this.handleInputChange} name="borrowerAddress" style={inputStyle} />
             <br/>
@@ -1189,6 +1193,7 @@ saveFormToAPI = async () => {
           <p>
             WITNESS<br />
             Name: <AutoResizingInput onChange={this.handleInputChange} name="borrowerWitnessName" style={inputStyle} /><br />
+            Phone Number: <AutoResizingInput onChange={this.handleInputChange} name="borrowerWitnessPhoneNumber" style={inputStyle} /><br />
             Address: <AutoResizingInput onChange={this.handleInputChange} name="borrowerWitnessName" style={inputStyle} /><br />
             Occupation: <AutoResizingInput onChange={this.handleInputChange} name="borrowerWitnessOccupation" style={inputStyle} /><br />
             Client’s <DisplaySignature placeholder="Enter Your Name" for="witness" witnessSignature={this.props.witnessSignature}/><br/>

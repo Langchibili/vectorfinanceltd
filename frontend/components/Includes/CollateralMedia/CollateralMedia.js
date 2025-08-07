@@ -1,8 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { Box, Typography, Button } from '@mui/material'
-import { getImage, backEndUrl } from '@/Functions'
+import { getImage } from '@/Functions'
 import Uploader from '../Uploader/Uploader'
+import { backEndUrl } from '@/Constants'
 
 const CollateralMedia = ({ mediaSlots, media, onAdd, onRemove, refId }) => {
     return (

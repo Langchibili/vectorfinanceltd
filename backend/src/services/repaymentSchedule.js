@@ -2,6 +2,7 @@ const { format } = require('date-fns')
 const { SendEmailNotification } = require('./messages')
 const { getAdminUserEmailsAndNumbers } = require('./getAdminUserEmailsAndNumbers')
 const { calculateLoan, amortization } = require('./intererestCalculation')
+const {  createReferralEarning } = require('./referallPayments')
 const { connect } = require('puppeteer')
 
 /**
@@ -167,6 +168,7 @@ async function recordPayment(loanId, amount, paymentDate, repaymentId) {
       if (newPaid >= principalPlusInterest + lateFeeCleared) {
         item.status = 'paid'
         item.paidAt = paymentDate? new Date(paymentDate).toISOString() : new Date()
+       // createReferralEarning(loanId,parseFloat(item.interestDue)) // a refferer only gets commision from the interest when paid in full
       } else {
         // if it was late, remain late; otherwise partial
         item.status = (item.status === 'late') ? 'late' : 'partial'

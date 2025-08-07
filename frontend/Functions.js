@@ -90,6 +90,82 @@ export function getAgreementYearWords() {
   return numberToWords(new Date().getFullYear());
 }
 
+// Converts 0–999 to words
+function threeDigitToWords(num) {
+  const ones = ["","one","two","three","four","five","six","seven","eight","nine"];
+  const teens = ["ten","eleven","twelve","thirteen","fourteen","fifteen","sixteen","seventeen","eighteen","nineteen"];
+  const tens = ["","","twenty","thirty","forty","fifty","sixty","seventy","eighty","ninety"];
+
+  let word = "";
+
+  const hundred = Math.floor(num / 100);
+  const rest = num % 100;
+
+  if (hundred) {
+    word += ones[hundred] + " hundred";
+    if (rest) word += " ";
+  }
+
+  if (rest >= 10 && rest < 20) {
+    word += teens[rest - 10];
+  } else {
+    const ten = Math.floor(rest / 10);
+    const one = rest % 10;
+    if (ten) {
+      word += tens[ten];
+      if (one) word += "-";
+    }
+    if (one) {
+      word += ones[one];
+    }
+  }
+
+  return word;
+}
+
+// Main number converter
+export function naturalNumberToWords(input) {
+  if (input === null || input === undefined) return "";
+  const num = Number(input);
+  if (isNaN(num)) return "";
+
+  if (num === 0) return "zero";
+
+  const scales = [
+    { value: 1e12, name: "trillion" },
+    { value: 1e9,  name: "billion"  },
+    { value: 1e6,  name: "million"  },
+    { value: 1e3,  name: "thousand" },
+    { value: 1,    name: ""         }
+  ];
+
+  let [intPart, decPart] = num.toString().split(".");
+  let n = parseInt(intPart, 10);
+
+  let words = [];
+
+  for (let { value, name } of scales) {
+    if (n >= value) {
+      const count = Math.floor(n / value);
+      n -= count * value;
+      const chunk = threeDigitToWords(count);
+      words.push(chunk + (name ? " " + name : ""));
+    }
+  }
+
+  let result = words.join(" ").trim();
+
+  // handle decimal part if present
+  if (decPart) {
+    result += " point";
+    for (let digit of decPart) {
+      result += " " + ["zero","one","two","three","four","five","six","seven","eight","nine"][+digit];
+    }
+  }
+
+  return result;
+}
+
 
 const formatDate = (date) => {
   const month = date.getMonth() + 1; // Months are zero-indexed

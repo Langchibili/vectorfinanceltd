@@ -22,6 +22,7 @@ export default function Loans() {
   useEffect(()=>{
     const runGetLoans = async () =>{
           const loans = await getLoansFromClientId(loggedInUser.user.id)
+          console.log('loans',loggedInUser.user.id)
           setLoans(loans)
     }
    runGetLoans()
