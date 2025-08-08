@@ -22,7 +22,7 @@
 
       .page-footer {
         position: fixed;
-        bottom: 10px;   /* distance from page bottom */
+        bottom: 0px;   /* distance from page bottom */
         right: 10px;    /* distance from page right edge */
         width: auto;
         height: auto;
@@ -281,7 +281,7 @@ the Loan Period be secured by the properties listed below:
     <li>Chassis No: <span class="dashed-input">{{securityChasisNo}}</span></li>
   </ul>
 {{/if}}
-<p>(a) {{propertyName}} (hereinafter collectively referred to as the “the Property”).</p>
+<p>(a) {{propertyNameOnly}} (hereinafter collectively referred to as the “the Property”).</p>
 <p>7.2 The Borrower hereby warrants that as at the date of this Agreement, the property is free from any and all encumbrances and shall remain as such until the Principal Sum plus interest and other fees and charges thereon secured, under this agreement is repaid by the Borrower and any and all outstanding obligations of the Borrower, pursuant to this Agreement have been discharged.</p>
 <p>7.3 Upon execution of this Agreement, the Borrower shall deposit the original documents relating to the ownership of the Property including but not limited to Certificates of Title and/or Vehicle Registration Documents, at the Lender’s registered office.</p>
 
@@ -480,30 +480,31 @@ with the terms and obligations thereof.
 
 <p>AS WITNESS the hands of the Parties hereto or their duly authorized agents the day and year first before written.</p>
 
-<p>
+<div style="width: 100%; margin: 0 auto; text-align: left;">
 SIGNED by the said {{lenderWitnessName}} For and on behalf of VECTOR FINANCE LIMITED)<br/>
-signature; <img src="{{ceoSignature}}" alt="Vendor Witness signature"/><br/>
-initials; <img style="height: 20px;" src="{{ceoInitials}}" alt="Vendor Witness signature"/><br/>
+Initials; <img style="height: 20px;" src="{{ceoInitials}}" alt="Vendor Witness signature"/><br/>
+Signature; <br/><img src="{{ceoSignature}}" alt="Vendor Witness signature"/><br/>
 <br/>
 In the presence of:<br/>
 DIRECTOR FOR VECTOR FINANCE LIMITED)<br/>
 Director’s Name {{directorName}};<br/>
-Director's signature; <img src="{{directorSignature}}" alt="Director signature"/><br/>
 Director's initials; <img style="height: 20px;" src="{{directorInitials}}" alt="Director signature"/><br/>
-<hr/>
+Director's signature; <br/><img src="{{directorSignature}}" alt="Director signature"/><br/>
+<div style="width: 100%;margin: 0 auto;text-align: left;"><hr style="width: 80%;"/></div>
 CLIENT)<br/>
 Client’s Name {{borrowerName}};<br/>
-Client’s signature; <img src="{{signature}}" alt="Borrower signature"/><br/>
+Client’s initials; <img style="height: 20px;" src="{{initials}}" alt="Borrower initials"/><br/>
+Client’s signature; <br/><img src="{{signature}}" alt="Borrower signature"/><br/>
 In the presence of:<br/>
 WITNESS)<br/>
 Name: {{borrowerWitnessName}};<br/>
 Phone Number: {{borrowerWitnessPhoneNumber}};<br/>
 Address: {{borrowerWitnessAddress}}.<br/>
 Occupation: {{borrowerWitnessOccupation}}.<br/>
-Witness’s signature; <img src="{{witnessSignature}}" alt="Witness signature"/><br/>
+Witness’s Initials; <img style="height: 20px;" src="{{witnessInitials}}" alt="Witness initials"/><br/>
+Witness’s signature; <br/><img src="{{witnessSignature}}" alt="Witness signature"/><br/>
 Date: {{agreementDateMonth}} <span>{{agreementDateDay}}</span><span style='vertical-align:super;font-size:0.75em;'>{{agreementDateDaySuffix}}</span>, day of June, {{agreementDateYearNumber}} {{agreementDateYearNumber}}.
-</p>
-
+</div>
 <table style="width:100%; border-collapse:collapse; margin-bottom:20px;">
   <thead>
     <tr>

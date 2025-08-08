@@ -7,7 +7,7 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import MenuIcon from "@mui/icons-material/Menu";
 import LinkIcon from "@mui/icons-material/Link";
 import { styled } from "@mui/system";
-import { getAgreementDay, getAgreementDaySuffix, getAgreementMonth, getAgreementYearNumber, getAgreementYearWords, naturalNumberToWords, scrolltoTopOFPage, validateEmail } from "@/Functions";
+import { getAgreementDay, getAgreementDaySuffix, getAgreementMonth, getAgreementYearNumber, getAgreementYearWords, naturalNumberToWords, scrolltoTopOFPage, textHasPhoneNumber, validateEmail } from "@/Functions";
 import DisplaySignature from "@/components/Includes/DisplaySignature/DisplaySignature";
 import { api_url, getJwt } from "@/Constants";
 import ErrorSnapBack from "@/components/Includes/SnapBacks/ErrorSnapBack";
@@ -309,10 +309,20 @@ saveFormToAPI = async () => {
     })
     return // make sure that all required fields are input
   }
+  if(formValues.borrowerWitnessPhoneNumber && !textHasPhoneNumber(formValues.borrowerWitnessPhoneNumber)){
+      this.setState({
+      error:"Please enter a valid phone number for the witness."
+    })
+    return // make sure that all required fields are input
+  }
   
   // in case of property name being other (to get the propery name only, from propertyName: some name)
   if(['land','house', 'vehicle'].includes(formValues.propertyName)){
+    formValues.propertyNameOnly = formValues.propertyName
     formValues.propertyName = "Property Name: "+formValues.propertyName
+  }
+  else{
+     formValues.propertyNameOnly = formValues.propertyName.replace("Property Name: ","")
   }
   // merge constants (date, principalSum, etc.) with the user-entered values
   const payload = { 

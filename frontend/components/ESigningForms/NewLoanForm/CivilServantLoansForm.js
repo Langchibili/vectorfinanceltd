@@ -265,9 +265,13 @@ saveFormToAPI = async () => {
   }
   
   // in case of property name being other (to get the propery name only, from propertyName: some name)
-  if(['land','house', 'vehicle'].includes(formValues.propertyName)){
-    formValues.propertyName = "Property Name: "+formValues.propertyName
-  }
+  // if(['land','house', 'vehicle'].includes(formValues.propertyName)){
+  //   formValues.propertyNameOnly = formValues.propertyName
+  //   formValues.propertyName = "Property Name: "+formValues.propertyName
+  // }
+  // else{
+  //    formValues.propertyNameOnly = formValues.propertyName.replace("Property Name: ","")
+  // }
   // merge constants (date, principalSum, etc.) with the user-entered values
   const payload = { 
     values: {...constants, ...formValues, ...signatures},

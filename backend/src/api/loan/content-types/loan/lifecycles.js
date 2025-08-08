@@ -9,7 +9,17 @@ const getAppStatus = async () => {
   return await strapi.db.query("api::app-status.app-status").findOne();
 }
 
-     
+const getLoan = async (id) => {
+      return await strapi.db.query("api::loan.loan").findOne({
+          where: { id: id },
+          populate: ['loanType','client']
+      })
+}
+
+const getFinances = async () => {
+    return await strapi.db.query("api::finance.finance").findOne()
+}
+
 const calculateDueDate = (date, loanTerm)=>{
     // Parse the initial date
     const startDate = new Date(date);
@@ -23,7 +33,6 @@ const calculateDueDate = (date, loanTerm)=>{
 
     return isoString;
 }
-
 
 const returnNineDigitNumber = (phoneNumber) =>{
     return phoneNumber.replace(/\D/g, '').slice(-9)
@@ -71,13 +80,12 @@ module.exports = {
             });
         };
         const { client }  = await getLoanClient(loanId)
-        console.log("forms",client.formsToFill.length)
         if (updatedById) { // id of admin user account which wants to update
           const adminUser = await strapi.query('admin::user').findOne({  where: { id: updatedById } })
           const { loanApproverEmails } = await getAdminUserEmailsAndNumbers()
           const { loanDisburserEmails } = await getAdminUserEmailsAndNumbers()
           
-          const { minutesBeforeLoanDisbursement, autoSendMessageOnLoanAcceptance } = await strapi.db.query("api::loans-information.loans-information").findOne()
+          /* these checks are happening here because if any of the following things happen during the following loan states, an error should be thrown to avoid completing the update. */
           // If current status is already approved or disbursed, block the update
           if (loan.loanStatus === "request-approval") {
               if(client.formsToFill.length < 1){
@@ -100,12 +108,8 @@ module.exports = {
               throw new Error('Loan cannot be accepted')
             }
             params.data.acceptanceDate = new Date() // you should add the date of when it's been accepted
-            // send a message to client that the they should sign documents if auto messages have been allowed on loan acceptance
-            if(autoSendMessageOnLoanAcceptance && autoSendMessageOnLoanAcceptance === "yes"){
-                const notificationBody = "Your loan request with vector finance limited has been processed, as a final step before we disburse you the funds, we require that you fill some important documents, we have sent you some forms to fill on your portal account. Thank you for choosing VectorFin."
-                SendEmailNotification(adminUser.email,notificationBody)
-            }
           }
+          
           if (loan.loanStatus === "approved") {
             // only users allowed to disburse loans can disburse them.
             if(!loanApproverEmails.includes(adminUser.email)){ 
@@ -119,11 +123,17 @@ module.exports = {
               SendEmailNotification(adminUser.email,notificationBody)
               throw new Error('Loan cannot be approved before being accepted')
             }
+            // const { autoSendMessageOnLoanAcceptance, minutesBeforeLoanDisbursement} = await strapi.db.query("api::loans-information.loans-information").findOne()
             // this is to stop the loan officer or loan approving officer from approving the loan and hence changing the loan status before the client signs the documents
-            if(getMinutesDifference(loan.acceptanceDate, new Date()) < (minutesBeforeLoanDisbursement || 15)){
-              const notificationBody = "Please wait a few minutes before you can change the loan status to approved, this is such that the client has enough time to sign the loan documents"
-              SendEmailNotification(adminUser.email,notificationBody)
-              throw new Error('Loan cannot be approved client has signed documents.')
+            // if(getMinutesDifference(loan.acceptanceDate, new Date()) < (minutesBeforeLoanDisbursement || 15)){
+            //   const notificationBody = "Please wait a few minutes before you can change the loan status to approved, this is such that the client has enough time to sign the loan documents"
+            //   SendEmailNotification(adminUser.email,notificationBody)
+            //   throw new Error('Loan cannot be approved client has signed documents.')
+            // }
+            if(!loan.loanAgreementDocuments){
+               const notificationBody = "The loan cannot be approved at the moment, this is because the client has not signed the loan form yet. You shall be alerted when the client finally signs the documents."
+               SendEmailNotification(adminUser.email,notificationBody)
+               throw new Error('Loan cannot be approved at the moment')
             }
             params.data.approvalDate = new Date() // you should add the date of when it's been accepted
           }
@@ -154,115 +164,127 @@ module.exports = {
     async afterUpdate(event) {
         const { result, params } = event;
         const { data } = params;
-        
-        if(!params.data.id){
-            return
-        }
-        const getLoan = async () => {
-            return await strapi.db.query("api::loan.loan").findOne({
-                where: { id: params.data.id },
-                populate: ['loanType','client']
-            })
-        }
+        const loanStatuses = ["request-approval","pending-approval","approved","disbursed","accepted"]
+        const loanBefore = data
 
-        const getFinances = async () => {
-           return await strapi.db.query("api::finance.finance").findOne()
-        }
-
-        const setLoanRepaymentAmount = async (loanBefore, loanAfter) => {
-            if(!loanBefore){
-                return
-            }
-
-            /* LOAN LOGIC  */
-                    
-              const loan = await getLoan();
+        if(data && data.id && loanStatuses.includes(data.loanStatus)){
+              const loan = await getLoan(params.data.id)
               const finances = await getFinances() // the loan financial aspect
               const appStatus = await getAppStatus()
+              const {loanApproverEmails, loanDisburserEmails, loanApproverNumbers, loanAdministratorEmails, adminNotificationsEmails} = await getAdminUserEmailsAndNumbers()
+             
+              const setLoanRepaymentAmount = async (loanAfter) => {
+                if(!loanBefore){
+                    return
+                }
+                /* LOAN LOGIC  */
+                if (loanBefore.loanStatus === "disbursed") {
+                    let repaymentAmount = null;
+                    if (!loan.loanType) { 
+                      return 
+                    }
+                    // disbusement logic
+                    if(parseInt(loanBefore.outstandingAmount) >= 1){ // it means you already approved the loan
+                      return
+                    }
+                    if (loan.loanType.typeName === "salaryBased") { 
+                        const { totalPayment } =  await calculateLoan({amount:loanBefore.loanAmount,termMonths:loanBefore.loanTerm,loanType:{typeName : 'salaryBased'}})
+                        repaymentAmount = totalPayment;
+                    } else { // for all asset based loans
+                        const { totalPayment } =  await calculateLoan({amount:loanBefore.loanAmount, termMonths:loanBefore.loanTerm, loanType:{typeName : 'assetBased'}})
+                        repaymentAmount = totalPayment;
+                    }
 
-              if (loanBefore.loanStatus === "request-approval") { // only for lower level loan administrators
-                  const { loanApproverEmails } = await getAdminUserEmailsAndNumbers()
-                  const { loanApproverNumbers } = await getAdminUserEmailsAndNumbers()
-                  const notificationBody = "A vectorFin loan officer is requesting approval of a loan with id #"+loanBefore.id 
-                  // for test and local app mode
-                  const numbersArray = await strapi.db.query("api::phone-numbers-list.phone-numbers-list").findOne();
-                  const emailsArray = await strapi.db.query("api::email-addresses-list.email-addresses-list").findOne();
-                  
-                  const adminPhoneNumbers = appStatus.status === "production"? loanApproverNumbers : numbersArray.adminNumbers
-                  const adminEmailAddress = appStatus.status === "production"? loanApproverEmails : emailsArray.adminEmailAddresses
-                  
-                  adminPhoneNumbers.forEach(number => {
-                      const phoneNumber = "+260"+returnNineDigitNumber(number)
-                      SendSmsNotification(phoneNumber,notificationBody)
-                  })
-                  
-                  adminEmailAddress.forEach(email => {
-                      SendEmailNotification(email,notificationBody)
-                  })
-                  return
-              }
-              if (loanBefore.loanStatus === "approved") {
-                  const {loanAdministratorEmails, adminNotificationsEmails} = await getAdminUserEmailsAndNumbers()
-                  const notificationBody = "The loan with id #"+loanBefore.id + " has been approved." 
-                  loanAdministratorEmails.forEach(email => {
-                      SendEmailNotification(email,notificationBody)
-                  })
-                  adminNotificationsEmails.forEach(email => {
-                      SendEmailNotification(email,notificationBody)
-                  })
+                    if(!loanBefore.id){
+                        return
+                    }
+
+                    if(!loanBefore.paymentScheduleCreated){
+                        createSchedule(params.data.id) // create a repayment schedule
+                    }
+                    const updateLoanAmountObject = {
+                        outstandingAmount: parseFloat(repaymentAmount),
+                        repaymentAmount: parseFloat(repaymentAmount),
+                        disbursedAmount: parseFloat(loanBefore.loanAmount),
+                        disbursementDate: new Date(),
+                        dueDate: calculateDueDate(loanAfter.updatedAt, loanBefore.loanTerm)
+                    }
+                    const financesUpdateObject = {
+                      totalAmountLoanedOut: parseFloat(finances.totalAmountLoanedOut) + parseFloat(loanBefore.loanAmount)
+                    }
+                    await strapi.db.query('api::loan.loan').update({ where: { id: loanBefore.id }, data: updateLoanAmountObject });
+                    if(appStatus.status === 'production'){// only update the finance part of loans if in production
+                        await strapi.db.query('api::finance.finance').update({ where: { id: finances.id }, data: financesUpdateObject }); // id = 0 because it's a single content type
+                        //SendEmailNotification(loan.client.email,"Congratulations! Your loan has been disbursed. Go to portal.vectorfinancelimited.com and check out your dashboard.")
+                    }
+                        
+                    const notificationBody = "The loan with id #"+loanBefore.id + " has been disbursed. You can now view this loan's Repayment Schedule." 
+                    loanAdministratorEmails.forEach(email => {
+                        SendEmailNotification(email,notificationBody)
+                    })
+                    adminNotificationsEmails.forEach(email => {
+                        SendEmailNotification(email,notificationBody)
+                    })
+                    const notificationBodyForDisurser = "The loan with id #"+loanBefore.id  +" has been approved, you may now change the loan's status to disbursed, and please note that this will also create a repayment schedule for the loan. Thank you."
+                    loanDisburserEmails.forEach(email => {
+                        SendEmailNotification(email,notificationBodyForDisurser)
+                    })
+                }
               }
               
-              if (loanBefore.loanStatus === "disbursed") {
-                  let repaymentAmount = null;
-                  if (!loan.loanType) { 
-                    return 
-                  }
-                  // disbusement logic
-                  if(parseInt(loanBefore.outstandingAmount) >= 1){ // it means you already approved the loan
-                    return
-                  }
-                  if (loan.loanType.typeName === "salaryBased") { 
-                      const { totalPayment } =  await calculateLoan({amount:loanBefore.loanAmount,termMonths:loanBefore.loanTerm,loanType:{typeName : 'salaryBased'}})
-                      repaymentAmount = totalPayment;
-                  } else { // for all asset based loans
-                      const { totalPayment } =  await calculateLoan({amount:loanBefore.loanAmount, termMonths:loanBefore.loanTerm, loanType:{typeName : 'assetBased'}})
-                      repaymentAmount = totalPayment;
-                  }
-
-                  if(!loanBefore.id){
-                      return
-                  }
-
-                  if(!loanBefore.paymentScheduleCreated){
-                      createSchedule(params.data.id) // create a repayment schedule
-                  }
-                  const updateLoanAmountObject = {
-                      outstandingAmount: parseFloat(repaymentAmount),
-                      repaymentAmount: parseFloat(repaymentAmount),
-                      disbursedAmount: parseFloat(loanBefore.loanAmount),
-                      disbursementDate: new Date(),
-                      dueDate: calculateDueDate(loanAfter.updatedAt, loanBefore.loanTerm)
-                  }
-                  const financesUpdateObject = {
-                    totalAmountLoanedOut: parseFloat(finances.totalAmountLoanedOut) + parseFloat(loanBefore.loanAmount)
-                  }
-                  await strapi.db.query('api::loan.loan').update({ where: { id: loanBefore.id }, data: updateLoanAmountObject });
-                  if(appStatus.status === 'production'){// only update the finance part of loans if in production
-                      await strapi.db.query('api::finance.finance').update({ where: { id: finances.id }, data: financesUpdateObject }); // id = 0 because it's a single content type
-                      //SendEmailNotification(loan.client.email,"Congratulations! Your loan has been disbursed. Go to portal.vectorfinancelimited.com and check out your dashboard.")
-                  }
+              if (loanBefore.loanStatus === "request-approval") { // only for lower level loan administrators  
+                      const notificationBody = "A vectorFin loan officer is requesting approval of a loan with id #"+loanBefore.id 
+                      // for test and local app mode
+                      const numbersArray = await strapi.db.query("api::phone-numbers-list.phone-numbers-list").findOne();
+                      const emailsArray = await strapi.db.query("api::email-addresses-list.email-addresses-list").findOne();
                       
-                  const { loanAdministratorEmails, adminNotificationsEmails } = await getAdminUserEmailsAndNumbers()
-                  const notificationBody = "The loan with id #"+loanBefore.id + " has been disbursed." 
-                  loanAdministratorEmails.forEach(email => {
-                      SendEmailNotification(email,notificationBody)
-                  })
-                  adminNotificationsEmails.forEach(email => {
-                      SendEmailNotification(email,notificationBody)
-                  })
+                      const adminPhoneNumbers = appStatus.status === "production"? loanApproverNumbers : numbersArray.adminNumbers
+                      const adminEmailAddress = appStatus.status === "production"? loanApproverEmails : emailsArray.adminEmailAddresses
+                      
+                      adminPhoneNumbers.forEach(number => {
+                          const phoneNumber = "+260"+returnNineDigitNumber(number)
+                          SendSmsNotification(phoneNumber,notificationBody)
+                      })
+                      
+                      adminEmailAddress.forEach(email => {
+                          SendEmailNotification(email,notificationBody)
+                      })
+                      return
               }
-          };
+              
+              if (loanBefore.loanStatus === "accepted") {
+                  const { autoSendMessageOnLoanAcceptance} = await strapi.db.query("api::loans-information.loans-information").findOne()
+                  const { client } = loan
+                  // send a message to client that the they should sign documents if auto messages have been allowed on loan acceptance
+                  if(autoSendMessageOnLoanAcceptance && autoSendMessageOnLoanAcceptance === "yes"){
+                      const notificationBody = "Your loan request with vector finance limited has been processed, as a final step before we disburse you the funds, we require that you fill some important documents, we have sent you some forms to fill on your portal account. Thank you for choosing VectorFin."
+                      SendEmailNotification(client.email,notificationBody)
+                      const clientPhoneNumber = "+260"+returnNineDigitNumber(client.username)
+                      SendSmsNotification(clientPhoneNumber,notificationBody)
+                  }
+              } 
 
-        await setLoanRepaymentAmount(data, result);
+              if (loanBefore.loanStatus === "pending-approval") {
+                    if(loanBefore.loanAgreementDocuments){
+                      const notificationBody = "The loan with Id #"+loanBefore.id  +" has been signed by the client, you may now approve the loan in order to alert them that they should await disbursement of funds."
+                      loanApproverEmails.forEach(email => {
+                        SendEmailNotification(email,notificationBody)
+                      })
+                    }
+              }
+                
+              if (loanBefore.loanStatus === "approved") {
+                      const notificationBody = "The loan with id #"+loanBefore.id + " has been approved." 
+                      loanAdministratorEmails.forEach(email => {
+                          SendEmailNotification(email,notificationBody)
+                      })
+                      adminNotificationsEmails.forEach(email => {
+                          SendEmailNotification(email,notificationBody)
+                      })
+              }
+              // when loan has been disbursed
+              await setLoanRepaymentAmount(result)
+        }
+        
     },
 };
