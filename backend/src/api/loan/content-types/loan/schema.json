@@ -24,9 +24,10 @@
         "initiated",
         "pending-collateral-addition",
         "pending-collateral-inspection",
+        "collateral-inspection",
+        "request-approval",
         "accepted",
         "pending-approval",
-        "request-approval",
         "approved",
         "rejected",
         "disbursed",
@@ -160,6 +161,29 @@
     },
     "acceptanceDate": {
       "type": "datetime"
+    },
+    "inspectorRecommendedAmount": {
+      "type": "decimal"
+    },
+    "inspectorReasonForLoanDisproval": {
+      "type": "string"
+    },
+    "inspectorRecommendationOnLoan": {
+      "type": "enumeration",
+      "enum": [
+        "Give Loan",
+        "Do Not Give Loan"
+      ]
+    },
+    "loanFormApendixSection": {
+      "displayName": "loanFormApendixSection",
+      "type": "component",
+      "repeatable": false,
+      "component": "forms.loan-form-apendix-section"
+    },
+    "loanAppendixCreated": {
+      "type": "boolean",
+      "default": false
     }
   }
 }

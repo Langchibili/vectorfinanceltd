@@ -12,8 +12,11 @@ import { AccountCircleRounded, Business, ContactSupport, Home, Money, PersonAdd 
 import { useRouter } from 'next/navigation'
 import Link from 'next/link';
 import { useConstants } from '@/Contexts/ConstantsContext';
+import { useUser } from '@/Contexts/UserContext';
 
 export default function MobileNav(props) {
+  const loggedInUser = useUser()
+  
   const [state, setState] = React.useState({
     top: false,
     left: false,
@@ -48,6 +51,7 @@ export default function MobileNav(props) {
   const router = useRouter()  // the router stuff
   const constants = useConstants()
   const refferalLinks = constants.loansInformation.allowReferrals && constants.loansInformation.allowReferrals === "yes"? [['Referrals','/referrals']] : []
+  const adminUserTypes = ['director', 'ceo', 'Loan Admin', 'Collateral Inspector']
   const list = (anchor) => (
     <Box
       sx={{ width: anchor === 'top' || anchor === 'bottom' ? 'auto' : 250 }}
@@ -56,7 +60,8 @@ export default function MobileNav(props) {
       onKeyDown={toggleDrawer(anchor, false)}
     >
       <List>
-        {[['Loans','/loans'],...refferalLinks,['Home','/'],['Profile(For Individuals)','/profile'], ['Profile(For Businesses)','/business-profile'],['Contact Us','https://vectorfinancelimited.com/contact-us/'], ['About Us','https://vectorfinancelimited.com/about-us/'], ['Logout','/logout']].map((text, index) => (
+        {
+        loggedInUser && loggedInUser.user && adminUserTypes.includes(loggedInUser.user.type)? [['Loans','/admin/loans'],['Home','/admin'],['Contact Us','https://vectorfinancelimited.com/contact-us/'], ['About Us','https://vectorfinancelimited.com/about-us/'], ['Logout','/logout']].map((text, index) => (
           window.location.pathname === "/" && text[0] === "Home"? '' :
           <ListItem key={text[0]} disablePadding onClick={(e)=>{router.push(text[1]); /*props.handlePageChange(e)*/}}>
             <ListItemButton>
@@ -66,7 +71,19 @@ export default function MobileNav(props) {
               <ListItemText primary={text[0]} sx={{color:'slategray'}} />
             </ListItemButton>
           </ListItem>
-        ))}
+        )) : 
+        [['Loans','/loans'],...refferalLinks,['Home','/'],['Profile(For Individuals)','/profile'], ['Profile(For Businesses)','/business-profile'],['Contact Us','https://vectorfinancelimited.com/contact-us/'], ['About Us','https://vectorfinancelimited.com/about-us/'], ['Logout','/logout']].map((text, index) => (
+          window.location.pathname === "/" && text[0] === "Home"? '' :
+          <ListItem key={text[0]} disablePadding onClick={(e)=>{router.push(text[1]); /*props.handlePageChange(e)*/}}>
+            <ListItemButton>
+              <ListItemIcon>
+                {renderLinkIcon(text[0])}
+              </ListItemIcon>
+              <ListItemText primary={text[0]} sx={{color:'slategray'}} />
+            </ListItemButton>
+          </ListItem>
+        ))
+        }
       </List>
       <Divider />
      </Box>
@@ -75,7 +92,7 @@ export default function MobileNav(props) {
   return (
     <nav className="navbar fixed-top" style={{backgroundColor:'ghostwhite'}}>
     <div className="container-fluid">
-        <Link className="navbar-brand" href="/">
+        <Link className="navbar-brand" href={loggedInUser && loggedInUser.user && adminUserTypes.includes(loggedInUser.user.type)? "/admin" : "/"}>
                 <img src="/vectorfinancelimitedplaingreenlogo.png" alt="" style={{height:'22px'}}/>
         </Link>
         <button

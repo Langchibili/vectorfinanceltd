@@ -821,6 +821,10 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
     initials: Attribute.Media;
     witnessInitials: Attribute.Media;
     signedDocuments: Attribute.Media;
+    type: Attribute.Enumeration<
+      ['director', 'ceo', 'Loan Admin', 'Collateral Inspector', 'client']
+    > &
+      Attribute.DefaultTo<'client'>;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
@@ -1659,9 +1663,10 @@ export interface ApiLoanLoan extends Schema.CollectionType {
         'initiated',
         'pending-collateral-addition',
         'pending-collateral-inspection',
+        'collateral-inspection',
+        'request-approval',
         'accepted',
         'pending-approval',
-        'request-approval',
         'approved',
         'rejected',
         'disbursed',
@@ -1746,6 +1751,13 @@ export interface ApiLoanLoan extends Schema.CollectionType {
     >;
     paymentScheduleCreated: Attribute.Boolean & Attribute.DefaultTo<false>;
     acceptanceDate: Attribute.DateTime;
+    inspectorRecommendedAmount: Attribute.Decimal;
+    inspectorReasonForLoanDisproval: Attribute.String;
+    inspectorRecommendationOnLoan: Attribute.Enumeration<
+      ['Give Loan', 'Do Not Give Loan']
+    >;
+    loanFormApendixSection: Attribute.Component<'forms.loan-form-apendix-section'>;
+    loanAppendixCreated: Attribute.Boolean & Attribute.DefaultTo<false>;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -1949,6 +1961,9 @@ export interface ApiLoansInformationLoansInformation extends Schema.SingleType {
     minutesBeforeLoanDisbursement: Attribute.Integer & Attribute.DefaultTo<15>;
     autoSendMessageOnLoanAcceptance: Attribute.Enumeration<['yes', 'no']> &
       Attribute.DefaultTo<'yes'>;
+    collateralInspectorNumber: Attribute.String;
+    collateralInspectorEmail: Attribute.String;
+    allowClientsToAddCollateralMedia: Attribute.Enumeration<['yes', 'no']>;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;

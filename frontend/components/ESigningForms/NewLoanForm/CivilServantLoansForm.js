@@ -1022,10 +1022,6 @@ render() {
   <p>13.1 The Borrower shall pay to the Lender:</p>
   <ol type="a">
     <li>
-      Drawdown Fees: A drawdown fee of ZMW 100.00 (Once off fee to be paid
-      upfront).
-    </li>
-    <li>
       Arrangement Fees: Arrangement fee at 3% of the Loan Amount calculated
       monthly (To be paid in arrears on the due date).
     </li>

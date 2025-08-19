@@ -78,7 +78,7 @@ export default class UpdateOtherCollateralForm extends React.Component {
 
   checkFormValidity = (initialCheck=false) => {
     const { otherCollateralName, collateralMedia } = this.state;
-    const collateralMediaSet = collateralMedia['image']
+    const collateralMediaSet = this.props.constants.loansInformation.allowClientsToAddMedia && this.props.constants.loansInformation.allowClientsToAddMedia === "no"? true : collateralMedia['image']
 
     // Validate that all fields are filled
     const isFormValid = 
@@ -142,6 +142,7 @@ export default class UpdateOtherCollateralForm extends React.Component {
         data:{
             collateral: {
                 id: this.state.collateralId,
+                collateralStatus: "pending-inspection",
                 otherCollateralName: this.state.otherCollateralName
             }
         }
@@ -355,7 +356,7 @@ handleOpenErrorSnapBack = ()=>{
                     </div>
                   </div>
                 
-                  {this.state.collateralId? <>
+                  {this.state.collateralId && this.props.constants.loansInformation.allowClientsToAddCollateralMedia && this.props.constants.loansInformation.allowClientsToAddCollateralMedia === "no"? <>
                   <hr style={{color:'lightgray'}}/>
                   <div style={{marginTop:'20px'}}>
                        Photo of collateral

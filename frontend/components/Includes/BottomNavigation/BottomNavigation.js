@@ -2,9 +2,10 @@ import * as React from 'react';
 import Box from '@mui/material/Box';
 import BottomNavigation from '@mui/material/BottomNavigation';
 import BottomNavigationAction from '@mui/material/BottomNavigationAction';
-import { Help, History, Home, Money, Person } from '@material-ui/icons';
+import { Add, Help, History, Home, Money, Person, PlusOne } from '@material-ui/icons';
 import { useBottomNav } from '@/Contexts/BottomNavContext';
 import { usePage } from '@/Contexts/PageContext';
+import { Step } from '@mui/material';
 
 export default function BottomNav() {
   const {setBottomNavLink} = useBottomNav()
@@ -29,6 +30,31 @@ export default function BottomNav() {
         <BottomNavigationAction label="Home" icon={<Home />} />
         <BottomNavigationAction label="Account" icon={<Person />} />
         
+      </BottomNavigation>
+      <div className="row" style={{padding:'5px',textAlign:'center',backgroundColor:'white'}}>
+          <div className="col-sm-6" style={{color:'lightgray'}}> 2024 ©VectorFinanceLimited.</div>
+        </div>
+    </Box>
+    </>
+  )
+  }
+  if(page && page.startsWith('/admin')){
+    return (
+    <>
+    <div style={{minHeight:'20px'}}></div>
+    <Box sx={{ zIndex:'10', width: "100%", position:'fixed', bottom:'0'}}>
+      <BottomNavigation
+        showLabels
+        value={value}
+        sx={{backgroundColor:'ghostwhite' }}
+        onChange={(event, newValue) => {
+          setBottomNavLink(newValue)
+          setValue(newValue);
+        }}
+      >
+        <BottomNavigationAction label="Loan" icon={<Money />} />
+        <BottomNavigationAction label="Client" icon={<Person />} />
+        <BottomNavigationAction label="Actions" icon={<Add />} />
       </BottomNavigation>
       <div className="row" style={{padding:'5px',textAlign:'center',backgroundColor:'white'}}>
           <div className="col-sm-6" style={{color:'lightgray'}}> 2024 ©VectorFinanceLimited.</div>

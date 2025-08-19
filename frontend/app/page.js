@@ -175,13 +175,13 @@ export default function Home() {
       // loans stuff
       const currentLoan = loggedInUser.user.currentLoan
       if(currentLoan){
-        if(currentLoan.loanStatus === "initiated"){
+        if(currentLoan.loanStatus === "initiated" || currentLoan.loanStatus === "request-approval"){
           return <LoanInitiatedDisplay /> 
         }
         else if(currentLoan.loanStatus === "pending-collateral-addition"){
           return <CollateralForm loggedInUser={loggedInUser.user} constants={constants}/> 
         }
-        else if(currentLoan.loanStatus === "pending-collateral-inspection"){
+        else if(currentLoan.loanStatus === "pending-collateral-inspection" || currentLoan.loanStatus === "collateral-inspection"){
           return (<div className="page-content">
                    <div className="container-fluid">
                     <Alert  severity="info">Thank you for applying for a loan with us, we are currently processing the loan, an agent will call you to proceed with inspection of your collateral.</Alert>

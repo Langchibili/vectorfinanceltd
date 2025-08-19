@@ -133,7 +133,7 @@ export default class UpdateHouseCollateralForm extends React.Component {
 
   checkFormValidity = (initialCheck=false) => {
     const { dimensions, plotNumber, location, titleDeed, collateralMedia } = this.state;
-    const collateralMediaSet = collateralMedia.front && collateralMedia.back
+    const collateralMediaSet = this.props.constants.loansInformation.allowClientsToAddCollateralMedia && this.props.constants.loansInformation.allowClientsToAddCollateralMedia === "no"? true : collateralMedia.front && collateralMedia.back
 
     // Validate that all fields are filled
     const isFormValid =
@@ -209,6 +209,7 @@ export default class UpdateHouseCollateralForm extends React.Component {
         data:{
             collateral: {
                 id: this.state.collateralId,
+                collateralStatus: "pending-inspection",
                 house: {
                     id: this.state.houseId,
                     dimensions: this.state.dimensions,
@@ -510,15 +511,17 @@ handleOpenErrorSnapBack = ()=>{
                         <small  style={{color:'lightgray'}}>(document(PDF,IMAGE,WORD))</small>
                         {this.renderFiles(this.state.titleDeed,"titleDeed")}
                          {/* Collateral Media */}
-                      <hr style={{ margin: '30px 0', color: 'lightgray' }} />
-                      <h5>House Photos</h5>
-                      <CollateralMedia
-                        mediaSlots={[ 'front', 'back']}
-                        media={collateralMedia}
-                        onAdd={this.handleAddCollateralMedia}
-                        onRemove={this.handleRemoveCollateralMedia}
-                        refId={collateralId}
-                      />
+                         {this.props.constants.loansInformation.allowClientsToAddCollateralMedia && this.props.constants.loansInformation.allowClientsToAddCollateralMedia === "no"? null : 
+                        <>
+                        <hr style={{ margin: '30px 0', color: 'lightgray' }} />
+                        <h5>House Photos</h5>
+                        <CollateralMedia
+                          mediaSlots={[ 'front', 'back']}
+                          media={collateralMedia}
+                          onAdd={this.handleAddCollateralMedia}
+                          onRemove={this.handleRemoveCollateralMedia}
+                          refId={collateralId}
+                        /></>}
                   </div>
                   </> : <></>}
                   {/* Save and Next Buttons */}

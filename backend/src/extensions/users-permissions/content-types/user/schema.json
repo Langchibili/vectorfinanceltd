@@ -267,6 +267,17 @@
         "images",
         "files"
       ]
+    },
+    "type": {
+      "type": "enumeration",
+      "enum": [
+        "director",
+        "ceo",
+        "Loan Admin",
+        "Collateral Inspector",
+        "client"
+      ],
+      "default": "client"
     }
   }
 }

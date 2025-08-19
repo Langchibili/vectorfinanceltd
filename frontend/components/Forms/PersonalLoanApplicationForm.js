@@ -136,7 +136,7 @@ export default class PersonalLoanApplicationForm extends React.Component{
                 }
                 pushUserIntoLoanClientsList({data:loanClientUpdateObject})
                 if(!updatedUserAccount.hasOwnProperty('error')){
-                    if(loanType === "salaryBased"){
+                    if(loanType === "salaryBased"){ // when this loan has been created, because it is a slaray based loan, it shall have initiated as the loan status
                         const AdminNotificationBody = {
                             loan: {connect: [newLoan.id]},
                             notification: {connect: [newNotitifcation.id]}

@@ -220,6 +220,19 @@
         "no"
       ],
       "default": "yes"
+    },
+    "collateralInspectorNumber": {
+      "type": "string"
+    },
+    "collateralInspectorEmail": {
+      "type": "string"
+    },
+    "allowClientsToAddCollateralMedia": {
+      "type": "enumeration",
+      "enum": [
+        "yes",
+        "no"
+      ]
     }
   }
 }

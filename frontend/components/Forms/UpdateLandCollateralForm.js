@@ -42,10 +42,10 @@ export default class UpdateLandCollateralForm extends React.Component {
     }
     const newCollaterallObject = {
         data:{
-            collateral: {
-                collateralType: "land",
-                land: newLandObject
-            }
+              collateral: {
+                  collateralType: "land",
+                  land: newLandObject
+              }
         }
     }
     if(!collateral){
@@ -123,7 +123,7 @@ export default class UpdateLandCollateralForm extends React.Component {
 
   checkFormValidity = (initialCheck=false) => {
     const { hectors, plotNumber, location, titleDeed, collateralMedia } = this.state;
-    const collateralMediaSet = collateralMedia['landscape image']
+    const collateralMediaSet = this.props.constants.loansInformation.allowClientsToAddCollateralMedia && this.props.constants.loansInformation.allowClientsToAddCollateralMedia === "no"? true : collateralMedia['landscape image']
 
     // Validate that all fields are filled
     const isFormValid =
@@ -197,6 +197,7 @@ export default class UpdateLandCollateralForm extends React.Component {
         data:{
             collateral: {
                 id: this.state.collateralId,
+                collateralStatus: "pending-inspection",
                 land: {
                     id: this.state.landId,
                     hectors: this.state.hectors,
@@ -497,15 +498,17 @@ handleOpenErrorSnapBack = ()=>{
                         />
                         <small  style={{color:'lightgray'}}>(document(PDF,IMAGE,WORD))</small>
                         {this.renderFiles(this.state.titleDeed,"titleDeed")}
+                        {this.props.constants.loansInformation.allowClientsToAddCollateralMedia && this.props.constants.loansInformation.allowClientsToAddCollateralMedia === "no"? null : 
+                        <>
                         <hr style={{ margin: '30px 0', color: 'lightgray' }} />
-                       Land Photos (<small>take a landscape picture of the land | phone flipped</small>)
-                      <CollateralMedia
-                        mediaSlots={[ 'landscape image']}
-                        media={collateralMedia}
-                        onAdd={this.handleAddCollateralMedia}
-                        onRemove={this.handleRemoveCollateralMedia}
-                        refId={collateralId}
-                      />
+                        Land Photos (<small>take a landscape picture of the land | phone flipped</small>)
+                        <CollateralMedia
+                          mediaSlots={[ 'landscape image']}
+                          media={collateralMedia}
+                          onAdd={this.handleAddCollateralMedia}
+                          onRemove={this.handleRemoveCollateralMedia}
+                          refId={collateralId}
+                        /></>}
                   </div>
                   </> : <></>}
                   {/* Save and Next Buttons */}

@@ -1,0 +1,56 @@
+{
+  "collectionName": "components_forms_loan_form_apendix_sections",
+  "info": {
+    "displayName": "loanFormApendixSection",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "interestAmount": {
+      "type": "decimal"
+    },
+    "arrangementFees": {
+      "type": "decimal"
+    },
+    "loanManagementFees": {
+      "type": "decimal"
+    },
+    "insuranceAmount": {
+      "type": "decimal"
+    },
+    "insuranceTerm": {
+      "type": "integer"
+    },
+    "insuranceType": {
+      "type": "enumeration",
+      "enum": [
+        "comprehensive",
+        "none-comprehensive"
+      ]
+    },
+    "trackerAmount": {
+      "type": "decimal"
+    },
+    "trackingFee": {
+      "type": "decimal"
+    },
+    "trackerInstallationFee": {
+      "type": "decimal"
+    },
+    "trackerRemovalFee": {
+      "type": "decimal"
+    },
+    "trackingTerm": {
+      "type": "integer"
+    },
+    "interestPercentage": {
+      "type": "integer"
+    },
+    "arrangementFeesPercentage": {
+      "type": "integer"
+    },
+    "loanManagementFeesPercentage": {
+      "type": "integer"
+    }
+  }
+}

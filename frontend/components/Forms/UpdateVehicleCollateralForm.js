@@ -45,7 +45,6 @@ export default class UpdateVehicleCollateralForm extends React.Component {
       if (!updatedLoan || !updatedLoan.error) {
         const { collateral: fresh } = await getLoanFromId(this.props.loggedInUser.currentLoan.id, "collateral.vehicle.whitebook,collateral.CollateralMedia");
         const { vehicle } = fresh;
-        console.log('fresh?.CollateralMedia',fresh.CollateralMedia)
         this.setState({
           collateralId: fresh.id,
           vehicleId: vehicle.id,
@@ -111,7 +110,7 @@ export default class UpdateVehicleCollateralForm extends React.Component {
 
   checkFormValidity = (initialCheck = false) => {
     const { numberPlate, packed, whitebook, collateralMedia } = this.state;
-    const collateralMediaSet = collateralMedia.front && collateralMedia.back && collateralMedia.left && collateralMedia.right
+    const collateralMediaSet = this.props.constants.loansInformation.allowClientsToAddCollateralMedia && this.props.constants.loansInformation.allowClientsToAddCollateralMedia === "no"? true : collateralMedia.front && collateralMedia.back && collateralMedia.left && collateralMedia.right
     const isFormValid = numberPlate.trim() && packed && whitebook && collateralMediaSet;
     if (!initialCheck) {
       this.setState({ isFormValid });
@@ -131,6 +130,7 @@ export default class UpdateVehicleCollateralForm extends React.Component {
       data: {
         collateral: {
           id: collateralId,
+          collateralStatus: "pending-inspection",
           vehicle: { id: vehicleId, numberPlate, packed }
         }
       }
@@ -366,7 +366,7 @@ export default class UpdateVehicleCollateralForm extends React.Component {
                       />
                     </div>
                     <div className="col-lg-12">
-                      <label className="form-label">Pack vehicle or keep it?</label>
+                      <label className="form-label">Pack vehicle with us or keep it?</label>
                       <select
                         name="packed"
                         className="form-select"
@@ -399,7 +399,8 @@ export default class UpdateVehicleCollateralForm extends React.Component {
                       {this.renderFiles(whitebook, 'whitebook')}
 
                       {/* Collateral Media */}
-                      <hr style={{ margin: '30px 0', color: 'lightgray' }} />
+                      {this.props.constants.loansInformation.allowClientsToAddCollateralMedia && this.props.constants.loansInformation.allowClientsToAddCollateralMedia === "no"? null : 
+                      <><hr style={{ margin: '30px 0', color: 'lightgray' }} />
                       <h5>Vehicle Collateral Media</h5>
                       <CollateralMedia
                         mediaSlots={[ 'front', 'back', 'right', 'left' ]}
@@ -407,7 +408,7 @@ export default class UpdateVehicleCollateralForm extends React.Component {
                         onAdd={this.handleAddCollateralMedia}
                         onRemove={this.handleRemoveCollateralMedia}
                         refId={collateralId}
-                      />
+                      /></>}
                     </>
                   )}
 

@@ -103,7 +103,7 @@ const HeaderPart = ()=>{
   if(loggedInUser && loggedInUser.user){
     if(loggedInUser.user.username === "director"  || loggedInUser.user.username === "ceo"){
     if(typeof document !== "undefined"){
-      if(window.location.pathname !== "/admin"){
+      if(!window.location.pathname.startsWith('/admin')){
          window.location = "/logout" // admin user cannot access normal account unless with normal account 
       }
     }

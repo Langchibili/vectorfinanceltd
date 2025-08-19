@@ -1078,9 +1078,8 @@ saveFormToAPI = async () => {
         <h4>13. COSTS, FEES AND OTHER CHARGES</h4>
         <p>13.1 The Borrower shall pay to the Lender:</p>
         <ol>
-        <li>A. Drawdown Fees: A drawdown fee of ZMW 100.00 (Once off fee to be paid upfront).</li>
-        <li>B. Arrangement Fees: Arrangement fee at 3% of the Loan Amount calculated monthly (To be paid in arrears on the due date).</li>
-        <li>C. Loan Management Fee: A Loan management fee at 11% of the Loan Amount calculated monthly (To be paid in arrears on the due date).</li>
+        <li>A. Arrangement Fees: Arrangement fee at 3% of the Loan Amount calculated monthly (To be paid in arrears on the due date).</li>
+        <li>B. Loan Management Fee: A Loan management fee at 11% of the Loan Amount calculated monthly (To be paid in arrears on the due date).</li>
         </ol>
         <p>13.2 The Lender may require the Borrower to pay the following fees:</p>
         <ol>

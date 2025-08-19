@@ -513,6 +513,56 @@ export const getContentCount = async ({
     .then(response => response.json())
     .then(data => data)
   }
+
+//   export async function getAllLoans(page) {
+//     try {
+//       const loans = await fetch(api_url+'/loans?sort=id:desc', {
+//         method: 'GET',
+//         headers: {
+//           'Authorization': `Bearer ${getJwt()}`,
+//           'Content-Type': 'application/json'
+//         }
+//       })
+//       .then(response => response.json())
+//       .then(data => data)
+//       if(loans && loans.data){
+//         return loans.data
+//       }
+//       return []
+//     } catch (err) {
+//       console.error('getAllLoans error:', err)
+//       return []
+//     }
+// }
+
+export async function getAllLoans(page = 1, pageSize = 10) {
+  try {
+    const loans = await fetch(
+      `${api_url}/loans?sort=id:desc&pagination[page]=${page}&pagination[pageSize]=${pageSize}`, 
+      {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${getJwt()}`,
+          'Content-Type': 'application/json'
+        }
+      }
+    )
+      .then(response => response.json())
+      .then(data => data)
+console.log('loans',loans)
+    if (loans && loans.data) {
+      return {
+        data: loans.data,
+        meta: loans.meta?.pagination || { page: 1, pageCount: 1 }
+      }
+    }
+    return { data: [], meta: { page: 1, pageCount: 1 } }
+  } catch (err) {
+    console.error('getAllLoans error:', err)
+    return { data: [], meta: { page: 1, pageCount: 1 } }
+  }
+}
+
   
   export const pushUserIntoLoanClientsList = async (createObject)=>{
     return await fetch(api_url+'/loans-clients', {

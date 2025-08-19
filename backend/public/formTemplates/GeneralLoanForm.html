@@ -374,7 +374,6 @@ to be given or made as follows:
 <h4>13. COSTS, FEES AND OTHER CHARGES</h4>
 <p>13.1 The Borrower shall pay to the Lender:</p>
 <ol type="a">
-  <li>Drawdown Fees: A drawdown fee of ZMW 100.00 (Once off fee to be paid upfront).</li>
   <li>Arrangement Fees: Arrangement fee at 3% of the Loan Amount calculated monthly (To be paid in arrears on the due date).</li>
   <li>Loan Management Fee: A Loan management fee at 11% of the Loan Amount calculated monthly (To be paid in arrears on the due date).</li>
 </ol>
@@ -517,63 +516,122 @@ Date: {{agreementDateMonth}} <span>{{agreementDateDay}}</span><span style='verti
     </tr>
   </thead>
   <tbody>
-    <!-- twelve blank rows -->
-    <tr><td style="border:1px solid #ccc; padding:8px;">1.</td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td></tr>
-    <tr><td style="border:1px solid #ccc; padding:8px;">2.</td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td></tr>
-    <tr><td style="border:1px solid #ccc; padding:8px;">3.</td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td></tr>
-    <tr><td style="border:1px solid #ccc; padding:8px;">4.</td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td></tr>
-    <tr><td style="border:1px solid #ccc; padding:8px;">5.</td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td></tr>
-    <tr><td style="border:1px solid #ccc; padding:8px;">6.</td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td></tr>
-    <tr><td style="border:1px solid #ccc; padding:8px;">7.</td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td></tr>
-    <tr><td style="border:1px solid #ccc; padding:8px;">8.</td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td></tr>
-    <tr><td style="border:1px solid #ccc; padding:8px;">9.</td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td></tr>
-    <tr><td style="border:1px solid #ccc; padding:8px;">10.</td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td></tr>
-    <tr><td style="border:1px solid #ccc; padding:8px;">11.</td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td></tr>
-    <tr><td style="border:1px solid #ccc; padding:8px;">12.</td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td></tr>
-    <!-- TOTAL row -->
+    {{#each repaymentSchedule}}
+      <tr>
+        <td style="border:1px solid #ccc; padding:8px;">{{paymentNumber}}.</td>
+
+        <td style="border:1px solid #ccc; padding:8px;">
+          {{#if dueDateInWords}}{{dueDateInWords}}{{else if dueDate}}{{dueDate}}{{/if}}
+        </td>
+
+        <td style="border:1px solid #ccc; padding:8px;">
+          {{#if paymentAmount}}{{formatCurrency paymentAmount}}{{/if}}
+        </td>
+
+        <td style="border:1px solid #ccc; padding:8px;">
+          {{#if principalDue}}{{formatCurrency principalDue}}{{/if}}
+        </td>
+
+        <td style="border:1px solid #ccc; padding:8px;">
+          {{!-- show interest + lateFee if either exists; otherwise blank --}}
+          {{#if interestDue}}
+            {{formatCurrency interestDue}}{{#if lateFee}} + {{formatCurrency lateFee}}{{/if}}
+          {{else if lateFee}}
+            {{formatCurrency lateFee}}
+          {{/if}}
+        </td>
+
+        <td style="border:1px solid #ccc; padding:8px;">
+          {{#if remainingBalance}}{{formatCurrency remainingBalance}}{{/if}}
+        </td>
+      </tr>
+    {{/each}}
+
     <tr>
-      <td colspan="5" style="border:1px solid #ccc; padding:8px; text-align:right;"><strong>TOTAL</strong></td>
-      <td style="border:1px solid #ccc; padding:8px;"></td>
+      <td colspan="2" style="border:1px solid #ccc; padding:8px; text-align:right;"><strong>TOTAL</strong></td>
+      <td style="border:1px solid #ccc; padding:8px;">
+        {{#if totalPaymentAmount}}{{formatCurrency totalPaymentAmount}}{{/if}}
+      </td>
+      <td colspan="3" style="border:1px solid #ccc; padding:8px;"></td>
     </tr>
   </tbody>
 </table>
+<div style="width: 100%;margin: 0 auto;text-align: center;"><h3><strong>APENDIX</strong></h3></div>
+{{!-- Individual checks for each loan value --}}
+{{#if interestPercentage}}
+ <p><strong>{{interestPercentage}}%</strong> Interest = {{#if interestAmount}}<strong>K{{interestAmount}}</strong>{{/if}}</p>
+{{/if}}
+
+{{#if arrangementFeesPercentage}}
+ <p><strong>{{arrangementFeesPercentage}}%</strong> Arrangement Fees = {{#if arrangementFees}}<strong>K{{arrangementFees}}</strong>{{/if}}</p>
+{{/if}}
+
+{{#if loanManagementFeesPercentage}}
+ <p><strong>{{loanManagementFeesPercentage}}%</strong> Loan Management Fees = {{#if loanManagementFees}}<strong>K{{loanManagementFees}}</strong>{{/if}}</p>
+{{/if}}
+
+{{#if insuranceTerm}}
+<p><strong>{{insuranceTerm}}</strong> months {{/if}} {{#if insuranceType}}<span style="text-transform: capitalize;"><strong>{{insuranceType}} insurance</strong> = </span>{{/if}} {{#if insuranceAmount}}<strong>K{{insuranceAmount}}</strong></p>
+{{/if}}
+
+{{#if trackerAmount}}
+<p>Tracker = <strong>K{{trackerAmount}}</strong></p>
+{{/if}}
+
+{{#if trackingTerm}}
+ <p><span>Tracking by {{trackingTerm}} months = </span> {{#if trackingFee}} <strong>K{{trackingFee}}</strong>{{/if}}</p>
+{{#if trackerInstallationFee}}<p>Tracker Installation = <strong>K{{trackerInstallationFee}}</strong></p>{{/if}}
+{{#if trackerRemovalFee}}<p>Tracker Removal = <strong>K{{trackerRemovalFee}}</strong></p>{{/if}}
+ {{/if}}
 </body>
 </html>
 
 <!--
-agreementDateDay
-agreementDateMonth
-agreementDateYearWords
-borrowerName
-borrowerAddress
-principalSum
-bankName
-branchName
-accountNumber
-sortCode
-swiftCode
-accountName
-repaymentTerm
-securityMake
-securityModel
-securityReg
-securityColour
-securityYear
-securityEngine
-securityChassis
-lenderEmail
-borrowerServiceAddress
-borrowerEmail
-lenderSignatoryName
-lenderSignatoryTitle
-agreementDateYearNumber
-lenderSignatureUrl
-lenderWitnessName
-lenderWitnessAddress
-lenderWitnessSignatureUrl
-borrowerNameSignature
-borrowerSignatureUrl
-borrowerWitnessName
-borrowerWitnessAddress
-borrowerWitnessSignatureUrl
+{
+  "bankName": "cd",
+  "fullname": "my name here",
+  "initials": "/uploads/5_initials_00c921c7bc.png",
+  "loanTerm": 60,
+  "bankPhone": "h",
+  "signature": "/uploads/5_signature_5d84bb24f9.png",
+  "branchCode": "g",
+  "branchName": "ef",
+  "ceoInitials": "/uploads/ceo_Initials_8c9c90fcf9.png",
+  "trackingFee": 8,
+  "borrowerName": "a",
+  "ceoSignature": "/uploads/ceo_Signature_7ef23c451c.png",
+  "directorName": "",
+  "interestRate": 18,
+  "principalSum": 10000,
+  "propertyName": "Property Name: other property",
+  "trackingTerm": 6,
+  "accountNumber": "gh",
+  "borrowerEmail": "l@gmail.com",
+  "insuranceTerm": 6,
+  "insuranceType": "comprehensive",
+  "trackerAmount": 4,
+  "interestAmount": 1,
+  "arrangementFees": 6,
+  "bankAccountName": "g",
+  "borrowerAddress": "b",
+  "insuranceAmount": 4,
+  "witnessInitials": "/uploads/5_witness_Initials_c87cfdfe94.png",
+  "agreementDateDay": 8,
+  "directorInitials": "/uploads/director_Initials_246e33a98f.png",
+  "propertyNameOnly": "other property",
+  "witnessSignature": "/uploads/5_witness_signature_fd841a6855.png",
+  "directorSignature": "/uploads/director_Signature_7f540ebd31.png",
+  "lenderWitnessName": "",
+  "trackerRemovalFee": null,
+  "agreementDateMonth": "August",
+  "loanManagementFees": 8,
+  "borrowerWitnessName": "c",
+  "interestRateInWords": "eighteen",
+  "agreementDateDaySuffix": "th",
+  "agreementDateYearWords": "Two Thousand Twenty Five",
+  "trackerInstallationFee": 9,
+  "agreementDateYearNumber": "2025",
+  "borrowerWitnessOccupation": "d",
+  "borrowerWitnessPhoneNumber": "0972644552"
+}
 -->

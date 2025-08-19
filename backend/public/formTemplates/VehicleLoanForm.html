@@ -22,7 +22,7 @@
 
       .page-footer {
         position: fixed;
-        bottom: 10px;   /* distance from page bottom */
+        bottom: 0px;   /* distance from page bottom */
         right: 10px;    /* distance from page right edge */
         width: auto;
         height: auto;
@@ -52,7 +52,7 @@
       <p style="text-align: center;">Dated the <span>{{agreementDateDay}}</span><span style='vertical-align:super;font-size:0.75em;'>{{agreementDateDaySuffix}}</span>, day of June, {{agreementDateYearNumber}} </p>
       <h2 style="text-align: center;">VECTOR FINANCE LIMITED</h2>
       <h3 style="text-align: center;">AND</h3>
-      <h3 style="text-align: center;">…</h3>
+      <h3 style="text-align: center;"><strong>{{fullname}}</strong></h3>
       <hr style="width:100%;margin:0 auto;height:3px;background-color: black;"/>
       <h1 style="text-align: center;">LOAN AGREEMENT</h1> 
       <hr style="width:100%;margin:0 auto;height:3px;background-color: black;"/>
@@ -162,7 +162,7 @@
       </tr>
     </tbody>
   </table>
-  <h4>2. COMMENCEMENT AND DURATION</h4>
+<h4>2. COMMENCEMENT AND DURATION</h4>
 <p>
 2.1 This Agreement shall commence on the day and year first before written and shall continue in
 force until such a time as all sums owed by the Borrower in terms of the Agreement have
@@ -203,8 +203,8 @@ Borrower a Loan in an amount of ZMW {{principalSum}} Zambian Kwacha] (hereinafte
   <p>Bank: <span class="dashed-input">{{bankName}}</span></p>
   <p>Branch: <span class="dashed-input">{{branchName}}</span></p>
   <p>Account Number: <span class="dashed-input">{{accountNumber}}</span></p>
-  <p>Sort Code: <span class="dashed-input">{{sortCode}}</span></p>
-  <p>SWIFT Code: <span class="dashed-input">{{swiftCode}}</span></p>
+  <p>Branch Code: <span class="dashed-input">{{branchCode}}</span></p>
+  <!-- <p>SWIFT Code: <span class="dashed-input">{{swiftCode}}</span></p> -->
   <p>Account Name: <span class="dashed-input">{{bankAccountName}}</span></p>
   <p>Phone number: <span class="dashed-input">{{bankPhone}}</span></p>
   <h4>5. REPAYMENT OF THE FACILITY</h4>
@@ -229,7 +229,7 @@ immediately available cleared funds to the Lender into the following bank accoun
     All payments in ZMW, cleared funds, to:<br/>
     Bank: Stanbic Bank (Zambia) Limited<br/>
     Branch: Woodlands<br/>
-    Account Number: 9130006381913<br/>
+    Account Number: 913006381913<br/>
     Sort Code: 040030<br/>
     SWIFT Code: SBICZMLX
   </p>
@@ -247,7 +247,7 @@ Business Day.
 
 <h4>6. INTEREST</h4>
 <p>
-6.1 Interest shall accrue on the outstanding balance of the Loan at the rate of 4% (four percent) per
+6.1 Interest shall accrue on the outstanding balance of the Loan at the rate of {{interestRate}}% ({{interestRateInWords}} percent) per
 month. Interest shall be calculated on the daily cleared balance outstanding on the
 Borrower’s account on the basis of a 365-day year, irrespective of whether or not the year
 in question is a leap year (as varied from time to time). Such interest will be capitalized if
@@ -281,7 +281,7 @@ the Loan Period be secured by the properties listed below:
     <li>Chassis No: <span class="dashed-input">{{securityChasisNo}}</span></li>
   </ul>
 {{/if}}
-<p>(a) {{propertyName}} (hereinafter collectively referred to as the “the Property”).</p>
+<p>(a) {{propertyNameOnly}} (hereinafter collectively referred to as the “the Property”).</p>
 <p>7.2 The Borrower hereby warrants that as at the date of this Agreement, the property is free from any and all encumbrances and shall remain as such until the Principal Sum plus interest and other fees and charges thereon secured, under this agreement is repaid by the Borrower and any and all outstanding obligations of the Borrower, pursuant to this Agreement have been discharged.</p>
 <p>7.3 Upon execution of this Agreement, the Borrower shall deposit the original documents relating to the ownership of the Property including but not limited to Certificates of Title and/or Vehicle Registration Documents, at the Lender’s registered office.</p>
 
@@ -374,7 +374,6 @@ to be given or made as follows:
 <h4>13. COSTS, FEES AND OTHER CHARGES</h4>
 <p>13.1 The Borrower shall pay to the Lender:</p>
 <ol type="a">
-  <li>Drawdown Fees: A drawdown fee of ZMW 100.00 (Once off fee to be paid upfront).</li>
   <li>Arrangement Fees: Arrangement fee at 3% of the Loan Amount calculated monthly (To be paid in arrears on the due date).</li>
   <li>Loan Management Fee: A Loan management fee at 11% of the Loan Amount calculated monthly (To be paid in arrears on the due date).</li>
 </ol>
@@ -480,29 +479,31 @@ with the terms and obligations thereof.
 
 <p>AS WITNESS the hands of the Parties hereto or their duly authorized agents the day and year first before written.</p>
 
-<p>
+<div style="width: 100%; margin: 0 auto; text-align: left;">
 SIGNED by the said {{lenderWitnessName}} For and on behalf of VECTOR FINANCE LIMITED)<br/>
-signature; <img src="{{ceoSignature}}" alt="Vendor Witness signature"/><br/>
-initials; <img style="height: 20px;" src="{{ceoInitials}}" alt="Vendor Witness signature"/><br/>
+Initials; <img style="height: 20px;" src="{{ceoInitials}}" alt="Vendor Witness signature"/><br/>
+Signature; <br/><img src="{{ceoSignature}}" alt="Vendor Witness signature"/><br/>
 <br/>
 In the presence of:<br/>
 DIRECTOR FOR VECTOR FINANCE LIMITED)<br/>
 Director’s Name {{directorName}};<br/>
-Director's signature; <img src="{{directorSignature}}" alt="Director signature"/><br/>
 Director's initials; <img style="height: 20px;" src="{{directorInitials}}" alt="Director signature"/><br/>
-<hr/>
+Director's signature; <br/><img src="{{directorSignature}}" alt="Director signature"/><br/>
+<div style="width: 100%;margin: 0 auto;text-align: left;"><hr style="width: 80%;"/></div>
 CLIENT)<br/>
 Client’s Name {{borrowerName}};<br/>
-Client’s signature; <img src="{{signature}}" alt="Borrower signature"/><br/>
+Client’s initials; <img style="height: 20px;" src="{{initials}}" alt="Borrower initials"/><br/>
+Client’s signature; <br/><img src="{{signature}}" alt="Borrower signature"/><br/>
 In the presence of:<br/>
 WITNESS)<br/>
 Name: {{borrowerWitnessName}};<br/>
+Phone Number: {{borrowerWitnessPhoneNumber}};<br/>
 Address: {{borrowerWitnessAddress}}.<br/>
 Occupation: {{borrowerWitnessOccupation}}.<br/>
-Witness’s signature; <img src="{{witnessSignature}}" alt="Witness signature"/><br/>
+Witness’s Initials; <img style="height: 20px;" src="{{witnessInitials}}" alt="Witness initials"/><br/>
+Witness’s signature; <br/><img src="{{witnessSignature}}" alt="Witness signature"/><br/>
 Date: {{agreementDateMonth}} <span>{{agreementDateDay}}</span><span style='vertical-align:super;font-size:0.75em;'>{{agreementDateDaySuffix}}</span>, day of June, {{agreementDateYearNumber}} {{agreementDateYearNumber}}.
-</p>
-
+</div>
 <table style="width:100%; border-collapse:collapse; margin-bottom:20px;">
   <thead>
     <tr>
@@ -515,63 +516,122 @@ Date: {{agreementDateMonth}} <span>{{agreementDateDay}}</span><span style='verti
     </tr>
   </thead>
   <tbody>
-    <!-- twelve blank rows -->
-    <tr><td style="border:1px solid #ccc; padding:8px;">1.</td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td></tr>
-    <tr><td style="border:1px solid #ccc; padding:8px;">2.</td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td></tr>
-    <tr><td style="border:1px solid #ccc; padding:8px;">3.</td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td></tr>
-    <tr><td style="border:1px solid #ccc; padding:8px;">4.</td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td></tr>
-    <tr><td style="border:1px solid #ccc; padding:8px;">5.</td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td></tr>
-    <tr><td style="border:1px solid #ccc; padding:8px;">6.</td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td></tr>
-    <tr><td style="border:1px solid #ccc; padding:8px;">7.</td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td></tr>
-    <tr><td style="border:1px solid #ccc; padding:8px;">8.</td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td></tr>
-    <tr><td style="border:1px solid #ccc; padding:8px;">9.</td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td></tr>
-    <tr><td style="border:1px solid #ccc; padding:8px;">10.</td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td></tr>
-    <tr><td style="border:1px solid #ccc; padding:8px;">11.</td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td></tr>
-    <tr><td style="border:1px solid #ccc; padding:8px;">12.</td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td><td style="border:1px solid #ccc; padding:8px;"></td></tr>
-    <!-- TOTAL row -->
+    {{#each repaymentSchedule}}
+      <tr>
+        <td style="border:1px solid #ccc; padding:8px;">{{paymentNumber}}.</td>
+
+        <td style="border:1px solid #ccc; padding:8px;">
+          {{#if dueDateInWords}}{{dueDateInWords}}{{else if dueDate}}{{dueDate}}{{/if}}
+        </td>
+
+        <td style="border:1px solid #ccc; padding:8px;">
+          {{#if paymentAmount}}{{formatCurrency paymentAmount}}{{/if}}
+        </td>
+
+        <td style="border:1px solid #ccc; padding:8px;">
+          {{#if principalDue}}{{formatCurrency principalDue}}{{/if}}
+        </td>
+
+        <td style="border:1px solid #ccc; padding:8px;">
+          {{!-- show interest + lateFee if either exists; otherwise blank --}}
+          {{#if interestDue}}
+            {{formatCurrency interestDue}}{{#if lateFee}} + {{formatCurrency lateFee}}{{/if}}
+          {{else if lateFee}}
+            {{formatCurrency lateFee}}
+          {{/if}}
+        </td>
+
+        <td style="border:1px solid #ccc; padding:8px;">
+          {{#if remainingBalance}}{{formatCurrency remainingBalance}}{{/if}}
+        </td>
+      </tr>
+    {{/each}}
+
     <tr>
-      <td colspan="5" style="border:1px solid #ccc; padding:8px; text-align:right;"><strong>TOTAL</strong></td>
-      <td style="border:1px solid #ccc; padding:8px;"></td>
+      <td colspan="2" style="border:1px solid #ccc; padding:8px; text-align:right;"><strong>TOTAL</strong></td>
+      <td style="border:1px solid #ccc; padding:8px;">
+        {{#if totalPaymentAmount}}{{formatCurrency totalPaymentAmount}}{{/if}}
+      </td>
+      <td colspan="3" style="border:1px solid #ccc; padding:8px;"></td>
     </tr>
   </tbody>
 </table>
+<div style="width: 100%;margin: 0 auto;text-align: center;"><h3><strong>APENDIX</strong></h3></div>
+{{!-- Individual checks for each loan value --}}
+{{#if interestPercentage}}
+ <p><strong>{{interestPercentage}}%</strong> Interest = {{#if interestAmount}}<strong>K{{interestAmount}}</strong>{{/if}}</p>
+{{/if}}
+
+{{#if arrangementFeesPercentage}}
+ <p><strong>{{arrangementFeesPercentage}}%</strong> Arrangement Fees = {{#if arrangementFees}}<strong>K{{arrangementFees}}</strong>{{/if}}</p>
+{{/if}}
+
+{{#if loanManagementFeesPercentage}}
+ <p><strong>{{loanManagementFeesPercentage}}%</strong> Loan Management Fees = {{#if loanManagementFees}}<strong>K{{loanManagementFees}}</strong>{{/if}}</p>
+{{/if}}
+
+{{#if insuranceTerm}}
+<p><strong>{{insuranceTerm}}</strong> months {{/if}} {{#if insuranceType}}<span style="text-transform: capitalize;"><strong>{{insuranceType}} insurance</strong> = </span>{{/if}} {{#if insuranceAmount}}<strong>K{{insuranceAmount}}</strong></p>
+{{/if}}
+
+{{#if trackerAmount}}
+<p>Tracker = <strong>K{{trackerAmount}}</strong></p>
+{{/if}}
+
+{{#if trackingTerm}}
+ <p><span>Tracking by {{trackingTerm}} months = </span> {{#if trackingFee}} <strong>K{{trackingFee}}</strong>{{/if}}</p>
+{{#if trackerInstallationFee}}<p>Tracker Installation = <strong>K{{trackerInstallationFee}}</strong></p>{{/if}}
+{{#if trackerRemovalFee}}<p>Tracker Removal = <strong>K{{trackerRemovalFee}}</strong></p>{{/if}}
+ {{/if}}
 </body>
 </html>
 
 <!--
-agreementDateDay
-agreementDateMonth
-agreementDateYearWords
-borrowerName
-borrowerAddress
-principalSum
-bankName
-branchName
-accountNumber
-sortCode
-swiftCode
-accountName
-repaymentTerm
-securityMake
-securityModel
-securityReg
-securityColour
-securityYear
-securityEngine
-securityChassis
-lenderEmail
-borrowerServiceAddress
-borrowerEmail
-lenderSignatoryName
-lenderSignatoryTitle
-agreementDateYearNumber
-lenderSignatureUrl
-lenderWitnessName
-lenderWitnessAddress
-lenderWitnessSignatureUrl
-borrowerNameSignature
-borrowerSignatureUrl
-borrowerWitnessName
-borrowerWitnessAddress
-borrowerWitnessSignatureUrl
+{
+  "bankName": "cd",
+  "fullname": "my name here",
+  "initials": "/uploads/5_initials_00c921c7bc.png",
+  "loanTerm": 60,
+  "bankPhone": "h",
+  "signature": "/uploads/5_signature_5d84bb24f9.png",
+  "branchCode": "g",
+  "branchName": "ef",
+  "ceoInitials": "/uploads/ceo_Initials_8c9c90fcf9.png",
+  "trackingFee": 8,
+  "borrowerName": "a",
+  "ceoSignature": "/uploads/ceo_Signature_7ef23c451c.png",
+  "directorName": "",
+  "interestRate": 18,
+  "principalSum": 10000,
+  "propertyName": "Property Name: other property",
+  "trackingTerm": 6,
+  "accountNumber": "gh",
+  "borrowerEmail": "l@gmail.com",
+  "insuranceTerm": 6,
+  "insuranceType": "comprehensive",
+  "trackerAmount": 4,
+  "interestAmount": 1,
+  "arrangementFees": 6,
+  "bankAccountName": "g",
+  "borrowerAddress": "b",
+  "insuranceAmount": 4,
+  "witnessInitials": "/uploads/5_witness_Initials_c87cfdfe94.png",
+  "agreementDateDay": 8,
+  "directorInitials": "/uploads/director_Initials_246e33a98f.png",
+  "propertyNameOnly": "other property",
+  "witnessSignature": "/uploads/5_witness_signature_fd841a6855.png",
+  "directorSignature": "/uploads/director_Signature_7f540ebd31.png",
+  "lenderWitnessName": "",
+  "trackerRemovalFee": null,
+  "agreementDateMonth": "August",
+  "loanManagementFees": 8,
+  "borrowerWitnessName": "c",
+  "interestRateInWords": "eighteen",
+  "agreementDateDaySuffix": "th",
+  "agreementDateYearWords": "Two Thousand Twenty Five",
+  "trackerInstallationFee": 9,
+  "agreementDateYearNumber": "2025",
+  "borrowerWitnessOccupation": "d",
+  "borrowerWitnessPhoneNumber": "0972644552"
+}
 -->

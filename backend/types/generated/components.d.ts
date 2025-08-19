@@ -78,6 +78,32 @@ export interface FormsApplicationForms extends Schema.Component {
   };
 }
 
+export interface FormsLoanFormApendixSection extends Schema.Component {
+  collectionName: 'components_forms_loan_form_apendix_sections';
+  info: {
+    displayName: 'loanFormApendixSection';
+    description: '';
+  };
+  attributes: {
+    interestAmount: Attribute.Decimal;
+    arrangementFees: Attribute.Decimal;
+    loanManagementFees: Attribute.Decimal;
+    insuranceAmount: Attribute.Decimal;
+    insuranceTerm: Attribute.Integer;
+    insuranceType: Attribute.Enumeration<
+      ['comprehensive', 'none-comprehensive']
+    >;
+    trackerAmount: Attribute.Decimal;
+    trackingFee: Attribute.Decimal;
+    trackerInstallationFee: Attribute.Decimal;
+    trackerRemovalFee: Attribute.Decimal;
+    trackingTerm: Attribute.Integer;
+    interestPercentage: Attribute.Integer;
+    arrangementFeesPercentage: Attribute.Integer;
+    loanManagementFeesPercentage: Attribute.Integer;
+  };
+}
+
 export interface LoanDetailsSchedule extends Schema.Component {
   collectionName: 'components_loan_details_schedules';
   info: {
@@ -122,6 +148,9 @@ export interface MediaAndDocumentsCollateral extends Schema.Component {
     inspectionDate: Attribute.DateTime;
     house: Attribute.Component<'media-and-documents.house'>;
     otherCollateralName: Attribute.String;
+    inspectedValue: Attribute.Decimal;
+    inspectionNotes: Attribute.Text;
+    inspectedCondition: Attribute.Enumeration<['new', 'good', 'bad']>;
   };
 }
 
@@ -209,6 +238,7 @@ declare module '@strapi/types' {
       'client-details.investment-profile': ClientDetailsInvestmentProfile;
       'client-details.salary': ClientDetailsSalary;
       'forms.application-forms': FormsApplicationForms;
+      'forms.loan-form-apendix-section': FormsLoanFormApendixSection;
       'loan-details.schedule': LoanDetailsSchedule;
       'media-and-documents.collateral': MediaAndDocumentsCollateral;
       'media-and-documents.house': MediaAndDocumentsHouse;
