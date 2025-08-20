@@ -90,9 +90,7 @@ export interface FormsLoanFormApendixSection extends Schema.Component {
     loanManagementFees: Attribute.Decimal;
     insuranceAmount: Attribute.Decimal;
     insuranceTerm: Attribute.Integer;
-    insuranceType: Attribute.Enumeration<
-      ['comprehensive', 'none-comprehensive']
-    >;
+    insuranceType: Attribute.Enumeration<['comprehensive', 'third-party']>;
     trackerAmount: Attribute.Decimal;
     trackingFee: Attribute.Decimal;
     trackerInstallationFee: Attribute.Decimal;

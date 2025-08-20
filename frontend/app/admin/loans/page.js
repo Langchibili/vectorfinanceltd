@@ -149,7 +149,10 @@ export default function AdminLoansList() {
             py: 1.5,
             textTransform: 'none',
             fontWeight: 500,
-            boxShadow: '0 3px 8px rgba(0,0,0,0.15)'
+            boxShadow: '0 3px 8px rgba(0,0,0,0.15)',
+            '&:hover': {
+                boxShadow: '0 5px 12px rgba(0,0,0,0.2)',
+            },
             }}
         >
             Search
@@ -162,7 +165,10 @@ export default function AdminLoansList() {
                     key={loanData.id}
                     variant="outlined"
                     color={getStatusColor(loan.loanStatus)}
-                    onClick={() => router.push(`/admin/loans/${loanData.id}`)}
+                    // onClick={() => router.push(`/admin/loans/${loanData.id}`)}
+                    onClick={() =>  { 
+                        window.location = `/admin/loans/${loanData.id}`
+                    }}
                     sx={{ justifyContent: 'flex-start', textTransform: 'none' }}
                 >
                     #{loanData.id} K{loan.loanAmount} — {loan.loanStatus}

@@ -15,6 +15,7 @@ import { Slide } from '@material-ui/core'
 import CollateralValueForm from '@/components/Includes/AdminComponents/CollateralValueForm'
 import OfferAmountForm from '@/components/Includes/AdminComponents/OfferAmountForm'
 import ActionOverview from '@/components/Includes/AdminComponents/ActionOverview '
+import AppendixForm from '@/components/Includes/AdminComponents/AppendixForm'
 
 export default function LoanDetailPage() {
   const { id } = useParams()
@@ -138,18 +139,25 @@ export default function LoanDetailPage() {
             <div className="page-content">
                  <Slide in={true} direction="left">
                     <div>
-                        <LoanActions loan={loan} role={user.type} onUpdated={refreshLoan} />
+                        {/* <LoanActions loan={loan} role={user.type} onUpdated={refreshLoan} /> */}
                         <ActionOverview
                             loan={loan}
                             role={user.type}
+                            ActionDisplay = {()=> { 
+                                return (
+                                    <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                                        {user.type === "Collateral Inspector"? null : <LoanActions loan={loan} role={user.type} onUpdated={refreshLoan} />}
+                                        {/* {user.type === "Loan Admin"?<AppendixForm loan={loan}/> : null} */}
+                                        <CollateralValueForm loan={loan} role={user.type} onUpdated={refreshLoan} />
+                                        <OfferAmountForm loan={loan} role={user.type} onUpdated={refreshLoan} />
+                                    </Box>
+                                )
+                            } }
                             onUpdated={refreshLoan}
                             onOpenCollateralForm={() => setShowCollateralForm(true)}
                             onOpenOfferForm={() => setShowOfferForm(true)}
                         />
-                        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                            <CollateralValueForm loan={loan} role={user.type} onUpdated={refreshLoan} />
-                            <OfferAmountForm loan={loan} role={user.type} onUpdated={refreshLoan} />
-                        </Box>
+                        
                     </div>
                 </Slide>
             </div>

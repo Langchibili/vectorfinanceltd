@@ -90,7 +90,7 @@ export default class SaveSignature extends React.Component {
     <>
       <HandWritingPad {...padProps} constants={this.props.constants}/>
 
-       {credentialsFor === "Director" || credentialsFor === "Ceo" ? null : (
+       {credentialsFor === "director" || credentialsFor === "ceo" ? null : (
           <div style={{
             left:'0',
             right:"0",

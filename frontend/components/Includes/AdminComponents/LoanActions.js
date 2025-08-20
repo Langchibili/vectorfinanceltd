@@ -1,65 +1,3 @@
-// import React from 'react'
-// import Button from '@mui/material/Button'
-// import Stack from '@mui/material/Stack'
-// import { getPermissions } from '@/lib/permissions'
-// import { updateLoanStatus } from '@/Functions' // assuming you have this in Functions.js
-
-// export default function LoanActions({ role, loan, onStatusChange }) {
-//   const perms = getPermissions(role)
-//   const { status } = loan
-
-//   // define allowed transitions per status
-//   const TRANSITIONS = {
-//     initiated: ['pending-collateral-addition', 'request-approval', 'rejected'],
-//     'pending-collateral-addition': ['pending-collateral-inspection', 'request-approval', 'rejected'],
-//     'pending-collateral-inspection': ['collateral-inspection', 'rejected'],
-//     'collateral-inspection': ['request-approval', 'rejected'],
-//     'request-approval': ['accepted', 'rejected'],
-//     accepted: ['pending-approval', 'rejected'],
-//     'pending-approval': ['approved', 'rejected'],
-//     approved: ['disbursed', 'rejected'],
-//     disbursed: ['completed', 'defaulted'],
-//     completed: [],
-//     defaulted: []
-//   }
-
-//   // filter transitions by permissions
-//   function getAllowedTransitions() {
-//     return TRANSITIONS[status] || []
-//   }
-
-//   async function handleChangeState(newStatus) {
-//     const updated = await updateLoanStatus(loan.id, newStatus)
-//     if (updated && onStatusChange) onStatusChange(updated)
-//   }
-
-//   const actions = getAllowedTransitions().filter(s => {
-//     if (s === 'disbursed' && !perms.canDisburse) return false
-//     if (s === 'approved' && !perms.canApprove) return false
-//     if (s === 'rejected' && !perms.canReject) return false
-//     if (s === 'completed' && !perms.canMarkComplete) return false
-//     if (s === 'defaulted' && !perms.canMarkDefault) return false
-//     if (s === 'request-approval' && !perms.canRequestApproval) return false
-//     return true
-//   })
-
-//   if (!actions.length) return null
-
-//   return (
-//     <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
-//       {actions.map(a => (
-//         <Button
-//           key={a}
-//           variant="contained"
-//           color="primary"
-//           onClick={() => handleChangeState(a)}
-//         >
-//           {a}
-//         </Button>
-//       ))}
-//     </Stack>
-//   )
-// }
 'use client'
 import React from 'react'
 import Box from '@mui/material/Box'
@@ -176,7 +114,6 @@ export default class LoanActions extends React.Component {
         </Box>
       )
     }
-
     return (
          <Slide in={true} direction="left">
             <Box sx={{ mt: 2, display: 'flex', gap: 1, flexWrap: 'wrap' }}>
