@@ -9,7 +9,7 @@ const ConstantsContext = createContext(null)
 
 // Create a provider component
 export function ConstantsProvider({ children }) {
-  const [constants, setConstants] = useState(null)
+  const [constants, setConstants] = useState({})
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {

@@ -77,8 +77,9 @@ export default function ResetPasswordPage() {
       setError('An unexpected error occurred. Please try again.');
       setLoading(false);
     }
-  };
+  }
 
+  
   return (
     <div className="min-vh-100 d-flex justify-content-center align-items-center">
       <div className="card w-100 mx-auto" style={{ maxWidth: '400px' }}>

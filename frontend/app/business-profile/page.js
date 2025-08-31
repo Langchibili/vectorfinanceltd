@@ -12,9 +12,31 @@ export default function Profile() {
     const loggedInUser = useUser()
     const constants = useConstants()
     const { setPage } = usePage()
-  
+    const loggedIn = loggedInUser?.status || false
     setPage('/business-profile')
     scrolltoTopOFPage()
+    if (!loggedIn) {
+        return (
+          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '50px' }}>
+            <Stack spacing={2} alignItems="center">
+              <Alert severity="warning">You are logged out, log in</Alert>
+      
+              {typeof window !== 'undefined' ? (
+                <Button
+                  variant="outlined"
+                  color="primary"
+                  onClick={() => {
+                    window.location.href = `/signup`
+                  }}
+                >
+                  Login to Proceed
+                </Button>
+              ) : null}
+            </Stack>
+          </div>
+        )
+    }
+
     return (
         <Slide in={true} direction="up">
                 <div className="p-3">

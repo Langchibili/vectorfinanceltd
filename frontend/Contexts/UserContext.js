@@ -10,7 +10,7 @@ const UserContext = createContext(null)
 
 // Create a provider component
 export function UserProvider({ children }) {
-  const [loggedInUser, setLoggedInUser] = useState(null)
+  const [loggedInUser, setLoggedInUser] = useState({})
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -42,7 +42,7 @@ export function UserProvider({ children }) {
 
   if (typeof window !== "undefined" && loading) {
     if(window.location.pathname.startsWith('/admin')){
-       return (<>
+         return (<>
                 <LinearProgress color='secondary'/> 
                 <PageSkeleton title="Loading loan..." loading={true}/>
              </>)

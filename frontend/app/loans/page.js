@@ -14,6 +14,7 @@ export default function Loans() {
   const currentLoan = loggedInUser.user?.currentLoan || []
   const [loans,setLoans] = useState([])
   const [currentLoanId, setCurrentLoanId] = useState(null)
+  const loggedIn = loggedInUser?.status || false
 
   setPage('/loans')
   scrolltoTopOFPage()
@@ -79,6 +80,28 @@ export default function Loans() {
     }
     return status
   }
+
+   if (!loggedIn) {
+        return (
+          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '50px' }}>
+            <Stack spacing={2} alignItems="center">
+              <Alert severity="warning">You are logged out, log in</Alert>
+      
+              {typeof window !== 'undefined' ? (
+                <Button
+                  variant="outlined"
+                  color="primary"
+                  onClick={() => {
+                    window.location.href = `/signup`
+                  }}
+                >
+                  Login to Proceed
+                </Button>
+              ) : null}
+            </Stack>
+          </div>
+        )
+    }
 
   return (
     <Slide in={true} direction="up">

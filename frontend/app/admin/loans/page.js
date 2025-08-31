@@ -17,7 +17,7 @@ export default function AdminLoansList() {
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
   const rowsPerPage = 10
-  const { user } = loggedInUser
+  const user = loggedInUser?.user || null
   const loggedIn = loggedInUser?.status || false
   const allowedRoles = ['director', 'ceo', 'Loan Admin', 'Collateral Inspector']
 
