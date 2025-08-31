@@ -2,6 +2,8 @@ import { createContext, useContext, useState, useEffect } from 'react'
 import { checkUserLogginStatus } from '@/Constants'
 import ImagePageLoader from '@/components/Includes/Loader/ImagePageLoader'
 import { createReferralAccount, getReferrerFromReferralCode, saveReferralCode } from '@/Functions'
+import { LinearProgress } from '@mui/material'
+import PageSkeleton from '@/components/Includes/Loader/PageSkeleton'
 
 // Create a context
 const UserContext = createContext(null)
@@ -38,8 +40,16 @@ export function UserProvider({ children }) {
     }
   }, []);
 
-  if (loading) {
-    return <ImagePageLoader/> // Show a loading state if needed
+  if (typeof window !== "undefined" && loading) {
+    if(window.location.pathname.startsWith('/admin')){
+       return (<>
+                <LinearProgress color='secondary'/> 
+                <PageSkeleton title="Loading loan..." loading={true}/>
+             </>)
+    }
+    else{
+       return <ImagePageLoader/> // Show a loading state if needed
+    }
   }
 
   return (

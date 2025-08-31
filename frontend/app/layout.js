@@ -111,7 +111,7 @@ const HeaderPart = ()=>{
   }
   return (<>
               {/* Main Header | Only visible to logged in users */}
-              {loggedInUser.status? <MobileNav loggedInUser={loggedInUser.user} userIsLoggedIn={loggedInUser.status}/> : <></>}
+              {loggedInUser && loggedInUser.status? <MobileNav loggedInUser={loggedInUser.user} userIsLoggedIn={loggedInUser.status}/> : <></>}
               {/* Sidebar */}
   </>)
 }

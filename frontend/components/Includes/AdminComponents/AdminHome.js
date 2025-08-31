@@ -38,6 +38,11 @@ export default class AdminHome extends React.Component {
         localStorage.setItem('admin_user_id', String(adminId))
       }
     }
+    if(incoming && incoming.type !== "client"){
+      this.setState({
+        step: 2
+      })
+    }
   }
 
   // ... your existing handlers unchanged (handleChange, showSnackbar, handleSnackClose, handleLogin, handleChoice, handleBack)
@@ -88,7 +93,13 @@ export default class AdminHome extends React.Component {
       localStorage.setItem('admin_role', role)
       localStorage.setItem('admin_user_id', data.user?.id || '')
       const userType = data.user?.type || data.user?.userType || ''
-      if (userType) localStorage.setItem('admin_user_type', userType)
+      if (userType) { 
+        localStorage.setItem('admin_user_type', userType) 
+        const redirectUrl = this.props.redirectUrl
+        if(redirectUrl){
+          window.location = redirectUrl
+        }
+      }
 
       this.showSnackbar('Login successful!', 'success')
       this.setState({ loading: false, step: 2 })
@@ -155,13 +166,13 @@ export default class AdminHome extends React.Component {
       snackMessage,
       snackSeverity
     } = this.state
-
+    console.log('this.props.loggedInUser',this.props.loggedInUser)
     return (
       <div className="container py-5" style={{ marginTop: '10px' }}>
         <div className="main-content">
 
           {/* Back button on steps 2 & 3 */}
-          {(step === 2 || step === 3) && (
+          {(step === 3) && (
             <button
               className="btn btn-link mb-3 d-flex align-items-center"
               onClick={this.handleBack}
@@ -273,7 +284,8 @@ const LoansButton = ()=>{
   return (
     <button
       className="btn btn-outline-danger px-4"
-      onClick={() => router.push('/admin/loans/')}
+      // onClick={() => router.push('/admin/loans/')}
+      onClick={()=>{window.location = "/admin/loans/"}}
     >
       Loans
     </button>

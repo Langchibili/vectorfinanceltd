@@ -7,7 +7,7 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import MenuIcon from "@mui/icons-material/Menu";
 import LinkIcon from "@mui/icons-material/Link";
 import { styled } from "@mui/system";
-import { getAgreementDay, getAgreementDaySuffix, getAgreementMonth, getAgreementYearNumber, getAgreementYearWords, naturalNumberToWords, scrolltoTopOFPage, textHasPhoneNumber, validateEmail } from "@/Functions";
+import { getAgreementDay, getAgreementDaySuffix, getAgreementMonth, getAgreementYearNumber, getAgreementYearWords, naturalNumberToWords, scrolltoTopOFPage, textHasPhoneNumber, updateUserAccount, validateEmail } from "@/Functions";
 import DisplaySignature from "@/components/Includes/DisplaySignature/DisplaySignature";
 import { api_url, getJwt } from "@/Constants";
 import ErrorSnapBack from "@/components/Includes/SnapBacks/ErrorSnapBack";
@@ -76,14 +76,14 @@ class AutoResizingInput extends React.Component {
     AutoResizingInput.ctx.font = font;
 
     // text to measure: either value or placeholder if empty
-    const text = this.state.value || this.props.placeholder || "";
+    const text = this.state.value || this.props.defaultValue || this.props.placeholder || "";
     const textWidth = AutoResizingInput.ctx.measureText(text).width;
 
     // Add some extra padding so text isn't right on the edge
     const extra = 8; 
 
     input.style.width = `${textWidth + extra}px`;
-  };
+  }
 
   render() {
     const { placeholder, defaultValue, style, disabled, name, ...rest } = this.props;
@@ -95,11 +95,11 @@ class AutoResizingInput extends React.Component {
         ref={this.inputRef}
         style={style}
         placeholder={placeholder}
-        value={defaultValue? defaultValue : this.state.value}
+        defaultValue={defaultValue? defaultValue : this.state.value}
         disabled={disabled}
         onChange={this.handleChange}
       />
-    );
+    )
   }
 }
 
@@ -140,44 +140,54 @@ export default class GeneralLoanForm extends React.Component {
         interestRateInWords: naturalNumberToWords(this.props.loggedInUser.currentLoan.interestRate),
         loanTerm: this.props.loggedInUser.currentLoan.loanTerm,
         principalSum : this.props.loggedInUser.currentLoan.loanAmount,
-        fullname: this.props.loggedInUser?.details?.firstname || "" + " "+ this.props.loggedInUser?.details?.lastname || " "
+        fullname: (this.props.loggedInUser?.details?.firstname || "") + " " + (this.props.loggedInUser?.details?.lastname || " ")
        }
     }
   }
 
   componentDidMount() {
-    console.log('the props',this.props)
+     const { bankDetails } = this.props.loggedInUser
+     const initialValues = bankDetails? { ...bankDetails} : {}
+     if(initialValues.id){
+        delete initialValues.id // might interfere with save operations
+     }
+     initialValues.borrowerEmail = this.props.loggedInUser?.email || ""
+     initialValues.borrowerName = (this.props.loggedInUser?.details?.firstname || "") + " " + (this.props.loggedInUser?.details?.lastname || " ")
+     this.setState({ formValues:{ ...initialValues} }) // add initialValues to form values
      if(document !== "undefined"){
         window.addEventListener("scroll", this.checkScrollPosition);
         scrolltoTopOFPage();
      }
   }
+
   saveSignatures = (signatures)=>{
      this.setState({
         signatures: signatures
      })
   }
-  componentWillUnmount() {
+
+  componentWillUnmount(){
     if(document !== "undefined"){
-       window.removeEventListener("scroll", this.checkScrollPosition);
+       window.removeEventListener("scroll", this.checkScrollPosition)
     }
   }
   
   checkScrollPosition = () => {
-        const scrolledToBottom =
-        window.innerHeight + window.pageYOffset >= document.body.offsetHeight - 2;
+        const scrolledToBottom = window.innerHeight + window.pageYOffset >= document.body.offsetHeight - 2;
         if (scrolledToBottom !== this.state.atBottom) {
-        this.setState({ atBottom: scrolledToBottom });
+            this.setState({ atBottom: scrolledToBottom })
         }
-  };
+  }
 
   scrollHandler = () => {
     if (this.state.atBottom) {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    } else {
-      window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    } 
+    else {
+        window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
     }
-  };
+  }
+
   // Generic change handler for inputs
   handleInputChange = (name, value) => {
     let inputValue = value
@@ -293,10 +303,18 @@ validateForm = (formValues) => {
   return true;
 }
 
+saveBankDetails = (bankDetailsObject)=>{
+  const { bankDetails } = this.props.loggedInUser
+  if(bankDetails){ // means update the existing bank details object
+     bankDetailsObject.id = bankDetails.id
+  }
+  updateUserAccount({ bankDetails: bankDetailsObject },this.props.loggedInUser.id)
+}
+
 saveFormToAPI = async () => {
   const { formValues, constants, signatures } = this.state;
-  console.log("formValues",formValues)
-  
+  console.log('formValues',formValues)
+
   if(!this.validateForm(formValues)){
     this.setState({
       error:"Make sure all highlighted fields are entered."
@@ -357,6 +375,14 @@ saveFormToAPI = async () => {
         body: JSON.stringify({data:{clientId: this.props.loggedInUser.id}})
       })
       if(updated.ok){
+        this.saveBankDetails({
+          "accountNumber": formValues.accountNumber,
+          "bankAccountName": formValues.bankAccountName,
+          "bankName": formValues.bankName,
+          "bankPhone": formValues.bankPhone,
+          "branchName": formValues.branchName,
+          "branchCode": formValues.branchCode
+        })
         this.setState({ formSaved: true, uploading: false },()=>{
             this.props.handleRenderNextForm(this.props.handleCompleteLoanApplication())
         })
@@ -395,18 +421,19 @@ saveFormToAPI = async () => {
       height: "25px",
       minWidth: "50px",
       flexGrow: 1
-    };
+    }
+
     const tableHeaderStyle = {
       padding: "8px",
       border: "1px solid #ccc",
       backgroundColor: "#f9f9f9",
       textAlign: "left"
-    };
+    }
 
     const tableCellStyle = {
       padding: "8px",
       border: "1px solid #ccc"
-    };
+    }
     const sections = [
       { icon: <LinkIcon />, name: "Borrower Details", target: "#borrower-details" },
       { icon: <LinkIcon />, name: "Costs", target: "#costs-and-fees" },
@@ -417,6 +444,8 @@ saveFormToAPI = async () => {
       // add more as needed, matching id attributes
     ]
     
+    const { bankDetails } = this.props.loggedInUser
+    const borrowerEmail = this.props.loggedInUser?.email || ""
     const { fullname, principalSum, loanTerm, interestRate, interestRateInWords, agreementDateDay, agreementDateDaySuffix, agreementDateMonth, agreementDateYearNumber, agreementDateYearWords } = this.state.constants
     return (
      <>
@@ -444,7 +473,7 @@ saveFormToAPI = async () => {
           </p>
 
           <p>
-            <strong>AND:</strong> <AutoResizingInput onChange={this.handleInputChange} placeholder="Enter Your Name" name="borrowerName" style={inputStyle} /> of<br/>
+            <strong>AND:</strong> <AutoResizingInput onChange={this.handleInputChange} defaultValue={fullname} placeholder="Enter Your Name" name="borrowerName" style={inputStyle} /> of<br/>
             <AutoResizingInput onChange={this.handleInputChange} placeholder="Enter Your Address" name="borrowerAddress" style={inputStyle} /> (the “<strong>The Borrower</strong>”).
             <br/><small><Info style={{fontSize:'13px'}}/> EG: Plot 101, Woodlands, Lusaka, Lusaka Province, Zambia</small>
           </p>
@@ -650,13 +679,13 @@ saveFormToAPI = async () => {
             Borrower’s Bank Account:
         </p>
         </>
-          <p>Bank: <AutoResizingInput onChange={this.handleInputChange} name="bankName" style={inputStyle} /></p>
-          <p>Branch: <AutoResizingInput onChange={this.handleInputChange} name="branchName" style={inputStyle} /></p>
-          <p>Account Number: <AutoResizingInput onChange={this.handleInputChange} name="accountNumber" style={inputStyle} /></p>
-          <p>Branch Code: <AutoResizingInput onChange={this.handleInputChange} name="branchCode" style={inputStyle} /></p>
+          <p>Bank: <AutoResizingInput onChange={this.handleInputChange} name="bankName" style={inputStyle} defaultValue={bankDetails?.bankName || ''}/></p>
+          <p>Branch: <AutoResizingInput onChange={this.handleInputChange} name="branchName" style={inputStyle} defaultValue={bankDetails?.branchName || ''}/></p>
+          <p>Account Number: <AutoResizingInput onChange={this.handleInputChange} name="accountNumber" style={inputStyle} defaultValue={bankDetails?.accountNumber || ''}/></p>
+          <p>Branch Code: <AutoResizingInput onChange={this.handleInputChange} name="branchCode" style={inputStyle} defaultValue={bankDetails?.branchCode || ''}/></p>
           {/* <p>Swift Code: <AutoResizingInput onChange={this.handleInputChange} name="swiftCode" style={inputStyle} /></p> */}
-          <p>Bank Account Name: <AutoResizingInput onChange={this.handleInputChange} name="bankAccountName" style={inputStyle} /></p>
-          <p>Phone number: <AutoResizingInput onChange={this.handleInputChange} name="bankPhone" style={inputStyle} /></p>
+          <p>Bank Account Name: <AutoResizingInput onChange={this.handleInputChange} name="bankAccountName" style={inputStyle} defaultValue={bankDetails?.bankAccountName || ''}/></p>
+          <p>Phone number: <AutoResizingInput onChange={this.handleInputChange} name="bankPhone" style={inputStyle} defaultValue={bankDetails?.bankPhone || ''}/></p>
           {/* Part 4 */}
            <>
             <p>
@@ -1056,7 +1085,7 @@ saveFormToAPI = async () => {
           <p style={{ paddingLeft: "20px" }}>
             <AutoResizingInput disabled={true} defaultValue={this.state.formValues.borrowerName} placeholder="Enter Your address" onChange={this.handleInputChange} name="borrowerAddress" style={inputStyle} />
             <br/>
-            Email: <AutoResizingInput onChange={this.handleInputChange} placeholder="Enter Your Email Address" name="borrowerEmail" style={inputStyle} />
+            Email: <AutoResizingInput onChange={this.handleInputChange} placeholder="Enter Your Email Address" name="borrowerEmail" defaultValue={borrowerEmail} style={inputStyle} />
           </p>
           {/* Part 7 */}
           <p>

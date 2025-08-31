@@ -1,11 +1,16 @@
 const axios = require('axios');
 const nodemailer = require('nodemailer');
 
+const returnNineDigitNumber = (phoneNumber) =>{
+    return phoneNumber.replace(/\D/g, '').slice(-9)
+}
+
 const SendSmsNotification = (phoneNumber,notificationBody)=>{
+    const validPhoneNumber = "+260"+returnNineDigitNumber(phoneNumber)
     axios.post(process.env.SMSGATEWAYURL+"/send-sms", {
         apiKey: process.env.SMSGATEWAYAPIKEY,
         username: process.env.SMSGATEWAYAPIUSERNAME,
-        recipients: [phoneNumber], // array of recipients
+        recipients: [validPhoneNumber], // array of recipients
         message: notificationBody,
         from: process.env.SMSGATEWAYAPICALLERID
     }, {
@@ -19,7 +24,7 @@ const SendSmsNotification = (phoneNumber,notificationBody)=>{
     .catch(error => {
         console.error('Error sending SMS:', error);
     });
-    console.log('sending sms notification',phoneNumber,notificationBody)
+    console.log('sending sms notification',validPhoneNumber,notificationBody)
 }
 
 const SendEmailNotification = (email,notificationBody)=>{

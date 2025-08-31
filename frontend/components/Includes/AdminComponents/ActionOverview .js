@@ -35,9 +35,9 @@ const STATUS_DESCRIPTIONS = {
   'pending-collateral-addition': 'Awaiting collateral from client',
   'pending-collateral-inspection': 'Awaiting collateral inspection',
   'collateral-inspection': 'Inspector inspecting collateral',
-  'request-approval': 'Awaiting approval request',
+  'request-approval': 'Awaiting loan approval',
   'accepted': 'Client signing loan form',
-  'pending-approval': 'Pending final approval',
+  'pending-approval': 'Awaiting final editions',
   'approved': 'Loan approved (pending disbursement)',
   'rejected': 'Loan rejected',
   'disbursed': 'Loan disbursed',
@@ -138,6 +138,17 @@ export default class ActionOverview extends React.Component {
     }
   }
 
+
+  getStatusTitle = status => {
+    if(status === "request-approval"){
+        return "awaiting approval"
+    }
+    if(status === "pending-approval"){
+        return "pending final editions"
+    }
+    return status
+  }
+
   render() {
     const { loan, role, ActionDisplay } = this.props
     const { loadingAction, error } = this.state
@@ -153,12 +164,12 @@ export default class ActionOverview extends React.Component {
     const currentActivity = this.getCurrentActivity(loan)
 
     return (
-      <Paper sx={{ p: 2 }}>
+      <Paper sx={{ p: 2, maxWidth: 400, mx: 'auto', my: 2 }}>
         <Box sx={{ mb: 2 }}>
           <Typography variant="subtitle2">Current activity</Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mt: 1 }}>
             <Typography variant="body1" sx={{ fontWeight: 600 }}>{currentActivity}</Typography>
-            <Chip label={currentStatus} size="small" />
+            <Chip label={this.getStatusTitle(currentStatus)} size="small" />
           </Box>
           {loan.lastActionAt && (
             <Typography variant="caption" sx={{ display: 'block', mt: 0.5, color: 'text.secondary' }}>
@@ -230,8 +241,8 @@ export default class ActionOverview extends React.Component {
                     minWidth: 220
                   }}
                 >
-                  {label}
-                  <Chip label={a.from || a.targetStatus} size="small" sx={{ ml: 1 }} />
+                  {this.getStatusTitle(label)}
+                  <Chip label={this.getStatusTitle(a.from || a.targetStatus)} size="small" sx={{ ml: 1 }} />
                 </Button>
               )
             })}

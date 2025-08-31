@@ -1,13 +1,14 @@
 "use client"
 
 import { useEffect, useState } from 'react'
-import { Slide, Button, Stack, Alert, CircularProgress, TextField, Pagination } from '@mui/material'
+import { Slide, Button, Stack, Alert, TextField, Pagination, LinearProgress } from '@mui/material'
 import { useRouter } from 'next/navigation'
 import { useUser } from '@/Contexts/UserContext'
 import { getAllLoans, getLoanFromId, scrolltoTopOFPage } from '@/Functions'
+import PageSkeleton from '@/components/Includes/Loader/PageSkeleton'
 
 export default function AdminLoansList() {
-  const { user } = useUser()
+  const loggedInUser = useUser()
   const router = useRouter()
   const [loans, setLoans] = useState([])
   const [loading, setLoading] = useState(true)
@@ -16,7 +17,8 @@ export default function AdminLoansList() {
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
   const rowsPerPage = 10
-
+  const { user } = loggedInUser
+  const loggedIn = loggedInUser?.status || false
   const allowedRoles = ['director', 'ceo', 'Loan Admin', 'Collateral Inspector']
 
   useEffect(() => {
@@ -86,10 +88,41 @@ export default function AdminLoansList() {
     }
   }
 
+  const getStatusTitle = (status) => {
+    if (status === "pending-approval") {
+        return 'pending-final-editions'
+    }
+    return status
+  }
+
   if (loading) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', marginTop: '50px' }}>
-        <CircularProgress />
+        <LinearProgress color='secondary'/> 
+        <PageSkeleton title="Loading loan..." loading={true}/>
+      </div>
+    )
+  }
+
+  if (!loggedIn) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', marginTop: '50px' }}>
+        <Stack spacing={2} alignItems="center">
+          <Alert severity="warning">You are logged out, log in</Alert>
+  
+          {typeof window !== 'undefined' ? (
+            <Button
+              variant="outlined"
+              color="primary"
+              onClick={() => {
+                const redirect = encodeURIComponent(window.location.href)
+                window.location.href = `/admin?redirectUrl=${redirect}`
+              }}
+            >
+              Login to Proceed
+            </Button>
+          ) : null}
+        </Stack>
       </div>
     )
   }
@@ -101,7 +134,7 @@ export default function AdminLoansList() {
       </div>
     )
   }
-  console.log('loans',loans)
+
   return (
     <Slide in={true} direction="up">
       <div
@@ -171,7 +204,7 @@ export default function AdminLoansList() {
                     }}
                     sx={{ justifyContent: 'flex-start', textTransform: 'none' }}
                 >
-                    #{loanData.id} K{loan.loanAmount} — {loan.loanStatus}
+                    #{loanData.id} K{loan.loanAmount} — {getStatusTitle(loan.loanStatus)}
                 </Button>
             )
           })}

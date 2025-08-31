@@ -278,6 +278,12 @@
         "client"
       ],
       "default": "client"
+    },
+    "bankDetails": {
+      "displayName": "bankDetails",
+      "type": "component",
+      "repeatable": false,
+      "component": "client-details.bank-details"
     }
   }
 }

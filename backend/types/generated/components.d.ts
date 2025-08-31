@@ -1,5 +1,21 @@
 import type { Schema, Attribute } from '@strapi/strapi';
 
+export interface ClientDetailsBankDetails extends Schema.Component {
+  collectionName: 'components_client_details_bank_details';
+  info: {
+    displayName: 'bankDetails';
+    icon: 'bold';
+  };
+  attributes: {
+    bankName: Attribute.String;
+    bankAccountName: Attribute.String;
+    accountNumber: Attribute.String;
+    bankPhone: Attribute.String;
+    branchName: Attribute.String;
+    branchCode: Attribute.String;
+  };
+}
+
 export interface ClientDetailsBusiness extends Schema.Component {
   collectionName: 'components_client_details_businesses';
   info: {
@@ -141,7 +157,13 @@ export interface MediaAndDocumentsCollateral extends Schema.Component {
     vehicle: Attribute.Component<'media-and-documents.vehicle'>;
     land: Attribute.Component<'media-and-documents.land'>;
     collateralStatus: Attribute.Enumeration<
-      ['inspected', 'pending-inspection', 'declined', 'accepted']
+      [
+        'inspected',
+        'requesting-inspection',
+        'pending-inspection',
+        'declined',
+        'accepted'
+      ]
     >;
     inspectionDate: Attribute.DateTime;
     house: Attribute.Component<'media-and-documents.house'>;
@@ -232,6 +254,7 @@ export interface UserProfileDetails extends Schema.Component {
 declare module '@strapi/types' {
   export module Shared {
     export interface Components {
+      'client-details.bank-details': ClientDetailsBankDetails;
       'client-details.business': ClientDetailsBusiness;
       'client-details.investment-profile': ClientDetailsInvestmentProfile;
       'client-details.salary': ClientDetailsSalary;

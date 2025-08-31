@@ -12,7 +12,13 @@ const getAppStatus = async () => {
 const getLoan = async (id) => {
       return await strapi.db.query("api::loan.loan").findOne({
           where: { id: id },
-          populate: ['loanType','client', "loanFormApendixSection"]
+          populate: ['loanType','collateral','loanAgreementDocuments','disbursementPOP','client',"loanFormApendixSection"]
+      })
+}
+
+const getLoanFormValues = async (loanId) => {
+      return await strapi.db.query("api::form-fill-value.form-fill-value").findOne({
+        where: { loanId },
       })
 }
 
@@ -32,10 +38,6 @@ const calculateDueDate = (date, loanTerm)=>{
     const isoString = dueDate.toISOString();
 
     return isoString;
-}
-
-const returnNineDigitNumber = (phoneNumber) =>{
-    return phoneNumber.replace(/\D/g, '').slice(-9)
 }
 
 
@@ -78,112 +80,79 @@ module.exports = {
             }
           });
         }
-        const getLoanFormValues = async (loanId) => {
-          return await strapi.db.query("api::form-fill-value.form-fill-value").findOne({
-            where: { loanId },
-          });
-        }
-
         
-        const { client, loanFormApendixSection, loanAppendixCreated }  = await getLoanClientAppendix(loanId)
-        const currentLoanFormAppendix = loan.loanFormApendixSection
-        if (updatedById) { // id of admin user account which wants to update
-          const adminUser = await strapi.query('admin::user').findOne({  where: { id: updatedById } })
-          const { loanApproverEmails } = await getAdminUserEmailsAndNumbers()
-          const { loanDisburserEmails } = await getAdminUserEmailsAndNumbers()
-          
+        const updateAuthenticated = ()=>{
+             if(updatedById){
+                return true
+             }
+             if(loan.frontendUpdateKey){
+                 return loan.frontendUpdateKey === process.env.FRONTENDUPDATEKEY
+             }
+             return false
+        }
+        
+        const { client, loanAppendixCreated, newLoanAmountOffer, loanAmount }  = await getLoanClientAppendix(loanId)
+        if (updateAuthenticated()) { // id of admin user account which wants to update
+          const { loanApproverEmails, loanDisburserEmails, adminNotificationsEmails } = await getAdminUserEmailsAndNumbers()
+          const updatedByUserEmail = updatedById? (await strapi.query('admin::user').findOne({  where: { id: updatedById } })).email : adminNotificationsEmails[0]
+          console.log("loan.newLoanAmountOffer",loan.newLoanAmountOffer,"newLoanAmountOffer",newLoanAmountOffer)
           /* these checks are happening here because if any of the following things happen during the following loan states, an error should be thrown to avoid completing the update. */
           // If current status is already approved or disbursed, block the update
           if (loan.loanStatus === "request-approval") {
               if(client.formsToFill.length < 1){
                 const notificationBody = "You cannot request for approval of this loan before adding forms for the client to fill when approved, please ensure that you add a form to the formsToFill field on the user's record (the client)."
-                SendEmailNotification(adminUser.email,notificationBody)
+                SendEmailNotification(updatedByUserEmail,notificationBody)
                 throw new Error('Loan cannot be changed to request approval')
               }
+              if(loan.loanAmount && (loan.loanAmount !== loanAmount)){
+                 loan.loanAmountUpdated = true
+              }
+              if(loan.newLoanAmountOffer && (loan.newLoanAmountOffer !== newLoanAmountOffer)){
+                 loan.newLoanAmountOffered = true
+              }
+              
           }
           if (loan.loanStatus === "accepted") {
             // only users allowed to disburse loans can disburse them.
-            if(!loanApproverEmails.includes(adminUser.email)){ 
+            if(updatedById && !loanApproverEmails.includes(updatedByUserEmail)){ // check for updatedById here because this ensures if a user decides to use the backend to update, the updatedById will be set
               const notificationBody = "You cannot accept loans, please change the loan status to request-approval or use an account that has the priviledge to accept or approve."
-              SendEmailNotification(adminUser.email,notificationBody)
+              SendEmailNotification(updatedByUserEmail,notificationBody)
               throw new Error('Loan cannot be accepted by user')
             }
             // cannot accept a loan that has no forms to fill on it
             if(client.formsToFill.length < 1){
               const notificationBody = "You cannot accept this loan before adding forms for the client to fill, please ensure that you add a form to the formsToFill field on the user(client's) record."
-              SendEmailNotification(adminUser.email,notificationBody)
+              SendEmailNotification(updatedByUserEmail,notificationBody)
               throw new Error('Loan cannot be accepted')
             }
             params.data.acceptanceDate = new Date() // you should add the date of when it's been accepted
           }
-          
+         
           // this should only be added when a user signs the documents
-          if(loan.loanStatus === "pending-approval"){
-            if(currentLoanFormAppendix !== loanFormApendixSection){ // if the appendix section has at least being opened by loan officer
-               if(!loanAppendixCreated){ // check only if appendix has been created before, not when about to save or create it, hence get from loan as is, not as is to become
-                 if(!loan.loanAgreementDocuments){
+          if(loan.loanStatus === "pending-approval"){ // this is for error check purposes
+            if(loan.loanFormApendixSection){ // if the appendix section has at least being opened by loan officer
+              if(!loanAppendixCreated){ // check only if appendix has been created before, not when about to save or create it, hence get from loan as is, not as is to become
+                if(!loan.loanAgreementDocuments){ 
                   const notificationBody = "You cannot add the appendix information to this loan, because the client has not yet signed the loan form."
-                  SendEmailNotification(adminUser.email,notificationBody)
+                  SendEmailNotification(updatedByUserEmail,notificationBody)
                   throw new Error('Appendix information cannot be added to loan')
-                 }
-                 // let us update the loan form here with appendix info
-                const LoanFormValues = await getLoanFormValues(loanId)
-                delete loanFormApendixSection.id // don't need to add the id field from appendix
-                const updateObject = { values:{...LoanFormValues.values,...loanFormApendixSection} }
-                loan.loanAppendixCreated = true
-                await strapi.db.query('api::form-fill-value.form-fill-value').update({ where: { id: LoanFormValues.id }, data: updateObject });
-                const notificationBody = "Appendix to loan form for loan with id #"+loanId+" has been updated."
-                SendEmailNotification(adminUser.email,notificationBody)
-                //  console.log('loanFormApendixSection',loanFormApendixSection)
-                //  console.log('formValues',formValues)
-               }
+                }
+              }
             }
           }
-
-          if (loan.loanStatus === "approved") {
-            // only users allowed to disburse loans can disburse them.
-            if(!loanApproverEmails.includes(adminUser.email)){ 
-              const notificationBody = "You cannot approve loans, please change the loan status to request-approval or use an account that has the priviledge to approve."
-              SendEmailNotification(adminUser.email,notificationBody)
-              throw new Error('Loan cannot be approved by user')
-            }
-            // loan must be accepted first before attempting to approve it.
-            if(!loan.acceptanceDate){ 
-              const notificationBody = "You cannot approve this loan before the client signs the loan form, make sure the loan status is first set to accepted before you can approve."
-              SendEmailNotification(adminUser.email,notificationBody)
-              throw new Error('Loan cannot be approved before being accepted')
-            }
-            // const { autoSendMessageOnLoanAcceptance, minutesBeforeLoanDisbursement} = await strapi.db.query("api::loans-information.loans-information").findOne()
-            // this is to stop the loan officer or loan approving officer from approving the loan and hence changing the loan status before the client signs the documents
-            // if(getMinutesDifference(loan.acceptanceDate, new Date()) < (minutesBeforeLoanDisbursement || 15)){
-            //   const notificationBody = "Please wait a few minutes before you can change the loan status to approved, this is such that the client has enough time to sign the loan documents"
-            //   SendEmailNotification(adminUser.email,notificationBody)
-            //   throw new Error('Loan cannot be approved client has signed documents.')
-            // }
-            if(!loan.loanAgreementDocuments){
-               const notificationBody = "The loan cannot be approved at the moment, this is because the client has not signed the loan form yet. You shall be alerted when the client finally signs the documents."
-               SendEmailNotification(adminUser.email,notificationBody)
-               throw new Error('Loan cannot be approved at the moment')
-            }
-            params.data.approvalDate = new Date() // you should add the date of when it's been accepted
-          }
+        
 
           if (loan.loanStatus === "disbursed") {
-            if(!loanDisburserEmails.includes(adminUser.email)){
-              const notificationBody = "You cannot change a loan's status to disbursed with this account, please change the loan status to request-approval or use an account that has the priviledge to change the loan's status to disbursed."
-              SendEmailNotification(adminUser.email,notificationBody)
-              throw new Error('Loan cannot be disbursed by user')
-            }
             // loan must be accepted first before attempting to approve it.
             if(!loan.approvalDate){ 
               const notificationBody = "You cannot change this loan's status to disbursed before the loan has been approved, make sure the loan's status is first set to approved before you may proceed to disbursemt."
-              SendEmailNotification(adminUser.email,notificationBody)
+              SendEmailNotification(updatedByUserEmail,notificationBody)
               throw new Error('Loan cannot be disbursed before being approved')
             }
             // loan must be accepted first before attempting to approve it.
             if(!loan.acceptanceDate){ 
               const notificationBody = "You cannot change this loan's status to disbursed before the loan has been accepted, make sure the loan's status is first set to accepted before you may proceed to disbursemt."
-              SendEmailNotification(adminUser.email,notificationBody)
+              SendEmailNotification(updatedByUserEmail,notificationBody)
               throw new Error('Loan cannot be disbursed before being accepted')
             }
           }
@@ -191,18 +160,23 @@ module.exports = {
         else {
           console.log('No updatedBy ID provided')
         }
+        if(loan.frontendUpdateKey){
+            if(loan.frontendUpdateKey !== process.env.FRONTENDUPDATEKEY){
+               throw new Error('FORBIDDEN REQUEST, invalid frontendUpdateKey')
+            }
+            delete loan.frontendUpdateKey // this could ccause unprecedented errors, so delete it, it's only useful for authentication, beyond which it's useless
+        }
     },
     async afterUpdate(event) {
         const { result, params } = event;
         const { data } = params;
-        const loanStatuses = ["request-approval","pending-approval","approved","disbursed","accepted"]
-        const loanBefore = data
-
-        if(data && data.id && loanStatuses.includes(data.loanStatus)){
-              const loan = await getLoan(params.data.id)
+        const loanStatuses = ["request-approval","pending-approval","collateral-inspection","approved","disbursed","accepted","rejected"]
+        const loanBefore = result  
+        if(result && result.id && loanStatuses.includes(result.loanStatus)){
+              const loan = await getLoan(params.data?.id || result.id)
               const finances = await getFinances() // the loan financial aspect
               const appStatus = await getAppStatus()
-              const {loanApproverEmails, loanDisburserEmails, loanApproverNumbers, loanAdministratorEmails, adminNotificationsEmails} = await getAdminUserEmailsAndNumbers()
+              const {loanApproverEmails, loanDisburserEmails, loanApproverNumbers, loanAdministratorNumbers, loanAdministratorEmails, adminNotificationsEmails, adminNotificationsNumbers} = await getAdminUserEmailsAndNumbers()
              
               const setLoanRepaymentAmount = async (loanAfter) => {
                 if(!loanBefore){
@@ -249,14 +223,69 @@ module.exports = {
                     if(autoSendMessageOnLoanAcceptance && autoSendMessageOnLoanAcceptance === "yes"){
                         const notificationBody = "Your loan request with vector finance limited has been processed and accepted, as a final step before we disburse you the funds, we require that you fill some important documents, we have sent you some forms to fill on your portal account. Thank you for choosing VectorFin."
                         SendEmailNotification(client.email,notificationBody)
-                        const clientPhoneNumber = "+260"+returnNineDigitNumber(client.username)
-                        SendSmsNotification(clientPhoneNumber,notificationBody)
+                        SendSmsNotification(client.username,notificationBody) // client.username is a phone number
                     }
                 }
               }
               
               if (loanBefore.loanStatus === "request-approval") { // only for lower level loan administrators  
-                      const notificationBody = "A vectorFin loan officer is requesting approval of a loan with id #"+loanBefore.id 
+                       if(loanBefore.loanAmountUpdated){
+                          await strapi.db.query('api::loan.loan').update({ where: { id: loanBefore.id }, data: {loanAmountUpdated:false} });
+                          return
+                       }      
+                       if(loan.newLoanAmountOfferDeclined){ // alert the approvers of their amount offer being declined
+                          const newLoanAmountOffer = loanBefore.newLoanAmountOffer
+                          const notificationBody = "Client has declined the offer of amount K"+newLoanAmountOffer+" made to the loan with id #"+loanBefore.id+" there reason: "+loanBefore.newLoanAmountOfferDeclineReason+" take the next action from here: "+process.env.CLIENTURL+"/admin/loans/"+loanBefore.id
+                          loanApproverNumbers.forEach(number => {
+                              SendSmsNotification(number,notificationBody)
+                          })
+                          loanApproverEmails.forEach(email => {
+                              SendEmailNotification(email,notificationBody)
+                          })
+                          adminNotificationsEmails.forEach(email => {
+                              SendEmailNotification(email,notificationBody)
+                          })
+                          await strapi.db.query('api::loan.loan').update({ where: { id: loanBefore.id }, data: {newLoanAmountOfferDeclined:false} });
+                          return
+                      }
+                      if(loan.newLoanAmountOfferAccepted){ // alert the approvers of their amount offer being accepted
+                          const newLoanAmountOffer = loanBefore.newLoanAmountOffer
+                          const notificationBody = "Client has accepted the offer of amount K"+newLoanAmountOffer+" made to the loan with id #"+loanBefore.id+" the new loan amount is now: "+newLoanAmountOffer+" take the next action from here: "+process.env.CLIENTURL+"/admin/loans/"+loanBefore.id
+                          loanApproverNumbers.forEach(number => {
+                              SendSmsNotification(number,notificationBody)
+                          })
+                          loanApproverEmails.forEach(email => {
+                              SendEmailNotification(email,notificationBody)
+                          })
+                          adminNotificationsEmails.forEach(email => {
+                              SendEmailNotification(email,notificationBody)
+                          })
+                          await strapi.db.query('api::loan.loan').update({ where: { id: loanBefore.id }, data: {newLoanAmountOfferAccepted:false} });
+                          return
+                      }
+                      if(loan.newLoanAmountOffered){ // alert the loan administrators of a new loan amount being offered to the loan
+                          const newLoanAmountOffer = loanBefore.newLoanAmountOffer
+                          const newLoanAmountOfferedReason = loanBefore.newLoanAmountOfferedReason? "The reason provided for the new offer is: "+loanBefore.newLoanAmountOfferedReason : ""
+                          const notificationBody = "An offer of amount K"+newLoanAmountOffer+" has been made to the loan with id #"+loanBefore.id+", please communicate with the client about this offer, and upon the client accepting or declining it, you can approve or decline the offered amount at: "+process.env.CLIENTURL+"/admin/loans/"+loanBefore.id+ " "+newLoanAmountOfferedReason
+                          loanAdministratorNumbers.forEach(number => {
+                              SendSmsNotification(number,notificationBody)
+                          })
+                          loanAdministratorEmails.forEach(email => {
+                              SendEmailNotification(email,notificationBody)
+                          })
+                          adminNotificationsEmails.forEach(email => {
+                              SendEmailNotification(email,notificationBody)
+                          })
+                          await strapi.db.query('api::loan.loan').update({ where: { id: loanBefore.id }, data: {newLoanAmountOffered:false} });
+                          return
+                      }
+                      if(loanBefore.newLoanAmountOffer !== loanBefore.loanAmount){
+                        return // this means an offer was made, so no need to resend messages from the back and forth
+                      }
+                      if(loanBefore.clientAskingAmount !== loanBefore.loanAmount){
+                        return // this means the loan amount was changed, so no need to resend messages from the back and forth
+                      }
+                      const notificationBody = "A vectorFin loan officer is requesting approval of a loan with id #"+loanBefore.id+" you can approve it at: "+process.env.CLIENTURL+"/admin/loans/"+loanBefore.id 
                       // for test and local app mode
                       const numbersArray = await strapi.db.query("api::phone-numbers-list.phone-numbers-list").findOne();
                       const emailsArray = await strapi.db.query("api::email-addresses-list.email-addresses-list").findOne();
@@ -265,8 +294,7 @@ module.exports = {
                       const adminEmailAddress = appStatus.status === "production"? loanApproverEmails : emailsArray.adminEmailAddresses
                       
                       adminPhoneNumbers.forEach(number => {
-                          const phoneNumber = "+260"+returnNineDigitNumber(number)
-                          SendSmsNotification(phoneNumber,notificationBody)
+                          SendSmsNotification(number,notificationBody)
                       })
                       
                       adminEmailAddress.forEach(email => {
@@ -275,44 +303,97 @@ module.exports = {
                       return
               }
               
-              if (loanBefore.loanStatus === "disbursed") {
-                  const notificationBody = "The loan with id #"+loanBefore.id + " has been disbursed." 
-                    loanAdministratorEmails.forEach(email => {
-                        SendEmailNotification(email,notificationBody)
-                    })
-                    adminNotificationsEmails.forEach(email => {
-                        SendEmailNotification(email,notificationBody)
-                    })
-              } 
+              if (loanBefore.loanStatus === "collateral-inspection") {
+                    const { collateral } = loan
+                    if(collateral.collateralStatus === "requesting-inspection"){
+                        const { collateralInspectorNumber, collateralInspectorEmail } = await strapi.db.query("api::loans-information.loans-information").findOne()
+                        const notificationBody = "A VectorFin client has initiated a loan with id #"+loanBefore.id + ", we ask that you inspect the collateral for us, details about the loan and client are on "+process.env.CLIENTURL+"/admin/loans/"+loanBefore.id
+                        SendEmailNotification(collateralInspectorEmail,notificationBody)
+                        SendSmsNotification(collateralInspectorNumber,notificationBody)
+                    }
+              }
 
               if (loanBefore.loanStatus === "pending-approval") {
-                   if(loanBefore.loanAgreementDocuments && !loanBefore.loanAppendixCreated){
+                   if(loan.loanAgreementDocuments && loan.loanFormApendixSection && !loanBefore.loanAppendixCreated){ // the documents will only be signed before an appendix has been added
                       const notificationBody = "The loan with Id #"+loanBefore.id  +" has been signed by the client. You can now add their loan form appendix information."
                       adminNotificationsEmails.forEach(email => {
                             SendEmailNotification(email,notificationBody)
                       })
                     }
-                    // if(loanBefore.loanAgreementDocuments){
-                    //   const notificationBody = "The loan with Id #"+loanBefore.id  +" has been signed by the client, you may now approve the loan in order to alert them that they should await disbursement of funds."
-                    //   loanApproverEmails.forEach(email => {
-                    //     SendEmailNotification(email,notificationBody)
-                    //   })
-                    // }
+                    
+                    if(loan.quickBooksInvoiceNumber && !loan.invoiceSent){ // this is the stage when we send an alert to the approvers that the loan has been updated, they need to disburse the funds
+                       // for test and local app mode
+                      const numbersArray = await strapi.db.query("api::phone-numbers-list.phone-numbers-list").findOne();
+                      const emailsArray = await strapi.db.query("api::email-addresses-list.email-addresses-list").findOne();
+                      
+                      const adminPhoneNumbers = appStatus.status === "production"? loanApproverNumbers : numbersArray.adminNumbers
+                      const adminEmailAddress = appStatus.status === "production"? loanApproverEmails : emailsArray.adminEmailAddresses
+                      
+                      
+                      const notificationBody = "Records of The loan with Id #"+loanBefore.id+" have been updated in quickbooks, you may now disburse funds, client details are as follows "+process.env.CLIENTURL+"/admin/loans/"+loanBefore.id
+                      
+                      adminEmailAddress.forEach(email => {
+                        SendEmailNotification(email,notificationBody)
+                      })
+                      adminPhoneNumbers.forEach(number => {
+                          SendSmsNotification(number,notificationBody)
+                      })
+                      await strapi.db.query('api::loan.loan').update({ where: { id: loanBefore.id }, data: {invoiceSent:true, loanStatus:"approved"} });
+                    }
+                    // this should only be added when a loan officer adds the quickBooksInvoiceNumber
+    
+                    if (loan.loanFormApendixSection){ // if the appendix section has at least being opened by loan officer
+                      if (!loan.loanAppendixCreated){ // check only if appendix has been created before, not when about to save or create it, hence get from loan as is, not as is to become
+                        // let us update the loan form here with appendix info
+                              const LoanFormValues = await getLoanFormValues(loanBefore.id)
+                              console.log('currentLoanFormAppendix',loan.loanFormApendixSection)
+                              const updateObject = { values: { ...(LoanFormValues?.values || {}), ...((({id, ...r})=>r)(loan.loanFormApendixSection||{})) } } // use currentLoanFormAppendix because we are using the data a user has just entered not from the loan as was
+                              await strapi.db.query('api::loan.loan').update({ where: { id: loanBefore.id }, data: {loanAppendixCreated:true} });
+                              await strapi.db.query('api::form-fill-value.form-fill-value').update({ where: { id: LoanFormValues.id }, data: updateObject });
+                              const notificationBody = "Appendix to loan form for loan with id #"+loanBefore.id+" has been updated."
+                              loanAdministratorEmails.forEach(email => {
+                                    SendEmailNotification(email,notificationBody)
+                              })
+                              adminNotificationsEmails.forEach(email => {
+                                    SendEmailNotification(email,notificationBody)
+                              })
+                              //  console.log('loanFormApendixSection',loanFormApendixSection)
+                              //  console.log('formValues',formValues)
+                          }
+                      }
               }
-                
+              
+              
               if (loanBefore.loanStatus === "approved") {
-                      const notificationBodyForDisurser = "The loan with id #"+loanBefore.id  +" has been approved, you may now change the loan's status to disbursed. Thank you."
-                      loanDisburserEmails.forEach(email => {
-                          SendEmailNotification(email,notificationBodyForDisurser)
-                      })
-                      const notificationBody = "The loan with id #"+loanBefore.id + " has been approved." 
-                      loanAdministratorEmails.forEach(email => {
-                          SendEmailNotification(email,notificationBody)
-                      })
+                    if(loan.disbursementPOP){ // pop is only sent when funds have been disbursed
+                      const { client } = loan
+                      const notificationBodyForAdmins = "POP(proof of payment) to loan with id #"+loanBefore.id  +" has been uploaded and client has been notified, as such the loan status is now disbursed. Thank you."
                       adminNotificationsEmails.forEach(email => {
-                          SendEmailNotification(email,notificationBody)
+                          SendEmailNotification(email,notificationBodyForAdmins)
                       })
+                      // send disbursement message to client
+                      const notificationBody = "Funds to your loan with vector finance limited have been disbursed, you may view your loan information from your portal account at "+process.env.CLIENTURL+". Thank you for choosing VectorFin."
+                      SendEmailNotification(client.email,notificationBody)
+                      SendSmsNotification(client.username,notificationBody) // client.username is a phone number
+                      await strapi.db.query('api::loan.loan').update({ where: { id: loanBefore.id }, data: {loanStatus:"disbursed"} });
+                    }
               }
+
+              if (loanBefore.loanStatus === "rejected") {
+                    if(!loan.rejectionMessageSent){ // pop is only sent when funds have been disbursed
+                      const { client } = loan
+                      const notificationBodyForAdmins = "Loan with id #"+loanBefore.id  +" has been rejected."
+                      adminNotificationsEmails.forEach(email => {
+                          SendEmailNotification(email,notificationBodyForAdmins)
+                      })
+                      // send disbursement message to client
+                      const notificationBody = loan.loanRejectionReason? loan.loanRejectionReason : "Apologies, your loan request has been declined at the moment, you can re-apply any time again later or contact us via "+adminNotificationsNumbers[0]+" for further queries. Regards, VectorFin."
+                      SendEmailNotification(client.email,notificationBody)
+                      SendSmsNotification(client.username,notificationBody) // client.username is a phone number
+                      await strapi.db.query('api::loan.loan').update({ where: { id: loanBefore.id }, data: {rejectionMessageSent:true} });
+                    }
+              }
+             
               // when loan has been disbursed
               await setLoanRepaymentAmount(result)
         }

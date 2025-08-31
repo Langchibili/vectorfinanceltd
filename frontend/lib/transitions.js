@@ -32,26 +32,26 @@ export const TRANSITIONS = {
     { action: 'client-added-collateral', allowedRoles: ['system'], targetStatus: 'pending-collateral-inspection', needsConfirmation: false }
   ],
   'pending-collateral-inspection': [
-    { action: 'request-inspection', allowedRoles: ['Loan Admin'], targetStatus: 'collateral-inspection', needsConfirmation: false }
+    { action: 'request-inspection', allowedRoles: ['Loan Admin'], targetStatus: 'collateral-inspection', needsConfirmation: false },
+    { action: 'reject', allowedRoles: ['Loan Admin'], targetStatus: 'rejected', needsConfirmation: true, requiresPayload: ['reason'] }
   ],
   'collateral-inspection': [
     { action: 'inspect-and-submit', allowedRoles: ['Collateral Inspector'], targetStatus: 'request-approval', needsConfirmation: false, requiresPayload: ['inspectionReport'] }
   ],
   'request-approval': [
     { action: 'accept', allowedRoles: ['director', 'ceo'], targetStatus: 'accepted', needsConfirmation: true },
-    { action: 'reject', allowedRoles: ['director', 'ceo', 'Loan Admin'], targetStatus: 'rejected', needsConfirmation: true, requiresPayload: ['reason'] }
+    { action: 'reject', allowedRoles: ['director', 'ceo'], targetStatus: 'rejected', needsConfirmation: true, requiresPayload: ['reason'] }
   ],
   accepted: [
     { action: 'client-signs', allowedRoles: ['system'], targetStatus: 'pending-approval', needsConfirmation: false }
   ],
   'pending-approval': [
     { action: 'add-appendix', allowedRoles: ['Loan Admin'], targetStatus: 'pending-approval', needsConfirmation: false, requiresPayload: ['appendix'] },
-    { action: 'approve', allowedRoles: ['director', 'ceo'], targetStatus: 'approved', needsConfirmation: true },
-    { action: 'reject', allowedRoles: ['director', 'ceo', 'Loan Admin'], targetStatus: 'rejected', needsConfirmation: true, requiresPayload: ['reason'] }
+    // { action: 'approve', allowedRoles: ['director', 'ceo'], targetStatus: 'approved', needsConfirmation: true },
+    // { action: 'reject', allowedRoles: ['director', 'ceo', 'Loan Admin'], targetStatus: 'rejected', needsConfirmation: true, requiresPayload: ['reason'] }
   ],
   approved: [
     { action: 'disburse', allowedRoles: ['director', 'ceo'], targetStatus: 'disbursed', needsConfirmation: true },
-    { action: 'reject', allowedRoles: ['director', 'ceo', 'Loan Admin'], targetStatus: 'rejected', needsConfirmation: true, requiresPayload: ['reason'] }
   ],
   disbursed: [
     { action: 'complete', allowedRoles: ['Loan Admin', 'director', 'ceo', 'system'], targetStatus: 'completed', needsConfirmation: false },

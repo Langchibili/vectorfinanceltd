@@ -1,0 +1,28 @@
+{
+  "collectionName": "components_client_details_bank_details",
+  "info": {
+    "displayName": "bankDetails",
+    "icon": "bold"
+  },
+  "options": {},
+  "attributes": {
+    "bankName": {
+      "type": "string"
+    },
+    "bankAccountName": {
+      "type": "string"
+    },
+    "accountNumber": {
+      "type": "string"
+    },
+    "bankPhone": {
+      "type": "string"
+    },
+    "branchName": {
+      "type": "string"
+    },
+    "branchCode": {
+      "type": "string"
+    }
+  }
+}

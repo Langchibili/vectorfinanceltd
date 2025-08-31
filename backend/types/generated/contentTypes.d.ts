@@ -825,6 +825,7 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
       ['director', 'ceo', 'Loan Admin', 'Collateral Inspector', 'client']
     > &
       Attribute.DefaultTo<'client'>;
+    bankDetails: Attribute.Component<'client-details.bank-details'>;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
@@ -1752,12 +1753,25 @@ export interface ApiLoanLoan extends Schema.CollectionType {
     paymentScheduleCreated: Attribute.Boolean & Attribute.DefaultTo<false>;
     acceptanceDate: Attribute.DateTime;
     inspectorRecommendedAmount: Attribute.Decimal;
-    inspectorReasonForLoanDisproval: Attribute.String;
+    inspectorReasonForLoanDisproval: Attribute.Text;
     inspectorRecommendationOnLoan: Attribute.Enumeration<
       ['Give Loan', 'Do Not Give Loan']
     >;
     loanFormApendixSection: Attribute.Component<'forms.loan-form-apendix-section'>;
     loanAppendixCreated: Attribute.Boolean & Attribute.DefaultTo<false>;
+    invoiceSent: Attribute.Boolean & Attribute.DefaultTo<false>;
+    disbursementPOP: Attribute.Media;
+    quickBooksInvoiceNumber: Attribute.String;
+    loanRejectionReason: Attribute.Text;
+    rejectionMessageSent: Attribute.Boolean & Attribute.DefaultTo<false>;
+    newLoanAmountOffer: Attribute.Decimal;
+    newLoanAmountOffered: Attribute.Boolean & Attribute.DefaultTo<false>;
+    newLoanAmountOfferedReason: Attribute.Text;
+    newLoanAmountOfferDeclined: Attribute.Boolean & Attribute.DefaultTo<false>;
+    newLoanAmountOfferDeclineReason: Attribute.Text;
+    newLoanAmountOfferAccepted: Attribute.Boolean & Attribute.DefaultTo<true>;
+    loanAmountUpdated: Attribute.Boolean & Attribute.DefaultTo<false>;
+    loanAmountChangedReason: Attribute.String;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;

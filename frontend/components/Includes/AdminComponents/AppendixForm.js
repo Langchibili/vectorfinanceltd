@@ -13,6 +13,8 @@ import {
   Alert
 } from '@mui/material'
 import Divider from '@mui/material/Divider'
+import { updateLoan } from '@/Functions'
+import { frontendUpdateKey } from '@/Secrets'
 /**
  * AppendixForm
  * A clean, well-structured MUI form that maps 1:1 to the appendix fields.
@@ -68,14 +70,16 @@ export default function AppendixForm({ initialValues = {}, loan }) {
 
  const handleSubmit = (e) => {
     e.preventDefault()
-    const loanFormApendixSection = loan.loanFormApendixSection
     const updateData = {
         data:{
-            ...values,
-            loanAppendixCreated: true
+            loanStatus : "pending-approval",
+            loanAgreementDocuments: loan.loanAgreementDocuments?.data || null,
+            loanFormApendixSection:{...normalize(values)},
+            frontendUpdateKey:frontendUpdateKey
         }
     }
-
+    console.log('updateData',updateData)
+    updateLoan(updateData,loan.id)
   }
 
   // SMALL_WIDTH used for percentage/month inputs (3-digit max)
@@ -84,15 +88,15 @@ export default function AppendixForm({ initialValues = {}, loan }) {
     return <Alert>Loan Appendix already added, change it from the backend. </Alert>
   }
   return (
-    <Box sx={{ maxWidth: 900, mx: 'auto', p: 3 }}>
+    <Box sx={{ maxWidth: 900, mx: 'auto', }}>
       <Box sx={{ textAlign: 'center', mb: 2 }}>
         <Typography variant="h6" component="h3" fontWeight={700}>APENDIX</Typography>
       </Box>
 
       <form onSubmit={handleSubmit} noValidate>
-        <Grid container spacing={2} alignItems="center">
+        <Box container spacing={2} alignItems="center">
           {/* Interest */}
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={6} mb={2}>
             <Typography variant="body1" component="div">
               <Box sx={{ display: 'inline-flex', alignItems: 'center' }}>
                 <TextField
@@ -119,9 +123,9 @@ export default function AppendixForm({ initialValues = {}, loan }) {
               </Box>
             </Typography>
           </Grid>
-        
+          <Divider sx={{ my: 1 }} />
           {/* Arrangement Fees */}
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={6} mb={2}>
             <Typography variant="body1">
               <Box sx={{ display: 'inline-flex', alignItems: 'center' }}>
                 <TextField
@@ -148,9 +152,9 @@ export default function AppendixForm({ initialValues = {}, loan }) {
               </Box>
             </Typography>
           </Grid>
-
+          <Divider sx={{ my: 1 }} />
           {/* Loan Management Fees */}
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={6} mb={2}>
             <Typography variant="body1">
               <Box sx={{ display: 'inline-flex', alignItems: 'center' }}>
                 <TextField
@@ -177,9 +181,9 @@ export default function AppendixForm({ initialValues = {}, loan }) {
               </Box>
             </Typography>
           </Grid>
-
+          <Divider sx={{ my: 2 }} />
           {/* Insurance */}
-          <Grid item xs={12} md={6} >
+          <Grid item xs={12} md={6} mb={2}>
             <Typography variant="body1">
               <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center' }}>
                 <TextField
@@ -193,7 +197,7 @@ export default function AppendixForm({ initialValues = {}, loan }) {
                 />
                 <Box component="span">months</Box>
 
-                <FormControl size="small" sx={{ ml: 2, minWidth: 180, mt: 1  }}>
+                <FormControl size="small" sx={{ ml: 2, minWidth: 180, mt: 2 }}>
                   <Select
                     displayEmpty
                     inputProps={{ 'aria-label': 'insurance type' }}
@@ -221,9 +225,9 @@ export default function AppendixForm({ initialValues = {}, loan }) {
               </Box>
             </Typography>
           </Grid>
-
+          <Divider sx={{ my: 2 }} />
           {/* Tracker & Tracking */}
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={6} mb={2}>
             <Typography variant="body1">
               <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
@@ -294,12 +298,12 @@ export default function AppendixForm({ initialValues = {}, loan }) {
               </Box>
             </Typography>
           </Grid>
-
+           <Divider sx={{ my: 1 }} />
           {/* Submit */}
           <Grid item xs={12} sx={{ textAlign: 'center', mt: 2 }}>
             <Button variant="contained" type="submit">Save Appendix</Button>
           </Grid>
-        </Grid>
+        </Box>
       </form>
     </Box>
   )

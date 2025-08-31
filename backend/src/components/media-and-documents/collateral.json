@@ -50,6 +50,7 @@
       "type": "enumeration",
       "enum": [
         "inspected",
+        "requesting-inspection",
         "pending-inspection",
         "declined",
         "accepted"

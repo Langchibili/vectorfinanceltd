@@ -5,7 +5,7 @@ import { useParams } from 'next/navigation'
 import { useUser } from '@/Contexts/UserContext'
 import { useConstants } from '@/Contexts/ConstantsContext'
 import { getLoanFromId, scrolltoTopOFPage } from '@/Functions'
-import { Box, Typography, CircularProgress, Alert, Paper } from '@mui/material'
+import { Box, Typography, Alert, Paper, LinearProgress, Button } from '@mui/material'
 import LoanActions from '@/components/Includes/AdminComponents/LoanActions'
 import ClientDetails from '@/components/Includes/AdminComponents/ClientDetails'
 import LoanDetails from '@/components/Includes/AdminComponents/LoanDetails'
@@ -16,26 +16,32 @@ import CollateralValueForm from '@/components/Includes/AdminComponents/Collatera
 import OfferAmountForm from '@/components/Includes/AdminComponents/OfferAmountForm'
 import ActionOverview from '@/components/Includes/AdminComponents/ActionOverview '
 import AppendixForm from '@/components/Includes/AdminComponents/AppendixForm'
+import PageSkeleton from '@/components/Includes/Loader/PageSkeleton'
+import { Stack } from '@mui/system'
+import OfferDecision from '@/components/Includes/AdminComponents/OfferDecision'
+import ChangeLoanAmount from '@/components/Includes/AdminComponents/ChangeLoanAmount'
 
 export default function LoanDetailPage() {
   const { id } = useParams()
-  const { user } = useUser()
+  const loggedInUser = useUser()
   const constants = useConstants()
-
   const [loan, setLoan] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const { setPage } = usePage()
   const {BottomNavLink} = useBottomNav()
+  const user = loggedInUser?.user || null
+  const loggedIn = loggedInUser?.status || false
   setPage('/admins/loans')
-    
-    
+  
+  // populate string for the loan
+  const POPULATE = "loanType,loanAgreementDocuments,disbursementPOP,collateral,collateral.vehicle,collateral.land,collateral.house,collateral.CollateralMedia,client,client.details,client.bankDetails"  
   // Allowed roles
   const allowedRoles = ['director', 'ceo', 'Loan Admin', 'Collateral Inspector']
 
   useEffect(() => {
     scrolltoTopOFPage()
-    if (!allowedRoles.includes(user?.type)) {
+    if (!allowedRoles.includes(user?.type)) { 
       setError('Forbidden access: You do not have permission to view this page.')
       setLoading(false)
       return
@@ -43,8 +49,7 @@ export default function LoanDetailPage() {
 
     async function fetchLoan() {
       try {
-        const data = await getLoanFromId(id,"collateral,collateral.vehicle,collateral.land,collateral.house,collateral.CollateralMedia,client,client.details")
-        console.log('data',data)
+        const data = await getLoanFromId(id,POPULATE)
         setLoan(data)
       } catch (err) {
         setError('Failed to fetch loan details.')
@@ -55,10 +60,6 @@ export default function LoanDetailPage() {
 
     fetchLoan()
   }, [id, user])
-
-  // populate string you used earlier
-  const POPULATE = "loanType,collateral,collateral.vehicle,collateral.land,collateral.house,collateral.CollateralMedia,client,client.details"
-
   // refreshLoan: accepts optional updatedLoan (from onUpdated) else fetches from API
   const refreshLoan = async (updatedLoan = null) => {
     // quick path: parent or child already has updated loan object
@@ -94,11 +95,35 @@ export default function LoanDetailPage() {
 
   if (loading) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 5 }}>
-        <CircularProgress />
-      </Box>
+      <div style={{ display: 'flex', justifyContent: 'center', marginTop: '50px' }}>
+        <LinearProgress color='secondary'/> 
+        <PageSkeleton title="Loading loan..." loading={true}/>
+      </div>
     )
   }
+
+ if (!loggedIn) {
+  return (
+    <div style={{ display: 'flex', justifyContent: 'center', marginTop: '50px' }}>
+      <Stack spacing={2} alignItems="center">
+        <Alert severity="warning">You are logged out, log in</Alert>
+
+        {typeof window !== 'undefined' ? (
+          <Button
+            variant="outlined"
+            color="primary"
+            onClick={() => {
+              const redirect = encodeURIComponent(window.location.href)
+              window.location.href = `/admin?redirectUrl=${redirect}`
+            }}
+          >
+            Login to Proceed
+          </Button>
+        ) : null}
+      </Stack>
+    </div>
+  )
+}
 
   if (error) {
     return (
@@ -119,7 +144,7 @@ export default function LoanDetailPage() {
           return (
             <div className="page-content">
                 <Slide in={true} direction="right">
-                    <LoanDetails loan={loan} role={user.type} onUpdated={refreshLoan} />
+                    <LoanDetails loan={loan} role={user.type} onUpdated={refreshLoan} constants={constants}/>
                 </Slide>
             </div>
            
@@ -129,7 +154,7 @@ export default function LoanDetailPage() {
         return (
             <div className="page-content">
                 <Slide in={true} direction="left">
-                        <ClientDetails loan={loan} role={user.type} />
+                        <ClientDetails loan={loan} role={user.type} constants={constants}/>
                 </Slide>
             </div>
         )
@@ -143,14 +168,29 @@ export default function LoanDetailPage() {
                         <ActionOverview
                             loan={loan}
                             role={user.type}
+                            constants={constants}
                             ActionDisplay = {()=> { 
                                 return (
-                                    <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                                        {user.type === "Collateral Inspector"? null : <LoanActions loan={loan} role={user.type} onUpdated={refreshLoan} />}
-                                        {/* {user.type === "Loan Admin"?<AppendixForm loan={loan}/> : null} */}
-                                        <CollateralValueForm loan={loan} role={user.type} onUpdated={refreshLoan} />
-                                        <OfferAmountForm loan={loan} role={user.type} onUpdated={refreshLoan} />
-                                    </Box>
+                                    <Stack spacing={2} sx={{ maxWidth: 400, mx: 'auto', my: 2 }}>
+                                        {user.type === "Collateral Inspector"? null : <LoanActions loan={loan} role={user.type} onUpdated={refreshLoan} constants={constants}/>}
+                                        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                                            
+                                            <CollateralValueForm loan={loan} role={user.type} onUpdated={refreshLoan} constants={constants}/>
+                                            <OfferAmountForm loan={loan} role={user.type} onUpdated={refreshLoan} constants={constants}/>
+                                            <ChangeLoanAmount loan={loan} role={user.type} onUpdated={refreshLoan} constants={constants}/>
+                                            {user.type === "Loan Admin" && loan.loanStatus === "request-approval" && (loan.newLoanAmountOffer !== loan.loanAmount)? (
+                                                <OfferDecision
+                                                    loan={loan}
+                                                    offeredAmount={loan.newLoanAmountOffer}
+                                                    role={user.type}
+                                                    onAccepted={refreshLoan}
+                                                    onDeclined={refreshLoan}
+                                                    constants={constants}
+                                                />
+                                            ) : null}
+                                        </Box>
+                                    </Stack>
+                                    
                                 )
                             } }
                             onUpdated={refreshLoan}

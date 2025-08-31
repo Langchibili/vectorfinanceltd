@@ -60,6 +60,7 @@ export default function Loans() {
       case 'accepted':
         return 'info'
       case 'approved':
+      case 'pending-approval':
         return 'success'
       case 'disbursed':
         return 'info'
@@ -70,6 +71,13 @@ export default function Loans() {
       default:
         return 'inherit'
     }
+  }
+
+  const getStatusTitle = (status) => {
+    if (status === "approved" || status === "pending-approval") {
+        return 'processing'
+    }
+    return status
   }
 
   return (
@@ -97,7 +105,7 @@ export default function Loans() {
               onClick={() => setCurrentLoanId(loan.id)}
               sx={{ justifyContent: 'flex-start', textTransform: 'none' }}
             >
-              #{loan.id} K{loan.loanAmount} - {loan.loanStatus}
+              #{loan.id} K{loan.loanAmount} - {getStatusTitle(loan.loanStatus)}
             </Button>
           ))}
         </Stack>

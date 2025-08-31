@@ -76,7 +76,7 @@ class AutoResizingInput extends React.Component {
     AutoResizingInput.ctx.font = font;
 
     // text to measure: either value or placeholder if empty
-    const text = this.state.value || this.props.placeholder || "";
+    const text = this.state.value || this.props.defaultValue || this.props.placeholder || "";
     const textWidth = AutoResizingInput.ctx.measureText(text).width;
 
     // Add some extra padding so text isn't right on the edge
@@ -146,11 +146,18 @@ export default class CivilServantLoansForm extends React.Component {
   }
 
   componentDidMount() {
-    console.log('the props',this.props)
-     if(document !== "undefined"){
-        window.addEventListener("scroll", this.checkScrollPosition);
-        scrolltoTopOFPage();
-     }
+       const { bankDetails } = this.props.loggedInUser
+       const initialValues = bankDetails? { ...bankDetails} : {}
+       if(initialValues.id){
+          delete initialValues.id // might interfere with save operations
+       }
+       initialValues.borrowerEmail = this.props.loggedInUser?.email || ""
+       initialValues.borrowerName = (this.props.loggedInUser?.details?.firstname || "") + " " + (this.props.loggedInUser?.details?.lastname || " ")
+       this.setState({ formValues:{ ...initialValues} }) // add initialValues to form values
+       if(document !== "undefined"){
+            window.addEventListener("scroll", this.checkScrollPosition);
+            scrolltoTopOFPage();
+       }
   }
   saveSignatures = (signatures)=>{
      this.setState({
@@ -247,6 +254,14 @@ validateForm = (formValues) => {
   return true;
 }
 
+saveBankDetails = (bankDetailsObject)=>{
+  const { bankDetails } = this.props.loggedInUser
+  if(bankDetails){ // means update the existing bank details object
+     bankDetailsObject.id = bankDetails.id
+  }
+  updateUserAccount({ bankDetails: bankDetailsObject },this.props.loggedInUser.id)
+}
+
 saveFormToAPI = async () => {
   const { formValues, constants, signatures } = this.state;
   console.log("formValues",formValues)
@@ -305,6 +320,14 @@ saveFormToAPI = async () => {
         body: JSON.stringify({data:{clientId: this.props.loggedInUser.id}})
       })
       if(updated.ok){
+        this.saveBankDetails({
+          "accountNumber": formValues.accountNumber,
+          "bankAccountName": formValues.bankAccountName,
+          "bankName": formValues.bankName,
+          "bankPhone": formValues.bankPhone,
+          "branchName": formValues.branchName,
+          "branchCode": formValues.branchCode
+        })
         this.setState({ formSaved: true, uploading: false },()=>{
             this.props.handleRenderNextForm(this.props.handleCompleteLoanApplication())
         })
@@ -364,6 +387,9 @@ render() {
         { icon: <LinkIcon />, name: "Signatures", target: "#signatures" },
         // add more as needed, matching id attributes
       ]
+  
+  const { bankDetails } = this.props.loggedInUser    
+  const borrowerEmail = this.props.loggedInUser?.email || ""
   const { fullname, principalSum, loanTerm, interestRate, interestRateInWords, agreementDateDay, agreementDateDaySuffix, agreementDateMonth, agreementDateYearNumber, agreementDateYearWords } = this.state.constants
   return (
    <>
@@ -648,11 +674,13 @@ render() {
     <strong>4.2</strong> The sums in 4.1 above, shall be paid into the
     Borrower’s Bank Account:
   </p>
-  <p>Bank: <AutoResizingInput onChange={this.handleInputChange} name="bankName" style={inputStyle} /></p>
-          <p>Branch: <AutoResizingInput onChange={this.handleInputChange} name="branchName" style={inputStyle} /></p>
-          <p>Account Number: <AutoResizingInput onChange={this.handleInputChange} name="accountNumber" style={inputStyle} /></p>
-          <p>Branch Code: <AutoResizingInput onChange={this.handleInputChange} name="branchCode" style={inputStyle} /></p>
-          {/* <p>Swift Code: <AutoResizingInput onChange={this.handleInputChange} name="swiftCode" style={inputStyle} /></p> */}
+  <p>Bank: <AutoResizingInput onChange={this.handleInputChange} name="bankName" style={inputStyle} defaultValue={bankDetails?.bankName || ''}/></p>
+  <p>Branch: <AutoResizingInput onChange={this.handleInputChange} name="branchName" style={inputStyle} defaultValue={bankDetails?.branchName || ''}/></p>
+  <p>Account Number: <AutoResizingInput onChange={this.handleInputChange} name="accountNumber" style={inputStyle} defaultValue={bankDetails?.accountNumber || ''}/></p>
+  <p>Branch Code: <AutoResizingInput onChange={this.handleInputChange} name="branchCode" style={inputStyle} defaultValue={bankDetails?.branchCode || ''}/></p>
+  {/* <p>Swift Code: <AutoResizingInput onChange={this.handleInputChange} name="swiftCode" style={inputStyle} /></p> */}
+  {/* <p>Bank Account Name: <AutoResizingInput onChange={this.handleInputChange} name="bankAccountName" style={inputStyle} defaultValue={bankDetails?.bankAccountName || ''}/></p> */}
+ 
   <h4>5. REPAYMENT OF THE LOAN</h4>
   <p>
     5.1 The Borrower authorizes its Employer and the Lender to deduct the sum of
@@ -996,7 +1024,7 @@ render() {
           <p style={{ paddingLeft: "20px" }}>
             <AutoResizingInput disabled={true} defaultValue={this.state.formValues.borrowerName} placeholder="Enter Your address" onChange={this.handleInputChange} name="borrowerAddress" style={inputStyle} />
             <br/>
-            Email: <AutoResizingInput onChange={this.handleInputChange} placeholder="Enter Your Email Address" name="borrowerEmail" style={inputStyle} />
+            Email: <AutoResizingInput onChange={this.handleInputChange} placeholder="Enter Your Email Address" defaultValue={borrowerEmail} name="borrowerEmail" style={inputStyle} />
           </p>
           {/* Part 7 */}
   <p>
@@ -1180,7 +1208,7 @@ render() {
             Phone Number: <AutoResizingInput onChange={this.handleInputChange} name="borrowerWitnessPhoneNumber" style={inputStyle} /><br />
             Address: <AutoResizingInput onChange={this.handleInputChange} name="borrowerWitnessName" style={inputStyle} /><br />
             Occupation: <AutoResizingInput onChange={this.handleInputChange} name="borrowerWitnessOccupation" style={inputStyle} /><br />
-            Client’s <DisplaySignature placeholder="Enter Your Name" for="witness" witnessSignature={this.props.witnessSignature}/><br/>
+            Client’s <DisplaySignature placeholder="Enter Your Name" for="witness" witnessSignature={this.props.witnessSignature} /><br/>
             Date: <><span>{agreementDateMonth} </span>{agreementDateDay}<span style={{verticalAlign:'super',fontSize:'0.75em'}}>{agreementDateDaySuffix}</span> <span>{agreementDateYearNumber}</span> </>
           </p>
   {/* <table

@@ -61,7 +61,7 @@ export default function MobileNav(props) {
     >
       <List>
         {
-        loggedInUser && loggedInUser.user && adminUserTypes.includes(loggedInUser.user.type)? [['Loans','/admin/loans'],['Home','/admin'],['Contact Us','https://vectorfinancelimited.com/contact-us/'], ['About Us','https://vectorfinancelimited.com/about-us/'], ['Logout','/logout']].map((text, index) => (
+        loggedInUser && loggedInUser.user && adminUserTypes.includes(loggedInUser.user.type)? [['Loans','/admin/loans'],['Home','/admin'],['Contact Us','https://vectorfinancelimited.com/contact-us/'], ['About Us','https://vectorfinancelimited.com/about-us/'], ['Logout','/logout?ref=admin']].map((text, index) => (
           window.location.pathname === "/" && text[0] === "Home"? '' :
           <ListItem key={text[0]} disablePadding onClick={(e)=>{router.push(text[1]); /*props.handlePageChange(e)*/}}>
             <ListItemButton>
@@ -72,7 +72,7 @@ export default function MobileNav(props) {
             </ListItemButton>
           </ListItem>
         )) : 
-        [['Loans','/loans'],...refferalLinks,['Home','/'],['Profile(For Individuals)','/profile'], ['Profile(For Businesses)','/business-profile'],['Contact Us','https://vectorfinancelimited.com/contact-us/'], ['About Us','https://vectorfinancelimited.com/about-us/'], ['Logout','/logout']].map((text, index) => (
+        [['Loans','/loans'],...refferalLinks,['Home','/'],['Profile(For Individuals)','/profile'], ['Profile(For Businesses)','/business-profile'],['Contact Us','https://vectorfinancelimited.com/contact-us/'], ['About Us','https://vectorfinancelimited.com/about-us/'], ['Logout','/logout?ref=home']].map((text, index) => (
           window.location.pathname === "/" && text[0] === "Home"? '' :
           <ListItem key={text[0]} disablePadding onClick={(e)=>{router.push(text[1]); /*props.handlePageChange(e)*/}}>
             <ListItemButton>

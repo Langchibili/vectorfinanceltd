@@ -251,7 +251,7 @@ export const removeIdFromArray = (arr,id)=>{
 }
 
 export const scrolltoTopOFPage = ()=>{
-  if(typeof window !== undefined){
+  if(typeof window !== "undefined"){
       window.scrollTo({
           top: 0,
           behavior: 'smooth' // Enables smooth scrolling
@@ -549,7 +549,6 @@ export async function getAllLoans(page = 1, pageSize = 10) {
     )
       .then(response => response.json())
       .then(data => data)
-console.log('loans',loans)
     if (loans && loans.data) {
       return {
         data: loans.data,
@@ -563,6 +562,21 @@ console.log('loans',loans)
   }
 }
 
+export const getAllUsers = async ({ search = '', page = 1 }) => {
+  // Example API call, adjust endpoint and params as needed
+  let url = `${api_url}/users?page=${page}`
+  if (search) {
+    url += `&search=${encodeURIComponent(search)}`
+  }
+  console.log('search',url)
+  const res = await fetch(url)
+  if (!res.ok) throw new Error('Failed to fetch users')
+  const users = await res.json()
+  return {
+    users: users || [],
+    totalPages: users.totalPages || 1
+  }
+}
   
   export const pushUserIntoLoanClientsList = async (createObject)=>{
     return await fetch(api_url+'/loans-clients', {

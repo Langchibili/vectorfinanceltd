@@ -166,7 +166,7 @@
       "type": "decimal"
     },
     "inspectorReasonForLoanDisproval": {
-      "type": "string"
+      "type": "text"
     },
     "inspectorRecommendationOnLoan": {
       "type": "enumeration",
@@ -184,6 +184,58 @@
     "loanAppendixCreated": {
       "type": "boolean",
       "default": false
+    },
+    "invoiceSent": {
+      "type": "boolean",
+      "default": false
+    },
+    "disbursementPOP": {
+      "type": "media",
+      "multiple": true,
+      "required": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos"
+      ]
+    },
+    "quickBooksInvoiceNumber": {
+      "type": "string"
+    },
+    "loanRejectionReason": {
+      "type": "text"
+    },
+    "rejectionMessageSent": {
+      "type": "boolean",
+      "default": false
+    },
+    "newLoanAmountOffer": {
+      "type": "decimal"
+    },
+    "newLoanAmountOffered": {
+      "type": "boolean",
+      "default": false
+    },
+    "newLoanAmountOfferedReason": {
+      "type": "text"
+    },
+    "newLoanAmountOfferDeclined": {
+      "type": "boolean",
+      "default": false
+    },
+    "newLoanAmountOfferDeclineReason": {
+      "type": "text"
+    },
+    "newLoanAmountOfferAccepted": {
+      "type": "boolean",
+      "default": true
+    },
+    "loanAmountUpdated": {
+      "type": "boolean",
+      "default": false
+    },
+    "loanAmountChangedReason": {
+      "type": "string"
     }
   }
 }

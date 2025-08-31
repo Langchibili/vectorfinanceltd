@@ -9,6 +9,7 @@ import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 import CircularProgress from '@mui/material/CircularProgress'
 import { updateLoan } from '@/Functions'
+import { frontendUpdateKey } from '@/Secrets'
 
 export default class OfferAmountForm extends React.Component {
   state = {
@@ -34,28 +35,26 @@ export default class OfferAmountForm extends React.Component {
       this.setState({ error: 'Please enter a valid offered amount' })
       return
     }
+    if(amount === loan.newLoanAmountOffer){
+        this.setState({ loading: false, error: 'You already offered this amount' })
+    }
 
     this.setState({ loading: true, error: '' })
 
     try {
-      // We leave status as pending-approval but record offered amount in actionPayload
-      const body = {
-        data: {
-          // keep status unchanged, directors/ceo can optionally leave as pending-approval
-          lastAction: 'offer-new-amount',
-          lastActionByRole: role,
-          lastActionAt: new Date().toISOString(),
-          actionPayload: {
-            offeredAmount: Number(amount),
-            offeredExplanation: explanation || ''
-          }
-        }
-      }
-
-      const updated = await updateLoan(body, loan.id)
-
+      // We leave status as request-approval but record offered amount
+    
+      const updateData = {
+              data:{
+                loanStatus:'request-approval',
+                newLoanAmountOffer: Number(amount),
+                newLoanAmountOfferedReason: explanation || null,
+                frontendUpdateKey:frontendUpdateKey 
+              }
+            }
+      const updated = await updateLoan(updateData, loan.id)
       if (onUpdated && typeof onUpdated === 'function') {
-        onUpdated(updated)
+          onUpdated(updated)
       }
 
       this.setState({ loading: false, open: false, amount: '', explanation: '' })
@@ -72,11 +71,11 @@ export default class OfferAmountForm extends React.Component {
     if (!loan) return null
     const roleLower = String(role || '').toLowerCase()
     if (roleLower !== 'director' && roleLower !== 'ceo') return null
-    if (String(loan.loanStatus).toLowerCase() !== 'pending-approval') return null
+    if (String(loan.loanStatus).toLowerCase() !== 'request-approval') return null
 
     return (
       <>
-        <Button variant="outlined" size="small" onClick={this.open}>
+        <Button color='warning' variant="outlined" size="small" onClick={this.open}>
           Offer New Amount To Client
         </Button>
 

@@ -93,7 +93,7 @@ export default class LoanDetails extends React.Component {
                     <p>Requested Amount</p>
                     <p variant="body2"> <strong>K{loan.clientAskingAmount || loan.loanAmount}</strong></p>
                     </Box>
-                    <strong><Chip label={loan.loanStatus} color={this.getStatusColor(loan.loanStatus)} /></strong>
+                    <strong><Chip label={loan.loanStatus === "accepted"? "Approved" : loan.loanStatus} color={this.getStatusColor(loan.loanStatus)} /></strong>
                 </Box>
                 </Grid>
 

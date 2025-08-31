@@ -1,6 +1,8 @@
 import { createContext, useContext, useState, useEffect } from 'react'
 import ImagePageLoader from '@/components/Includes/Loader/ImagePageLoader'
 import { getAdminInitials, getAdminSignature, getLoanCategoryIds, getLoansInformation, getLoanTypesIds } from '@/Functions'
+import PageSkeleton from '@/components/Includes/Loader/PageSkeleton'
+import { LinearProgress } from '@mui/material'
 
 // Create a context
 const ConstantsContext = createContext(null)
@@ -34,10 +36,18 @@ export function ConstantsProvider({ children }) {
     }
   }, []);
 
-  if (loading) {
-    return <ImagePageLoader/> // Show a loading state if needed
+  if (typeof window !== "undefined" && loading) {
+    if(window.location.pathname.startsWith('/admin')){
+       return (<>
+                <LinearProgress color='secondary'/> 
+                <PageSkeleton title="Loading loan..." loading={true}/>
+             </>)
+    }
+    else{
+       return <ImagePageLoader/> // Show a loading state if needed
+    }
   }
-
+  
   return (
     <ConstantsContext.Provider value={constants}>
       {children}
