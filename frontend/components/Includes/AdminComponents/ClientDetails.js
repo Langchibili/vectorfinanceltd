@@ -14,17 +14,17 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy'
 
 export default class ClientDetails extends React.Component {
   render() {
-    const { loan, role } = this.props
+    const { loan, user, role, adminActions } = this.props
     // loan.client is the populated object: loan.client.data.attributes
     const clientWrapped = loan?.client
-    const client = clientWrapped?.data?.attributes || {}
+    const client = user? user : clientWrapped?.data?.attributes || {} // if the user account is set directly, use it
 
     const details = client.details || {}
-    const bankDetails = client.bankDetails || {}
+    const bankDetails = client.bankDetails || null
     const avatarUrl = client.profilePicture?.data?.attributes?.formats?.thumbnail?.url
       ? backEndUrl + client.profilePicture.data.attributes.formats.thumbnail.url
       : null
-   console.log('loan.client', loan.client)
+
     return (
         <Slide in={true} direction="left">
             <Box sx={{ maxWidth: 700, mx: 'auto', p: { xs: 1.5, sm: 2 } }}>
@@ -38,7 +38,8 @@ export default class ClientDetails extends React.Component {
                 </Box>
 
                 <Divider sx={{ my: 2 }} />
-
+                {adminActions? <>{adminActions()} <Divider sx={{ my: 2 }} /></> : null}
+                
                 <h4 style={{marginBottom:'10px'}}>Personal details</h4>
                 <p>First name: {details.firstname || '-'}</p>
                 <p>Last name: {details.lastname || '-'}</p>
@@ -48,9 +49,11 @@ export default class ClientDetails extends React.Component {
                 <p>Address: {details.address || '-'}</p>
 
                 <Divider sx={{ my: 2 }} />
+                {role === "Collateral Inspector"? null : <>
                 <h4 style={{marginBottom:'10px'}}>Bank Details</h4>
                 <BankDetails bankDetails={bankDetails}/>
                 <Divider sx={{ my: 2 }} /> 
+                </>}
                 <h4 style={{marginBottom:'10px'}}>Account info</h4>
                 <p>{role === "Collateral Inspector"? "Phone Number" : "Username"}: <strong>{client.username || '-'}</strong></p>
                 <p>Email: <strong>{client.email || '-'}</strong></p>
@@ -75,7 +78,8 @@ const BankDetails = ({ bankDetails }) => {
     if (reason === 'clickaway') return
     setSnackbarOpen(false)
   }
-
+  
+ 
   return (
     <>
       <Card sx={{ maxWidth: 500, margin: '20px auto', borderRadius: 3, boxShadow: 3 }}>

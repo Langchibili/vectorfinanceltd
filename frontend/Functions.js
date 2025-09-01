@@ -568,7 +568,6 @@ export const getAllUsers = async ({ search = '', page = 1 }) => {
   if (search) {
     url += `&search=${encodeURIComponent(search)}`
   }
-  console.log('search',url)
   const res = await fetch(url)
   if (!res.ok) throw new Error('Failed to fetch users')
   const users = await res.json()
@@ -1073,6 +1072,7 @@ export const getUserById = async (id,populateString="")=>{
 
     const response = await fetch(api_url+'/users/'+id+populate,{
         headers: {
+          'Authorization': `Bearer ${getJwt()}`,
           'Content-Type': 'application/json'
         }
       }).then(response => response.json())
@@ -1093,7 +1093,8 @@ export const getUserFromDashedId = async (dashedId,populateString)=>{
    export const getUserFromUsername = async (username, populateString)=>{
     const response = await fetch(api_url+'/auths?username='+username,{
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+           'Authorization': `Bearer ${getJwt()}`
         }
       }).then(response => response.json())
         .then(data => data)

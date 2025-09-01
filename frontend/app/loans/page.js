@@ -3,7 +3,8 @@
 import { usePage } from '@/Contexts/PageContext'
 import { useUser } from '@/Contexts/UserContext'
 import { getLoansFromClientId, scrolltoTopOFPage, updateUserAccount } from '@/Functions'
-import { Slide, Button, Stack, Alert } from '@mui/material'
+import { Slide } from '@material-ui/core'
+import { Button, Stack, Alert } from '@mui/material'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 

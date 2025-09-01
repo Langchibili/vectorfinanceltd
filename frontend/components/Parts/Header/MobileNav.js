@@ -7,7 +7,7 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import { Info, Logout } from '@mui/icons-material';
+import { Info, Logout, Person } from '@mui/icons-material';
 import { AccountCircleRounded, Business, ContactSupport, Home, Money, PersonAdd } from '@material-ui/icons';
 import { useRouter } from 'next/navigation'
 import Link from 'next/link';
@@ -38,6 +38,7 @@ export default function MobileNav(props) {
 
   const renderLinkIcon = (linkName)=>{
         if(linkName === 'Loans') return <Money color='success'/>
+        if(linkName === 'Clients') return <Person color='info'/>
         if(linkName === 'Referrals') return <PersonAdd style={{color:'green'}}/>
         if(linkName === 'Profile(For Individuals)') return <AccountCircleRounded color='info'/>
         if(linkName === 'Profile(For Businesses)') return <Business color='info'/>
@@ -61,7 +62,7 @@ export default function MobileNav(props) {
     >
       <List>
         {
-        loggedInUser && loggedInUser.user && adminUserTypes.includes(loggedInUser.user.type)? [['Loans','/admin/loans'],['Home','/admin'],['Contact Us','https://vectorfinancelimited.com/contact-us/'], ['About Us','https://vectorfinancelimited.com/about-us/'], ['Logout','/logout?ref=admin']].map((text, index) => (
+        loggedInUser && loggedInUser.user && adminUserTypes.includes(loggedInUser.user.type)? [['Loans','/admin/loans'], ['Clients','/admin/users'],['Home','/admin'],['Contact Us','https://vectorfinancelimited.com/contact-us/'], ['About Us','https://vectorfinancelimited.com/about-us/'], ['Logout','/logout?ref=admin']].map((text, index) => (
           window.location.pathname === "/" && text[0] === "Home"? '' :
           <ListItem key={text[0]} disablePadding onClick={(e)=>{router.push(text[1]); /*props.handlePageChange(e)*/}}>
             <ListItemButton>

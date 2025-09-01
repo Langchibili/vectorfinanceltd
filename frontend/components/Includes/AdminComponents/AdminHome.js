@@ -245,6 +245,7 @@ export default class AdminHome extends React.Component {
                   Initials
                 </button> : null}
                 <LoansButton />
+                <UsersButton/>
               </div>
             </div>
           )}
@@ -285,9 +286,22 @@ const LoansButton = ()=>{
     <button
       className="btn btn-outline-danger px-4"
       // onClick={() => router.push('/admin/loans/')}
-      onClick={()=>{window.location = "/admin/loans/"}}
+      onClick={()=>{window.location = "/admin/users"}}
     >
       Loans
+    </button>
+  )
+}
+
+const UsersButton = ()=>{
+  const router = useRouter()
+  return (
+    <button
+      className="btn btn-outline-info px-4"
+      // onClick={() => router.push('/admin/loans/')}
+      onClick={()=>{window.location = "/admin/users/"}}
+    >
+      Users
     </button>
   )
 }

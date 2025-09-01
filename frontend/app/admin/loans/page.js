@@ -1,7 +1,8 @@
 "use client"
 
 import { useEffect, useState } from 'react'
-import { Slide, Button, Stack, Alert, TextField, Pagination, LinearProgress } from '@mui/material'
+import { Slide } from '@material-ui/core'
+import { Button, Stack, Alert, TextField, Pagination, LinearProgress } from '@mui/material'
 import { useRouter } from 'next/navigation'
 import { useUser } from '@/Contexts/UserContext'
 import { getAllLoans, getLoanFromId, scrolltoTopOFPage } from '@/Functions'
