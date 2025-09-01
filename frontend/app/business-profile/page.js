@@ -6,7 +6,6 @@ import { useConstants } from "@/Contexts/ConstantsContext";
 import { usePage } from "@/Contexts/PageContext";
 import { useUser } from "@/Contexts/UserContext";
 import { scrolltoTopOFPage } from "@/Functions";
-import { Slide } from "@material-ui/core";
 import { Slide, Stack, Alert } from '@mui/material'
 
 export default function Profile() {

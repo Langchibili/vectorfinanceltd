@@ -1,6 +1,5 @@
 'use client'
 
-import { Slide } from '@mui/material'
 import { usePage } from '@/Contexts/PageContext'
 import { useBottomNav } from '@/Contexts/BottomNavContext'
 import { scrolltoTopOFPage } from '@/Functions'
