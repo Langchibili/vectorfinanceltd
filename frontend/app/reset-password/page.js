@@ -2,15 +2,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
 import { api_url } from '@/Constants'; // ← Ensure this points at your Strapi base URL
 import Link from 'next/link';
 
-export default function ResetPasswordPage() {
+export default function ResetPasswordPage({ searchParams }) {
   // Grab the "code" from the URL: /reset-password?code=<token>
-  const params = useSearchParams();
-  const router = useRouter();
-  const code = params.get('code') ?? '';
+  const { code } = searchParams
 
   // Local state for form fields & status
   const [password, setPassword] = useState('');
@@ -97,7 +94,7 @@ export default function ResetPasswordPage() {
               {successMessage} <br />
               <small>
                 If you are not redirected automatically,{' '}
-                <Link href="/login" className="text-decoration-underline">
+                <Link href="/signin" className="text-decoration-underline">
                   click here
                 </Link>.
               </small>
