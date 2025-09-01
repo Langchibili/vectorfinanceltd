@@ -8,6 +8,7 @@ import ReferralEarningsPage from '@/components/Includes/Referrals/ReferralEarnin
 import ReferralAccountPage from '@/components/Includes/Referrals/ReferralAccountPage'
 import ReferralHomePage from '@/components/Includes/Referrals/ReferralHomePage'
 import { useUser } from '@/Contexts/UserContext'
+import { Slide, Stack, Alert } from '@mui/material'
 
 export default function Referrals() {
   const { setPage } = usePage()
