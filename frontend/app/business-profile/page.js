@@ -20,9 +20,9 @@ export default function Profile() {
         return (
           <div style={{ display: 'flex', justifyContent: 'center', marginTop: '50px' }}>
             <Stack spacing={2} alignItems="center">
-              <Alert severity="warning">You are logged out, log in</Alert>
-      
               {typeof window !== 'undefined' ? (
+                <>
+                <Alert severity="warning">You are logged out, log in</Alert>
                 <Button
                   variant="outlined"
                   color="primary"
@@ -32,6 +32,7 @@ export default function Profile() {
                 >
                   Login to Proceed
                 </Button>
+                </>
               ) : null}
             </Stack>
           </div>

@@ -82,18 +82,7 @@ export default function AdminUsersList() {
   const handleAddClient = () => {
     window.location = '/admin/users/add'
   }
-
-  const handleCopy = (value) => {
-    if (navigator && navigator.clipboard && value) {
-      navigator.clipboard.writeText(value)
-    }
-  }
-
-  const handleWhatsapp = (phone) => {
-    if (phone) {
-      window.open(`https://wa.me/${phone.replace(/[^0-9]/g, '')}`, '_blank')
-    }
-  }
+  
 
   if (loading) {
     return (
@@ -107,20 +96,21 @@ export default function AdminUsersList() {
       return (
         <div style={{ display: 'flex', justifyContent: 'center', marginTop: '50px' }}>
           <Stack spacing={2} alignItems="center">
-            <Alert severity="warning">You are logged out, log in</Alert>
-    
             {typeof window !== 'undefined' ? (
-              <Button
-                variant="outlined"
-                color="primary"
-                onClick={() => {
-                  const redirect = encodeURIComponent(window.location.href)
-                  window.location.href = `/admin?redirectUrl=${redirect}`
-                }}
-              >
-                Login to Proceed
-              </Button>
-            ) : null}
+            <>
+            <Alert severity="warning">You are logged out, log in</Alert>
+            <Button
+              variant="outlined"
+              color="primary"
+              onClick={() => {
+                const redirect = encodeURIComponent(window.location.href)
+                window.location.href = `/admin?redirectUrl=${redirect}`
+              }}
+            >
+              Login to Proceed
+            </Button>
+            </>
+          ) : null}
           </Stack>
         </div>
       )
@@ -147,7 +137,7 @@ export default function AdminUsersList() {
         <Stack spacing={3} alignItems="center">
           <Button
             variant="contained"
-            color="primary"
+            color="secondary"
             size="large"
             onClick={handleAddClient}
             startIcon={<PersonAdd />}
@@ -226,7 +216,7 @@ export default function AdminUsersList() {
           {users.length === 0 ? (
             <Alert severity="info" sx={{ width: '100%', maxWidth: 600 }}>No users found.</Alert>
           ) : (
-            <Stack spacing={2} sx={{ width: '100%', maxWidth: 600, mx:'auto', textAlign:'center' }}>
+            <Stack spacing={2} sx={{ width: '100%', maxWidth: 600, mx:'auto', alignItems:'center' }}>
             {users
                 .slice()
                 .sort((a, b) => b.id - a.id)
@@ -261,8 +251,17 @@ export default function AdminUsersList() {
                         <Typography variant="body2" color="text.secondary">
                             Phone: {phone}
                         </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                            Email: {email}
+                        <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{
+                            userSelect: 'text',
+                            pointerEvents: 'none', // disables click/tap
+                            textDecoration: 'none',
+                            cursor: 'default'
+                        }}
+                        >
+                        Email: {email}
                         </Typography>
                         <Typography variant="caption" color="text.secondary">
                             Client ID: {clientId}

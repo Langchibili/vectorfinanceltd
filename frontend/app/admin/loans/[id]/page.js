@@ -106,19 +106,20 @@ export default function LoanDetailPage() {
   return (
     <div style={{ display: 'flex', justifyContent: 'center', marginTop: '50px' }}>
       <Stack spacing={2} alignItems="center">
-        <Alert severity="warning">You are logged out, log in</Alert>
-
         {typeof window !== 'undefined' ? (
-          <Button
+        <>
+        <Alert severity="warning">You are logged out, log in</Alert>
+        <Button
             variant="outlined"
             color="primary"
             onClick={() => {
-              const redirect = encodeURIComponent(window.location.href)
-              window.location.href = `/admin?redirectUrl=${redirect}`
+            const redirect = encodeURIComponent(window.location.href)
+            window.location.href = `/admin?redirectUrl=${redirect}`
             }}
-          >
+        >
             Login to Proceed
-          </Button>
+        </Button>
+        </>
         ) : null}
       </Stack>
     </div>

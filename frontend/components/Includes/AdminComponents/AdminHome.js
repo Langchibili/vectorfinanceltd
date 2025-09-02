@@ -130,7 +130,7 @@ export default class AdminHome extends React.Component {
             </Typography>
             <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center' }}>
               <Button variant="contained" onClick={() => window.location.replace('/')}>Home</Button>
-              <Button variant="outlined" onClick={() => window.location.replace('/admin')}>Admin login</Button>
+              <Button variant="outlined" onClick={() => window.location.replace('/logout?ref=admin')}>Admin login</Button>
             </Box>
           </div>
         </div>
@@ -166,7 +166,6 @@ export default class AdminHome extends React.Component {
       snackMessage,
       snackSeverity
     } = this.state
-    console.log('this.props.loggedInUser',this.props.loggedInUser)
     return (
       <div className="container py-5" style={{ marginTop: '10px' }}>
         <div className="main-content">
@@ -231,7 +230,7 @@ export default class AdminHome extends React.Component {
           {step === 2 && (
             <div className="text-center">
               <h4>Select Action</h4>
-              <div className="d-flex justify-content-center gap-3 mt-4">
+              <div className="d-flex justify-content-center gap-3 mt-4" style={{paddingLeft:'10px',paddingRight:'10px'}}>
                 {role === "ceo" || role === "director"? <button
                   className="btn btn-outline-success px-4"
                   onClick={() => this.handleChoice('signature')}
@@ -239,13 +238,15 @@ export default class AdminHome extends React.Component {
                   Signature
                 </button> : null}
                 {role === "ceo" || role === "director"? <button
-                  className="btn btn-outline-info px-4"
+                  className="btn btn-outline-secondary px-4"
                   onClick={() => this.handleChoice('initials')}
                 >
                   Initials
                 </button> : null}
+              </div>
+              <div className="d-flex justify-content-center gap-3 mt-4">
                 <LoansButton />
-                <UsersButton/>
+                {role === "Collateral Inspector"? null : <UsersButton/>}
               </div>
             </div>
           )}
@@ -286,7 +287,7 @@ const LoansButton = ()=>{
     <button
       className="btn btn-outline-danger px-4"
       // onClick={() => router.push('/admin/loans/')}
-      onClick={()=>{window.location = "/admin/users"}}
+      onClick={()=>{window.location = "/admin/loans"}}
     >
       Loans
     </button>

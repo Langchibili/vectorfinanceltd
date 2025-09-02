@@ -11,6 +11,7 @@ import CircularProgress from '@mui/material/CircularProgress'
 import { TRANSITIONS } from '@/lib/transitions'
 import { getPermissions } from '@/lib/permissions'
 import { updateLoan } from '@/Functions'
+import { useBottomNav } from '@/Contexts/BottomNavContext'
 
 // friendly labels
 const ACTION_LABELS = {
@@ -247,8 +248,21 @@ export default class ActionOverview extends React.Component {
               )
             })}
           </Stack>
+          <div className="d-flex justify-content-center gap-3 mt-4">
+                <div><ViewLoanDetails/></div>
+                <div><ViewClientDetails/></div>
+          </div>
         </Box>
       </Paper>
     )
   }
+}
+
+const ViewLoanDetails = ()=>{
+     const {setBottomNavLink} = useBottomNav()
+     return <Button variant="outlined" size="small" onClick={()=>{setBottomNavLink(0)}}>View Loan Details</Button>
+}
+const ViewClientDetails = ()=>{
+     const {setBottomNavLink} = useBottomNav()
+     return <Button variant="outlined" size="small" onClick={()=>{setBottomNavLink(1)}}>View Client Details</Button>
 }

@@ -109,20 +109,21 @@ export default function AdminLoansList() {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', marginTop: '50px' }}>
         <Stack spacing={2} alignItems="center">
-          <Alert severity="warning">You are logged out, log in</Alert>
-  
           {typeof window !== 'undefined' ? (
-            <Button
-              variant="outlined"
-              color="primary"
-              onClick={() => {
-                const redirect = encodeURIComponent(window.location.href)
-                window.location.href = `/admin?redirectUrl=${redirect}`
-              }}
-            >
-              Login to Proceed
-            </Button>
-          ) : null}
+                <>
+                <Alert severity="warning">You are logged out, log in</Alert>
+                <Button
+                variant="outlined"
+                color="primary"
+                onClick={() => {
+                    const redirect = encodeURIComponent(window.location.href)
+                    window.location.href = `/admin?redirectUrl=${redirect}`
+                }}
+                >
+                Login to Proceed
+                </Button>
+                </>
+            ) : null}
         </Stack>
       </div>
     )
