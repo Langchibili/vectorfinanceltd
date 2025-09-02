@@ -93,7 +93,7 @@ export default function Loans() {
                   variant="outlined"
                   color="primary"
                   onClick={() => {
-                    window.location.href = `/signup`
+                    window.location.href = `/signin`
                   }}
                 >
                   Login to Proceed

@@ -228,7 +228,7 @@ export default function AdminUserAdd() {
                       <div>
                         <h5 className="text-primary">Register Account</h5>
                         <p className="text-muted">
-                          Sign up and access one of our low-interest loans within 24hrs.
+                          You are registering a clinet's account on their behalf, make sure to have them read the terms of use
                         </p>
                       </div>
                       <div className="mt-4">
@@ -328,13 +328,13 @@ export default function AdminUserAdd() {
                               />
                           <div className="mb-4">
                                 <p className="mb-0 fs-12 text-muted fst-italic">
-                                By registering you agree to the VectorFinance{" "}
-                                    <a
-                                    href="#"
+                                   By registering this client, the client agrees to the VectorFinance{" "}
+                                    <Link
+                                    href="/termsofuse"
                                     className="text-primary text-decoration-underline fst-normal fw-medium"
                                     >
                                     Terms of Use
-                                    </a>
+                                    </Link>
                                 </p>
                             </div>
                             <p className="text text-danger">{serverError}</p>
@@ -345,17 +345,7 @@ export default function AdminUserAdd() {
                           </div>
                         </form>
                       </div>
-                      <div className="mt-5 text-center">
-                        <p className="mb-0">
-                          Already have an account?{" "}
-                          <Link
-                            href="/signin"
-                            className="fw-semibold text-primary text-decoration-underline"
-                          >
-                            Login
-                          </Link>
-                        </p>
-                      </div>
+                      
                     </div>
                   </div>
                   </Slide>

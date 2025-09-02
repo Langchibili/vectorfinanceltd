@@ -29,7 +29,7 @@ export default function Profile() {
                   variant="outlined"
                   color="primary"
                   onClick={() => {
-                    window.location.href = `/signup`
+                    window.location.href = `/signin`
                   }}
                 >
                   Login to Proceed

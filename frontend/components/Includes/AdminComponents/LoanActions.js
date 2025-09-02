@@ -232,7 +232,7 @@ export default class LoanActions extends React.Component {
     if(loan.loanStatus === "pending-approval"){
         if(role === 'ceo' || role === 'director'){
             if(!loan.loanAppendixCreated){
-               return <Alert severity='info'>Client has signed the loan form, awating the loan officer attach appendix details to the loan form.</Alert>
+               return <Alert severity='info'>Client has signed the loan form, awaiting the loan officer to attach appendix details to the loan form.</Alert>
             }
             if(!loan.invoiceSent){
                 return <Alert severity='info'>Loan officer has entered loan form appendix details, now awaiting the loan officer to enter the invoice number from the loan's quick books record.</Alert>
@@ -255,7 +255,7 @@ export default class LoanActions extends React.Component {
 
     return (
          <Slide in={true} direction="left">
-            <Box sx={{ mt: 2, display: 'flex', gap: 1, flexWrap: 'wrap', textAlign:'center' }}>
+            <Box sx={{ mt: 2, display: 'flex', gap: 1, flexWrap: 'wrap' }}>
                 {actions.map(a => {
                 const allowed = this.isAllowed ? this.isAllowed(a, role) : true // adapt to your permission check
                 const color = this.getActionColor(a)

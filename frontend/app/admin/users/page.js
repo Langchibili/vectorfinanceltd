@@ -30,7 +30,7 @@ export default function AdminUsersList() {
   const { setPage: setPageContext } = usePage()
   const { BottomNavLink } = useBottomNav()
   const loggedIn = loggedInUser?.status || false
-  const adminRoles = ['director', 'ceo', 'Loan Admin', 'Accountant']
+  const adminRoles = ['director', 'ceo', 'Loan Admin', 'Accountant','collateral inspector']
   setPageContext('/admin/users')
 
   useEffect(() => {
@@ -248,19 +248,29 @@ export default function AdminUsersList() {
                         <Typography variant="h6" fontWeight={600}>
                             {user_title}
                         </Typography>
-                        <Typography variant="body2" color="text.secondary">
+                        <Typography 
+                            variant="body2" 
+                            color="text.secondary"
+                            sx={{
+                                userSelect: 'text',
+                                textDecorationStyle:"none",
+                                pointerEvents: 'none', // disables click/tap
+                                textDecoration: 'none',
+                                cursor: 'default'
+                            }}>
                             Phone: {phone}
                         </Typography>
                         <Typography
-                        variant="body2"
-                        color="text.secondary"
-                        sx={{
-                            userSelect: 'text',
-                            pointerEvents: 'none', // disables click/tap
-                            textDecoration: 'none',
-                            cursor: 'default'
-                        }}
-                        >
+                            variant="body2"
+                            color="text.secondary"
+                            sx={{
+                                userSelect: 'text',
+                                textDecorationStyle:"none",
+                                pointerEvents: 'none', // disables click/tap
+                                textDecoration: 'none',
+                                cursor: 'default'
+                            }}
+                            >
                         Email: {email}
                         </Typography>
                         <Typography variant="caption" color="text.secondary">

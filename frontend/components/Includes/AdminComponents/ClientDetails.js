@@ -33,7 +33,13 @@ export default class ClientDetails extends React.Component {
                     <Avatar src={avatarUrl || '/default-profile.png'} sx={{ width: 64, height: 64 }} />
                     <Box>
                     <h6>{client.fullnames || client.username || 'Client'}</h6>
-                    <p variant="body2">{client.email || ''}</p>
+                    <p variant="body2" sx={{
+                                userSelect: 'text',
+                                textDecorationStyle:"none",
+                                pointerEvents: 'none', // disables click/tap
+                                textDecoration: 'none',
+                                cursor: 'default'
+                            }}>{client.email || ''}</p>
                     </Box>
                 </Box>
 
@@ -56,7 +62,13 @@ export default class ClientDetails extends React.Component {
                 </>}
                 <h4 style={{marginBottom:'10px'}}>Account info</h4>
                 <p>{role === "Collateral Inspector"? "Phone Number" : "Username"}: <strong>{client.username || '-'}</strong></p>
-                <p>Email: <strong>{client.email || '-'}</strong></p>
+                <p sx={{
+                                userSelect: 'text',
+                                textDecorationStyle:"none",
+                                pointerEvents: 'none', // disables click/tap
+                                textDecoration: 'none',
+                                cursor: 'default'
+                            }}>Email: <strong>{client.email || '-'}</strong></p>
                 {role === "Collateral Inspector"? null : <p>Registered: {client.createdAt ? new Date(client.createdAt).toLocaleString() : '-'}</p>}
                 <ContactCard phone={client.username} email={client.email} user_title="Client"/>
                 </Paper>

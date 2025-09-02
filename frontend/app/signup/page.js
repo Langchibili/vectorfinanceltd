@@ -311,7 +311,7 @@ export default function Signup() {
                             />
                             {errors.email && <div className="invalid-feedback">{errors.email}</div>}
                           </div>
-                          <div className="mb-3">
+                          {/* <div className="mb-3">
                             <label className="form-label" htmlFor="password-input">
                               Password <span className="text-danger">*</span>
                             </label>
@@ -341,7 +341,37 @@ export default function Signup() {
                                 </button>
                               {errors.password && <div className="invalid-feedback">{errors.password}</div>}
                             </div>
+                          </div> */}
+                        <div className="mb-3">
+                          <label className="form-label" htmlFor="password-input">
+                            Password <span className="text-danger">*</span>
+                          </label>
+                          <div className="position-relative auth-pass-inputgroup">
+                            <input
+                              type={showPassword ? "text" : "password"}
+                              className={`form-control pe-5 password-input ${errors.password ? 'is-invalid' : ''}`}
+                              placeholder="Enter Password"
+                              id="password-input"
+                              ref={passwordRef}
+                            />
+                            <button
+                              type="button"
+                              className="btn btn-link position-absolute end-0 top-0 text-decoration-none shadow-none text-muted password-addon"
+                              onClick={() => setShowPassword((prev) => !prev)}
+                              style={{ zIndex: 2 }}
+                              tabIndex={-1}
+                            >
+                              <i
+                                className={
+                                  showPassword
+                                    ? "ri-eye-off-fill align-middle"
+                                    : "ri-eye-fill align-middle"
+                                }
+                              />
+                            </button>
+                            {errors.password && <div className="invalid-feedback">{errors.password}</div>}
                           </div>
+                        </div>
                           
                           {!numberOtpVerified? <><br/>{renderPhoneOtpVerificationForm()}</> : <Alert severity="success" sx={{marginBottom:'10px'}}>Phone Number Verified</Alert>}
                           {!emailOtpVerified? <><br/>{renderEmailOtpVerificationForm()}</> : <Alert severity="success" sx={{marginBottom:'10px'}}>Email Address Verified</Alert>}
@@ -359,12 +389,12 @@ export default function Signup() {
                           <div className="mb-4">
                                 <p className="mb-0 fs-12 text-muted fst-italic">
                                 By registering you agree to the VectorFinance{" "}
-                                    <a
-                                    href="#"
+                                    <Link
+                                    href="/termsofuse"
                                     className="text-primary text-decoration-underline fst-normal fw-medium"
                                     >
                                     Terms of Use
-                                    </a>
+                                    </Link>
                                 </p>
                             </div>
                             <p className="text text-danger">{serverError}</p>
