@@ -20,7 +20,7 @@ export default function Profile() {
     scrolltoTopOFPage()
     if (!loggedIn) {
         return (
-          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '50px' }}>
+          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '70px' }}>
             <Stack spacing={2} alignItems="center">
                {typeof window !== 'undefined' ? (
                 <>

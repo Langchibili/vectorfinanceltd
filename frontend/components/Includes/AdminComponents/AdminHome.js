@@ -229,7 +229,7 @@ export default class AdminHome extends React.Component {
 
           {step === 2 && (
             <div className="text-center">
-              <h4>Select Action</h4>
+              <h4 className="mt-4">Select Action</h4>
               <div className="d-flex justify-content-center gap-3 mt-4" style={{paddingLeft:'10px',paddingRight:'10px'}}>
                 {role === "ceo" || role === "director"? <button
                   className="btn btn-outline-success px-4"
