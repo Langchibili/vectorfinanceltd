@@ -337,6 +337,93 @@ async function getScheduleCriteria2(loanId) {
  * - In the last month, the user pays the remaining principal plus the last interest installment.
  * This matches the example: 50000 loan, 18% for 3 months, 9000 per month interest, last payment is 59000 (50000 principal + 9000 interest).
  */
+// async function createScheduleCriteria3(loanId) {
+//   try {
+//     const loan = await strapi.db.query('api::loan.loan').findOne({
+//       where: { id: loanId },
+//       populate: ['loanType', 'client'],
+//     });
+//     if (!loan) throw new Error('Loan not found');
+
+//     const { disbursementDate, loanAmount: principal, loanTerm: termMonths, loanType } = loan;
+
+//     // Get loan info constants
+//     const loanInfo = await strapi.db.query('api::loans-information.loans-information').findOne();
+//     const annualRatePercent = loanType.typeName === 'salaryBased'
+//       ? loanInfo.defaultSalaryLoanInterestRate * 12
+//       : loanInfo.defaultCollaterallLoanInterestRate * 12;
+
+//     // Calculate total interest for the term (simple interest)
+//     const totalInterest = +(principal * (annualRatePercent / 100) * (termMonths / 12)).toFixed(2);
+//     const totalPayment = +(principal + totalInterest).toFixed(2);
+
+//     // Determine fixed interest payment per month (rounded to 2 decimals)
+//     const interestPerMonth = +(totalInterest / termMonths).toFixed(2);
+
+//     // Build schedule array
+//     const Schedule = [];
+//     let balance = totalPayment;
+
+//     for (let i = 1; i <= termMonths; i++) {
+//       const dueDateObj = new Date(disbursementDate || Date.now());
+//       dueDateObj.setMonth(dueDateObj.getMonth() + i);
+
+//       if (i < termMonths) {
+//         // For months 1 to (n-1): pay only interest, reduce balance by interest payment
+//         balance = +(balance - interestPerMonth).toFixed(2);
+//         Schedule.push({
+//           dueDateInWords: format(dueDateObj, 'do MMMM yyyy'),
+//           dueDate: dueDateObj.toISOString(),
+//           principalDue: 0,
+//           interestDue: interestPerMonth,
+//           paymentAmount: interestPerMonth,
+//           status: 'pending',
+//           paidAmount: 0,
+//           paidAt: null,
+//           lateFee: 0,
+//           remainingBalance: balance,
+//         });
+//       } else {
+//         // Last month: pay all principal + last interest
+//         Schedule.push({
+//           dueDateInWords: format(dueDateObj, 'do MMMM yyyy'),
+//           dueDate: dueDateObj.toISOString(),
+//           principalDue: principal,
+//           interestDue: interestPerMonth,
+//           paymentAmount: +(principal + interestPerMonth).toFixed(2),
+//           status: 'pending',
+//           paidAmount: 0,
+//           paidAt: null,
+//           lateFee: 0,
+//           remainingBalance: 0,
+//         });
+//       }
+//     }
+
+//     // Upsert component schedule
+//     const existing = await strapi.entityService.findMany('api::repayment-schedule.repayment-schedule', {
+//       filters: { loan: loanId },
+//       populate: ['Schedule'],
+//       limit: 1
+//     });
+
+//     if (existing.length) {
+//       return strapi.entityService.update(
+//         'api::repayment-schedule.repayment-schedule',
+//         existing[0].id,
+//         { data: { Schedule } }
+//       );
+//     } else {
+//       return strapi.entityService.create('api::repayment-schedule.repayment-schedule', {
+//         data: { loan: loanId, Schedule },
+//       });
+//     }
+//   } catch (err) {
+//     console.error('createScheduleCriteria3 error:', err);
+//     return [];
+//   }
+// }
+
 async function createScheduleCriteria3(loanId) {
   try {
     const loan = await strapi.db.query('api::loan.loan').findOne({
@@ -369,33 +456,33 @@ async function createScheduleCriteria3(loanId) {
       dueDateObj.setMonth(dueDateObj.getMonth() + i);
 
       if (i < termMonths) {
-        // For months 1 to (n-1): pay only interest, reduce balance by interest payment
+        // For months 1 to (n-1): pay only interest, reduce balance by payment
         balance = +(balance - interestPerMonth).toFixed(2);
         Schedule.push({
           dueDateInWords: format(dueDateObj, 'do MMMM yyyy'),
           dueDate: dueDateObj.toISOString(),
+          paymentAmount: interestPerMonth,
           principalDue: 0,
           interestDue: interestPerMonth,
-          paymentAmount: interestPerMonth,
+          remainingBalance: balance,
           status: 'pending',
           paidAmount: 0,
           paidAt: null,
           lateFee: 0,
-          remainingBalance: balance,
         });
       } else {
-        // Last month: pay all principal + last interest
+        // Last month: pay all principal + last interest, balance becomes 0
         Schedule.push({
           dueDateInWords: format(dueDateObj, 'do MMMM yyyy'),
           dueDate: dueDateObj.toISOString(),
+          paymentAmount: +(principal + interestPerMonth).toFixed(2),
           principalDue: principal,
           interestDue: interestPerMonth,
-          paymentAmount: +(principal + interestPerMonth).toFixed(2),
+          remainingBalance: 0,
           status: 'pending',
           paidAmount: 0,
           paidAt: null,
           lateFee: 0,
-          remainingBalance: 0,
         });
       }
     }

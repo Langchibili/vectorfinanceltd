@@ -10,6 +10,7 @@ import { PageProvider } from "@/Contexts/PageContext";
 import React from "react";
 import Script from "next/script";
 import MobileNav from "@/components/Parts/Header/MobileNav";
+import { updateUserAccount } from "@/Functions";
 
 
 export default function RootLayout({ children }) {
@@ -101,13 +102,18 @@ export default function RootLayout({ children }) {
 const HeaderPart = ()=>{
   const loggedInUser = useUser()
   if(loggedInUser && loggedInUser.user){
-    if(loggedInUser.user.username === "director"  || loggedInUser.user.username === "ceo"){
-    if(typeof document !== "undefined"){
-      if(!window.location.pathname.startsWith('/admin')){
-         window.location = "/logout" // admin user cannot access normal account unless with normal account 
+    if(loggedInUser && loggedInUser.user && !loggedInUser.user.type){ //null for example
+      updateUserAccount({type:"client"},loggedInUser.user.id)
+    }
+
+    const adminRoles = ['director', 'ceo', 'Loan Admin', 'Accountant','Collateral Inspector']
+    if(adminRoles.includes(loggedInUser.user.type)){
+      if(typeof document !== "undefined"){
+        if(!window.location.pathname.startsWith('/admin')){
+            window.location = "/logout?ref=admin" // admin user cannot access normal account unless with normal account 
+        }
       }
     }
-  }
   }
   return (<>
               {/* Main Header | Only visible to logged in users */}

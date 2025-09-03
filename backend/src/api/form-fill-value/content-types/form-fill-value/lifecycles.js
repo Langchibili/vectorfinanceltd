@@ -91,13 +91,16 @@ module.exports = {
       // 4.5 Fetch repayment schedule and normalize it for the template
       //    — id should be incremental (1,2,3,...), not the DB id
       // ─────────────────────────────────────────────────────────────
-      //const rawSchedule = await getSchedule(Number(loanId)) || []
-      //const rawSchedule = await getScheduleCriteria2(Number(loanId)) || []
+      // 4.5 Fetch repayment schedule and normalize it for the template
+      // const rawSchedule = await getSchedule(Number(loanId)) || []
+      // const rawSchedule = await getScheduleCriteria2(Number(loanId)) || []
+      // for 3rd criteria of loan repayment schedule calculation(only tested for collateral loans)
       const rawSchedule = await getScheduleCriteria3(Number(loanId)) || []
-      
-      // compute starting outstanding balance as sum of principalDue
+
+      // For Criteria3: running balance starts as sum of paymentAmount (totalPayment), and is reduced by paymentAmount each period
       const sumPrincipal = rawSchedule.reduce((s, r) => s + (Number(r.principalDue || 0)), 0)
-      let runningBalance = +sumPrincipal.toFixed(2)
+      const sumInterest = rawSchedule.reduce((s, r) => s + (Number(r.interestDue || 0)), 0)
+      let runningBalance = +(sumPrincipal + sumInterest).toFixed(2)
 
       const repaymentSchedule = rawSchedule.map((r, idx) => {
         const principal = Number(r.principalDue ?? 0)
@@ -105,8 +108,12 @@ module.exports = {
         const lateFee = Number(r.lateFee ?? 0)
         const paymentAmount = +(principal + interest + lateFee).toFixed(2)
 
-        // decrement running balance by principal portion
-        runningBalance = +((runningBalance - principal)).toFixed(2)
+        // For Criteria3: running balance is reduced by paymentAmount each period
+        if (idx < rawSchedule.length - 1) {
+          runningBalance = +(runningBalance - paymentAmount).toFixed(2)
+        } else {
+          runningBalance = 0
+        }
 
         return {
           paymentNumber: idx + 1,                 // incremental id 1,2,3,...
@@ -239,3 +246,45 @@ module.exports = {
     }
   },
 }
+
+
+
+/* for criteria 1*/
+// //const rawSchedule = await getSchedule(Number(loanId)) || []
+//       //const rawSchedule = await getScheduleCriteria2(Number(loanId)) || []
+//       /* first criteria */
+//       const rawSchedule = await getScheduleCriteria3(Number(loanId)) || []
+      
+//       // compute starting outstanding balance as sum of principalDue
+//       const sumPrincipal = rawSchedule.reduce((s, r) => s + (Number(r.principalDue || 0)), 0)
+//       let runningBalance = +sumPrincipal.toFixed(2)
+ 
+//       /* first criteria */
+//       const repaymentSchedule = rawSchedule.map((r, idx) => {
+//         const principal = Number(r.principalDue ?? 0)
+//         const interest = Number(r.interestDue ?? 0)
+//         const lateFee = Number(r.lateFee ?? 0)
+//         const paymentAmount = +(principal + interest + lateFee).toFixed(2)
+
+//         // decrement running balance by principal portion
+//         runningBalance = +((runningBalance - principal)).toFixed(2)
+
+//         return {
+//           paymentNumber: idx + 1,                 // incremental id 1,2,3,...
+//           dueDateInWords: r.dueDateInWords || '',
+//           dueDate: r.dueDate || '',
+//           paymentAmount: isFinite(paymentAmount) ? paymentAmount : null,
+//           principalDue: isFinite(principal) ? principal : null,
+//           interestDue: isFinite(interest) ? interest : null,
+//           lateFee: isFinite(lateFee) ? lateFee : null,
+//           status: r.status || '',
+//           paidAmount: r.paidAmount ?? null,
+//           paidAt: r.paidAt ?? null,
+//           remainingBalance: isFinite(runningBalance) ? runningBalance : null
+//         }
+//       })
+
+//       const totalPaymentAmount = repaymentSchedule.reduce((s, row) => s + (Number(row.paymentAmount) || 0), 0)
+
+//       console.log('[Debug] repaymentSchedule length:', repaymentSchedule.length)
+//       console.log('[Debug] totalPaymentAmount:', totalPaymentAmount)
