@@ -21,6 +21,7 @@ import SendQuickBookInvoiceNumber from './SendQuickBookInvoiceNumber'
 import UploadPOP from './UploadPOP'
 import ContactCard from './ContactCard'
 import ChangeLoanAmount from './ChangeLoanAmount'
+import RequestApproval from './RequestApproval'
 
 export default class LoanActions extends React.Component {
   state = {
@@ -221,11 +222,16 @@ export default class LoanActions extends React.Component {
                  <Alert severity='info'>You have already sent an inspection request.</Alert> : null}
                  <RequestCollateralInspection loan={loan} onUpdated={onUpdated} role={role} handleActionClose={this.handleActionClose}/> 
                  <RejectionForm loan={loan} onUpdated={onUpdated} role={role} handleActionClose={this.handleActionClose} openModal={false}/>
-                 
                  </>)
     }
     
     if(role !== "Collateral Inspector" &&  loan.loanStatus === "collateral-inspection"){
+        if(role === 'Loan Admin' && loan.collateral && loan.collateral.collateralStatus === "inspected"){
+            return <>
+                    <RequestApproval loan={loan} onUpdated={onUpdated} role={role} handleActionClose={this.handleActionClose}/> 
+                   <ContactCard phone={constants.loansInformation.collateralInspectorNumber} email={constants.loansInformation.collateralInspectorEmail} user_title="Inspector" />
+            </>
+        }
         return <ContactCard phone={constants.loansInformation.collateralInspectorNumber} email={constants.loansInformation.collateralInspectorEmail} user_title="Inspector" />
     }
 

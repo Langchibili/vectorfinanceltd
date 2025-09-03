@@ -30,7 +30,7 @@ export default function AdminUsersList() {
   const { setPage: setPageContext } = usePage()
   const { BottomNavLink } = useBottomNav()
   const loggedIn = loggedInUser?.status || false
-  const adminRoles = ['director', 'ceo', 'Loan Admin', 'Accountant','collateral inspector']
+  const adminRoles = ['director', 'ceo', 'Loan Admin', 'Accountant','Collateral Inspector']
   setPageContext('/admin/users')
 
   useEffect(() => {

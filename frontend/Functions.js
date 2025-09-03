@@ -603,6 +603,39 @@ export const getAllUsers = async ({ search = '', page = 1 }) => {
     .then(data => data)
   }
   
+
+// getFormByName
+// Returns the first matching form or null if none found
+export async function getFormByName(formName) {
+  if (!formName) throw new Error('getFormByName: formName is required')
+
+  const base = api_url.replace(/\/$/, '')
+  const params = new URLSearchParams()
+  params.set('filters[formName][$eq]', formName)
+  params.set('populate', '*')
+  params.set('pagination[pageSize]', '1') // get just the first match
+
+  const url = `${base}/forms?${params.toString()}`
+
+  const headers = {
+    Accept: 'application/json'
+  }
+
+  const res = await fetch(url, { headers })
+  if (!res.ok) {
+    const text = await res.text().catch(() => '')
+    throw new Error(`Failed to fetch form: ${res.status} ${res.statusText} ${text}`)
+  }
+
+  const body = await res.json()
+  const item = Array.isArray(body.data) && body.data.length ? body.data[0] : null
+  if (!item) return null
+  console.log('item', item)
+  // Return a flattened object: { id, ...attributes }
+  return { id: item.id, ...item.attributes }
+}
+
+
 // REFERRAL STUFF
 export const createReferralAccount = async (userId)=>{
     const referralAccount = await fetch(api_url+'/referrals/', {

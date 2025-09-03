@@ -1,7 +1,7 @@
 'use client'
 
 import { submitCreateUserRequest } from "@/Constants";
-import { dynamicConfig, getReferrerFromReferralCode, scrolltoTopOFPage, textHasPhoneNumber, updateUserAccount, validateEmail } from "@/Functions";
+import { dynamicConfig, getFormByName, getReferrerFromReferralCode, scrolltoTopOFPage, textHasPhoneNumber, updateUserAccount, validateEmail } from "@/Functions";
 import { Slide } from "@material-ui/core";
 import { Alert, Button } from "@mui/material";
 import Link from "next/link";
@@ -134,9 +134,11 @@ export default function AdminUserAdd() {
      
        else{
           const referrer = await getReferrer(referralCode) // get user who referred this user
+          const form = await getFormByName('GeneralLoanForm')
           const userUpdateObject = {
                   fullnames: firstName+" "+lastName,
-                  referredBy: referrer.id,
+                  referredBy: referrer?.id || null,
+                  formsToFill: {connect:[form.id]},
                   "details":{
                       firstname: firstName,
                       lastname: lastName,
@@ -228,7 +230,7 @@ export default function AdminUserAdd() {
                       <div>
                         <h5 className="text-primary">Register Account</h5>
                         <p className="text-muted">
-                          You are registering a clinet's account on their behalf, make sure to have them read the terms of use
+                          You are registering a client's account on their behalf, make sure to have them read the terms of use
                         </p>
                       </div>
                       <div className="mt-4">

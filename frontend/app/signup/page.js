@@ -3,7 +3,7 @@
 import EmailOtpVerificationForm from "@/components/Forms/EmailOtpVerificationForm";
 import PhoneOtpVerificationForm from "@/components/Forms/PhoneOtpVerificationForm";
 import { submitCreateUserRequest } from "@/Constants";
-import { dynamicConfig, getReferrerFromReferralCode, scrolltoTopOFPage, sendOTP, textHasPhoneNumber, updateUserAccount, validateEmail } from "@/Functions";
+import { dynamicConfig, getFormByName, getReferrerFromReferralCode, scrolltoTopOFPage, sendOTP, textHasPhoneNumber, updateUserAccount, validateEmail } from "@/Functions";
 import { saveJwt } from "@/Secrets";
 import { Slide } from "@material-ui/core";
 import { Alert } from "@mui/material";
@@ -137,9 +137,11 @@ export default function Signup() {
        else{
           saveJwt(response.jwt)
           const referrer = await getReferrer(referralCode) // get user who referred this user
+          const form = await getFormByName('GeneralLoanForm')
           const userUpdateObject = {
                   fullnames: firstName+" "+lastName,
-                  referredBy: referrer.id,
+                  referredBy: referrer?.id || null,
+                  formsToFill: {connect:[form.id]},
                   "details":{
                       firstname: firstName,
                       lastname: lastName,
@@ -186,7 +188,7 @@ export default function Signup() {
        return true
   }
   
-  const handleBeginOtpVerification = (e)=>{
+  const handleBeginOtpVerification = async (e)=>{
     e.preventDefault()
     if(validateForm()){
       const phone = phoneRef.current.value.trim();

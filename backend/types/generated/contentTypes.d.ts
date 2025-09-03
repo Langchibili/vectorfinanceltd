@@ -1769,7 +1769,7 @@ export interface ApiLoanLoan extends Schema.CollectionType {
     newLoanAmountOfferedReason: Attribute.Text;
     newLoanAmountOfferDeclined: Attribute.Boolean & Attribute.DefaultTo<false>;
     newLoanAmountOfferDeclineReason: Attribute.Text;
-    newLoanAmountOfferAccepted: Attribute.Boolean & Attribute.DefaultTo<true>;
+    newLoanAmountOfferAccepted: Attribute.Boolean & Attribute.DefaultTo<false>;
     loanAmountUpdated: Attribute.Boolean & Attribute.DefaultTo<false>;
     loanAmountChangedReason: Attribute.String;
     createdAt: Attribute.DateTime;

@@ -36,7 +36,8 @@ export const TRANSITIONS = {
     { action: 'reject', allowedRoles: ['Loan Admin'], targetStatus: 'rejected', needsConfirmation: true, requiresPayload: ['reason'] }
   ],
   'collateral-inspection': [
-    { action: 'inspect-and-submit', allowedRoles: ['Collateral Inspector'], targetStatus: 'request-approval', needsConfirmation: false, requiresPayload: ['inspectionReport'] }
+    { action: 'inspect-and-submit', allowedRoles: ['Collateral Inspector'], targetStatus: 'request-approval', needsConfirmation: false, requiresPayload: ['inspectionReport'] },
+    { action: 'request-approval', allowedRoles: ['Loan Admin'], targetStatus: 'request-approval', needsConfirmation: false },
   ],
   'request-approval': [
     { action: 'accept', allowedRoles: ['director', 'ceo'], targetStatus: 'accepted', needsConfirmation: true },

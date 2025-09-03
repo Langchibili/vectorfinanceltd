@@ -182,58 +182,122 @@
 
 
 
+// function simpleInterest({ principal, ratePercent, termMonths }) {
+//   // 1) force everything to float
+//   principal   = parseFloat(principal);
+//   ratePercent = parseFloat(ratePercent);
+//   termMonths  = parseFloat(termMonths);
+
+//   // 2) do the arithmetic
+//   const totalInterest  = (principal * ratePercent * termMonths) / 100;
+//   const totalPayment   = principal + totalInterest;
+//   const monthlyPayment = totalPayment / termMonths;
+
+//   // 3) round *once* at the very end
+//   return {
+//     totalInterest:  parseFloat(totalInterest.toFixed(2)),
+//     totalPayment:   parseFloat(totalPayment.toFixed(2)),
+//     monthlyPayment: parseFloat(monthlyPayment.toFixed(2)),
+//   }
+// }
+// /**
+//  * Pure compound interest (no amortization)
+//  */
+// function compoundInterest({ principal, ratePercent, termPeriods }) {
+//   const r = ratePercent / 100
+//   const n = termPeriods
+//   const totalPayment = principal * Math.pow(1 + r, n)
+//   const totalInterest = totalPayment - principal
+
+//   return {
+//     totalInterest: parseFloat(totalInterest.toFixed(2)),
+//     totalPayment: parseFloat(totalPayment.toFixed(2)),
+//   }
+// }
+
+// /**
+//  * Amortization schedule calculator
+//  */
+// function amortization({ principal, annualRatePercent, termMonths, periodsPerYear = 12 }) {
+//   const r = annualRatePercent / 100 / periodsPerYear
+//   const n = termMonths
+//   const payment =
+//     (principal * r * Math.pow(1 + r, n)) /
+//     (Math.pow(1 + r, n) - 1)
+//   const totalPayment = payment * n
+//   const totalInterest = totalPayment - principal
+
+//   return {
+//     monthlyPayment: parseFloat(payment.toFixed(2)),
+//     totalInterest: parseFloat(totalInterest.toFixed(2)),
+//     totalPayment: parseFloat(totalPayment.toFixed(2)),
+//   }
+// }
+
+/**
+ * Simple interest calculator
+ * All inputs are parsed as floats and all outputs are rounded to 2 decimal places.
+ */
 function simpleInterest({ principal, ratePercent, termMonths }) {
-  // 1) force everything to float
   principal   = parseFloat(principal);
   ratePercent = parseFloat(ratePercent);
-  termMonths  = parseFloat(termMonths);
 
-  // 2) do the arithmetic
-  const totalInterest  = (principal * ratePercent * termMonths) / 100;
-  const totalPayment   = principal + totalInterest;
-  const monthlyPayment = totalPayment / termMonths;
+  const totalInterest  = +(principal * ratePercent * termMonths / 100).toFixed(2);
+  const totalPayment   = +(principal + totalInterest).toFixed(2);
+  const monthlyPayment = +(totalPayment / termMonths).toFixed(2);
 
-  // 3) round *once* at the very end
   return {
-    totalInterest:  parseFloat(totalInterest.toFixed(2)),
-    totalPayment:   parseFloat(totalPayment.toFixed(2)),
-    monthlyPayment: parseFloat(monthlyPayment.toFixed(2)),
+    totalInterest,
+    totalPayment,
+    monthlyPayment,
   };
 }
 
-
 /**
- * Pure compound interest (no amortization)
+ * Compound interest calculator (no amortization)
+ * All inputs are parsed as floats and all outputs are rounded to 2 decimal places.
  */
 function compoundInterest({ principal, ratePercent, termPeriods }) {
-  const r = ratePercent / 100
-  const n = termPeriods
-  const totalPayment = principal * Math.pow(1 + r, n)
-  const totalInterest = totalPayment - principal
+  principal   = parseFloat(principal);
+  ratePercent = parseFloat(ratePercent);
+
+  const r = ratePercent / 100;
+  const totalPayment = +(principal * Math.pow(1 + r, termPeriods)).toFixed(2);
+  const totalInterest = +(totalPayment - principal).toFixed(2);
 
   return {
-    totalInterest: parseFloat(totalInterest.toFixed(2)),
-    totalPayment: parseFloat(totalPayment.toFixed(2)),
-  }
+    totalInterest,
+    totalPayment,
+  };
 }
 
 /**
  * Amortization schedule calculator
+ * All inputs are parsed as floats and all outputs are rounded to 2 decimal places.
  */
 function amortization({ principal, annualRatePercent, termMonths, periodsPerYear = 12 }) {
-  const r = annualRatePercent / 100 / periodsPerYear
-  const n = termMonths
-  const payment =
-    (principal * r * Math.pow(1 + r, n)) /
-    (Math.pow(1 + r, n) - 1)
-  const totalPayment = payment * n
-  const totalInterest = totalPayment - principal
+  principal         = parseFloat(principal);
+  annualRatePercent = parseFloat(annualRatePercent);
+  termMonths        = parseFloat(termMonths);
+
+  const r = annualRatePercent / 100 / periodsPerYear;
+  const n = termMonths;
+
+  let payment = 0;
+  if (r === 0) {
+    payment = principal / n;
+  } else {
+    payment = (principal * r * Math.pow(1 + r, n)) /
+              (Math.pow(1 + r, n) - 1);
+  }
+  const totalPayment  = +(payment * n).toFixed(2);
+  const totalInterest = +(totalPayment - principal).toFixed(2);
 
   return {
-    monthlyPayment: parseFloat(payment.toFixed(2)),
-    totalInterest: parseFloat(totalInterest.toFixed(2)),
-    totalPayment: parseFloat(totalPayment.toFixed(2)),
-  }
+    monthlyPayment: +payment.toFixed(2),
+    totalInterest,
+    totalPayment,
+  };
 }
 
 /**

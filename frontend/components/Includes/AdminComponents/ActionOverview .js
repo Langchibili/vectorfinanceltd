@@ -260,9 +260,9 @@ export default class ActionOverview extends React.Component {
 
 const ViewLoanDetails = ()=>{
      const {setBottomNavLink} = useBottomNav()
-     return <Button variant="outlined" size="small" onClick={()=>{setBottomNavLink(0)}}>View Loan Details</Button>
+     return <Button sx={{opacity:'0.6'}} variant="outlined" size="small" onClick={()=>{setBottomNavLink(0)}}>View Loan Details</Button>
 }
 const ViewClientDetails = ()=>{
      const {setBottomNavLink} = useBottomNav()
-     return <Button variant="outlined" size="small" onClick={()=>{setBottomNavLink(1)}}>View Client Details</Button>
+     return <Button sx={{opacity:'0.6'}} variant="outlined" size="small" onClick={()=>{setBottomNavLink(1)}}>View Client Details</Button>
 }

@@ -1,7 +1,7 @@
 'use strict';
 const  { SendSmsNotification,SendEmailNotification }  = require('../../../../services/messages')
 const  { calculateLoan }  = require('../../../../services/intererestCalculation')
-const  { createSchedule }  = require('../../../../services/repaymentSchedule')
+const  { createSchedule, createScheduleCriteria2, createScheduleCriteria3 }  = require('../../../../services/repaymentSchedule')
 const { getAdminUserEmailsAndNumbers } = require('../../../../services/getAdminUserEmailsAndNumbers')
 
 
@@ -104,13 +104,12 @@ module.exports = {
                 SendEmailNotification(updatedByUserEmail,notificationBody)
                 throw new Error('Loan cannot be changed to request approval')
               }
-              if(loan.loanAmount && (loan.loanAmount !== loanAmount)){
+              if(loan.loanAmount && (loan.loanAmount > 0 && loan.loanAmount !== loanAmount)){
                  loan.loanAmountUpdated = true
               }
-              if(loan.newLoanAmountOffer && (loan.newLoanAmountOffer !== newLoanAmountOffer)){
+              if(loan.newLoanAmountOffer && (loan.newLoanAmountOffer > 0 && loan.newLoanAmountOffer !== newLoanAmountOffer)){
                  loan.newLoanAmountOffered = true
               }
-              
           }
           if (loan.loanStatus === "accepted") {
             // only users allowed to disburse loans can disburse them.
@@ -200,7 +199,9 @@ module.exports = {
                         repaymentAmount = totalPayment;
                     }
                     if(!loanBefore.paymentScheduleCreated){
-                        createSchedule(params.data.id) // create a repayment schedule
+                        createScheduleCriteria3(params.data.id)
+                        // createScheduleCriteria2(params.data.id)
+                        //createSchedule(params.data.id) // create a repayment schedule
                     }
                     const updateLoanAmountObject = {
                         outstandingAmount: parseFloat(repaymentAmount),
@@ -279,10 +280,10 @@ module.exports = {
                           await strapi.db.query('api::loan.loan').update({ where: { id: loanBefore.id }, data: {newLoanAmountOffered:false} });
                           return
                       }
-                      if(loanBefore.newLoanAmountOffer !== loanBefore.loanAmount){
+                      if(loanBefore.newLoanAmountOffer && loanBefore.newLoanAmountOffer > 0 && loanBefore.newLoanAmountOffer !== loanBefore.loanAmount){
                         return // this means an offer was made, so no need to resend messages from the back and forth
                       }
-                      if(loanBefore.clientAskingAmount !== loanBefore.loanAmount){
+                      if(loanBefore.clientAskingAmount && loanBefore.clientAskingAmount > 0 && loanBefore.clientAskingAmount !== loanBefore.loanAmount){
                         return // this means the loan amount was changed, so no need to resend messages from the back and forth
                       }
                       const notificationBody = "A vectorFin loan officer is requesting approval of a loan with id #"+loanBefore.id+" you can approve it at: "+process.env.CLIENTURL+"/admin/loans/"+loanBefore.id 

@@ -179,7 +179,7 @@ export default function LoanDetailPage() {
                                             <CollateralValueForm loan={loan} role={user.type} onUpdated={refreshLoan} constants={constants}/>
                                             <OfferAmountForm loan={loan} role={user.type} onUpdated={refreshLoan} constants={constants}/>
                                             <ChangeLoanAmount loan={loan} role={user.type} onUpdated={refreshLoan} constants={constants}/>
-                                            {user.type === "Loan Admin" && loan.loanStatus === "request-approval" && (loan.newLoanAmountOffer !== loan.loanAmount)? (
+                                            {user.type === "Loan Admin" && loan.loanStatus === "request-approval" && (loan.newLoanAmountOffer > 0 && loan.newLoanAmountOffer !== loan.loanAmount)? (
                                                 <OfferDecision
                                                     loan={loan}
                                                     offeredAmount={loan.newLoanAmountOffer}
