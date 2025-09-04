@@ -35,7 +35,7 @@ export default function LoanDetailPage() {
   setPage('/admins/loans')
   
   // populate string for the loan
-  const POPULATE = "loanType,loanAgreementDocuments,disbursementPOP,collateral,collateral.vehicle,collateral.land,collateral.house,collateral.CollateralMedia,client,client.details,client.bankDetails"  
+  const POPULATE = "loanType,loanAgreementDocuments,disbursementPOP,collateral,collateral.vehicle,collateral.land,collateral.house,collateral.CollateralMedia,client,client.details,client.bankDetails,client.currentLoan"  
   // Allowed roles
   const allowedRoles = ['director', 'ceo', 'Loan Admin', 'Collateral Inspector']
 

@@ -213,6 +213,10 @@ export interface MediaAndDocumentsVehicle extends Schema.Component {
     packingFeePaid: Attribute.Decimal;
     numberPlate: Attribute.String;
     packed: Attribute.Enumeration<['yes', 'no']>;
+    insuranceType: Attribute.Enumeration<
+      ['comprehensive', 'third-party', 'unset']
+    > &
+      Attribute.DefaultTo<'unset'>;
   };
 }
 

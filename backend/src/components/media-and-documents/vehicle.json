@@ -27,6 +27,15 @@
         "yes",
         "no"
       ]
+    },
+    "insuranceType": {
+      "type": "enumeration",
+      "enum": [
+        "comprehensive",
+        "third-party",
+        "unset"
+      ],
+      "default": "unset"
     }
   }
 }

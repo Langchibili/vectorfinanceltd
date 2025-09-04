@@ -18,13 +18,17 @@ export default class ClientDetails extends React.Component {
     // loan.client is the populated object: loan.client.data.attributes
     const clientWrapped = loan?.client
     const client = user? user : clientWrapped?.data?.attributes || {} // if the user account is set directly, use it
-
+    const quickbookInvoiceNumber = client.currentLoan?.data?.attributes?.quickBooksInvoiceNumber || null
+    
     const details = client.details || {}
     const bankDetails = client.bankDetails || null
     const avatarUrl = client.profilePicture?.data?.attributes?.formats?.thumbnail?.url
       ? backEndUrl + client.profilePicture.data.attributes.formats.thumbnail.url
       : null
 
+    if(quickbookInvoiceNumber){
+       client.bankDetails.quickbookInvoiceNumber = quickbookInvoiceNumber
+    } 
     return (
         <Slide in={true} direction="left">
             <Box sx={{ maxWidth: 700, mx: 'auto', p: { xs: 1.5, sm: 2 } }}>
@@ -91,7 +95,7 @@ const BankDetails = ({ bankDetails }) => {
     setSnackbarOpen(false)
   }
   
- 
+  
   return (
     <>
       <Card sx={{ maxWidth: 500, margin: '20px auto', borderRadius: 3, boxShadow: 3 }}>
