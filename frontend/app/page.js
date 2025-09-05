@@ -18,20 +18,43 @@ import { useBottomNav } from "@/Contexts/BottomNavContext";
 import { useConstants } from "@/Contexts/ConstantsContext";
 import { usePage } from "@/Contexts/PageContext";
 import { useUser } from "@/Contexts/UserContext";
-import { scrolltoTopOFPage } from "@/Functions";
+import { getLoanFromId, scrolltoTopOFPage } from "@/Functions";
 import { Alert } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function Home() {
   const [showLoanApplicationForms, setShowLoanApplicationForms] = useState(false)
   const [showInvestMentForms, setshowInvestMentForms] = useState(false)
   const [selectedloanCategory, setSelectedloanCategory] = useState(null)
+  const [currentLoanWithSessionLetterStuff, setCurrentLoanWithSessionLetterStuff] = useState(null)
   const {BottomNavLink} = useBottomNav()
   const loggedInUser = useUser()
   const constants = useConstants()
   const { setPage } = usePage()
   
   //console.log('constants',constants)
+
+  useEffect(()=>{
+     const runSetCurrentLoanWithSessionLetterStuff = async ()=>{
+        const currentLoan = await getLoanFromId(loggedInUser.user.currentLoan.id,"collateral,collateral.vehicle,collateral.vehicle.sessionLetterTemplate,collateral.vehicle.sessionLetter")
+        const { collateral } = currentLoan
+        const { vehicle } = collateral
+        if(collateral && collateral.collateralType === 'vehicle'){
+            if(vehicle && vehicle.insuranceType && (vehicle.insuranceType === "third-party" || vehicle.insuranceType === "comprehensive")){
+              if(currentLoan.insuranceRequest && currentLoan.insuranceRequest === "African Gray"){
+                 return
+              }
+              else{
+                setCurrentLoanWithSessionLetterStuff(currentLoan) // this means the current loan meets the session letter requirements
+              }
+            }
+        }
+        return
+    }
+    if(loggedInUser.user.currentLoan){
+      runSetCurrentLoanWithSessionLetterStuff()
+    }
+  },[loggedInUser?.user?.currentLoan])
 
   setPage('/')
   scrolltoTopOFPage() // should always show the top of the page as the view point
@@ -153,6 +176,21 @@ export default function Home() {
                 </>
         )
   }
+
+  const showSessionLetter = ()=>{
+        const currentLoan = currentLoanWithSessionLetterStuff
+        const { collateral } = currentLoan
+        const { vehicle } = collateral
+        console.log('sessionleter',currentLoan,vehicle)
+        if(vehicle.sessionLetter && vehicle.sessionLetter.data){
+          return null // means you have already uploaded the session letter
+        }
+        if(!(vehicle.sessionLetterTemplate && vehicle.sessionLetterTemplate.data)){
+          return <Alert severity="warning" sx={{marginTop:'10px'}}>We shall send you a message when the session letter template has been uploaded, along with instructions on what to do next. Thank you.</Alert>
+        }
+        return <>session letter stuff</>
+  }
+
   const renderMainContent = ()=>{
     // investment stuff
     const currentInvestment = loggedInUser.user.currentInvestment
@@ -185,6 +223,7 @@ export default function Home() {
           return (<div className="page-content">
                    <div className="container-fluid">
                     <Alert  severity="info">Thank you for applying for a loan with us, we are currently processing the loan, an agent will call you to proceed with inspection of your collateral.</Alert>
+                    {currentLoanWithSessionLetterStuff? showSessionLetter() : null}
                   </div>
                   </div>)
         }

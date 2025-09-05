@@ -25,6 +25,8 @@ export default class UpdateVehicleCollateralForm extends React.Component {
       saved: false,
       openErrorSnapBack: false,
       errorMessage: '',
+      insuranceType: '',         // 'comprehensive' or 'third-party'
+      insuranceRequest: null,    // 'African Gray', 'other', or null
       // new collateral media slots
       collateralMedia: {
         front: null,
@@ -108,33 +110,65 @@ export default class UpdateVehicleCollateralForm extends React.Component {
     this.setState({ [name]: value || '', saved: false }, this.checkFormValidity);
   }
 
+  // checkFormValidity = (initialCheck = false) => {
+  //   const { numberPlate, packed, whitebook, collateralMedia } = this.state;
+  //   const collateralMediaSet = this.props.constants.loansInformation.allowClientsToAddCollateralMedia && this.props.constants.loansInformation.allowClientsToAddCollateralMedia === "no"? true : collateralMedia.front && collateralMedia.back && collateralMedia.left && collateralMedia.right
+  //   const isFormValid = numberPlate.trim() && packed && whitebook && collateralMediaSet;
+  //   if (!initialCheck) {
+  //     this.setState({ isFormValid });
+  //   } else {
+  //     this.setState({ isFormValid, saved: isFormValid });
+  //   }
+  // }
   checkFormValidity = (initialCheck = false) => {
-    const { numberPlate, packed, whitebook, collateralMedia } = this.state;
-    const collateralMediaSet = this.props.constants.loansInformation.allowClientsToAddCollateralMedia && this.props.constants.loansInformation.allowClientsToAddCollateralMedia === "no"? true : collateralMedia.front && collateralMedia.back && collateralMedia.left && collateralMedia.right
-    const isFormValid = numberPlate.trim() && packed && whitebook && collateralMediaSet;
-    if (!initialCheck) {
-      this.setState({ isFormValid });
-    } else {
-      this.setState({ isFormValid, saved: isFormValid });
-    }
+  const { numberPlate, packed, whitebook, collateralMedia, insuranceType, insuranceRequest } = this.state;
+  const collateralMediaSet = this.props.constants.loansInformation.allowClientsToAddCollateralMedia && this.props.constants.loansInformation.allowClientsToAddCollateralMedia === "no"? true : collateralMedia.front && collateralMedia.back && collateralMedia.left && collateralMedia.right;
+  let isFormValid = numberPlate.trim() && packed && whitebook && collateralMediaSet && insuranceType;
+  if (insuranceType === "third-party") {
+    isFormValid = isFormValid && insuranceRequest;
   }
+  if (!initialCheck) {
+    this.setState({ isFormValid });
+  } else {
+    this.setState({ isFormValid, saved: isFormValid });
+  }
+}
+
+
+  /* 
+    session letter for comprehenis isniuuf
+      - to use to reco
+    if no, i will the vector for 
+       - you have 
+    must recognize vector 
+
+  */
 
   handleSubmit = async (e) => {
     e.preventDefault();
-    const { numberPlate, packed, collateralId, vehicleId } = this.state;
+    const { numberPlate, packed, collateralId, vehicleId, insuranceType, insuranceRequest } = this.state;
     if (!numberPlate || !packed) {
       this.setState({ error: 'Please ensure all fields are filled.', saving: false });
       return;
     }
+    if (!insuranceType) {
+    this.setState({ error: 'Please select the type of insurance for the vehicle.', saving: false });
+    return;
+    }
+    if (insuranceType === "third-party" && !insuranceRequest) {
+      this.setState({ error: 'Please select how you will purchase comprehensive insurance.', saving: false });
+      return;
+    }
     const updateObject = {
       data: {
+        insuranceRequest,
         collateral: {
           id: collateralId,
           collateralStatus: "pending-inspection",
-          vehicle: { id: vehicleId, numberPlate, packed }
+          vehicle: { id: vehicleId, numberPlate, packed, insuranceType }
         }
       }
-    };
+    }
     this.setState({ saving: true, error: null });
     const updatedLoan = await updateLoan(updateObject, this.props.loggedInUser.currentLoan.id);
     if (updatedLoan.error) {
@@ -381,6 +415,56 @@ export default class UpdateVehicleCollateralForm extends React.Component {
                     </div>
                     {this.renderPackingWarning()}
                   </div>
+<div className="col-lg-12 mt-3">
+  <label className="form-label">Type of Insurance</label>
+  <select
+    name="insuranceType"
+    className="form-select"
+    value={this.state.insuranceType}
+    onChange={e => this.setState({ insuranceType: e.target.value, insuranceRequest: null, saved: false }, this.checkFormValidity)}
+  >
+    <option value="">Choose...</option>
+    <option value="comprehensive">Comprehensive</option>
+    <option value="third-party">Third Party</option>
+  </select>
+</div>
+
+{this.state.insuranceType === "comprehensive" && (
+  <Alert severity="info" className="mt-2">
+    After you complete the loan application, please note that you shall be sent a document called a session letter request, which you must fill with your details and send to your insurance company, either in person or via email or whatsapp, and after a few hours, or days, your insurance must send us the document either through email, through you or any other digital means. You can contact us for more information on this once you complete your application.
+  </Alert>
+)}
+
+{this.state.insuranceType === "third-party" && (
+  <>
+    <Alert severity="warning" className="mt-2">
+      You have a third party insurance, we only give out loans to clients with vehicles registered under comprehensive insurance. Please ensure that you purchase a comprehensive insurance by following the steps listed below and shall be listed after you complete your application.
+    </Alert>
+    <div className="mt-3">
+      <label className="form-label">How will you purchase comprehensive insurance?</label>
+      <select
+        name="insuranceRequest"
+        className="form-select"
+        value={this.state.insuranceRequest || ''}
+        onChange={e => this.setState({ insuranceRequest: e.target.value, saved: false }, this.checkFormValidity)}
+      >
+        <option value="">Choose...</option>
+        <option value="African Gray">Buy From African Gray (Recommended)</option>
+        <option value="other">Buy from other</option>
+      </select>
+    </div>
+    {this.state.insuranceRequest === "African Gray" && (
+      <Alert severity="info" className="mt-2">
+        Because you have chosen to buy comprehensive insurance from African Gray, you will not have to obtain a session letter. We shall send you a quotation soon after you complete your application.
+      </Alert>
+    )}
+    {this.state.insuranceRequest === "other" && (
+      <Alert severity="info" className="mt-2">
+        You have chosen to buy your comprehensive insurance from another company other than the recommended African Gray. We shall require a session letter from them the soonest you purchase it. Details shall be shown the moment you complete your loan application.
+      </Alert>
+    )}
+  </>
+)}
 
                   {vehicleId && (
                     <>

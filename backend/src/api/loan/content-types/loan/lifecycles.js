@@ -12,7 +12,7 @@ const getAppStatus = async () => {
 const getLoan = async (id) => {
       return await strapi.db.query("api::loan.loan").findOne({
           where: { id: id },
-          populate: ['loanType','collateral','loanAgreementDocuments','disbursementPOP','client',"loanFormApendixSection"]
+          populate: ['loanType','collateral','collateral.vehicle','loanAgreementDocuments','disbursementPOP','client',"loanFormApendixSection"]
       })
 }
 
@@ -169,7 +169,7 @@ module.exports = {
     async afterUpdate(event) {
         const { result, params } = event;
         const { data } = params;
-        const loanStatuses = ["request-approval","pending-approval","collateral-inspection","approved","disbursed","accepted","rejected"]
+        const loanStatuses = ["request-approval","pending-approval","pending-collateral-inspection","collateral-inspection","approved","disbursed","accepted","rejected"]
         const loanBefore = result  
         if(result && result.id && loanStatuses.includes(result.loanStatus)){
               const loan = await getLoan(params.data?.id || result.id)
@@ -304,6 +304,36 @@ module.exports = {
                       return
               }
               
+              if (loanBefore.loanStatus === "pending-collateral-inspection") {
+                    const { collateral } = loan
+                    if(collateral.collateralType === 'vehicle'){
+                      const { vehicle } = collateral
+                      const { client } = loan
+                      if(vehicle.insuranceType && vehicle.insuranceType === "third-party"){
+                        if(loan.insuranceRequest && loan.insuranceRequest === "African Gray"){
+                           const adminNotificationBody = "The VectorFin client who has initiated a loan with id #"+loanBefore.id + ", wants to register their vehicle's insurance under African Gray. Their phone number is: "+client.username
+                           adminNotificationsEmails.forEach(email => {
+                               SendEmailNotification(email,adminNotificationBody)
+                           })
+                        }
+                        else{
+                           const adminNotificationBody = "The VectorFin client who has initiated a loan with id #"+loanBefore.id + ", does not have comprehensive insurance, but they have chosen to purchase comprehensive insurance from a company other than the recommended African Gray."
+                           adminNotificationsEmails.forEach(email => {
+                               SendEmailNotification(email,adminNotificationBody)
+                           })
+                           const clientNotificationBody = "Please note that we shall require a session letter from your insurance company, details have been placed on your account, read them from: "+process.env.CLIENTURL+" or give us a call at "+adminNotificationsNumbers[0]
+                           SendEmailNotification(client.email,clientNotificationBody)
+                           SendSmsNotification(client.username,clientNotificationBody) // client.username is a phone number
+                        }
+                      }
+                      if(vehicle.insuranceType && vehicle.insuranceType === "comprehensive"){
+                           const clientNotificationBody = "Please note that we shall require a session letter from your insurance company, details have been placed on your account, read them from: "+process.env.CLIENTURL+" or give us a call at "+adminNotificationsNumbers[0]
+                           SendEmailNotification(client.email,clientNotificationBody)
+                           SendSmsNotification(client.username,clientNotificationBody) // client.username is a phone number
+                      }
+                    }
+              }
+
               if (loanBefore.loanStatus === "collateral-inspection") {
                     const { collateral } = loan
                     if(collateral.collateralStatus === "requesting-inspection"){

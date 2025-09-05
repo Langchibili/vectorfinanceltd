@@ -1772,6 +1772,7 @@ export interface ApiLoanLoan extends Schema.CollectionType {
     newLoanAmountOfferAccepted: Attribute.Boolean & Attribute.DefaultTo<false>;
     loanAmountUpdated: Attribute.Boolean & Attribute.DefaultTo<false>;
     loanAmountChangedReason: Attribute.String;
+    insuranceRequest: Attribute.Enumeration<['African Gray', 'other']>;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;

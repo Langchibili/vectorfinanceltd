@@ -236,6 +236,13 @@
     },
     "loanAmountChangedReason": {
       "type": "string"
+    },
+    "insuranceRequest": {
+      "type": "enumeration",
+      "enum": [
+        "African Gray",
+        "other"
+      ]
     }
   }
 }

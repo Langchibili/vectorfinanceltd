@@ -4,10 +4,10 @@ import { Box, Paper, Typography } from "@mui/material";
 
 export default function TermsOfUsePage() {
   return (
-    <Box sx={{ maxWidth: 900, mx: "auto", my: 6, px: 2 }}>
+    <Box sx={{ maxWidth: 900, mx: "auto", my: 6, px: 2, mt: 10 }}>
       <Paper elevation={3} sx={{ p: { xs: 2, md: 4 } }}>
         <Typography variant="h4" fontWeight={700} gutterBottom>
-          VectorFinanceLimited — Terms of Use (Loans Portal)
+          Vector Finance Limited — Terms of Use (Loans Portal)
         </Typography>
         <Typography variant="subtitle2" color="text.secondary" gutterBottom>
           <strong>Effective Date:</strong> September 2, 2025

@@ -217,6 +217,8 @@ export interface MediaAndDocumentsVehicle extends Schema.Component {
       ['comprehensive', 'third-party', 'unset']
     > &
       Attribute.DefaultTo<'unset'>;
+    sessionLetterTemplate: Attribute.Media;
+    sessionLetter: Attribute.Media;
   };
 }
 

@@ -36,6 +36,22 @@
         "unset"
       ],
       "default": "unset"
+    },
+    "sessionLetterTemplate": {
+      "allowedTypes": [
+        "images",
+        "files"
+      ],
+      "type": "media",
+      "multiple": true
+    },
+    "sessionLetter": {
+      "allowedTypes": [
+        "images",
+        "files"
+      ],
+      "type": "media",
+      "multiple": true
     }
   }
 }
