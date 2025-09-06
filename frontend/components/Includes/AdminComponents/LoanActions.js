@@ -22,6 +22,7 @@ import UploadPOP from './UploadPOP'
 import ContactCard from './ContactCard'
 import ChangeLoanAmount from './ChangeLoanAmount'
 import RequestApproval from './RequestApproval'
+import UploadSessionLetterTemplate from './UploadSessionLetterTemplate'
 
 export default class LoanActions extends React.Component {
   state = {
@@ -175,6 +176,25 @@ export default class LoanActions extends React.Component {
     ))
   }
 
+   renderSessionLetterTemplateUpload = ()=>{
+          const { loan, onUpdated, constants, role } = this.props
+          if(!loan || !loan.collateral || !loan.collateral.vehicle){
+            return null
+          }
+          const { collateral } = loan
+          const { vehicle } = collateral
+          if(collateral && collateral.collateralType === 'vehicle'){
+              if(vehicle && vehicle.insuranceType && (vehicle.insuranceType === "third-party" || vehicle.insuranceType === "comprehensive")){
+                if(loan.insuranceRequest && loan.insuranceRequest === "African Gray"){
+                   return null
+                }
+                else{
+                  return <UploadSessionLetterTemplate loan={loan} onUpdated={onUpdated} role={role} handleActionClose={this.handleActionClose}/> // this means the current loan meets the session letter requirements
+                }
+              }
+          }
+          return null
+      }
 
   render() {
     const actions = this.allowedActions()
@@ -213,14 +233,15 @@ export default class LoanActions extends React.Component {
     if(role === 'Loan Admin' && loan.loanStatus === "pending-collateral-inspection"){
         if(loan.collateral && loan.collateral.collateralStatus === "inspected"){
            return (<><Alert severity='info'>Collateral Inspected by Inspector</Alert> 
+                    {this.renderSessionLetterTemplateUpload()}
                    <RejectionForm loan={loan} onUpdated={onUpdated} role={role} handleActionClose={this.handleActionClose} openModal={false}/>
                    </>)
         }
-        
         return (<>
                  {loan.collateral && loan.collateral.collateralStatus === "requesting-inspection"? 
                  <Alert severity='info'>You have already sent an inspection request.</Alert> : null}
                  <RequestCollateralInspection loan={loan} onUpdated={onUpdated} role={role} handleActionClose={this.handleActionClose}/> 
+                 {this.renderSessionLetterTemplateUpload()}
                  <RejectionForm loan={loan} onUpdated={onUpdated} role={role} handleActionClose={this.handleActionClose} openModal={false}/>
                  </>)
     }
@@ -229,7 +250,8 @@ export default class LoanActions extends React.Component {
         if(role === 'Loan Admin' && loan.collateral && loan.collateral.collateralStatus === "inspected"){
             return <>
                     <RequestApproval loan={loan} onUpdated={onUpdated} role={role} handleActionClose={this.handleActionClose}/> 
-                   <ContactCard phone={constants.loansInformation.collateralInspectorNumber} email={constants.loansInformation.collateralInspectorEmail} user_title="Inspector" />
+                    <ContactCard phone={constants.loansInformation.collateralInspectorNumber} email={constants.loansInformation.collateralInspectorEmail} user_title="Inspector" />
+                    {this.renderSessionLetterTemplateUpload()}
             </>
         }
         return <ContactCard phone={constants.loansInformation.collateralInspectorNumber} email={constants.loansInformation.collateralInspectorEmail} user_title="Inspector" />

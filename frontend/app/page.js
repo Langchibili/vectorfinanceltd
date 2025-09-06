@@ -188,7 +188,8 @@ export default function Home() {
         if(!(vehicle.sessionLetterTemplate && vehicle.sessionLetterTemplate.data)){
           return <Alert severity="warning" sx={{marginTop:'10px'}}>We shall send you a message when the session letter template has been uploaded, along with instructions on what to do next. Thank you.</Alert>
         }
-        return <>session letter stuff</>
+        return null
+        // return <>session letter stuff</>
   }
 
   const renderMainContent = ()=>{

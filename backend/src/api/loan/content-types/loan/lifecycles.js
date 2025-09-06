@@ -92,6 +92,7 @@ module.exports = {
         }
         
         const { client, loanAppendixCreated, newLoanAmountOffer, loanAmount }  = await getLoanClientAppendix(loanId)
+        
         if (updateAuthenticated()) { // id of admin user account which wants to update
           const { loanApproverEmails, loanDisburserEmails, adminNotificationsEmails } = await getAdminUserEmailsAndNumbers()
           const updatedByUserEmail = updatedById? (await strapi.query('admin::user').findOne({  where: { id: updatedById } })).email : adminNotificationsEmails[0]
@@ -309,6 +310,21 @@ module.exports = {
                     if(collateral.collateralType === 'vehicle'){
                       const { vehicle } = collateral
                       const { client } = loan
+                      // this is when the sessionletter template has just been uploaded
+                      if(vehicle.insuranceType && (vehicle.insuranceType === "third-party" || vehicle.insuranceType === "comprehensive") && vehicle.sessionLetterTemplate && !loan.sessionLetterTemplateUploaded){
+                        const clientNotificationBody = "A session letter template file has been uploaded to your account, please download it and send it to your insurance company, details have been placed on your account, download the file from: "+process.env.CLIENTURL+" or give us a call for any other queries at "+adminNotificationsNumbers[0]+". Regards, Vectorfin."
+                           SendEmailNotification(client.email,clientNotificationBody)
+                           SendSmsNotification(client.username,clientNotificationBody) // client.username is a phone number
+                        await strapi.db.query('api::loan.loan').update({ where: { id: loanBefore.id }, data: {sessionLetterTemplateUploaded:true} })
+                      }
+                      if(vehicle.insuranceType && (vehicle.insuranceType === "third-party" || vehicle.insuranceType === "comprehensive") && vehicle.sessionLetter && !loan.sessionLetterUploaded){
+                          const adminNotificationBody = "The VectorFin client who has initiated a loan with id #"+loanBefore.id + " has uploaded a session letter to their account."
+                          adminNotificationsEmails.forEach(email => {
+                               SendEmailNotification(email,adminNotificationBody)
+                           })
+                          await strapi.db.query('api::loan.loan').update({ where: { id: loanBefore.id }, data: {sessionLetterUploaded:true} })
+                      }
+                      // this is for insurance type and requests checks 
                       if(vehicle.insuranceType && vehicle.insuranceType === "third-party"){
                         if(loan.insuranceRequest && loan.insuranceRequest === "African Gray"){
                            const adminNotificationBody = "The VectorFin client who has initiated a loan with id #"+loanBefore.id + ", wants to register their vehicle's insurance under African Gray. Their phone number is: "+client.username
@@ -321,7 +337,7 @@ module.exports = {
                            adminNotificationsEmails.forEach(email => {
                                SendEmailNotification(email,adminNotificationBody)
                            })
-                           const clientNotificationBody = "Please note that we shall require a session letter from your insurance company, details have been placed on your account, read them from: "+process.env.CLIENTURL+" or give us a call at "+adminNotificationsNumbers[0]
+                           const clientNotificationBody = "Please note that we shall require a session letter from your insurance company, details have been placed on your account, read them from: "+process.env.CLIENTURL+" or give us a call at "+adminNotificationsNumbers[0]+". Regards, Vectorfin."
                            SendEmailNotification(client.email,clientNotificationBody)
                            SendSmsNotification(client.username,clientNotificationBody) // client.username is a phone number
                         }
@@ -336,6 +352,24 @@ module.exports = {
 
               if (loanBefore.loanStatus === "collateral-inspection") {
                     const { collateral } = loan
+                    if(collateral.collateralType === 'vehicle'){ // this is when the sessionletter template has just been uploaded
+                      const { vehicle } = collateral
+                      const { client } = loan
+                      if(vehicle.insuranceType && (vehicle.insuranceType === "third-party" || vehicle.insuranceType === "comprehensive") && vehicle.sessionLetterTemplate && !loan.sessionLetterTemplateUploaded){
+                        const clientNotificationBody = "A session letter template file has been uploaded to your account, please download it and send it to your insurance company, details have been placed on your account, download the file from: "+process.env.CLIENTURL+" or give us a call for any other queries at "+adminNotificationsNumbers[0]+". Regards, Vectorfin."
+                           SendEmailNotification(client.email,clientNotificationBody)
+                           SendSmsNotification(client.username,clientNotificationBody) // client.username is a phone number
+                        await strapi.db.query('api::loan.loan').update({ where: { id: loanBefore.id }, data: {sessionLetterTemplateUploaded:true} })
+                      }
+                      if(vehicle.insuranceType && (vehicle.insuranceType === "third-party" || vehicle.insuranceType === "comprehensive") && vehicle.sessionLetter && !loan.sessionLetterUploaded){
+                          const adminNotificationBody = "The VectorFin client who has initiated a loan with id #"+loanBefore.id + " has uploaded a session letter to their account."
+                          adminNotificationsEmails.forEach(email => {
+                               SendEmailNotification(email,adminNotificationBody)
+                           })
+                          await strapi.db.query('api::loan.loan').update({ where: { id: loanBefore.id }, data: {sessionLetterUploaded:true} })
+                      }
+                    }
+                    
                     if(collateral.collateralStatus === "requesting-inspection"){
                         const { collateralInspectorNumber, collateralInspectorEmail } = await strapi.db.query("api::loans-information.loans-information").findOne()
                         const notificationBody = "A VectorFin client has initiated a loan with id #"+loanBefore.id + ", we ask that you inspect the collateral for us, details about the loan and client are on "+process.env.CLIENTURL+"/admin/loans/"+loanBefore.id

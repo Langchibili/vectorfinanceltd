@@ -243,6 +243,14 @@
         "African Gray",
         "other"
       ]
+    },
+    "sessionLetterTemplateUploaded": {
+      "type": "boolean",
+      "default": false
+    },
+    "sessionLetterUploaded": {
+      "type": "boolean",
+      "default": false
     }
   }
 }

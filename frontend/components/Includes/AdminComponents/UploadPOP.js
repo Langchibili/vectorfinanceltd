@@ -28,12 +28,18 @@ export default class UploadPOP extends React.Component {
   open = () => {
     const { loan } = this.props
     // prefill from loan
+    let disbursementPOP = loan?.disbursementPOP ?? null
+    // If disbursementPOP is an object with .data, use .data
+    if (disbursementPOP && disbursementPOP.data) {
+        disbursementPOP = disbursementPOP.data
+    }
     this.setState({
-      open: true,
-      error: '',
-      disbursementPOP: loan?.disbursementPOP ?? null
+        open: true,
+        error: '',
+        disbursementPOP
     })
   }
+
 
   close = () => {
     this.setState({ open: false, loading: false, error: '' })
@@ -109,14 +115,20 @@ export default class UploadPOP extends React.Component {
     const { open, loading, error, disbursementPOP } = this.state
 
     if (!loan) return null
-
     if (role === "Collateral Inspector") return null
 
-    const hasPOP = !!(disbursementPOP || loan.disbursementPOP)
+    // Check existence for both .data and direct object
+    let hasPOP = !!disbursementPOP
+    if (disbursementPOP && disbursementPOP.data) {
+        hasPOP = !!disbursementPOP.data
+    } else if (!hasPOP && loan.disbursementPOP) {
+        hasPOP = !!loan.disbursementPOP
+        if (loan.disbursementPOP.data) {
+        hasPOP = !!loan.disbursementPOP.data
+        }
+    }
 
-    // label adapts if pop exists
     const buttonLabel = hasPOP ? 'Replace Disbursement POP' : 'Upload Disbursement POP'
-
     return (
       <>
         <Button variant="contained" size="small" onClick={this.open}>

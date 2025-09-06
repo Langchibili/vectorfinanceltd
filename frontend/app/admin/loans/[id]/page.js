@@ -35,7 +35,7 @@ export default function LoanDetailPage() {
   setPage('/admins/loans')
   
   // populate string for the loan
-  const POPULATE = "loanType,loanAgreementDocuments,disbursementPOP,collateral,collateral.vehicle,collateral.land,collateral.house,collateral.CollateralMedia,client,client.details,client.bankDetails,client.currentLoan"  
+  const POPULATE = "loanType,loanAgreementDocuments,disbursementPOP,collateral,collateral.vehicle,collateral.land,collateral.house,collateral.CollateralMedia,collateral.vehicle.sessionLetterTemplate,collateral.vehicle.sessionLetter,client,client.details,client.bankDetails,client.currentLoan"  
   // Allowed roles
   const allowedRoles = ['director', 'ceo', 'Loan Admin', 'Collateral Inspector']
 
@@ -50,6 +50,7 @@ export default function LoanDetailPage() {
     async function fetchLoan() {
       try {
         const data = await getLoanFromId(id,POPULATE)
+        console.log('data',data)
         setLoan(data)
       } catch (err) {
         setError('Failed to fetch loan details.')
