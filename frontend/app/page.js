@@ -6,20 +6,23 @@ import FilledForms from "@/components/Forms/FilledForms";
 import InvestmentForm from "@/components/Forms/InvestmentForm";
 import LoanApplicationForm from "@/components/Forms/LoanApplicationForm";
 import ApplyForALoanButton from "@/components/Includes/ApplyForALoanButton/ApplyForALoanButton";
+import FileDownload from "@/components/Includes/FileDownload/FileDownload";
 import FormSigning from "@/components/Includes/FormSigning/FormSigning";
 import HelpPageDisplay from "@/components/Includes/HelpPageDisplay/HelpPageDisplay";
 import InvestButton from "@/components/Includes/InvestButton/InvestButton";
 import LoanInformationDisplay from "@/components/Includes/LoanInformationDisplay/LoanInformationDisplay";
 import LoanInitiatedDisplay from "@/components/Includes/LoanInitiatedDisplay/LoanInitiatedDisplay";
 import LoanTransactionHistory from "@/components/Includes/LoanTransactionHistory/LoanTransactionHistory";
+import Uploader from "@/components/Includes/Uploader/Uploader";
 import ListStyleLoanApplicationDisplay from "@/components/LoanApplicationDisplay/ListStyleLoanApplicationDisplay";
 import LoanApplicationDisplay from "@/components/LoanApplicationDisplay/LoanApplicationDisplay";
+import { backEndUrl } from "@/Constants";
 import { useBottomNav } from "@/Contexts/BottomNavContext";
 import { useConstants } from "@/Contexts/ConstantsContext";
 import { usePage } from "@/Contexts/PageContext";
 import { useUser } from "@/Contexts/UserContext";
 import { getLoanFromId, scrolltoTopOFPage } from "@/Functions";
-import { Alert } from "@mui/material";
+import { Alert, Divider } from "@mui/material";
 import { useEffect, useState } from "react";
 
 export default function Home() {
@@ -181,15 +184,40 @@ export default function Home() {
         const currentLoan = currentLoanWithSessionLetterStuff
         const { collateral } = currentLoan
         const { vehicle } = collateral
-        console.log('sessionleter',currentLoan,vehicle)
         if(vehicle.sessionLetter && vehicle.sessionLetter.data){
           return null // means you have already uploaded the session letter
         }
         if(!(vehicle.sessionLetterTemplate && vehicle.sessionLetterTemplate.data)){
           return <Alert severity="warning" sx={{marginTop:'10px'}}>We shall send you a message when the session letter template has been uploaded, along with instructions on what to do next. Thank you.</Alert>
         }
-        return null
-        // return <>session letter stuff</>
+        return (
+            <div style={{width:'100%', textAlign:'center', marginTop:'10px'}}>
+               <FileDownload
+                  files={vehicle.sessionLetterTemplate}
+                  backEndUrl={backEndUrl}
+                  fileDisplayName="Session Letter Template"
+                />
+                 
+                <Divider my="2" style={{marginTop:'10px'}}/>
+                <h3>Upload Session Letter</h3> 
+                <h6><small><strong>(Stamped and signed by your insurance company | <strong>Make sure to download and produce the session letter to your insurance first</strong>)</strong></small></h6>
+                <Uploader
+                      refId={currentLoan.collateral.vehicle.id}
+                      refName="media-and-documents.vehicle"
+                      fieldName="sessionLetter"
+                      allowMultiple={false}
+                      allowedTypes={[
+                        'image/*',
+                        'application/pdf',
+                        'application/msword',
+                        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                        'text/plain',
+                        'application/vnd.ms-excel',
+                        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                      ]}
+                    />
+                </div>
+        )
   }
 
   const renderMainContent = ()=>{

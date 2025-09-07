@@ -251,6 +251,14 @@
     "sessionLetterUploaded": {
       "type": "boolean",
       "default": false
+    },
+    "insuranceMessageSent": {
+      "type": "boolean",
+      "default": false
+    },
+    "documentUploadAlerted": {
+      "type": "boolean",
+      "default": false
     }
   }
 }

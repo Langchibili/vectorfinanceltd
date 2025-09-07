@@ -2,7 +2,7 @@
 const  { SendSmsNotification,SendEmailNotification }  = require('../../../../services/messages')
 const  { calculateLoan }  = require('../../../../services/intererestCalculation')
 const  { createSchedule, createScheduleCriteria2, createScheduleCriteria3 }  = require('../../../../services/repaymentSchedule')
-const { getAdminUserEmailsAndNumbers } = require('../../../../services/getAdminUserEmailsAndNumbers')
+const { getAdminUserEmailsAndNumbers } = require('../../../../services/getAdminUserEmailsAndNumbers');
 
 
 const getAppStatus = async () => {
@@ -12,7 +12,7 @@ const getAppStatus = async () => {
 const getLoan = async (id) => {
       return await strapi.db.query("api::loan.loan").findOne({
           where: { id: id },
-          populate: ['loanType','collateral','collateral.vehicle','loanAgreementDocuments','disbursementPOP','client',"loanFormApendixSection"]
+          populate: ['loanType','collateral','collateral.vehicle','collateral.vehicle.sessionLetterTemplate', 'collateral.vehicle.sessionLetter','loanAgreementDocuments','disbursementPOP','client',"loanFormApendixSection"]
       })
 }
 
@@ -96,7 +96,7 @@ module.exports = {
         if (updateAuthenticated()) { // id of admin user account which wants to update
           const { loanApproverEmails, loanDisburserEmails, adminNotificationsEmails } = await getAdminUserEmailsAndNumbers()
           const updatedByUserEmail = updatedById? (await strapi.query('admin::user').findOne({  where: { id: updatedById } })).email : adminNotificationsEmails[0]
-          console.log("loan.newLoanAmountOffer",loan.newLoanAmountOffer,"newLoanAmountOffer",newLoanAmountOffer)
+          
           /* these checks are happening here because if any of the following things happen during the following loan states, an error should be thrown to avoid completing the update. */
           // If current status is already approved or disbursed, block the update
           if (loan.loanStatus === "request-approval") {
@@ -222,6 +222,10 @@ module.exports = {
                     const { autoSendMessageOnLoanAcceptance} = await strapi.db.query("api::loans-information.loans-information").findOne()
                     const { client } = loan
                     // send a message to client that the they should sign documents if auto messages have been allowed on loan acceptance
+                    const notificationBody = "Loan with id #"+loanBefore.id+" has been approved."
+                    adminNotificationsEmails.forEach(email => {
+                            SendEmailNotification(email,notificationBody)
+                    })
                     if(autoSendMessageOnLoanAcceptance && autoSendMessageOnLoanAcceptance === "yes"){
                         const notificationBody = "Your loan request with vector finance limited has been processed and accepted, as a final step before we disburse you the funds, we require that you fill some important documents, we have sent you some forms to fill on your portal account. Thank you for choosing VectorFin."
                         SendEmailNotification(client.email,notificationBody)
@@ -312,10 +316,10 @@ module.exports = {
                       const { client } = loan
                       // this is when the sessionletter template has just been uploaded
                       if(vehicle.insuranceType && (vehicle.insuranceType === "third-party" || vehicle.insuranceType === "comprehensive") && vehicle.sessionLetterTemplate && !loan.sessionLetterTemplateUploaded){
-                        const clientNotificationBody = "A session letter template file has been uploaded to your account, please download it and send it to your insurance company, details have been placed on your account, download the file from: "+process.env.CLIENTURL+" or give us a call for any other queries at "+adminNotificationsNumbers[0]+". Regards, Vectorfin."
-                           SendEmailNotification(client.email,clientNotificationBody)
-                           SendSmsNotification(client.username,clientNotificationBody) // client.username is a phone number
-                        await strapi.db.query('api::loan.loan').update({ where: { id: loanBefore.id }, data: {sessionLetterTemplateUploaded:true} })
+                          const clientNotificationBody = "A session letter template file has been uploaded to your account, please download it and send it to your insurance company, details have been placed on your account, download the file from: "+process.env.CLIENTURL+" or give us a call for any other queries at "+adminNotificationsNumbers[0]+". Regards, Vectorfin."
+                          SendEmailNotification(client.email,clientNotificationBody)
+                          SendSmsNotification(client.username,clientNotificationBody) // client.username is a phone number
+                          await strapi.db.query('api::loan.loan').update({ where: { id: loanBefore.id }, data: {sessionLetterTemplateUploaded:true} })
                       }
                       if(vehicle.insuranceType && (vehicle.insuranceType === "third-party" || vehicle.insuranceType === "comprehensive") && vehicle.sessionLetter && !loan.sessionLetterUploaded){
                           const adminNotificationBody = "The VectorFin client who has initiated a loan with id #"+loanBefore.id + " has uploaded a session letter to their account."
@@ -324,28 +328,33 @@ module.exports = {
                            })
                           await strapi.db.query('api::loan.loan').update({ where: { id: loanBefore.id }, data: {sessionLetterUploaded:true} })
                       }
-                      // this is for insurance type and requests checks 
-                      if(vehicle.insuranceType && vehicle.insuranceType === "third-party"){
-                        if(loan.insuranceRequest && loan.insuranceRequest === "African Gray"){
-                           const adminNotificationBody = "The VectorFin client who has initiated a loan with id #"+loanBefore.id + ", wants to register their vehicle's insurance under African Gray. Their phone number is: "+client.username
-                           adminNotificationsEmails.forEach(email => {
-                               SendEmailNotification(email,adminNotificationBody)
-                           })
+                      if(!loan.insuranceMessageSent){
+                        // this is for insurance type and requests checks 
+                        if(vehicle.insuranceType && vehicle.insuranceType === "third-party"){
+                          if(loan.insuranceRequest && loan.insuranceRequest === "African Gray"){
+                            const adminNotificationBody = "The VectorFin client who has initiated a loan with id #"+loanBefore.id + ", wants to register their vehicle's insurance under African Gray. Their phone number is: "+client.username
+                            adminNotificationsEmails.forEach(email => {
+                                SendEmailNotification(email,adminNotificationBody)
+                            })
+                            await strapi.db.query('api::loan.loan').update({ where: { id: loanBefore.id }, data: {insuranceMessageSent:true} })
+                          }
+                          else{
+                            const adminNotificationBody = "The VectorFin client who has initiated a loan with id #"+loanBefore.id + ", does not have comprehensive insurance, but they have chosen to purchase comprehensive insurance from a company other than the recommended African Gray."
+                            adminNotificationsEmails.forEach(email => {
+                                SendEmailNotification(email,adminNotificationBody)
+                            })
+                            const clientNotificationBody = "Please note that we shall require a session letter from your insurance company, details have been placed on your account, read them from: "+process.env.CLIENTURL+" or give us a call at "+adminNotificationsNumbers[0]+". Regards, Vectorfin."
+                            SendEmailNotification(client.email,clientNotificationBody)
+                            SendSmsNotification(client.username,clientNotificationBody) // client.username is a phone number
+                            await strapi.db.query('api::loan.loan').update({ where: { id: loanBefore.id }, data: {insuranceMessageSent:true} })
+                          }
                         }
-                        else{
-                           const adminNotificationBody = "The VectorFin client who has initiated a loan with id #"+loanBefore.id + ", does not have comprehensive insurance, but they have chosen to purchase comprehensive insurance from a company other than the recommended African Gray."
-                           adminNotificationsEmails.forEach(email => {
-                               SendEmailNotification(email,adminNotificationBody)
-                           })
-                           const clientNotificationBody = "Please note that we shall require a session letter from your insurance company, details have been placed on your account, read them from: "+process.env.CLIENTURL+" or give us a call at "+adminNotificationsNumbers[0]+". Regards, Vectorfin."
-                           SendEmailNotification(client.email,clientNotificationBody)
-                           SendSmsNotification(client.username,clientNotificationBody) // client.username is a phone number
-                        }
-                      }
-                      if(vehicle.insuranceType && vehicle.insuranceType === "comprehensive"){
-                           const clientNotificationBody = "Please note that we shall require a session letter from your insurance company, details have been placed on your account, read them from: "+process.env.CLIENTURL+" or give us a call at "+adminNotificationsNumbers[0]
-                           SendEmailNotification(client.email,clientNotificationBody)
-                           SendSmsNotification(client.username,clientNotificationBody) // client.username is a phone number
+                        if(vehicle.insuranceType && vehicle.insuranceType === "comprehensive"){
+                            const clientNotificationBody = "Please note that we shall require a session letter from your insurance company, details have been placed on your account, read them from: "+process.env.CLIENTURL+" or give us a call at "+adminNotificationsNumbers[0]
+                            SendEmailNotification(client.email,clientNotificationBody)
+                            SendSmsNotification(client.username,clientNotificationBody) // client.username is a phone number
+                            await strapi.db.query('api::loan.loan').update({ where: { id: loanBefore.id }, data: {insuranceMessageSent:true} })
+                          }
                       }
                     }
               }

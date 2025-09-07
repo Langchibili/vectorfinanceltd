@@ -1776,6 +1776,8 @@ export interface ApiLoanLoan extends Schema.CollectionType {
     sessionLetterTemplateUploaded: Attribute.Boolean &
       Attribute.DefaultTo<false>;
     sessionLetterUploaded: Attribute.Boolean & Attribute.DefaultTo<false>;
+    insuranceMessageSent: Attribute.Boolean & Attribute.DefaultTo<false>;
+    documentUploadAlerted: Attribute.Boolean & Attribute.DefaultTo<false>;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;

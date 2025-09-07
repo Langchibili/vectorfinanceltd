@@ -70,7 +70,26 @@ export default class UploadPOP extends React.Component {
     const uploadedRaw = extracted?.raw ?? null
 
     // if there is already a POP uploaded, ask for confirmation to replace
-    const existing = loan.disbursementPOP
+    const disbursementPOP = uploaded.disbursementPOP
+    let existing = false;
+    if (disbursementPOP && disbursementPOP.data) {
+        // If it's an array, check the first item
+        const data = Array.isArray(disbursementPOP.data)
+            ? disbursementPOP.data[0]
+            : disbursementPOP.data;
+        existing = !!(data && (data.id || data.url));
+    } else if (disbursementPOP && (disbursementPOP.id || disbursementPOP.url)) {
+        existing = true;
+    } else if (loan.disbursementPOP) {
+        const pop = loan.disbursementPOP;
+        if (pop.data) {
+            const data = Array.isArray(pop.data) ? pop.data[0] : pop.data;
+            existing = !!(data && (data.id || data.url));
+        } 
+        else {
+            existing = !!(pop.id || pop.url);
+        }
+    }
     if (existing) {
       const ok = window.confirm('A POP is already uploaded for this loan. Do you want to replace the existing POP?')
       if (!ok) return
@@ -118,18 +137,29 @@ export default class UploadPOP extends React.Component {
     if (role === "Collateral Inspector") return null
 
     // Check existence for both .data and direct object
-    let hasPOP = !!disbursementPOP
+    let hasPOP = false;
     if (disbursementPOP && disbursementPOP.data) {
-        hasPOP = !!disbursementPOP.data
-    } else if (!hasPOP && loan.disbursementPOP) {
-        hasPOP = !!loan.disbursementPOP
-        if (loan.disbursementPOP.data) {
-        hasPOP = !!loan.disbursementPOP.data
+        // If it's an array, check the first item
+        const data = Array.isArray(disbursementPOP.data)
+            ? disbursementPOP.data[0]
+            : disbursementPOP.data;
+        hasPOP = !!(data && (data.id || data.url));
+    } else if (disbursementPOP && (disbursementPOP.id || disbursementPOP.url)) {
+        hasPOP = true;
+    } else if (loan.disbursementPOP) {
+        const pop = loan.disbursementPOP;
+        if (pop.data) {
+            const data = Array.isArray(pop.data) ? pop.data[0] : pop.data;
+            hasPOP = !!(data && (data.id || data.url));
+        } 
+        else {
+            hasPOP = !!(pop.id || pop.url);
         }
     }
 
-    const buttonLabel = hasPOP ? 'Replace Disbursement POP' : 'Upload Disbursement POP'
-    return (
+    const buttonLabel = hasPOP ? 'Replace Disbursement POP' : 'Upload Disbursement POP';
+   
+return (
       <>
         <Button variant="contained" size="small" onClick={this.open}>
           {buttonLabel}

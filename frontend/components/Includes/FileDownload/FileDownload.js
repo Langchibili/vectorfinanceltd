@@ -60,10 +60,3 @@ const FileDownload = ({ files, backEndUrl, fileDisplayName }) => {
 };
 
 export default FileDownload;
-
-
-{/* <FileDownload
-  files={yourFileOrArray}
-  backEndUrl={backEndUrl}
-  fileDisplayName={optionalDisplayName}
-/> */}
