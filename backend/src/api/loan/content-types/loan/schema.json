@@ -259,6 +259,10 @@
     "documentUploadAlerted": {
       "type": "boolean",
       "default": false
+    },
+    "collateralInspected": {
+      "type": "boolean",
+      "default": false
     }
   }
 }

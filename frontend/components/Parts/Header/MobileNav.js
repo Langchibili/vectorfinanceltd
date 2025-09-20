@@ -7,7 +7,7 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import { Info, Logout, Person, ReadMore } from '@mui/icons-material';
+import { Book, Info, Logout, Person, ReadMore } from '@mui/icons-material';
 import { AccountCircleRounded, Business, ContactSupport, Home, Money, PersonAdd } from '@material-ui/icons';
 import { useRouter } from 'next/navigation'
 import Link from 'next/link';
@@ -47,6 +47,7 @@ export default function MobileNav(props) {
         if(linkName === 'Home') return <Home color='primary'/>
         if(linkName === 'Logout') return <Logout color='secondary'/>
         if(linkName === 'Terms of Use') return <ReadMore color='primary'/>
+        if(linkName === 'My Documents') return <Book color='primary'/>     
   }
 
 
@@ -74,7 +75,7 @@ export default function MobileNav(props) {
             </ListItemButton>
           </ListItem>
         )) : 
-        [['Loans','/loans'],...refferalLinks,['Home','/'],['Profile(For Individuals)','/profile'], ['Profile(For Businesses)','/business-profile'],['Contact Us','https://vectorfinancelimited.com/contact-us/'], ['About Us','https://vectorfinancelimited.com/about-us/'], ['Logout','/logout?ref=home'], ['Terms of Use','termsofuse']].map((text, index) => (
+        [['Loans','/loans'],...refferalLinks,['Home','/'],['Profile(For Individuals)','/profile'], ['Profile(For Businesses)','/business-profile'],['Contact Us','https://vectorfinancelimited.com/contact-us/'], ['About Us','https://vectorfinancelimited.com/about-us/'], ['Logout','/logout?ref=home'], ['Terms of Use','termsofuse'],['My Documents','mydocuments']].map((text, index) => (
           window.location.pathname === "/" && text[0] === "Home"? '' :
           <ListItem key={text[0]} disablePadding onClick={(e)=>{router.push(text[1]); /*props.handlePageChange(e)*/}}>
             <ListItemButton>

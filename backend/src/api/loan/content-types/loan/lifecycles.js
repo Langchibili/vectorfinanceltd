@@ -242,14 +242,15 @@ module.exports = {
                        if(loan.newLoanAmountOfferDeclined){ // alert the approvers of their amount offer being declined
                           const newLoanAmountOffer = loanBefore.newLoanAmountOffer
                           const notificationBody = "Client has declined the offer of amount K"+newLoanAmountOffer+" made to the loan with id #"+loanBefore.id+" there reason: "+loanBefore.newLoanAmountOfferDeclineReason+" take the next action from here: "+process.env.CLIENTURL+"/admin/loans/"+loanBefore.id
-                          loanApproverNumbers.forEach(number => {
-                              SendSmsNotification(number,notificationBody)
-                          })
+                          
                           loanApproverEmails.forEach(email => {
                               SendEmailNotification(email,notificationBody)
                           })
                           adminNotificationsEmails.forEach(email => {
                               SendEmailNotification(email,notificationBody)
+                          })
+                          loanApproverNumbers.forEach(number => {
+                              SendSmsNotification(number,notificationBody)
                           })
                           await strapi.db.query('api::loan.loan').update({ where: { id: loanBefore.id }, data: {newLoanAmountOfferDeclined:false} });
                           return
@@ -257,14 +258,15 @@ module.exports = {
                       if(loan.newLoanAmountOfferAccepted){ // alert the approvers of their amount offer being accepted
                           const newLoanAmountOffer = loanBefore.newLoanAmountOffer
                           const notificationBody = "Client has accepted the offer of amount K"+newLoanAmountOffer+" made to the loan with id #"+loanBefore.id+" the new loan amount is now: "+newLoanAmountOffer+" take the next action from here: "+process.env.CLIENTURL+"/admin/loans/"+loanBefore.id
-                          loanApproverNumbers.forEach(number => {
-                              SendSmsNotification(number,notificationBody)
-                          })
+                          
                           loanApproverEmails.forEach(email => {
                               SendEmailNotification(email,notificationBody)
                           })
                           adminNotificationsEmails.forEach(email => {
                               SendEmailNotification(email,notificationBody)
+                          })
+                          loanApproverNumbers.forEach(number => {
+                              SendSmsNotification(number,notificationBody)
                           })
                           await strapi.db.query('api::loan.loan').update({ where: { id: loanBefore.id }, data: {newLoanAmountOfferAccepted:false} });
                           return
@@ -273,14 +275,15 @@ module.exports = {
                           const newLoanAmountOffer = loanBefore.newLoanAmountOffer
                           const newLoanAmountOfferedReason = loanBefore.newLoanAmountOfferedReason? "The reason provided for the new offer is: "+loanBefore.newLoanAmountOfferedReason : ""
                           const notificationBody = "An offer of amount K"+newLoanAmountOffer+" has been made to the loan with id #"+loanBefore.id+", please communicate with the client about this offer, and upon the client accepting or declining it, you can approve or decline the offered amount at: "+process.env.CLIENTURL+"/admin/loans/"+loanBefore.id+ " "+newLoanAmountOfferedReason
-                          loanAdministratorNumbers.forEach(number => {
-                              SendSmsNotification(number,notificationBody)
-                          })
+                          
                           loanAdministratorEmails.forEach(email => {
                               SendEmailNotification(email,notificationBody)
                           })
                           adminNotificationsEmails.forEach(email => {
                               SendEmailNotification(email,notificationBody)
+                          })
+                          loanAdministratorNumbers.forEach(number => {
+                              SendSmsNotification(number,notificationBody)
                           })
                           await strapi.db.query('api::loan.loan').update({ where: { id: loanBefore.id }, data: {newLoanAmountOffered:false} });
                           return
@@ -299,12 +302,11 @@ module.exports = {
                       const adminPhoneNumbers = appStatus.status === "production"? loanApproverNumbers : numbersArray.adminNumbers
                       const adminEmailAddress = appStatus.status === "production"? loanApproverEmails : emailsArray.adminEmailAddresses
                       
-                      adminPhoneNumbers.forEach(number => {
-                          SendSmsNotification(number,notificationBody)
-                      })
-                      
                       adminEmailAddress.forEach(email => {
                           SendEmailNotification(email,notificationBody)
+                      })
+                      adminPhoneNumbers.forEach(number => {
+                          SendSmsNotification(number,notificationBody)
                       })
                       return
               }
@@ -384,6 +386,19 @@ module.exports = {
                         const notificationBody = "A VectorFin client has initiated a loan with id #"+loanBefore.id + ", we ask that you inspect the collateral for us, details about the loan and client are on "+process.env.CLIENTURL+"/admin/loans/"+loanBefore.id
                         SendEmailNotification(collateralInspectorEmail,notificationBody)
                         SendSmsNotification(collateralInspectorNumber,notificationBody)
+                    }
+                    if(collateral.collateralStatus === "inspected" && !loan.collateralInspected){
+                          const adminNotificationBody = "The VectorFin loan with id #"+loanBefore.id + " has been inspected."
+                          adminNotificationsEmails.forEach(email => {
+                               SendEmailNotification(email,adminNotificationBody)
+                           })
+                          loanAdministratorEmails.forEach(email => {
+                              SendEmailNotification(email,adminNotificationBody)
+                          })
+                          loanAdministratorNumbers.forEach(number => {
+                              SendSmsNotification(number,adminNotificationBody)
+                          })
+                          await strapi.db.query('api::loan.loan').update({ where: { id: loanBefore.id }, data: {collateralInspected:true} })
                     }
               }
 
