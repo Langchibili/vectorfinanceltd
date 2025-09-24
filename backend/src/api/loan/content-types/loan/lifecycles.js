@@ -200,7 +200,7 @@ module.exports = {
                         repaymentAmount = totalPayment;
                     }
                     if(!loanBefore.paymentScheduleCreated){
-                        createScheduleCriteria3(params.data.id)
+                        createScheduleCriteria3(result.id)
                         // createScheduleCriteria2(params.data.id)
                         //createSchedule(params.data.id) // create a repayment schedule
                     }
