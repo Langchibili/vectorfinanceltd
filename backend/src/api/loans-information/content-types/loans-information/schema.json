@@ -233,6 +233,40 @@
         "yes",
         "no"
       ]
+    },
+    "requirePOPuploadForSalaryLoans": {
+      "type": "boolean",
+      "default": false
+    },
+    "requirePOPuploadForAssetLoans": {
+      "type": "boolean",
+      "default": false
+    },
+    "requireLoanFormApendixSectionForSalaryLoans": {
+      "type": "boolean",
+      "default": false
+    },
+    "requireLoanFormApendixSectionForAssetLoans": {
+      "type": "boolean",
+      "default": false
+    },
+    "requireVerificationVideo": {
+      "type": "boolean",
+      "default": false
+    },
+    "requireSocialSecurityNumber": {
+      "type": "boolean",
+      "default": false
+    },
+    "requireUserToComeOnSiteVerification": {
+      "type": "boolean",
+      "default": false
+    },
+    "address": {
+      "type": "text"
+    },
+    "userRequirementsToBrinOnSite": {
+      "type": "text"
     }
   }
 }

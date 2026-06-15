@@ -1779,6 +1779,8 @@ export interface ApiLoanLoan extends Schema.CollectionType {
     insuranceMessageSent: Attribute.Boolean & Attribute.DefaultTo<false>;
     documentUploadAlerted: Attribute.Boolean & Attribute.DefaultTo<false>;
     collateralInspected: Attribute.Boolean & Attribute.DefaultTo<false>;
+    allowUserToSignLoanDocuments: Attribute.Boolean &
+      Attribute.DefaultTo<false>;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -1985,6 +1987,20 @@ export interface ApiLoansInformationLoansInformation extends Schema.SingleType {
     collateralInspectorNumber: Attribute.String;
     collateralInspectorEmail: Attribute.String;
     allowClientsToAddCollateralMedia: Attribute.Enumeration<['yes', 'no']>;
+    requirePOPuploadForSalaryLoans: Attribute.Boolean &
+      Attribute.DefaultTo<false>;
+    requirePOPuploadForAssetLoans: Attribute.Boolean &
+      Attribute.DefaultTo<false>;
+    requireLoanFormApendixSectionForSalaryLoans: Attribute.Boolean &
+      Attribute.DefaultTo<false>;
+    requireLoanFormApendixSectionForAssetLoans: Attribute.Boolean &
+      Attribute.DefaultTo<false>;
+    requireVerificationVideo: Attribute.Boolean & Attribute.DefaultTo<false>;
+    requireSocialSecurityNumber: Attribute.Boolean & Attribute.DefaultTo<false>;
+    requireUserToComeOnSiteVerification: Attribute.Boolean &
+      Attribute.DefaultTo<false>;
+    address: Attribute.Text;
+    userRequirementsToBrinOnSite: Attribute.Text;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;

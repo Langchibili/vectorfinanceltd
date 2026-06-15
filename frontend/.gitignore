@@ -35,3 +35,18 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+./agent-context.txt
+
+frontend/code_collection.js 
+frontend/code.min.txt 
+frontend/code.txt 
+frontend/agent-context.txt
+frontend/app/code_collection.js 
+frontend/app/code.min.txt 
+frontend/app/code.txt 
+frontend/app/agent-context.txt
+frontend/app/admin/code_collection.js 
+frontend/app/admin/code.min.txt 
+frontend/app/admin/code.txt 
+frontend/app/admin/agent-context.txt

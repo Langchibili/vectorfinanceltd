@@ -1,0 +1,11 @@
+#page-loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 4px; /* Thickness of the loader */
+    background-color: #3498db; /* Loader color */
+    z-index: 9999; /* Ensure the loader stays on top */
+    transition: width 0.4s ease;
+  }
+  

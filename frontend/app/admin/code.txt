@@ -1,0 +1,1723 @@
+
+================================================================================
+FILE: code_collection.js
+================================================================================
+
+const fs = require('fs');
+const path = require('path');
+const { promisify } = require('util');
+
+// Promisify fs functions for async/await usage
+const readdir = promisify(fs.readdir);
+const stat = promisify(fs.stat);
+const readFile = promisify(fs.readFile);
+const writeFile = promisify(fs.writeFile);
+
+// ============================================
+// CONFIGURATION - Customize these as needed
+// ============================================
+
+// Directories to ignore (by name - anywhere in the tree)
+const IGNORED_DIRECTORIES = [
+    'node_modules',
+    '.git',
+    '.vscode',
+    '.idea',
+    'dist',
+    'build',
+    'public',
+    'coverage',
+    '.next',
+    '.strapi',
+    '.nuxt',
+    '.cache',
+    '.DS_Store'
+];
+
+// Specific directory paths to ignore (relative to root)
+const IGNORED_DIRECTORY_PATHS = [
+    'app/(auth)',
+    'components/Map',
+    'components/Rider',
+    'lib/api',
+    'app/(main)',
+    'app/finding-driver',
+    'app/trip-summary'
+];
+
+// Files to ignore (by filename - anywhere in the tree)
+const IGNORED_FILES = [
+    'package-lock.json',
+    'yarn.lock',
+    'pnpm-lock.yaml',
+    '.gitignore',
+    '.env',
+    '.env.local',
+    '.env.development',
+    '.env.production',
+    'code.txt',
+    'code.min.txt',
+    'Thumbs.db',
+    'desktop.ini',
+    'collect-code.js'  // This script itself
+];
+
+// Specific file paths to ignore (relative to root)
+const IGNORED_FILE_PATHS = [
+    'lib/hooks/useAuth.js',
+    'lib/hooks/useRide.js',
+    'app/page.js'
+];
+
+// File extensions to ignore
+const IGNORED_FILE_EXTENSIONS = [
+    '.log', '.tmp', '.temp', '.bak', '.swp', '.swo',
+    '.pid', '.seed', '.pem', '.cert', '.key',
+    '.zip', '.rar', '.7z', '.gz', '.tar',
+    '.jpg', '.jpeg', '.png', '.gif', '.ico', '.svg',
+    '.mp3', '.mp4', '.avi', '.mov', '.wmv',
+    '.exe', '.dll', '.so', '.dylib',
+    '.pdf', '.doc', '.docx', '.xls', '.xlsx'
+];
+
+// Custom ignored items - Add your own here
+const CUSTOM_IGNORED_FILES = [
+    // 'secrets.json',
+    // 'private.key'
+];
+
+const CUSTOM_IGNORED_PATHS = [
+    // 'app/specific-folder/specific-file.js'
+];
+
+// Combine all ignored files
+const ALL_IGNORED_FILES = [...IGNORED_FILES, ...CUSTOM_IGNORED_FILES];
+const ALL_IGNORED_FILE_PATHS = [...IGNORED_FILE_PATHS, ...CUSTOM_IGNORED_PATHS];
+
+// Output file configuration
+const OUTPUT_FILE = path.join(process.cwd(), 'code.txt');
+const OUTPUT_MIN_FILE = path.join(process.cwd(), 'code.min.txt');
+
+// Statistics tracking
+let stats = {
+    processed: 0,
+    skipped: 0,
+    errors: 0
+};
+
+// ============================================
+// HELPER FUNCTIONS
+// ============================================
+
+/**
+ * Get normalized relative path from root directory
+ */
+function getRelativePath(filePath) {
+    const relative = path.relative(process.cwd(), filePath);
+    return relative ? relative.replace(/\\/g, '/') : '.';
+}
+
+/**
+ * Check if a directory should be ignored
+ */
+function shouldIgnoreDirectory(dirPath) {
+    const relativePath = getRelativePath(dirPath);
+    const dirName = path.basename(dirPath);
+
+    // Check by directory name (global)
+    if (IGNORED_DIRECTORIES.includes(dirName)) {
+        return true;
+    }
+
+    // Check exact directory path
+    if (IGNORED_DIRECTORY_PATHS.includes(relativePath)) {
+        return true;
+    }
+
+    return false;
+}
+
+/**
+ * Check if a file should be ignored
+ */
+function shouldIgnoreFile(fileName, filePath) {
+    const relativePath = getRelativePath(filePath);
+    const ext = path.extname(fileName).toLowerCase();
+
+    // Check by filename
+    if (ALL_IGNORED_FILES.includes(fileName)) {
+        return true;
+    }
+
+    // Check by extension
+    if (IGNORED_FILE_EXTENSIONS.includes(ext)) {
+        return true;
+    }
+
+    // Check exact file path
+    if (ALL_IGNORED_FILE_PATHS.includes(relativePath)) {
+        return true;
+    }
+
+    // Check if file is in an ignored directory
+    const fileDir = path.dirname(relativePath);
+    if (IGNORED_DIRECTORY_PATHS.includes(fileDir)) {
+        return true;
+    }
+
+    // Check hidden files (except allowed ones)
+    if (fileName.startsWith('.') && !fileName.startsWith('.env')) {
+        const allowedHidden = ['.eslintrc', '.prettierrc', '.babelrc', '.npmrc'];
+        if (!allowedHidden.some(allowed => fileName.startsWith(allowed))) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+/**
+ * Recursively traverse directory and collect all non-ignored files
+ */
+async function traverseDirectory(dirPath) {
+    const files = [];
+
+    // Skip if this directory should be ignored
+    if (shouldIgnoreDirectory(dirPath)) {
+        console.log(`  ⏭️  Skipping directory: ${getRelativePath(dirPath)}`);
+        stats.skipped++;
+        return files;
+    }
+
+    try {
+        const items = await readdir(dirPath);
+
+        for (const item of items) {
+            const fullPath = path.join(dirPath, item);
+
+            try {
+                const fileStat = await stat(fullPath);
+
+                if (fileStat.isDirectory()) {
+                    const subFiles = await traverseDirectory(fullPath);
+                    files.push(...subFiles);
+                } else if (fileStat.isFile()) {
+                    if (!shouldIgnoreFile(item, fullPath)) {
+                        files.push(fullPath);
+                    } else {
+                        console.log(`  ⏭️  Skipping file: ${getRelativePath(fullPath)}`);
+                        stats.skipped++;
+                    }
+                }
+            } catch (err) {
+                console.error(`  ❌ Error accessing ${fullPath}: ${err.message}`);
+                stats.errors++;
+            }
+        }
+    } catch (err) {
+        console.error(`  ❌ Error reading directory ${dirPath}: ${err.message}`);
+        stats.errors++;
+    }
+
+    return files;
+}
+
+/**
+ * Read file content with encoding detection
+ */
+async function readFileContent(filePath) {
+    try {
+        const buffer = await readFile(filePath);
+
+        // Try UTF-8 first
+        try {
+            return buffer.toString('utf8');
+        } catch (err) {
+            // Fallback to latin1 for binary files
+            return `[BINARY FILE]\n${buffer.toString('base64')}\n[/BINARY FILE]`;
+        }
+    } catch (err) {
+        console.error(`  ❌ Error reading file: ${err.message}`);
+        stats.errors++;
+        return `[ERROR: ${err.message}]`;
+    }
+}
+
+/**
+ * Format file size for display
+ */
+function formatFileSize(bytes) {
+    if (bytes < 1024) return `${bytes} bytes`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(2)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+}
+
+/**
+ * Display configuration summary
+ */
+function displayConfig() {
+    console.log('\n⚙️  Configuration:');
+    console.log(`  • Ignored directories (by name): ${IGNORED_DIRECTORIES.length}`);
+    console.log(`  • Ignored directory paths: ${IGNORED_DIRECTORY_PATHS.length}`);
+    console.log(`  • Ignored files (by name): ${ALL_IGNORED_FILES.length}`);
+    console.log(`  • Ignored file paths: ${ALL_IGNORED_FILE_PATHS.length}`);
+    console.log(`  • Ignored extensions: ${IGNORED_FILE_EXTENSIONS.length}`);
+
+    if (IGNORED_DIRECTORY_PATHS.length > 0) {
+        console.log('\n  📁 Ignored directories:');
+        IGNORED_DIRECTORY_PATHS.forEach(dir => console.log(`    - ${dir}`));
+    }
+
+    if (ALL_IGNORED_FILE_PATHS.length > 0) {
+        console.log('\n  📄 Ignored files:');
+        ALL_IGNORED_FILE_PATHS.forEach(file => console.log(`    - ${file}`));
+    }
+}
+
+// ============================================
+// MAIN FUNCTIONS
+// ============================================
+
+/**
+ * Create the complete source code document
+ */
+async function createCodeDocument() {
+    console.log('\n📂 Scanning directory:', process.cwd());
+    console.log('🔍 Gathering files...\n');
+
+    const allFiles = await traverseDirectory(process.cwd());
+
+    if (allFiles.length === 0) {
+        console.log('❌ No files found to process!');
+        return null;
+    }
+
+    console.log(`\n📊 Found ${allFiles.length} files to process\n`);
+
+    let outputContent = '';
+
+    // Process each file
+    for (let i = 0; i < allFiles.length; i++) {
+        const filePath = allFiles[i];
+        const relativePath = getRelativePath(filePath);
+
+        console.log(`📝 Processing (${i + 1}/${allFiles.length}): ${relativePath}`);
+
+        // Add file header with path
+        outputContent += `\n${'='.repeat(80)}\n`;
+        outputContent += `FILE: ${relativePath}\n`;
+        outputContent += `${'='.repeat(80)}\n\n`;
+
+        // Add file content
+        const content = await readFileContent(filePath);
+        outputContent += content;
+
+        // Ensure trailing newline
+        if (content && !content.endsWith('\n')) {
+            outputContent += '\n';
+        }
+
+        stats.processed++;
+    }
+
+    // Write to file
+    try {
+        await writeFile(OUTPUT_FILE, outputContent, 'utf8');
+        console.log(`\n✅ Created: ${OUTPUT_FILE}`);
+        console.log(`📏 Size: ${formatFileSize(outputContent.length)}`);
+        return outputContent;
+    } catch (err) {
+        console.error(`❌ Error writing file: ${err.message}`);
+        return null;
+    }
+}
+
+/**
+ * Create minified version (remove all whitespace)
+ */
+async function createMinifiedVersion(sourceContent) {
+    if (!sourceContent) {
+        console.log('❌ No source content to minify');
+        return false;
+    }
+
+    console.log('\n⚡ Creating minified version...');
+
+    try {
+        // Remove all whitespace
+        const minified = sourceContent.replace(/\s/g, '');
+
+        await writeFile(OUTPUT_MIN_FILE, minified, 'utf8');
+        console.log(`✅ Created: ${OUTPUT_MIN_FILE}`);
+        console.log(`📏 Size: ${formatFileSize(minified.length)}`);
+
+        const reduction = ((1 - minified.length / sourceContent.length) * 100).toFixed(2);
+        console.log(`📉 Reduction: ${reduction}%`);
+
+        return true;
+    } catch (err) {
+        console.error(`❌ Error creating minified file: ${err.message}`);
+        return false;
+    }
+}
+
+/**
+ * Display final summary
+ */
+function displaySummary() {
+    console.log('\n' + '='.repeat(50));
+    console.log('📊 SUMMARY');
+    console.log('='.repeat(50));
+    console.log(`✅ Files processed: ${stats.processed}`);
+    console.log(`⏭️  Files/directories skipped: ${stats.skipped}`);
+    console.log(`❌ Errors encountered: ${stats.errors}`);
+    console.log(`📁 Output files:`);
+    console.log(`   - ${path.basename(OUTPUT_FILE)}`);
+    console.log(`   - ${path.basename(OUTPUT_MIN_FILE)}`);
+    console.log('\n🎉 Done!');
+}
+
+// ============================================
+// SCRIPT ENTRY POINT
+// ============================================
+
+async function main() {
+    console.log('🔍 Source Code Collector');
+    console.log('='.repeat(50));
+
+    displayConfig();
+
+    try {
+        const sourceContent = await createCodeDocument();
+
+        if (!sourceContent) {
+            console.log('❌ Failed to create code document');
+            return;
+        }
+
+        await createMinifiedVersion(sourceContent);
+        displaySummary();
+
+    } catch (error) {
+        console.error('💥 Unexpected error:', error.message);
+        if (error.stack) console.error(error.stack);
+    }
+}
+
+// Run the script
+main();
+
+================================================================================
+FILE: loans/page.js
+================================================================================
+
+"use client"
+
+import { useEffect, useState } from 'react'
+import { Slide } from '@material-ui/core'
+import { Button, Stack, Alert, TextField, Pagination, LinearProgress } from '@mui/material'
+import { useRouter } from 'next/navigation'
+import { useUser } from '@/Contexts/UserContext'
+import { getAllLoans, getLoanFromId, scrolltoTopOFPage } from '@/Functions'
+import PageSkeleton from '@/components/Includes/Loader/PageSkeleton'
+
+export default function AdminLoansList() {
+  const loggedInUser = useUser()
+  const router = useRouter()
+  const [loans, setLoans] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [page, setPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const rowsPerPage = 10
+  const user = loggedInUser?.user || null
+  const loggedIn = loggedInUser?.status || false
+  const allowedRoles = ['director', 'ceo', 'Loan Admin', 'Collateral Inspector']
+
+  useEffect(() => {
+    scrolltoTopOFPage()
+
+    if (!allowedRoles.includes(user?.type)) {
+      setError('Forbidden access: You do not have permission to view this page.')
+      setLoading(false)
+      return
+    }
+
+    fetchLoans(page)
+  }, [user, page])
+
+  const fetchLoans = async (currentPage) => {
+    try {
+      setLoading(true)
+      const { data, meta } = await getAllLoans(currentPage, rowsPerPage)
+      setLoans(data)
+      setTotalPages(meta.pageCount)
+    } catch (err) {
+      setError('Failed to fetch loans.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleSearch = async () => {
+    if (!searchTerm.trim()) {
+      fetchLoans(1)
+      return
+    }
+
+    setLoading(true)
+    try {
+      const loan = await getLoanFromId(searchTerm.trim())
+      if (loan) {
+        setLoans([loan])
+        setTotalPages(1)
+      } else {
+        setLoans([])
+      }
+    } catch (err) {
+      setError('Loan not found.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'initiated':
+      case 'pending-collateral-addition':
+      case 'pending-collateral-inspection':
+        return 'warning'
+      case 'accepted':
+      case 'disbursed':
+        return 'info'
+      case 'approved':
+        return 'success'
+      case 'completed':
+        return 'secondary'
+      case 'defaulted':
+        return 'error'
+      default:
+        return 'inherit'
+    }
+  }
+
+  const getStatusTitle = (status) => {
+    if (status === "pending-approval") {
+        return 'pending-final-editions'
+    }
+    return status
+  }
+
+  if (loading) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', marginTop: '50px' }}>
+        <LinearProgress color='secondary'/> 
+        <PageSkeleton title="Loading loan..." loading={true}/>
+      </div>
+    )
+  }
+
+  if (!loggedIn) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', marginTop: '70px' }}>
+        <Stack spacing={2} alignItems="center">
+          {typeof window !== 'undefined' ? (
+                <>
+                <Alert severity="warning">You are logged out, log in</Alert>
+                <Button
+                variant="outlined"
+                color="primary"
+                onClick={() => {
+                    const redirect = encodeURIComponent(window.location.href)
+                    window.location.href = `/admin?redirectUrl=${redirect}`
+                }}
+                >
+                Login to Proceed
+                </Button>
+                </>
+            ) : null}
+        </Stack>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div style={{ maxWidth: 500, margin: '50px auto' }}>
+        <Alert severity="error">{error}</Alert>
+      </div>
+    )
+  }
+
+  return (
+    <Slide in={true} direction="up">
+      <div
+        style={{
+          minHeight: '100vh',
+          background: 'linear-gradient(135deg, rgb(188 200 197), rgb(252 252 252))',
+          padding: '2rem',
+          marginTop: '30px'
+        }}
+      >
+        <Stack spacing={2}>
+        <Stack direction="row" spacing={1} sx={{ mb: 3, width: '100%', maxWidth: 500 }}>
+        <TextField
+            label="Search Loan by ID"
+            variant="filled"
+            size="small"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+            sx={{
+            flex: 1,
+            backgroundColor: '#fff',
+            borderRadius: '8px',
+            '& .MuiFilledInput-root': {
+                backgroundColor: '#fff',
+                borderRadius: '8px',
+                '&:before, &:after': {
+                borderBottom: 'none',  // removes underline / strike
+                },
+            },
+            '& .MuiInputBase-input': {
+                padding: '10px 12px',
+            },
+            }}
+        />
+
+        <Button
+            variant="contained"
+            color="secondary"
+            size="medium"
+            onClick={handleSearch}
+            sx={{
+            borderRadius: '8px',
+            px: 3,
+            py: 1.5,
+            textTransform: 'none',
+            fontWeight: 500,
+            boxShadow: '0 3px 8px rgba(0,0,0,0.15)',
+            '&:hover': {
+                boxShadow: '0 5px 12px rgba(0,0,0,0.2)',
+            },
+            }}
+        >
+            Search
+        </Button>
+        </Stack>
+          {loans.map((loanData) => {
+             const loan = loanData.hasOwnProperty('attributes')? loanData.attributes : loanData
+             return (
+                <Button
+                    key={loanData.id}
+                    variant="outlined"
+                    color={getStatusColor(loan.loanStatus)}
+                    // onClick={() => router.push(`/admin/loans/${loanData.id}`)}
+                    onClick={() =>  { 
+                        window.location = `/admin/loans/${loanData.id}`
+                    }}
+                    sx={{ justifyContent: 'flex-start', textTransform: 'none' }}
+                >
+                    #{loanData.id} K{loan.loanAmount} — {getStatusTitle(loan.loanStatus)}
+                </Button>
+            )
+          })}
+
+          {totalPages > 1 && (
+            <Pagination
+              count={totalPages}
+              page={page}
+              onChange={(e, val) => setPage(val)}
+              color="primary"
+              sx={{ mt: 2 }}
+            />
+          )}
+        </Stack>
+      </div>
+    </Slide>
+  )
+}
+
+================================================================================
+FILE: loans/[id]/page.js
+================================================================================
+
+"use client"
+
+import React, { useEffect, useState } from 'react'
+import { useParams } from 'next/navigation'
+import { useUser } from '@/Contexts/UserContext'
+import { useConstants } from '@/Contexts/ConstantsContext'
+import { getLoanFromId, scrolltoTopOFPage } from '@/Functions'
+import { Box, Typography, Alert, Paper, LinearProgress, Button } from '@mui/material'
+import LoanActions from '@/components/Includes/AdminComponents/LoanActions'
+import ClientDetails from '@/components/Includes/AdminComponents/ClientDetails'
+import LoanDetails from '@/components/Includes/AdminComponents/LoanDetails'
+import { usePage } from '@/Contexts/PageContext'
+import { useBottomNav } from '@/Contexts/BottomNavContext'
+import { Slide } from '@material-ui/core'
+import CollateralValueForm from '@/components/Includes/AdminComponents/CollateralValueForm'
+import OfferAmountForm from '@/components/Includes/AdminComponents/OfferAmountForm'
+import ActionOverview from '@/components/Includes/AdminComponents/ActionOverview '
+import AppendixForm from '@/components/Includes/AdminComponents/AppendixForm'
+import PageSkeleton from '@/components/Includes/Loader/PageSkeleton'
+import { Stack } from '@mui/system'
+import OfferDecision from '@/components/Includes/AdminComponents/OfferDecision'
+import ChangeLoanAmount from '@/components/Includes/AdminComponents/ChangeLoanAmount'
+
+export default function LoanDetailPage() {
+  const { id } = useParams()
+  const loggedInUser = useUser()
+  const constants = useConstants()
+  const [loan, setLoan] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+  const { setPage } = usePage()
+  const {BottomNavLink} = useBottomNav()
+  const user = loggedInUser?.user || null
+  const loggedIn = loggedInUser?.status || false
+  setPage('/admins/loans')
+  
+  // populate string for the loan
+  const POPULATE = "loanType,loanAgreementDocuments,disbursementPOP,collateral,collateral.vehicle,collateral.land,collateral.house,collateral.CollateralMedia,collateral.vehicle.sessionLetterTemplate,collateral.vehicle.sessionLetter,client,client.details,client.bankDetails,client.currentLoan"  
+  // Allowed roles
+  const allowedRoles = ['director', 'ceo', 'Loan Admin', 'Collateral Inspector']
+
+  useEffect(() => {
+    scrolltoTopOFPage()
+    if (!allowedRoles.includes(user?.type)) { 
+      setError('Forbidden access: You do not have permission to view this page.')
+      setLoading(false)
+      return
+    }
+
+    async function fetchLoan() {
+      try {
+        const data = await getLoanFromId(id,POPULATE)
+        console.log('data',data)
+        setLoan(data)
+      } catch (err) {
+        setError('Failed to fetch loan details.')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchLoan()
+  }, [id, user])
+  // refreshLoan: accepts optional updatedLoan (from onUpdated) else fetches from API
+  const refreshLoan = async (updatedLoan = null) => {
+    // quick path: parent or child already has updated loan object
+    if (updatedLoan) {
+      setLoan(updatedLoan)
+      setError(null)
+      return
+    }
+
+    setLoading(true)
+    setError(null)
+    try {
+      const data = await getLoanFromId(id, POPULATE)
+      if (!data) {
+        setError('Loan not found')
+        setLoan(null)
+      } else {
+        // your getLoanFromId returns a populated attributes object (as you showed)
+        setLoan(data)
+      }
+    } catch (err) {
+      console.error('refreshLoan error', err)
+      setError('Failed to load loan')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    if (!id) return
+    refreshLoan()
+  }, [id])
+
+  if (loading) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', marginTop: '50px' }}>
+        <LinearProgress color='secondary'/> 
+        <PageSkeleton title="Loading loan..." loading={true}/>
+      </div>
+    )
+  }
+
+ if (!loggedIn) {
+  return (
+    <div style={{ display: 'flex', justifyContent: 'center', marginTop: '70px' }}>
+      <Stack spacing={2} alignItems="center">
+        {typeof window !== 'undefined' ? (
+        <>
+        <Alert severity="warning">You are logged out, log in</Alert>
+        <Button
+            variant="outlined"
+            color="primary"
+            onClick={() => {
+            const redirect = encodeURIComponent(window.location.href)
+            window.location.href = `/admin?redirectUrl=${redirect}`
+            }}
+        >
+            Login to Proceed
+        </Button>
+        </>
+        ) : null}
+      </Stack>
+    </div>
+  )
+}
+
+  if (error) {
+    return (
+      <Box sx={{ maxWidth: 500, mx: 'auto', mt: 5 }}>
+        <Alert severity="error">{error}</Alert>
+      </Box>
+    )
+  }
+
+  if (!loan) {
+    return (
+      <Box sx={{ maxWidth: 500, mx: 'auto', mt: 5 }}>
+        <Alert severity="warning">Loan not found.</Alert>
+      </Box>
+    )
+  }
+  if(parseInt(BottomNavLink) === 0){
+          return (
+            <div className="page-content">
+                <Slide in={true} direction="right">
+                    <LoanDetails loan={loan} role={user.type} onUpdated={refreshLoan} constants={constants}/>
+                </Slide>
+            </div>
+           
+          )
+        }
+    else if(parseInt(BottomNavLink) === 1){
+        return (
+            <div className="page-content">
+                <Slide in={true} direction="left">
+                        <ClientDetails loan={loan} role={user.type} constants={constants}/>
+                </Slide>
+            </div>
+        )
+    }
+    else{
+        return (
+            <div className="page-content">
+                 <Slide in={true} direction="left">
+                    <div>
+                        {/* <LoanActions loan={loan} role={user.type} onUpdated={refreshLoan} /> */}
+                        <ActionOverview
+                            loan={loan}
+                            role={user.type}
+                            constants={constants}
+                            ActionDisplay = {()=> { 
+                                return (
+                                    <Stack spacing={2} sx={{ maxWidth: 400, mx: 'auto', my: 2 }}>
+                                        {user.type === "Collateral Inspector"? null : <LoanActions loan={loan} role={user.type} onUpdated={refreshLoan} constants={constants}/>}
+                                        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                                            
+                                            <CollateralValueForm loan={loan} role={user.type} onUpdated={refreshLoan} constants={constants}/>
+                                            <OfferAmountForm loan={loan} role={user.type} onUpdated={refreshLoan} constants={constants}/>
+                                            <ChangeLoanAmount loan={loan} role={user.type} onUpdated={refreshLoan} constants={constants}/>
+                                            {user.type === "Loan Admin" && loan.loanStatus === "request-approval" && (loan.newLoanAmountOffer > 0 && loan.newLoanAmountOffer !== loan.loanAmount)? (
+                                                <OfferDecision
+                                                    loan={loan}
+                                                    offeredAmount={loan.newLoanAmountOffer}
+                                                    role={user.type}
+                                                    onAccepted={refreshLoan}
+                                                    onDeclined={refreshLoan}
+                                                    constants={constants}
+                                                />
+                                            ) : null}
+                                        </Box>
+                                    </Stack>
+                                    
+                                )
+                            } }
+                            onUpdated={refreshLoan}
+                            onOpenCollateralForm={() => setShowCollateralForm(true)}
+                            onOpenOfferForm={() => setShowOfferForm(true)}
+                        />
+                        
+                    </div>
+                </Slide>
+            </div>
+        )
+    }
+}
+
+================================================================================
+FILE: page.js
+================================================================================
+
+"use client"
+      
+import AdminHome from '@/components/Includes/AdminComponents/AdminHome'
+import { useConstants } from '@/Contexts/ConstantsContext'
+import { useUser } from '@/Contexts/UserContext'
+import { scrolltoTopOFPage } from '@/Functions'
+import React, { useEffect, useState } from 'react'
+
+export default function Admin({searchParams}){
+    const { redirectUrl } = searchParams
+    scrolltoTopOFPage() // should always show the top of the page as the view point
+    const constants = useConstants()
+    const loggedInUser = useUser()
+    return (<> {loggedInUser? <AdminHome redirectUrl={redirectUrl} constants={constants} loggedInUser={loggedInUser.user}/> : null} </>)
+}
+
+================================================================================
+FILE: users/add/page.js
+================================================================================
+
+'use client'
+
+import { submitCreateUserRequest } from "@/Constants";
+import { dynamicConfig, getFormByName, getReferrerFromReferralCode, scrolltoTopOFPage, textHasPhoneNumber, updateUserAccount, validateEmail } from "@/Functions";
+import { Slide } from "@material-ui/core";
+import { Alert, Button } from "@mui/material";
+import Link from "next/link";
+import { useRef, useState, useEffect } from "react";
+import { useUser } from '@/Contexts/UserContext'
+import { usePage } from '@/Contexts/PageContext'
+import { Stack } from "@mui/system";
+
+// Force the page to be dynamically rendered on every request
+export const dynamic = dynamicConfig();
+
+export default function AdminUserAdd() {  
+  // Admin authentication logic
+  const loggedInUser = useUser()
+  const { setPage: setPageContext } = usePage()
+  const loggedIn = loggedInUser?.status || false
+  const adminRoles = ['director', 'ceo', 'Loan Admin', 'Accountant']
+  setPageContext('/admin/users')
+
+  // Refs for the form inputs
+  const emailRef = useRef(null);
+  const firstNameRef = useRef(null);
+  const lastNameRef = useRef(null);
+  const phoneRef = useRef(null);
+  const passwordRef = useRef(null);
+  const referralCodeRef = useRef(null)
+
+  // State for error messages
+  const [serverError,setServerError] = useState(null)
+  const [loading,setLoading] = useState(false)
+  const [showPassword, setShowPassword] = useState(false);
+
+  const [errors, setErrors] = useState({
+    email: "",
+    firstName: "",
+    lastName: "",
+    phone: "",
+    password: ""
+  });
+
+  useEffect(() => {
+    scrolltoTopOFPage()
+  }, [])
+
+  // Form validation checks
+  const validateForm = () => {
+    const email = emailRef.current.value.trim();
+    const firstName = firstNameRef.current.value.trim();
+    const lastName = lastNameRef.current.value.trim();
+    const phone = phoneRef.current.value.trim();
+    const password = passwordRef.current.value.trim();
+
+    let isValid = true;
+    const newErrors = { email: "", firstName: "", lastName: "", phone: "", password: "" };
+
+    // Basic validation (adjust rules as needed)
+    if (!email) {
+      newErrors.email = "Please enter email";
+      isValid = false;
+    }
+
+    if (!firstName) {
+      newErrors.firstName = "Please enter your first name";
+      isValid = false;
+    }
+
+    if (!lastName) {
+      newErrors.lastName = "Please enter your last name";
+      isValid = false;
+    }
+
+    if (!phone) {
+      newErrors.phone = "Please enter your phone number";
+      isValid = false;
+    }
+
+    if (!password) {
+      newErrors.password = "Please enter your password";
+      isValid = false;
+    } 
+    // else if (!/(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}/.test(password)) {
+    //   newErrors.password = "Password must meet the criteria";
+    //   isValid = false;
+    // }
+   
+    if (!textHasPhoneNumber(phone)) {
+        newErrors.phone = "Please enter a valid phone number";
+        isValid = false;
+    }
+    if(!validateEmail(email)){
+        newErrors.email = "Please enter a valid email address";
+        isValid = false;
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
+
+  // Handle form submit (You will add the actual submit logic)
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    const referralCode = referralCodeRef.current.value.trim();
+    const validatereferralcode = await validateReferralCode(referralCode)
+    
+    if(!validatereferralcode){
+      setServerError("Please enter a valid reference code, or remove it entirely.")
+      return
+    }
+    
+    const email = emailRef.current.value.trim();
+    const firstName = firstNameRef.current.value.trim();
+    const lastName = lastNameRef.current.value.trim();
+    const phone = phoneRef.current.value.trim();
+    const password = passwordRef.current.value.trim();
+    
+    const requestObject = {
+        username: phone,
+        email:email,
+        password:password
+    }
+    
+    if (validateForm()) {
+       setLoading(true) 
+       const response = await submitCreateUserRequest(requestObject) // initial user account creation
+       if(response.hasOwnProperty('error')){
+           setServerError(response.error.message.replace("Username","Number"))
+           setLoading(false)
+           return
+       }
+     
+       else{
+          const referrer = await getReferrer(referralCode) // get user who referred this user
+          const form = await getFormByName('GeneralLoanForm')
+          const userUpdateObject = {
+                  fullnames: firstName+" "+lastName,
+                  referredBy: referrer?.id || null,
+                  formsToFill: {connect:[form.id]},
+                  "details":{
+                      firstname: firstName,
+                      lastname: lastName,
+                      age:null,
+                      gender:null,
+                      dateOfBirth:null,
+                      address:null
+                    }
+          }
+          const user = await updateUserAccount(userUpdateObject,response.user.id,response.jwt)
+          window.location = "/admin/users/"+user.id
+       }
+    }
+    else {
+      return
+    }
+  }
+
+  const getReferrer = async (referralCode)=>{
+        return await getReferrerFromReferralCode(referralCode)
+  }
+          
+  const getDefaultReferralCode = ()=>{
+       if(typeof document !== "undefined"){
+        if(localStorage.getItem('referralCode')){
+          return localStorage.getItem('referralCode')
+        }
+       }
+       return ''
+  }
+
+  const validateReferralCode = async (referralCode)=>{
+       const referredBy = await getReferrerFromReferralCode(referralCode)
+       if(referralCode === ''){
+          return true
+       }
+       if(!referredBy){
+          return false
+       }
+       return true
+  }
+  
+  // Admin authentication UI
+  if (!loggedIn || !adminRoles.includes(loggedInUser?.user?.type)) {
+    return (
+    <div style={{ display: 'flex', justifyContent: 'center', marginTop: '70px' }}>
+          <Stack spacing={2} alignItems="center">
+            {typeof window !== 'undefined' ? (
+            <>
+            <Alert severity="warning">You are logged out, log in</Alert>
+            <Button
+              variant="outlined"
+              color="primary"
+              onClick={() => {
+                const redirect = encodeURIComponent(window.location.href)
+                window.location.href = `/admin?redirectUrl=${redirect}`
+              }}
+            >
+              Login to Proceed
+            </Button>
+            </>
+          ) : null}
+          </Stack>
+        </div>
+    )
+  }
+
+  scrolltoTopOFPage()
+  return (
+    <div className="auth-page-wrapper auth-bg-cover py-5 d-flex justify-content-center align-items-center min-vh-100">
+      <div className="bg-overlay" />
+      <div className="auth-page-content overflow-hidden pt-lg-5">
+        <div className="container">
+          <div className="row">
+            <div className="col-lg-12">
+              <div className="card overflow-hidden m-0">
+                <div className="row justify-content-center g-0">
+                 <Slide in={true} direction="right">
+                  <div className="col-lg-6">
+                    <div className="p-lg-5 p-4 auth-one-bg h-100">
+                      <div className="bg-overlay" />
+                      {/* Carousel section omitted for brevity */}
+                    </div>
+                  </div>
+                  </Slide>
+                  <Slide in={true} direction="left">
+                  <div className="col-lg-6">
+                    <div className="p-lg-5 p-4">
+                      <div>
+                        <h5 className="text-primary">Register Account</h5>
+                        <p className="text-muted">
+                          You are registering a client's account on their behalf, make sure to have them read the terms of use
+                        </p>
+                      </div>
+                      <div className="mt-4">
+                        <form className="needs-validation" noValidate="" onSubmit={handleSubmit}>
+                          <div className="mb-3">
+                            <label htmlFor="firstname" className="form-label">
+                              First name <span className="text-danger">*</span>
+                            </label>
+                            <input
+                              type="text"
+                              className={`form-control ${errors.firstName ? 'is-invalid' : ''}`}
+                              id="firstname"
+                              placeholder="Enter First name"
+                              ref={firstNameRef}
+                            />
+                            {errors.firstName && <div className="invalid-feedback">{errors.firstName}</div>}
+                          </div>
+                          <div className="mb-3">
+                            <label htmlFor="lastname" className="form-label">
+                              Last name <span className="text-danger">*</span>
+                            </label>
+                            <input
+                              type="text"
+                              className={`form-control ${errors.lastName ? 'is-invalid' : ''}`}
+                              id="lastname"
+                              placeholder="Enter Last name"
+                              ref={lastNameRef}
+                            />
+                            {errors.lastName && <div className="invalid-feedback">{errors.lastName}</div>}
+                          </div>
+                          <div className="mb-3">
+                            <label htmlFor="phonenumber" className="form-label">
+                              Phone number <span className="text-danger">*</span>
+                            </label>
+                            <input
+                              type="text"
+                              className={`form-control ${errors.phone ? 'is-invalid' : ''}`}
+                              id="phonenumber"
+                              placeholder="Enter Phone Number"
+                              ref={phoneRef}
+                            />
+                            {errors.phone && <div className="invalid-feedback">{errors.phone}</div>}
+                          </div>
+                          <div className="mb-3">
+                            <label htmlFor="useremail" className="form-label">
+                              Email <span className="text-danger">*</span>
+                            </label>
+                            <input
+                              type="email"
+                              className={`form-control ${errors.email ? 'is-invalid' : ''}`}
+                              id="useremail"
+                              placeholder="Enter Email Address"
+                              ref={emailRef}
+                            />
+                            {errors.email && <div className="invalid-feedback">{errors.email}</div>}
+                          </div>
+                          <div className="mb-3">
+                            <label className="form-label" htmlFor="password-input">
+                              Password <span className="text-danger">*</span>
+                            </label>
+                            <div className="position-relative auth-pass-inputgroup">
+                              <input
+                                type={showPassword ? "text" : "password"}
+                                className={`form-control pe-5 password-input ${errors.password ? 'is-invalid' : ''}`}
+                                placeholder="Enter Password"
+                                id="password-input"
+                                ref={passwordRef}
+                              />
+                              <button
+                                  type="button"
+                                  className="btn btn-link position-absolute end-0 top-0 text-decoration-none shadow-none text-muted password-addon"
+                                  onClick={() =>
+                                    setShowPassword((prev) => !prev)
+                                  }
+                                  style={{ zIndex: 2 }}
+                                >
+                                  <i
+                                    className={showPassword
+                                        ? "ri-eye-off-fill align-middle"
+                                        : "ri-eye-fill align-middle"
+                                    }
+                                  />
+                                </button>
+                              {errors.password && <div className="invalid-feedback">{errors.password}</div>}
+                            </div>
+                          </div>
+                          <label htmlFor="referral-code" className="form-label">
+                              Referral Code: <span className="text-info">(leave blank if you don't have a code)</span>
+                          </label>
+                          <input
+                                type="text"
+                                className="form-control"
+                                placeholder="Enter Code"
+                                id="referral-code"
+                                defaultValue={getDefaultReferralCode()}
+                                ref={referralCodeRef}
+                              />
+                          <div className="mb-4">
+                                <p className="mb-0 fs-12 text-muted fst-italic">
+                                   By registering this client, the client agrees to the VectorFinance{" "}
+                                    <Link
+                                    href="/termsofuse"
+                                    className="text-primary text-decoration-underline fst-normal fw-medium"
+                                    >
+                                    Terms of Use
+                                    </Link>
+                                </p>
+                            </div>
+                            <p className="text text-danger">{serverError}</p>
+                          <div className="mt-4">
+                            <button type="submit" disabled={loading} className="btn btn-success w-100">
+                              {loading? "Setting Account Up..." : "Sign Up"}
+                            </button>
+                          </div>
+                        </form>
+                      </div>
+                      
+                    </div>
+                  </div>
+                  </Slide>
+                </div>
+              </div>
+              {/* end card */}
+            </div>
+            {/* end col */}
+          </div>
+          {/* end row */}
+        </div>
+        {/* end container */}
+      </div>
+      {/* end auth page content */}
+    </div>
+  )
+}
+
+================================================================================
+FILE: users/page.js
+================================================================================
+
+"use client"
+
+import React, { useEffect, useState } from 'react'
+import { useUser } from '@/Contexts/UserContext'
+import { useConstants } from '@/Contexts/ConstantsContext'
+import { getAllUsers, scrolltoTopOFPage } from '@/Functions'
+import { Slide } from '@material-ui/core'
+import { Box, Typography, Alert, LinearProgress, Button, TextField, Stack, Card, CardContent, Tooltip } from '@mui/material'
+import { usePage } from '@/Contexts/PageContext'
+import { useBottomNav } from '@/Contexts/BottomNavContext'
+import Pagination from '@mui/material/Pagination'
+import SearchIcon from '@mui/icons-material/Search'
+import Radio from '@mui/material/Radio'
+import RadioGroup from '@mui/material/RadioGroup'
+import FormControlLabel from '@mui/material/FormControlLabel'
+import FormControl from '@mui/material/FormControl'
+import FormLabel from '@mui/material/FormLabel'
+import { PersonAdd } from '@mui/icons-material'
+
+export default function AdminUsersList() {
+  const loggedInUser = useUser()
+  const constants = useConstants()
+  const [users, setUsers] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [searchType, setSearchType] = useState('id') // 'id' or 'phone'
+  const [page, setPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const { setPage: setPageContext } = usePage()
+  const { BottomNavLink } = useBottomNav()
+  const loggedIn = loggedInUser?.status || false
+  const adminRoles = ['director', 'ceo', 'Loan Admin', 'Accountant','Collateral Inspector']
+  setPageContext('/admin/users')
+
+  useEffect(() => {
+    scrolltoTopOFPage()
+    fetchUsers()
+    // eslint-disable-next-line
+  }, [])
+
+  const fetchUsers = async (query = '') => {
+    setLoading(true)
+    setError(null)
+    try {
+      const { users: fetchedUsers, totalPages: fetchedTotalPages } = await getAllUsers({ search: query, page, order: 'desc' })
+      setUsers(fetchedUsers)
+      setTotalPages(fetchedTotalPages || 1)
+    } catch (err) {
+      setError('Failed to fetch users.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleSearch = async () => {
+    if (!searchTerm.trim()) {
+      fetchUsers()
+      return
+    }
+    setLoading(true)
+    setError(null)
+    try {
+      let user = null
+      if (searchType === 'id') {
+        user = await getUserById(searchTerm.trim())
+        console.log('user by id',id)
+      } else if (searchType === 'phone') {
+        user = await getUserFromUsername(searchTerm.trim())
+      }
+      setUsers(user && user.id ? [user] : [])
+      setTotalPages(1)
+      if (!user || !user.id) setError('User not found.')
+    } catch (err) {
+      setUsers([])
+      setError('User not found.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleAddClient = () => {
+    window.location = '/admin/users/add'
+  }
+  
+
+  if (loading) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', marginTop: '50px' }}>
+        <LinearProgress color='secondary' />
+      </div>
+    )
+  }
+
+   if (!loggedIn) {
+      return (
+        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '70px' }}>
+          <Stack spacing={2} alignItems="center">
+            {typeof window !== 'undefined' ? (
+            <>
+            <Alert severity="warning">You are logged out, log in</Alert>
+            <Button
+              variant="outlined"
+              color="primary"
+              onClick={() => {
+                const redirect = encodeURIComponent(window.location.href)
+                window.location.href = `/admin?redirectUrl=${redirect}`
+              }}
+            >
+              Login to Proceed
+            </Button>
+            </>
+          ) : null}
+          </Stack>
+        </div>
+      )
+  }
+  
+
+  if (error) {
+    return (
+      <Box sx={{ maxWidth: 500, mx: 'auto', mt: 5 }}>
+        <Alert severity="error">{error}</Alert>
+      </Box>
+    )
+  }
+  
+  return ( <Slide in={true} direction="up">
+      <div
+        style={{
+          minHeight: '100vh',
+          background: 'linear-gradient(135deg, rgb(188 200 197), rgb(252 252 252))',
+          padding: '2rem',
+          marginTop: '30px'
+        }}
+      >
+        <Stack spacing={3} alignItems="center">
+          <Button
+            variant="contained"
+            color="secondary"
+            size="large"
+            onClick={handleAddClient}
+            startIcon={<PersonAdd />}
+            sx={{
+              borderRadius: '8px',
+              px: 4,
+              py: 1.5,
+              textTransform: 'none',
+              fontWeight: 600,
+              width: '100%',
+              maxWidth: 600,
+              mb: 1
+            }}
+          >
+            Add Client
+          </Button>
+         {/* <Stack direction="row" spacing={1} sx={{ width: '100%', maxWidth: 600 }}>
+          <TextField
+            label={searchType === 'id' ? "Search User by ID" : "Search User by Phone Number"}
+            variant="filled"
+            size="small"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+            sx={{
+              flex: 1,
+              backgroundColor: '#fff',
+              borderRadius: '8px',
+              '& .MuiFilledInput-root': {
+                backgroundColor: '#fff',
+                borderRadius: '8px',
+                '&:before, &:after': {
+                  borderBottom: 'none',
+                },
+              },
+              '& .MuiInputBase-input': {
+                padding: '10px 12px',
+              },
+            }}
+          />
+          <Button
+            variant="contained"
+            color="secondary"
+            size="medium"
+            onClick={handleSearch}
+            sx={{
+              borderRadius: '8px',
+              px: 3,
+              py: 1.5,
+              textTransform: 'none',
+              fontWeight: 500,
+              boxShadow: '0 3px 8px rgba(0,0,0,0.15)',
+              '&:hover': {
+                boxShadow: '0 5px 12px rgba(0,0,0,0.2)',
+              },
+              minWidth: 0
+            }}
+            startIcon={<SearchIcon />}
+          >
+            Search
+          </Button>
+        </Stack>
+        <FormControl component="fieldset" sx={{ width: '100%', maxWidth: 600 }}>
+          <RadioGroup
+            row
+            aria-label="search-type"
+            name="search-type"
+            value={searchType}
+            onChange={(e) => setSearchType(e.target.value)}
+            sx={{ justifyContent: 'center' }}
+          >
+            <FormControlLabel value="id" control={<Radio />} label="Search by ID" />
+            <FormControlLabel value="phone" control={<Radio />} label="Search by Phone Number" />
+          </RadioGroup>
+        </FormControl> */}
+          {users.length === 0 ? (
+            <Alert severity="info" sx={{ width: '100%', maxWidth: 600 }}>No users found.</Alert>
+          ) : (
+            <Stack spacing={2} sx={{ width: '100%', maxWidth: 600, mx:'auto', alignItems:'center' }}>
+            {users
+                .slice()
+                .sort((a, b) => b.id - a.id)
+                .map((user) => {
+                if(user.type && adminRoles.includes(user.type)){
+                    return null // can't display admin users
+                }  
+                const user_title = user.fullnames || 'No Name'
+                const phone = user.username
+                const email = user.email
+                const clientId = user.id
+                return (
+                    <Card
+                    key={clientId}
+                    sx={{
+                        maxWidth: 420,
+                        width: '100%',
+                        borderRadius: 2,
+                        boxShadow: 3,
+                        mx: 'auto',
+                        cursor: 'pointer',
+                        transition: 'box-shadow 0.2s',
+                        '&:hover': { boxShadow: 6 }
+                    }}
+                    onClick={() => window.location = `/admin/users/${clientId}`}
+                    >
+                    <CardContent>
+                        <Stack spacing={1}>
+                        <Typography variant="h6" fontWeight={600}>
+                            {user_title}
+                        </Typography>
+                        <Typography 
+                            variant="body2" 
+                            color="text.secondary"
+                            sx={{
+                                userSelect: 'text',
+                                textDecorationStyle:"none",
+                                pointerEvents: 'none', // disables click/tap
+                                textDecoration: 'none',
+                                cursor: 'default'
+                            }}>
+                            Phone: {phone}
+                        </Typography>
+                        <Typography
+                            variant="body2"
+                            color="text.secondary"
+                            sx={{
+                                userSelect: 'text',
+                                textDecorationStyle:"none",
+                                pointerEvents: 'none', // disables click/tap
+                                textDecoration: 'none',
+                                cursor: 'default'
+                            }}
+                            >
+                        Email: {email}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                            Client ID: {clientId}
+                        </Typography>
+                        </Stack>
+                    </CardContent>
+                    </Card>
+                )
+                })}
+            </Stack>
+          )}
+          {totalPages > 1 && (
+            <Pagination
+              count={totalPages}
+              page={page}
+              onChange={(e, val) => {
+                setPage(val)
+                fetchUsers(searchTerm)
+              }}
+              color="primary"
+              sx={{ mt: 2 }}
+            />
+          )}
+        </Stack>
+      </div>
+    </Slide>
+   
+  )
+  
+}
+
+================================================================================
+FILE: users/[id]/page.js
+================================================================================
+
+'use client'
+
+import { useEffect, useState } from "react";
+import { useUser } from '@/Contexts/UserContext'
+import { getUserById, scrolltoTopOFPage } from "@/Functions";
+import { Slide } from '@material-ui/core'
+import {Alert, LinearProgress, Box, Stack, Button } from "@mui/material";
+import { useConstants } from "@/Contexts/ConstantsContext";
+import ClientDetails from "@/components/Includes/AdminComponents/ClientDetails";
+import { useParams } from "next/navigation";
+import { api_url } from "@/Constants";
+import Snackbar from "@mui/material/Snackbar";
+import MuiAlert from "@mui/material/Alert";
+
+export default function AdminUserDetailsPage() {
+  // Admin authentication logic
+  const loggedInUser = useUser();
+  const constants = useConstants();
+  const [client, setClient] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState(null);
+  const loggedIn = loggedInUser?.status || false;
+  const adminRoles = ['director', 'ceo', 'Loan Admin', 'Accountant'];
+  const user = loggedInUser?.user || null;
+  const { id } = useParams()
+  const [forgotMessage, setForgotMessage] = useState("");
+  const [serverError, setServerError] = useState("");
+  const [snackOpen, setSnackOpen] = useState(false);
+  const [snackSeverity, setSnackSeverity] = useState("success");
+
+  useEffect(() => {
+    scrolltoTopOFPage()
+  }, [])
+
+  useEffect(() => {
+    async function fetchUser() {
+      setLoading(true);
+      setError(null);
+      try {
+        // Populate details and bankDetails
+        const populate = "details,bankDetails";
+        const fetchedUser = await getUserById(id, populate);
+        console.log(fetchedUser)
+        if (!fetchedUser) {
+          setError("User not found.");
+        } else {
+          setClient(fetchedUser);
+        }
+      } catch (err) {
+        setError("Failed to fetch user details.");
+      } finally {
+        setLoading(false);
+      }
+    }
+    if(id){
+        fetchUser()
+    }
+  }, [id]);
+
+  const handleForgotPassword = async () => {
+    setSending(true);
+    setSnackOpen(false);
+    try {
+      const email = client?.email;
+      const response = await fetch(`${api_url}/password-resets`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ data: { email } }),
+      });
+
+      const data = await response.json();
+      if (data && data.data) {
+        setForgotMessage("A forget password link has been sent to the client email");
+        setSnackSeverity("success");
+        setSnackOpen(true);
+      } else {
+        setServerError("Failed to send reset link. Please try again in a few minutes.");
+        setSnackSeverity("error");
+        setSnackOpen(true);
+      }
+    } catch (err) {
+      console.error(err);
+      setServerError("Failed to send reset link. Please try again and ensure to input the correct email.");
+      setSnackSeverity("error");
+      setSnackOpen(true);
+    } finally {
+      setSending(false);
+    }
+  };
+
+  const handleCloseSnack = (event, reason) => {
+    if (reason === "clickaway") return;
+    setSnackOpen(false);
+  }
+  // Admin authentication UI
+  
+  if (!loggedIn || !adminRoles.includes(user?.type)) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', marginTop: '70px' }}>
+        <Stack spacing={2} alignItems="center">
+          {typeof window !== 'undefined' ? (
+            <>
+            <Alert severity="warning">You are logged out, log in</Alert>
+            <Button
+              variant="outlined"
+              color="primary"
+              onClick={() => {
+                const redirect = encodeURIComponent(window.location.href)
+                window.location.href = `/admin?redirectUrl=${redirect}`
+              }}
+            >
+              Login to Proceed
+            </Button>
+            </>
+          ) : null}
+        </Stack>
+      </div>
+    )
+  }
+
+  if (loading) {
+    return (
+      <Box sx={{ maxWidth: 500, mx: 'auto', mt: 5 }}>
+        <LinearProgress color="secondary" />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box sx={{ maxWidth: 500, mx: 'auto', mt: 5 }}>
+        <Alert severity="error">{error}</Alert>
+      </Box>
+    );
+  }
+
+   return (
+    <div className="page-content">
+      <Slide in={true} direction="left">
+        <ClientDetails
+          user={client}
+          role={user.type}
+          constants={constants}
+          adminActions={() => (
+            <Button
+              color="warning"
+              variant="contained"
+              onClick={handleForgotPassword}
+              disabled={sending}
+            >
+              {sending ? "Sending..." : "Send Password Reset"}
+            </Button>
+          )}
+        />
+      </Slide>
+      <Snackbar open={snackOpen} autoHideDuration={4000} onClose={handleCloseSnack}>
+        <MuiAlert onClose={handleCloseSnack} severity={snackSeverity} sx={{ width: '100%' }}>
+          {snackSeverity === "success" ? forgotMessage : serverError}
+        </MuiAlert>
+      </Snackbar>
+    </div>
+  )
+}

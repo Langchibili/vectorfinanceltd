@@ -21,6 +21,7 @@ module.exports = {
       // 1. Validate IDs
       const clientId = Number(result.clientId)
       const loanId = Number(result.loanId)
+      console.log('loanId',loanId)
       const appFormId = Number(result.applicationFormId)
       console.log('[Debug] clientId, applicationFormId:', result.clientId, result.applicationFormId)
       if (isNaN(clientId) || isNaN(appFormId)) {

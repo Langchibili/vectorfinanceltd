@@ -1,0 +1,252 @@
+# Full App Breakdown: Vector Finance Loan Management System
+
+## What This App Is
+
+This is a **Next.js financial services web application** — specifically a **loan management platform** called "Vector Finance." It has two distinct sides: a **client-facing portal** (where borrowers apply for loans) and an **admin portal** (where staff manage loans, users, and collateral).
+
+---
+
+## Architecture & Tech Stack
+
+The app is built with:
+
+- **Next.js (App Router)** — file-based routing under the `app/` directory
+- **React** with hooks (`useState`, `useEffect`, `useRef`)
+- **MUI (Material UI v5)** for most UI components (`@mui/material`)
+- **Material UI v4** (`@material-ui/core`) — specifically just for the `<Slide>` animation component, meaning they're mixing two MUI versions
+- **Custom Contexts** for global state (`UserContext`, `ConstantsContext`, `PageContext`, `BottomNavContext`)
+- **Custom utility functions** imported from `@/Functions` and `@/Constants`
+- A **Strapi-style backend API** (evidenced by `.attributes` patterns, populate strings, and the `/password-resets` endpoint)
+
+---
+
+## Global Context System
+
+The app relies heavily on four custom React Contexts that wrap the entire application:
+
+| Context | Purpose |
+|---|---|
+| `UserContext` | Holds the logged-in user object and auth status (`loggedInUser.user`, `loggedInUser.status`) |
+| `ConstantsContext` | Holds app-wide config/constants (likely fetched from the backend — loan types, interest rates, etc.) |
+| `PageContext` | Tracks the current active page, probably used by a bottom navigation bar to highlight the right tab |
+| `BottomNavContext` | Controls which tab is selected in a bottom navigation bar, used to switch between sub-views on a single page |
+
+Every page calls `useUser()`, `useConstants()`, etc. at the top — there's no prop-drilling.
+
+---
+
+## Role-Based Access Control (RBAC)
+
+The app has a strict role system. Every admin page checks `user.type` against an allowed roles array before rendering anything. The roles seen across the codebase are:
+
+- `director`
+- `ceo`
+- `LoanAdmin`
+- `CollateralInspector`
+- `Accountant`
+
+If the user's role is not in the allowed list for that page, they get a "Forbidden access" alert. If they're not logged in at all, they see a login prompt with a redirect URL that bounces them back after signing in.
+
+---
+
+## Page-by-Page Breakdown
+
+---
+
+### `/admin` — Admin Home (`app/admin/page.js`)
+
+This is the **admin login landing page and dashboard entry point**. It's simple:
+
+1. It calls `scrolltoTopOFPage()` immediately on render
+2. It reads `loggedInUser` from context
+3. It passes a `redirectUrl` query param (from `searchParams`) into the `<AdminHome>` component — this is how users get bounced back to their intended page after logging in
+4. If `loggedInUser` is null (still loading or logged out), it renders nothing (`null`)
+
+This page acts as both the **login page** and the **admin dashboard shell** — the `<AdminHome>` component handles both scenarios internally.
+
+---
+
+### `/admin/loans` — Loans List (`app/admin/loans/page.js`)
+
+This page shows a **paginated, searchable list of all loans** in the system.
+
+**Startup flow:**
+1. Scrolls to top
+2. Checks if the user's role is in `allowedRoles` — if not, shows a forbidden error and stops
+3. Calls `fetchLoans(page)` which calls `getAllLoans(currentPage, rowsPerPage)` — this returns `{ data, meta }` where `meta.pageCount` gives total pages
+
+**Search flow:**
+- There's a search bar that lets admins find a specific loan by ID
+- On search, it calls `getLoanFromId(searchTerm)` and replaces the list with just that one result, setting `totalPages` to 1
+- If the search term is cleared, it goes back to the full paginated list
+- Pressing Enter or clicking the Search button both trigger the search
+
+**Display:**
+- Each loan renders as a MUI `<Button>` with a color based on loan status (warning/info/success/secondary/error)
+- Clicking a loan navigates to `/admin/loans/[id]`
+- The status `"pending-approval"` gets relabeled as `"pending-final-editions"` in the UI via `getStatusTitle()`
+- Pagination appears only when `totalPages > 1`
+
+**Status color mapping:**
+
+| Status | Color |
+|---|---|
+| initiated, pending-collateral-* | warning (yellow) |
+| accepted, disbursed | info (blue) |
+| approved | success (green) |
+| completed | secondary (purple) |
+| defaulted | error (red) |
+
+---
+
+### `/admin/loans/[id]` — Loan Detail Page (`app/admin/loans/[id]/page.js`)
+
+This is the **most complex page in the app**. It's a full loan management workspace for a single loan.
+
+**Data loading:**
+1. Gets the `id` from `useParams()`
+2. Fetches the loan using `getLoanFromId(id, POPULATE)` where `POPULATE` is a long comma-separated string telling the backend to deeply populate related data:
+   - `loanType`
+   - `loanAgreementDocuments`
+   - `disbursementPOP` (proof of payment)
+   - `collateral` (and nested: `vehicle`, `land`, `house`, `CollateralMedia`, session letters)
+   - `client` (and nested: `details`, `bankDetails`, `currentLoan`)
+
+**Three-tab layout via `BottomNavContext`:**
+
+The page renders three completely different views depending on which bottom nav tab is active:
+
+- **Tab 0** (`BottomNavLink === 0`): `<LoanDetails>` — slides in from the right. Shows all loan-specific information.
+- **Tab 1** (`BottomNavLink === 1`): `<ClientDetails>` — slides in from the left. Shows the borrower's profile info.
+- **Tab 2+ (else)**: `<ActionOverview>` — the main action workspace. Contains:
+  - `<LoanActions>` — hidden from `CollateralInspector` role
+  - `<CollateralValueForm>` — for setting collateral value
+  - `<OfferAmountForm>` — for making a loan offer
+  - `<ChangeLoanAmount>` — for modifying the loan amount
+  - `<OfferDecision>` — only shows when: user is `LoanAdmin`, loan status is `"request-approval"`, and `newLoanAmountOffer` is greater than 0 and different from the original `loanAmount`
+
+**`refreshLoan` pattern:**
+There's a smart refresh function used across all child components. It accepts an optional `updatedLoan` argument:
+- If a child component already has the updated loan data (e.g., after a mutation), it passes it directly — no extra API call needed
+- If no updated loan is passed, it re-fetches from the API
+- This pattern propagates down via `onUpdated={refreshLoan}` props
+
+---
+
+### `/admin/users` — Users List (`app/admin/users/page.js`)
+
+A **paginated list of all client accounts**, with an "Add Client" button.
+
+Key behaviors:
+- Admin roles filtered out from display — if a user's `type` is in `adminRoles`, they're skipped with `return null` in the map
+- Users sorted by ID descending (`b.id - a.id`) so newest clients appear first
+- Search functionality exists in the code but is **commented out** — the search UI (text field, radio buttons for ID vs phone search) is wrapped in a JSX comment block, suggesting it's mid-development or temporarily disabled
+- The `handleSearch` function references `getUserById` and `getUserFromUsername` but these aren't imported, and there's a bug: it references `id` instead of `searchTerm` when logging
+- Clicking a user card navigates to `/admin/users/[clientId]`
+
+---
+
+### `/admin/users/add` — Add New Client (`app/admin/users/add/page.js`)
+
+A **registration form** where admins create client accounts on behalf of borrowers.
+
+**Form fields:**
+- First name, Last name, Phone number, Email, Password, Referral Code (optional)
+
+**Uses `useRef` instead of controlled state** for form inputs — this is a deliberate performance choice, avoiding re-renders on every keystroke. Validation reads `.current.value` on submit.
+
+**Submit flow:**
+1. Validates the referral code (empty is OK; invalid non-empty code blocks submission)
+2. Validates the form fields (email format, phone format, required fields)
+3. Calls `submitCreateUserRequest({ username: phone, email, password })` — creates the Strapi user
+4. If that fails, shows the server error (with "Username" replaced by "Number" in the message for better UX)
+5. If successful:
+   - Looks up the referrer from the referral code
+   - Gets the "GeneralLoanForm" form object
+   - Updates the new user account with: full name, referredBy ID, and a `formsToFill` connection to the general loan form
+6. Redirects to `/admin/users/[new user id]`
+
+There's also a `getDefaultReferralCode()` that checks `localStorage` for a pre-stored referral code to pre-fill the field.
+
+---
+
+### `/admin/users/[id]` — User Detail Page (`app/admin/users/[id]/page.js`)
+
+Shows a **single client's full profile** using the `<ClientDetails>` component.
+
+**Extra admin action — Password Reset:**
+- There's a "Send Password Reset" button
+- It POSTs to `${api_url}/password-resets` with the client's email
+- Uses a MUI `<Snackbar>` with severity (success/error) to give feedback — this is a toast notification pattern
+- The `sending` state disables the button during the request to prevent double-submission
+
+---
+
+### `/business-profile` — Business Profile Page (`app/business-profile/page.js`)
+
+A **client-facing page** for business/company loan applicants to fill in their details. It stacks three forms:
+
+1. `<UpdateDetailsForm>` — personal/business details
+2. `<UpdateClientDetailsForm>` — client-specific details
+3. `<BusinessInformationForm>` — business-specific information
+
+All three receive `loanCategory="business"` and `formDisplay="profile"` — these props likely control which fields are shown and how.
+
+---
+
+### `/esigning` — E-Signing Page (`app/esigning/page.js`)
+
+This page is **currently a stub** — it has no real UI. The comment block inside it describes the intended logic:
+
+- Get all forms to fill (`formsToFill` array on the user)
+- Show the first form (`formsToFill[0]`)
+- After filling, move it to a "previously filled" stack
+- Shift to the next form
+- When all forms are filled, show a "Complete Loan Application" button
+
+This is clearly a **work in progress** — the workflow is designed but not yet implemented.
+
+---
+
+## Common Patterns Across the App
+
+**1. Three-state page rendering:**
+Every page follows the same guard pattern:
+```
+loading → show spinner
+!loggedIn → show login prompt
+error → show error alert
+→ show actual content
+```
+
+**2. `window.location` vs `router.push`:**
+In the loans list, there's a commented-out `router.push()` and a live `window.location =` — the comment suggests they switched intentionally, likely because the Next.js router wasn't triggering a full re-fetch of data.
+
+**3. Strapi `.attributes` pattern:**
+Multiple places check `loanData.hasOwnProperty('attributes')` before accessing data — this handles both Strapi v4's wrapped response format (`{ data: { id, attributes: {...} } }`) and a flattened format.
+
+**4. `export const dynamic = dynamicConfig()`:**
+Used in the add user page to force dynamic (server-side) rendering on every request, disabling Next.js static caching for that route.
+
+**5. `scrolltoTopOFPage()`:**
+Called at the top of nearly every page — this is a utility function that likely calls `window.scrollTo(0, 0)`, ensuring users always start at the top when navigating.
+
+---
+
+## Overall User & Loan Lifecycle
+
+Based on the loan statuses visible in the code, the lifecycle appears to be:
+
+```
+initiated
+  → pending-collateral-addition   (client adds collateral info)
+  → pending-collateral-inspection (CollateralInspector reviews)
+  → accepted                      (collateral accepted)
+  → request-approval              (loan amount negotiation)
+  → approved                      (final approval)
+  → disbursed                     (money sent out)
+  → completed                     (loan fully repaid)
+  → defaulted                     (client failed to repay)
+```
+
+The admin panel's role system maps directly onto this lifecycle — `CollateralInspector` only touches the collateral stages, `LoanAdmin` handles approvals and offers, `Accountant` handles user management, and `director`/`ceo` have access to everything.

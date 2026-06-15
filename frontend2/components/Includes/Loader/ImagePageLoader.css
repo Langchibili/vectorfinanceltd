@@ -1,0 +1,25 @@
+.loading-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Full height of the viewport */
+    z-index: 10000;
+  }
+  
+  .loading-image {
+    width: 100px; /* Adjust the size of the image */
+    animation: dimBright 1.5s infinite;
+  }
+  
+  @keyframes dimBright {
+    0% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.3;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+  
