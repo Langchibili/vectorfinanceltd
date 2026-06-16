@@ -1997,8 +1997,12 @@ export interface ApiLoansInformationLoansInformation extends Schema.SingleType {
       Attribute.DefaultTo<false>;
     requireVerificationVideo: Attribute.Boolean & Attribute.DefaultTo<false>;
     requireSocialSecurityNumber: Attribute.Boolean & Attribute.DefaultTo<false>;
-    requireUserToComeOnSiteVerification: Attribute.Boolean &
+    requireUserToComeOnSiteForSalaryLoanVerification: Attribute.Boolean &
       Attribute.DefaultTo<false>;
+    requireUserToComeOnSiteForAssetLoanVerification: Attribute.Boolean &
+      Attribute.DefaultTo<false>;
+    requireIntroductoryLetterSalaryLoan: Attribute.Boolean &
+      Attribute.DefaultTo<true>;
     address: Attribute.Text;
     userRequirementsToBrinOnSite: Attribute.Text;
     createdAt: Attribute.DateTime;

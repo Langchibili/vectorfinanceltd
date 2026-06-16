@@ -1553,11 +1553,11 @@ export default class UpdateSalaryDetailsForm extends React.Component {
 
   /* ── derived flags from constants ── */
   get requireVerificationVideo() {
-    return this.props.constants?.loansInformation?.requireVerificationVideo !== false;
+    return (this.props.constants?.loansInformation?.requireVerificationVideo || false) && this.props.constants?.loansInformation?.requireVerificationVideo !== false;
   }
 
   get requireSocialSecurityNumber() {
-    return this.props.constants?.loansInformation?.requireSocialSecurityNumber !== false;
+    return (this.props.constants?.loansInformation?.requireSocialSecurityNumber || false) && this.props.constants?.loansInformation?.requireSocialSecurityNumber !== false;
   }
 
   getClientDetails = async () => {

@@ -258,9 +258,17 @@
       "type": "boolean",
       "default": false
     },
-    "requireUserToComeOnSiteVerification": {
+    "requireUserToComeOnSiteForSalaryLoanVerification": {
       "type": "boolean",
       "default": false
+    },
+    "requireUserToComeOnSiteForAssetLoanVerification": {
+      "type": "boolean",
+      "default": false
+    },
+    "requireIntroductoryLetterSalaryLoan": {
+      "type": "boolean",
+      "default": true
     },
     "address": {
       "type": "text"

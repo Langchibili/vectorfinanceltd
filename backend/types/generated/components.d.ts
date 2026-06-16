@@ -75,6 +75,7 @@ export interface ClientDetailsSalary extends Schema.Component {
     salaryAmount: Attribute.Decimal;
     socialSecurityNumber: Attribute.String;
     bankStatement: Attribute.Media;
+    introductoryLetter: Attribute.Media;
   };
 }
 

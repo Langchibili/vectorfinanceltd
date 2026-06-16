@@ -44,6 +44,15 @@
       "allowedTypes": [
         "files"
       ]
+    },
+    "introductoryLetter": {
+      "allowedTypes": [
+        "videos",
+        "images",
+        "files"
+      ],
+      "type": "media",
+      "multiple": true
     }
   }
 }

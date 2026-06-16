@@ -50,6 +50,25 @@
 //     error: ''
 //   }
 
+//   // ── Convenience getter — pulls the loansInformation config from constants ──
+//   get loansInfo() {
+//     return this.props.constants?.loansInformation || {}
+//   }
+
+//   // Whether POP upload is required for the current loan type
+//   get requirePOP() {
+//     return isSalaryLoan(this.props.loan)
+//       ? this.loansInfo.requirePOPuploadForSalaryLoans && this.loansInfo.requirePOPuploadForSalaryLoans !== false
+//       : this.loansInfo.requirePOPuploadForAssetLoans && this.loansInfo.requirePOPuploadForAssetLoans !== false
+//   }
+
+//   // Whether the appendix section is required for the current loan type
+//   get requireAppendix() {
+//     return isSalaryLoan(this.props.loan)
+//       ? this.loansInfo.requireLoanFormApendixSectionForSalaryLoans && this.loansInfo.requireLoanFormApendixSectionForSalaryLoans !== false
+//       : this.loansInfo.requireLoanFormApendixSectionForAssetLoans && this.loansInfo.requireLoanFormApendixSectionForAssetLoans !== false
+//   }
+
 //   allowedActions = () => {
 //     const { loan, role } = this.props
 //     if (!loan || !loan.loanStatus) return []
@@ -58,7 +77,10 @@
 //     return actions.filter(a => {
 //       if (!a.allowedRoles || a.allowedRoles.includes('system')) return false
 //       const roleLower = String(role || '').toLowerCase()
-//       return a.allowedRoles.some(r => String(r).toLowerCase() === roleLower || r === role)
+//       if (!a.allowedRoles.some(r => String(r).toLowerCase() === roleLower || r === role)) return false
+//       // Hide appendix action when config says it's not required
+//       if (a.action === 'add-appendix' && !this.requireAppendix) return false
+//       return true
 //     })
 //   }
 
@@ -195,7 +217,8 @@
 //     // Pending-approval state — salary loans skip straight from client signing to appendix / invoice
 //     if (loan.loanStatus === "pending-approval") {
 //       if (role === 'ceo' || role === 'director') {
-//         if (!loan.loanAppendixCreated) {
+//         // If appendix is not required, skip straight to waiting for invoice
+//         if (this.requireAppendix && !loan.loanAppendixCreated) {
 //           return (
 //             <Box sx={{ mt: 2 }}>
 //               <Alert severity='info'>
@@ -208,18 +231,20 @@
 //           return (
 //             <Box sx={{ mt: 2 }}>
 //               <Alert severity='info'>
-//                 Appendix details have been added. Waiting for the loan officer to enter the QuickBooks invoice number.
+//                 {this.requireAppendix
+//                   ? 'Appendix details have been added. Waiting for the loan officer to enter the QuickBooks invoice number.'
+//                   : 'The client has signed the loan form. Waiting for the loan officer to enter the QuickBooks invoice number.'}
 //               </Alert>
 //             </Box>
 //           )
 //         }
 //       }
 //       if (role === 'Loan Admin') {
-//         if (!loan.loanAppendixCreated) {
-//           // Salary loan appendix has no insurance/tracker — use trimmed form
+//         // Show appendix form only when required and not yet done
+//         if (this.requireAppendix && !loan.loanAppendixCreated) {
 //           return <SalaryAppendixForm loan={loan} onUpdated={onUpdated} />
 //         }
-//         if (loan.loanAppendixCreated && !loan.invoiceSent) {
+//         if (!loan.invoiceSent) {
 //           return <SendQuickBookInvoiceNumber loan={loan} onUpdated={onUpdated} role={role} handleActionClose={this.handleActionClose} />
 //         }
 //         if (loan.invoiceSent) {
@@ -232,9 +257,20 @@
 //       }
 //     }
 
-//     // Approved / Disbursed — just POP upload (no collateral inspector restriction)
+//     // Approved / Disbursed — POP upload only when required
 //     if (loan.loanStatus === "approved" || loan.loanStatus === "disbursed") {
 //       if (role === 'Collateral Inspector') return null
+//       if (!this.requirePOP) {
+//         return (
+//           <Box sx={{ mt: 2 }}>
+//             <Alert severity='info'>
+//               {loan.loanStatus === "approved"
+//                 ? 'This loan has been approved. No proof of payment upload is required for salary loans — the loan will be marked as disbursed once funds are sent.'
+//                 : 'This loan has been disbursed.'}
+//             </Alert>
+//           </Box>
+//         )
+//       }
 //       return <UploadPOP loan={loan} onUpdated={onUpdated} role={role} handleActionClose={this.handleActionClose} />
 //     }
 
@@ -376,22 +412,47 @@
 
 //     if (loan.loanStatus === "pending-approval") {
 //       if (role === 'ceo' || role === 'director') {
-//         if (!loan.loanAppendixCreated) {
+//         if (this.requireAppendix && !loan.loanAppendixCreated) {
 //           return <Box sx={{ mt: 2 }}><Alert severity='info'>Client has signed the loan form, awaiting the loan officer to attach appendix details to the loan form.</Alert></Box>
 //         }
 //         if (!loan.invoiceSent) {
-//           return <Box sx={{ mt: 2 }}><Alert severity='info'>Loan officer has entered loan form appendix details, now awaiting the loan officer to enter the invoice number from the loan's quick books record.</Alert></Box>
+//           return (
+//             <Box sx={{ mt: 2 }}>
+//               <Alert severity='info'>
+//                 {this.requireAppendix
+//                   ? "Loan officer has entered loan form appendix details, now awaiting the loan officer to enter the invoice number from the loan's quick books record."
+//                   : "The client has signed the loan form. Waiting for the loan officer to enter the QuickBooks invoice number."}
+//               </Alert>
+//             </Box>
+//           )
 //         }
 //       }
-//       if (role === 'Loan Admin' && loan.loanAppendixCreated) {
+//       if (role === 'Loan Admin') {
+//         // Show appendix form only when required and not yet done
+//         if (this.requireAppendix && !loan.loanAppendixCreated) {
+//           return <AppendixForm loan={loan} onUpdated={onUpdated} />
+//         }
+//         if (!loan.invoiceSent) {
+//           return <SendQuickBookInvoiceNumber loan={loan} onUpdated={onUpdated} role={role} handleActionClose={this.handleActionClose} />
+//         }
 //         if (loan.invoiceSent) {
 //           return <Box sx={{ mt: 2 }}><Alert severity='info'>You have already sent an Invoice number, to resend, you must use the backend.</Alert></Box>
 //         }
-//         return <SendQuickBookInvoiceNumber loan={loan} onUpdated={onUpdated} role={role} handleActionClose={this.handleActionClose} />
 //       }
 //     }
 
 //     if (role !== "Collateral Inspector" && (loan.loanStatus === "approved" || loan.loanStatus === "disbursed")) {
+//       if (!this.requirePOP) {
+//         return (
+//           <Box sx={{ mt: 2 }}>
+//             <Alert severity='info'>
+//               {loan.loanStatus === "approved"
+//                 ? 'This loan has been approved. No proof of payment upload is required — the loan will be marked as disbursed once funds are sent.'
+//                 : 'This loan has been disbursed.'}
+//             </Alert>
+//           </Box>
+//         )
+//       }
 //       return <UploadPOP loan={loan} onUpdated={onUpdated} role={role} handleActionClose={this.handleActionClose} />
 //     }
 
@@ -508,28 +569,178 @@ export default class LoanActions extends React.Component {
     actionObj: null,
     payload: {},
     loading: false,
-    error: ''
+    error: '',
+    // ── allow-signing gate ──────────────────────────────────────────────
+    allowSigningLoading: false,
+    allowSigningError: '',
+    allowSigningDone: false,   // optimistic flag: true once we have set it successfully
   }
 
-  // ── Convenience getter — pulls the loansInformation config from constants ──
+  // ── Convenience getters ─────────────────────────────────────────────
   get loansInfo() {
     return this.props.constants?.loansInformation || {}
   }
 
-  // Whether POP upload is required for the current loan type
   get requirePOP() {
     return isSalaryLoan(this.props.loan)
       ? this.loansInfo.requirePOPuploadForSalaryLoans && this.loansInfo.requirePOPuploadForSalaryLoans !== false
       : this.loansInfo.requirePOPuploadForAssetLoans && this.loansInfo.requirePOPuploadForAssetLoans !== false
   }
 
-  // Whether the appendix section is required for the current loan type
   get requireAppendix() {
     return isSalaryLoan(this.props.loan)
       ? this.loansInfo.requireLoanFormApendixSectionForSalaryLoans && this.loansInfo.requireLoanFormApendixSectionForSalaryLoans !== false
       : this.loansInfo.requireLoanFormApendixSectionForAssetLoans && this.loansInfo.requireLoanFormApendixSectionForAssetLoans !== false
   }
 
+  /**
+   * Mirrors the check on the client home page exactly:
+   *   salary: requireUserToComeOnSiteForSalaryLoanVerification
+   *   asset:  requireUserToComeOnSiteForAssetLoanVerification
+   */
+  get requireOnSite() {
+    const info = this.loansInfo
+    if (isSalaryLoan(this.props.loan)) {
+      return (
+        (info.requireUserToComeOnSiteForSalaryLoanVerification || false) &&
+        info.requireUserToComeOnSiteForSalaryLoanVerification === true
+      )
+    }
+    return (
+      (info.requireUserToComeOnSiteForAssetLoanVerification || false) &&
+      info.requireUserToComeOnSiteForAssetLoanVerification === true
+    )
+  }
+
+  // ── Allow-signing action ────────────────────────────────────────────
+  allowClientToSign = async () => {
+    const { loan, onUpdated } = this.props
+    if (!loan) return
+    this.setState({ allowSigningLoading: true, allowSigningError: '' })
+    try {
+      const updated = await updateLoan(
+        { data: { allowUserToSignLoanDocuments: true } },
+        loan.id
+      )
+      if (onUpdated && typeof onUpdated === 'function') onUpdated(updated)
+      this.setState({ allowSigningLoading: false, allowSigningDone: true })
+    } catch (err) {
+      console.error('allowClientToSign error', err)
+      this.setState({
+        allowSigningLoading: false,
+        allowSigningError: 'Failed to update. Try again.',
+      })
+    }
+  }
+
+  /**
+   * Renders the "accepted" state for ALL roles.
+   *
+   * ┌─────────────────────────────────────────────────────────────────┐
+   * │  requireOnSite = false                                          │
+   * │    → plain info message; no button needed (client signs freely) │
+   * │  requireOnSite = true                                           │
+   * │    → if already cleared: show confirmation badge                │
+   * │    → if not yet cleared: show "Allow client to sign" button     │
+   * │      (available to director, ceo, loan admin — not inspector)   │
+   * └─────────────────────────────────────────────────────────────────┘
+   */
+  renderAcceptedState = () => {
+    const { loan, role } = this.props
+    const { allowSigningLoading, allowSigningError, allowSigningDone } = this.state
+    const isInspector = String(role || '').toLowerCase() === 'collateral inspector'
+
+    // ── No gate required ────────────────────────────────────────────
+    if (!this.requireOnSite) {
+      return (
+        <Box sx={{ mt: 2 }}>
+          <Alert severity="info">
+            {isSalaryLoan(loan)
+              ? 'You have successfully accepted this loan. The client will be notified to fill their forms and you will be informed once they are done.'
+              : 'You have successfully accepted this loan, you shall be notified when the client has signed the loan form.'}
+          </Alert>
+        </Box>
+      )
+    }
+
+    // ── On-site gate active ─────────────────────────────────────────
+    const alreadyAllowed =
+      allowSigningDone || loan?.allowUserToSignLoanDocuments === true
+
+    return (
+      <Box sx={{ mt: 2 }}>
+        <Stack spacing={1.5}>
+          {/* Context message */}
+          <Alert severity="info">
+            You have accepted this loan.{' '}
+            {alreadyAllowed
+              ? 'The client has been cleared and may now sign their loan documents.'
+              : 'This loan requires in-person verification before the client can sign their documents. Once you have confirmed their visit, click the button below.'}
+          </Alert>
+
+          {/* Button — all roles except collateral inspector */}
+          {!isInspector && (
+            alreadyAllowed ? (
+              /* Already cleared — confirmation badge */
+              <Box sx={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 1,
+                px: 2, py: 1.25,
+                borderRadius: '10px',
+                background: 'rgba(16,185,129,0.10)',
+                border: `1px solid rgba(16,185,129,0.28)`,
+                width: 'fit-content',
+              }}>
+                <svg width={15} height={15} fill="none" viewBox="0 0 24 24" stroke={G.green3} strokeWidth={2.5}>
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+                <Typography sx={{ fontSize: '13px', fontWeight: 700, color: G.green3, fontFamily: FONTS.body }}>
+                  Client cleared to sign loan documents
+                </Typography>
+              </Box>
+            ) : (
+              /* Allow-signing button */
+              <Box>
+                <Button
+                  variant="contained"
+                  color="success"
+                  disabled={allowSigningLoading}
+                  onClick={this.allowClientToSign}
+                  startIcon={
+                    allowSigningLoading
+                      ? <CircularProgress size={16} sx={{ color: '#fff' }} />
+                      : (
+                        <svg width={16} height={16} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
+                          <path d="M9 12l2 2 4-4" />
+                          <path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      )
+                  }
+                  sx={{
+                    textTransform: 'none',
+                    fontSize: '13.5px',
+                    fontWeight: 700,
+                    borderRadius: '10px',
+                  }}
+                >
+                  {allowSigningLoading ? 'Updating…' : 'Allow Client to Sign Loan Form'}
+                </Button>
+
+                {allowSigningError && (
+                  <Alert severity="error" sx={{ mt: 1.5, borderRadius: '10px' }}>
+                    {allowSigningError}
+                  </Alert>
+                )}
+              </Box>
+            )
+          )}
+        </Stack>
+      </Box>
+    )
+  }
+
+  // ── Standard action machinery ───────────────────────────────────────
   allowedActions = () => {
     const { loan, role } = this.props
     if (!loan || !loan.loanStatus) return []
@@ -539,7 +750,6 @@ export default class LoanActions extends React.Component {
       if (!a.allowedRoles || a.allowedRoles.includes('system')) return false
       const roleLower = String(role || '').toLowerCase()
       if (!a.allowedRoles.some(r => String(r).toLowerCase() === roleLower || r === role)) return false
-      // Hide appendix action when config says it's not required
       if (a.action === 'add-appendix' && !this.requireAppendix) return false
       return true
     })
@@ -603,7 +813,6 @@ export default class LoanActions extends React.Component {
     return s.toUpperCase()
   }
 
-  // ── Only relevant for asset loans (vehicle with insurance) ─────────────────
   renderSessionLetterTemplateUpload = () => {
     const { loan, onUpdated, role } = this.props
     if (!loan || !loan.collateral || !loan.collateral.vehicle) return null
@@ -620,10 +829,9 @@ export default class LoanActions extends React.Component {
 
   renderDialogFields = () => {
     const { actionObj, payload } = this.state
-    const { loan, onUpdated, role } = this.props
+    const { loan } = this.props
     if (actionObj && actionObj.allowedRoles.includes('Loan Admin')) {
       if (actionObj.action === "add-appendix") {
-        // Salary loans use a trimmed appendix form (no insurance / tracker fields)
         return isSalaryLoan(loan)
           ? <SalaryAppendixForm loan={loan} handleActionClose={this.handleActionClose} />
           : <AppendixForm loan={loan} handleActionClose={this.handleActionClose} />
@@ -638,14 +846,44 @@ export default class LoanActions extends React.Component {
     ))
   }
 
-  // ══════════════════════════════════════════════════════════════════════════
+  // Shared confirm dialog used by both render paths
+  renderConfirmDialog = (loan, actionObj) => {
+    const { open, loading, error } = this.state
+    return (
+      <Dialog open={open} onClose={this.close} fullWidth maxWidth="sm">
+        <DialogTitle>
+          {actionObj ? `Confirm: ${actionObj.action === "accept" ? "Approve" : actionObj.action}` : 'Confirm Action'}
+        </DialogTitle>
+        <DialogContent>
+          <Typography variant="body2" sx={{ mb: 1 }}>
+            {actionObj && actionObj.targetStatus === "accepted"
+              ? `This will notify the client that their loan has been accepted. Loan amount: K${loan.loanAmount}.`
+              : actionObj ? `This will move the loan to "${actionObj.targetStatus}"` : ''}
+          </Typography>
+          {this.renderDialogFields()}
+          {error && <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={this.close} disabled={loading} variant="outlined">Cancel</Button>
+          <Button
+            onClick={this.perform}
+            disabled={loading}
+            color={actionObj && actionObj.targetStatus === "accepted" ? "success" : "primary"}
+            variant="contained"
+          >
+            {loading ? <CircularProgress size={18} /> : 'Confirm'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+    )
+  }
+
+  // ══════════════════════════════════════════════════════════════════════
   //  SALARY LOAN RENDER PATH
-  //  Status flow: request-approval → accepted → pending-approval → approved → disbursed
-  //  No collateral, no inspection, no session letters.
-  // ══════════════════════════════════════════════════════════════════════════
+  // ══════════════════════════════════════════════════════════════════════
   renderSalaryLoanActions = () => {
-    const { loan, onUpdated, constants, role } = this.props
-    const { open, actionObj, loading, error } = this.state
+    const { loan, onUpdated, role } = this.props
+    const { actionObj } = this.state
     const actions = this.allowedActions()
 
     if (loan.loanStatus === "rejected") {
@@ -664,29 +902,15 @@ export default class LoanActions extends React.Component {
       return <RejectionForm loan={loan} onUpdated={onUpdated} role={role} handleActionClose={this.handleActionClose} openModal={true} />
     }
 
-    // Director/CEO accepted the loan — waiting on client to sign
-    if ((role === "ceo" || role === "director") && loan.loanStatus === "accepted") {
-      return (
-        <Box sx={{ mt: 2 }}>
-          <Alert severity='info'>
-            You have successfully accepted this loan. The client will be notified to fill their forms and you will be informed once they are done.
-          </Alert>
-        </Box>
-      )
+    // ── ACCEPTED ── delegate to shared gate handler
+    if (loan.loanStatus === "accepted") {
+      return this.renderAcceptedState()
     }
 
-    // Pending-approval state — salary loans skip straight from client signing to appendix / invoice
     if (loan.loanStatus === "pending-approval") {
       if (role === 'ceo' || role === 'director') {
-        // If appendix is not required, skip straight to waiting for invoice
         if (this.requireAppendix && !loan.loanAppendixCreated) {
-          return (
-            <Box sx={{ mt: 2 }}>
-              <Alert severity='info'>
-                The client has signed the loan form. Waiting for the loan officer to attach appendix details.
-              </Alert>
-            </Box>
-          )
+          return <Box sx={{ mt: 2 }}><Alert severity='info'>The client has signed the loan form. Waiting for the loan officer to attach appendix details.</Alert></Box>
         }
         if (!loan.invoiceSent) {
           return (
@@ -701,7 +925,6 @@ export default class LoanActions extends React.Component {
         }
       }
       if (role === 'Loan Admin') {
-        // Show appendix form only when required and not yet done
         if (this.requireAppendix && !loan.loanAppendixCreated) {
           return <SalaryAppendixForm loan={loan} onUpdated={onUpdated} />
         }
@@ -709,16 +932,11 @@ export default class LoanActions extends React.Component {
           return <SendQuickBookInvoiceNumber loan={loan} onUpdated={onUpdated} role={role} handleActionClose={this.handleActionClose} />
         }
         if (loan.invoiceSent) {
-          return (
-            <Box sx={{ mt: 2 }}>
-              <Alert severity='info'>You have already sent the invoice number. To resend, use the backend.</Alert>
-            </Box>
-          )
+          return <Box sx={{ mt: 2 }}><Alert severity='info'>You have already sent the invoice number. To resend, use the backend.</Alert></Box>
         }
       }
     }
 
-    // Approved / Disbursed — POP upload only when required
     if (loan.loanStatus === "approved" || loan.loanStatus === "disbursed") {
       if (role === 'Collateral Inspector') return null
       if (!this.requirePOP) {
@@ -735,7 +953,6 @@ export default class LoanActions extends React.Component {
       return <UploadPOP loan={loan} onUpdated={onUpdated} role={role} handleActionClose={this.handleActionClose} />
     }
 
-    // Default: render transition action buttons (e.g. "accept", "reject" on request-approval)
     if (!actions.length) {
       return (
         <Box sx={{ mt: 2, p: 2, borderRadius: '12px', background: 'rgba(255,255,255,0.03)', border: `1px solid ${G.border}` }}>
@@ -747,62 +964,26 @@ export default class LoanActions extends React.Component {
     return (
       <Slide in={true} direction="left">
         <Box sx={{ mt: 2, display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-          {actions.map(a => {
-            const color = this.getActionColor(a)
-            const label = a.action === "accept" ? "APPROVE" : a.action
-            return (
-              <Button
-                key={a.action}
-                variant="contained"
-                size="small"
-                color={color}
-                onClick={() => this.open(a)}
-                sx={{ minWidth: 140, justifyContent: 'flex-start', fontSize: '12px', letterSpacing: '0.04em' }}
-              >
-                {label}
-              </Button>
-            )
-          })}
-
-          <Dialog open={open} onClose={this.close} fullWidth maxWidth="sm">
-            <DialogTitle>
-              {actionObj ? `Confirm: ${actionObj.action === "accept" ? "Approve" : actionObj.action}` : 'Confirm Action'}
-            </DialogTitle>
-            <DialogContent>
-              <Typography variant="body2" sx={{ mb: 1 }}>
-                {actionObj && actionObj.targetStatus === "accepted"
-                  ? `This will notify the client that their salary loan has been accepted. They will be asked to fill forms before disbursement. Loan amount: K${loan.loanAmount}.`
-                  : actionObj ? `This will move the loan to "${actionObj.targetStatus}"` : ''}
-              </Typography>
-              {this.renderDialogFields()}
-              {error && <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>}
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={this.close} disabled={loading} variant="outlined">Cancel</Button>
-              <Button
-                onClick={this.perform}
-                disabled={loading}
-                color={actionObj && actionObj.targetStatus === "accepted" ? "success" : "primary"}
-                variant="contained"
-              >
-                {loading ? <CircularProgress size={18} /> : 'Confirm'}
-              </Button>
-            </DialogActions>
-          </Dialog>
+          {actions.map(a => (
+            <Button key={a.action} variant="contained" size="small" color={this.getActionColor(a)} onClick={() => this.open(a)} sx={{ minWidth: 140, justifyContent: 'flex-start', fontSize: '12px', letterSpacing: '0.04em' }}>
+              {a.action === "accept" ? "APPROVE" : a.action}
+            </Button>
+          ))}
+          {this.renderConfirmDialog(loan, actionObj)}
         </Box>
       </Slide>
     )
   }
 
-  // ══════════════════════════════════════════════════════════════════════════
-  //  ASSET LOAN RENDER PATH  — original logic, fully preserved
-  // ══════════════════════════════════════════════════════════════════════════
+  // ══════════════════════════════════════════════════════════════════════
+  //  ASSET LOAN RENDER PATH
+  // ══════════════════════════════════════════════════════════════════════
   renderAssetLoanActions = () => {
     const actions = this.allowedActions()
-    const { open, actionObj, loading, error } = this.state
+    const { actionObj } = this.state
     const { loan, onUpdated, constants, role } = this.props
 
-    if (!actions.length && !loan.loanStatus === "disbursed") {
+    if (!actions.length && loan.loanStatus !== "disbursed") {
       return (
         <Box sx={{ mt: 2, p: 2, borderRadius: '12px', background: 'rgba(255,255,255,0.03)', border: `1px solid ${G.border}` }}>
           <Typography variant="body2" sx={{ color: G.muted }}>No actions available for you right now</Typography>
@@ -826,12 +1007,9 @@ export default class LoanActions extends React.Component {
       return <RejectionForm loan={loan} onUpdated={onUpdated} role={role} handleActionClose={this.handleActionClose} openModal={true} />
     }
 
-    if ((role === "ceo" || role === "director") && loan.loanStatus === "accepted") {
-      return (
-        <Box sx={{ mt: 2 }}>
-          <Alert severity='info'>You have successfully accepted this loan, you shall be notified when the client has signed the loan form.</Alert>
-        </Box>
-      )
+    // ── ACCEPTED ── delegate to shared gate handler
+    if (loan.loanStatus === "accepted") {
+      return this.renderAcceptedState()
     }
 
     if (role === 'Loan Admin' && loan.loanStatus === "pending-collateral-inspection") {
@@ -889,7 +1067,6 @@ export default class LoanActions extends React.Component {
         }
       }
       if (role === 'Loan Admin') {
-        // Show appendix form only when required and not yet done
         if (this.requireAppendix && !loan.loanAppendixCreated) {
           return <AppendixForm loan={loan} onUpdated={onUpdated} />
         }
@@ -920,48 +1097,12 @@ export default class LoanActions extends React.Component {
     return (
       <Slide in={true} direction="left">
         <Box sx={{ mt: 2, display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-          {actions.map(a => {
-            const color = this.getActionColor(a)
-            const label = a.action === "accept" ? "APPROVE" : a.action
-            return (
-              <Button
-                key={a.action}
-                variant="contained"
-                size="small"
-                color={color}
-                onClick={() => this.open(a)}
-                sx={{ minWidth: 140, justifyContent: 'flex-start', fontSize: '12px', letterSpacing: '0.04em' }}
-              >
-                {label}
-              </Button>
-            )
-          })}
-
-          <Dialog open={open} onClose={this.close} fullWidth maxWidth="sm">
-            <DialogTitle>
-              {actionObj ? `Confirm: ${actionObj.action === "accept" ? "Approve" : actionObj.action}` : 'Confirm Action'}
-            </DialogTitle>
-            <DialogContent>
-              <Typography variant="body2" sx={{ mb: 1 }}>
-                {actionObj && actionObj.targetStatus === "accepted"
-                  ? `This will send a message to the user, informing them that their loan has been accepted. Are you sure you want to accept this loan with amount K${loan.loanAmount}?`
-                  : actionObj ? `This will move the loan to "${actionObj.targetStatus}"` : ''}
-              </Typography>
-              {this.renderDialogFields()}
-              {error && <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>}
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={this.close} disabled={loading} variant="outlined">Cancel</Button>
-              <Button
-                onClick={this.perform}
-                disabled={loading}
-                color={actionObj && actionObj.targetStatus === "accepted" ? "success" : "primary"}
-                variant="contained"
-              >
-                {loading ? <CircularProgress size={18} /> : 'Confirm'}
-              </Button>
-            </DialogActions>
-          </Dialog>
+          {actions.map(a => (
+            <Button key={a.action} variant="contained" size="small" color={this.getActionColor(a)} onClick={() => this.open(a)} sx={{ minWidth: 140, justifyContent: 'flex-start', fontSize: '12px', letterSpacing: '0.04em' }}>
+              {a.action === "accept" ? "APPROVE" : a.action}
+            </Button>
+          ))}
+          {this.renderConfirmDialog(loan, actionObj)}
         </Box>
       </Slide>
     )
@@ -970,7 +1111,6 @@ export default class LoanActions extends React.Component {
   render() {
     const { loan } = this.props
     if (!loan) return null
-
     return (
       <ThemeProvider theme={adminTheme}>
         {isSalaryLoan(loan)
