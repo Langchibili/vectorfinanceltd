@@ -1,3 +1,4 @@
+/* global.css */
 /* ── Google Fonts ─────────────────────────────────────────────── */
 @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
@@ -6,39 +7,79 @@
 @tailwind utilities;
 
 /* ── CSS Custom Properties ─────────────────────────────────────── */
+/*
+ * Two groups of variables below:
+ *  1. Brand tokens — identical in both themes (greens, gold, state colors).
+ *  2. Adaptive tokens — defined here with LIGHT values (the new default),
+ *     then flipped inside `[data-theme="dark"]`. Anything that should
+ *     visually respond to the toggle reads one of these adaptive vars
+ *     instead of a hardcoded literal.
+ */
 :root {
-  /* Primary: Deep forest green palette */
+  /* Primary: Deep forest green palette (brand — same both themes) */
   --primary: #059669;
   --primary-mid: #047857;
   --primary-light: #10B981;
   --primary-glow: rgba(5, 150, 105, 0.22);
   --primary-glass: rgba(5, 150, 105, 0.10);
 
-  /* Accent: warm gold for secondary highlights only */
+  /* Accent: warm gold for secondary highlights only (brand) */
   --gold: #C9A84C;
   --gold-light: #E8C87A;
 
-  /* Neutrals */
+  /* Fixed dark-green tokens (kept for any decorative/legacy use —
+     NOT theme-adaptive on purpose) */
   --navy: #0A1F14;
   --navy-mid: #0D2B1A;
   --navy-light: #0F3320;
+
+  /* Fixed "always light surface" tokens (kept for legacy use) */
   --surface: #F7F5F0;
   --surface-dark: #ECEAE4;
 
-  /* Glass */
-  --glass: rgba(255, 255, 255, 0.08);
-  --glass-border: rgba(255, 255, 255, 0.11);
+  /* Fixed literal text tokens — used by the explicit "-light" suffixed
+     classes below, which intentionally render light-surface content
+     regardless of the app theme. NOT theme-adaptive on purpose. */
+  --text-dark: #1A1A2E;
+  --text-muted: #6B7280;
+  --text-light: #9CA3AF;
 
-  /* State */
+  /* State (brand) */
   --error: #DC2626;
   --success: #059669;
   --warning: #D97706;
   --info: #3B82F6;
 
-  /* Text */
-  --text-dark: #1A1A2E;
-  --text-muted: #6B7280;
-  --text-light: #9CA3AF;
+  /* ── Adaptive tokens — LIGHT (default) values ──────────────── */
+  --fg: #1A1A2E;
+  --fg-muted: rgba(26, 26, 46, 0.55);
+  --fg-dim: rgba(26, 26, 46, 0.30);
+  --bg: #F7F5F0;
+  --bg-elevated: #FFFFFF;
+  --border-soft: rgba(26, 26, 46, 0.08);
+  --border-mid: rgba(26, 26, 46, 0.14);
+  --hover-tint: rgba(26, 26, 46, 0.045);
+
+  --chrome-bg: rgba(255, 255, 255, 0.92);
+  --chrome-bg-solid: #FFFFFF;
+  --chrome-border: rgba(26, 26, 46, 0.07);
+  --chrome-shadow: rgba(0, 0, 0, 0.08);
+
+  --glass-tint: rgba(26, 26, 46, 0.035);
+  --glass-tint-border: rgba(26, 26, 46, 0.09);
+  --glass-shadow: rgba(0, 0, 0, 0.08);
+
+  --input-bg: rgba(26, 26, 46, 0.04);
+  --input-border: rgba(26, 26, 46, 0.16);
+  --label-color: rgba(26, 26, 46, 0.45);
+
+  --skel-tint: rgba(0, 0, 0, 0.06);
+  --skel-shine: rgba(255, 255, 255, 0.65);
+
+  /* Aliases used by body — kept separate from --fg/--bg in case
+     something elsewhere already depends on these exact names */
+  --background: var(--bg);
+  --foreground: var(--fg);
 
   /* Fonts */
   --font-display: 'DM Serif Display', Georgia, serif;
@@ -49,8 +90,34 @@
   --nav-height: 64px;
   --sidebar-width: 256px;
   --bottom-nav-height: 72px;
-  --background: #F7F5F0;
-  --foreground: #1A1A2E;
+}
+
+/* ── DARK THEME — flips every adaptive token above ─────────────── */
+[data-theme="dark"] {
+  --fg: #FFFFFF;
+  --fg-muted: rgba(255, 255, 255, 0.55);
+  --fg-dim: rgba(255, 255, 255, 0.28);
+  --bg: #0A0F1E;
+  --bg-elevated: rgba(255, 255, 255, 0.05);
+  --border-soft: rgba(255, 255, 255, 0.08);
+  --border-mid: rgba(255, 255, 255, 0.15);
+  --hover-tint: rgba(255, 255, 255, 0.05);
+
+  --chrome-bg: rgba(10, 31, 20, 0.92);
+  --chrome-bg-solid: #0A1F14;
+  --chrome-border: rgba(255, 255, 255, 0.06);
+  --chrome-shadow: rgba(0, 0, 0, 0.55);
+
+  --glass-tint: rgba(255, 255, 255, 0.08);
+  --glass-tint-border: rgba(255, 255, 255, 0.11);
+  --glass-shadow: rgba(0, 0, 0, 0.40);
+
+  --input-bg: rgba(255, 255, 255, 0.06);
+  --input-border: rgba(255, 255, 255, 0.14);
+  --label-color: rgba(255, 255, 255, 0.42);
+
+  --skel-tint: rgba(255, 255, 255, 0.07);
+  --skel-shine: rgba(255, 255, 255, 0.09);
 }
 
 /* ── Reset ─────────────────────────────────────────────────────── */
@@ -71,6 +138,7 @@ body {
   color: var(--foreground);
   background: var(--background);
   line-height: 1.6;
+  transition: background 0.25s ease, color 0.25s ease;
 }
 
 /* ── Layout ────────────────────────────────────────────────────── */
@@ -142,28 +210,29 @@ body {
   background-clip: text;
 }
 
-/* ── Glass Cards (dark bg) ─────────────────────────────────────── */
+/* ── Glass Cards (now theme-adaptive) ───────────────────────────── */
 .glass-card {
   position: relative;
-  background: var(--glass);
-  border: 1px solid var(--glass-border);
+  background: var(--glass-tint);
+  border: 1px solid var(--glass-tint-border);
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
   border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.40), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 32px var(--glass-shadow), inset 0 1px 0 var(--glass-tint-border);
   overflow: hidden;
+  transition: background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
 .glass-card::before {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.07) 0%, transparent 60%);
+  background: linear-gradient(145deg, var(--glass-tint-border) 0%, transparent 60%);
   pointer-events: none;
   border-radius: inherit;
 }
 
-/* Green-tinted glass variant */
+/* Green-tinted glass variant (brand tint stays constant, fine both themes) */
 .glass-card-green {
   position: relative;
   background: linear-gradient(135deg, rgba(5, 150, 105, 0.16), rgba(5, 150, 105, 0.05));
@@ -171,7 +240,7 @@ body {
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
   border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.28), 0 0 0 1px rgba(5, 150, 105, 0.06) inset;
+  box-shadow: 0 8px 32px var(--glass-shadow), 0 0 0 1px rgba(5, 150, 105, 0.06) inset;
   overflow: hidden;
 }
 
@@ -183,26 +252,26 @@ body {
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
   border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.28);
+  box-shadow: 0 8px 32px var(--glass-shadow);
   overflow: hidden;
 }
 
-/* Surface cards (light bg pages) */
+/* Surface cards — now theme-adaptive (was hardcoded white-only) */
 .vf-card {
-  background: #fff;
-  border: 1px solid rgba(26, 26, 46, 0.07);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-soft);
   border-radius: 16px;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06), 0 1px 4px rgba(0, 0, 0, 0.03);
+  box-shadow: 0 4px 24px var(--chrome-shadow), 0 1px 4px var(--chrome-shadow);
   overflow: hidden;
-  transition: box-shadow 0.2s, transform 0.2s;
+  transition: box-shadow 0.2s, transform 0.2s, background 0.25s ease, border-color 0.25s ease;
 }
 
 .vf-card:hover {
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.10), 0 4px 12px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 12px 40px var(--chrome-shadow), 0 4px 12px var(--chrome-shadow);
   transform: translateY(-2px);
 }
 
-/* ── Primary (Green) Buttons ───────────────────────────────────── */
+/* ── Primary (Green) Buttons — brand colors, same both themes ──── */
 .btn-primary {
   position: relative;
   overflow: hidden;
@@ -338,7 +407,7 @@ body {
   color: #0A1F14;
 }
 
-/* ── Floating Label Inputs (dark bg) ───────────────────────────── */
+/* ── Floating Label Inputs — now theme-adaptive by default ──────── */
 .flabel-group {
   position: relative;
   margin-bottom: 18px;
@@ -348,14 +417,14 @@ body {
   width: 100%;
   height: 58px;
   padding: 22px 16px 8px 16px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1.5px solid rgba(255, 255, 255, 0.14);
+  background: var(--input-bg);
+  border: 1.5px solid var(--input-border);
   border-radius: 12px;
-  color: #fff;
+  color: var(--fg);
   font-family: var(--font-body);
   font-size: 15px;
   outline: none;
-  transition: border-color 0.25s, background 0.25s, box-shadow 0.25s;
+  transition: border-color 0.25s, background 0.25s, box-shadow 0.25s, color 0.25s;
   -webkit-appearance: none;
 }
 
@@ -365,7 +434,7 @@ body {
 
 .flabel-input:focus {
   border-color: var(--primary);
-  background: rgba(255, 255, 255, 0.09);
+  background: var(--hover-tint);
   box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.18);
 }
 
@@ -378,7 +447,7 @@ body {
   left: 16px;
   top: 50%;
   transform: translateY(-50%);
-  color: rgba(255, 255, 255, 0.42);
+  color: var(--label-color);
   font-size: 14px;
   font-family: var(--font-body);
   pointer-events: none;
@@ -396,7 +465,11 @@ body {
   text-transform: uppercase;
 }
 
-/* Light bg variant */
+/* Light bg variant — kept as-is on purpose: this is for a component
+   that should ALWAYS sit on a light surface regardless of app theme
+   (e.g. a white modal shown inside an otherwise dark page). It uses
+   the fixed --text-dark/--text-muted tokens above, not the adaptive
+   ones, so it won't flip when the app theme flips. */
 .flabel-light .flabel-input {
   background: rgba(26, 26, 46, 0.04);
   border-color: rgba(26, 26, 46, 0.14);
@@ -494,12 +567,12 @@ body {
   color: #DC2626;
 }
 
-/* ── Shimmer Skeleton ──────────────────────────────────────────── */
+/* ── Shimmer Skeleton — now theme-adaptive by default ────────────── */
 .skel {
   position: relative;
   overflow: hidden;
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.07);
+  background: var(--skel-tint);
 }
 
 .skel::after {
@@ -509,7 +582,7 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.09) 50%, transparent 100%);
+  background: linear-gradient(90deg, transparent 0%, var(--skel-shine) 50%, transparent 100%);
   background-size: 200% 100%;
   animation: skel-anim 1.7s infinite linear;
 }
@@ -524,6 +597,7 @@ body {
   }
 }
 
+/* Kept for explicit "always light" usage, same reasoning as .flabel-light */
 .skel-light {
   background: rgba(0, 0, 0, 0.06);
 }
@@ -533,7 +607,7 @@ body {
   background-size: 200% 100%;
 }
 
-/* ── Top Navigation Bar ────────────────────────────────────────── */
+/* ── Top Navigation Bar — now theme-adaptive ─────────────────────── */
 .vf-topnav {
   position: fixed;
   top: 0;
@@ -541,14 +615,15 @@ body {
   right: 0;
   height: var(--nav-height);
   z-index: 100;
-  background: rgba(10, 31, 20, 0.92);
+  background: var(--chrome-bg);
   backdrop-filter: blur(22px);
   -webkit-backdrop-filter: blur(22px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid var(--chrome-border);
   display: flex;
   align-items: center;
   padding: 0 20px;
   gap: 12px;
+  transition: background 0.25s ease, border-color 0.25s ease;
 }
 
 @media (min-width:1024px) {
@@ -557,24 +632,25 @@ body {
   }
 }
 
-/* ── Admin Sidebar ─────────────────────────────────────────────── */
+/* ── Admin Sidebar — now theme-adaptive ───────────────────────────── */
 .vf-sidebar {
   position: fixed;
   top: 0;
   left: 0;
   width: var(--sidebar-width);
   height: 100vh;
-  background: var(--navy);
-  border-right: 1px solid rgba(255, 255, 255, 0.06);
-  box-shadow: 4px 0 28px rgba(0, 0, 0, 0.55);
+  background: var(--chrome-bg-solid);
+  border-right: 1px solid var(--chrome-border);
+  box-shadow: 4px 0 28px var(--chrome-shadow);
   z-index: 99;
   display: flex;
   flex-direction: column;
+  transition: background 0.25s ease, border-color 0.25s ease;
 }
 
 .vf-sidebar-logo {
   padding: 22px 20px 18px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid var(--chrome-border);
 }
 
 .vf-sidebar-nav {
@@ -588,7 +664,7 @@ body {
   align-items: center;
   gap: 11px;
   padding: 10px 18px;
-  color: rgba(255, 255, 255, 0.48);
+  color: var(--fg-muted);
   font-size: 13.5px;
   font-weight: 500;
   font-family: var(--font-body);
@@ -603,8 +679,8 @@ body {
 }
 
 .sidebar-link:hover {
-  color: rgba(255, 255, 255, 0.82);
-  background: rgba(255, 255, 255, 0.04);
+  color: var(--fg);
+  background: var(--hover-tint);
 }
 
 .sidebar-link.active {
@@ -619,26 +695,27 @@ body {
   font-weight: 700;
   letter-spacing: 0.10em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.22);
+  color: var(--fg-dim);
 }
 
-/* ── Bottom Navigation ─────────────────────────────────────────── */
+/* ── Bottom Navigation — now theme-adaptive ──────────────────────── */
 .vf-bottom-nav {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
   height: var(--bottom-nav-height);
-  background: rgba(10, 31, 20, 0.96);
+  background: var(--chrome-bg);
   backdrop-filter: blur(22px);
   -webkit-backdrop-filter: blur(22px);
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-top: 1px solid var(--chrome-border);
   display: flex;
   align-items: flex-start;
   justify-content: space-around;
   z-index: 90;
   padding: 10px 6px 0;
   padding-bottom: env(safe-area-inset-bottom, 0px);
+  transition: background 0.25s ease, border-color 0.25s ease;
 }
 
 @media (min-width:1024px) {
@@ -653,7 +730,7 @@ body {
   align-items: center;
   gap: 3px;
   padding: 4px 8px;
-  color: rgba(255, 255, 255, 0.32);
+  color: var(--fg-dim);
   font-size: 10px;
   font-weight: 600;
   font-family: var(--font-body);
@@ -795,13 +872,13 @@ body {
   color: var(--warning);
 }
 
-/* ── Password toggle ───────────────────────────────────────────── */
+/* ── Password toggle — now theme-adaptive ─────────────────────────── */
 .pwd-toggle {
   position: absolute;
   right: 12px;
   top: 50%;
   transform: translateY(-50%);
-  color: rgba(255, 255, 255, 0.38);
+  color: var(--fg-muted);
   background: none;
   border: none;
   cursor: pointer;
@@ -813,7 +890,7 @@ body {
 }
 
 .pwd-toggle:hover {
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--fg);
 }
 
 /* ── Page Entry Animations ─────────────────────────────────────── */
@@ -931,22 +1008,23 @@ body {
   animation: fadeIn 0.35s ease-out;
 }
 
-/* ── Info Label/Value pairs ────────────────────────────────────── */
+/* ── Info Label/Value pairs — now theme-adaptive ─────────────────── */
 .info-label {
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.09em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.38);
+  color: var(--fg-muted);
   margin-bottom: 3px;
 }
 
 .info-value {
   font-size: 14.5px;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.88);
+  color: var(--fg);
 }
 
+/* Kept for explicit "always light surface" usage */
 .info-label-light {
   color: var(--text-muted);
   font-size: 10px;
@@ -962,7 +1040,7 @@ body {
   color: var(--text-dark);
 }
 
-/* ── Admin Tab Pills ───────────────────────────────────────────── */
+/* ── Admin Tab Pills — now theme-adaptive ─────────────────────────── */
 .admin-tab {
   display: flex;
   align-items: center;
@@ -975,13 +1053,13 @@ body {
   cursor: pointer;
   transition: all 0.2s;
   border: 1px solid transparent;
-  color: rgba(255, 255, 255, 0.45);
+  color: var(--fg-muted);
   background: transparent;
 }
 
 .admin-tab:hover {
-  color: rgba(255, 255, 255, 0.75);
-  background: rgba(255, 255, 255, 0.05);
+  color: var(--fg);
+  background: var(--hover-tint);
 }
 
 .admin-tab.active {
@@ -1009,7 +1087,7 @@ body {
 }
 
 /* ── Override Bootstrap/theme conflicts ────────────────────────── */
-.auth-page-wrapper,
+/* .auth-page-wrapper,
 .auth-bg-cover,
 .auth-page-content,
 .auth-one-bg,
@@ -1020,7 +1098,7 @@ body {
 
 .needs-validation {
   display: block;
-}
+} */
 
 /* ── Help page iframe ─────────────────────────────────────────── */
 #help-page-iframe {

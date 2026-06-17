@@ -5,37 +5,37 @@
 import { api_url, backEndUrl, getJwt, log } from "./Constants"
 import { getJWT } from "./Secrets";
 
-export const returnNineDigitNumber = (phoneNumber) =>{
-    // Remove any non-digit characters
-    let normalizedNumber = phoneNumber.replace(/\D/g, '')
-  
-    // Extract the last nine digits
-    return normalizedNumber.slice(-9)
+export const returnNineDigitNumber = (phoneNumber) => {
+  // Remove any non-digit characters
+  let normalizedNumber = phoneNumber.replace(/\D/g, '')
+
+  // Extract the last nine digits
+  return normalizedNumber.slice(-9)
 }
 
-export const textHasPhoneNumber = (text)=>{
+export const textHasPhoneNumber = (text) => {
   // Regular expression to match sequences of digits that are 8 characters or longer
   const phoneNumberRegex = /[0-9]{9,}/;
   // Use the test method to check if the text contains a phone number
   return phoneNumberRegex.test(text);
-} 
+}
 
 // Utility to convert numbers up to 9999 into English words
 function numberToWords(num) {
-  const ones = ["","One","Two","Three","Four","Five","Six","Seven","Eight","Nine"];
-  const teens = ["Ten","Eleven","Twelve","Thirteen","Fourteen","Fifteen","Sixteen","Seventeen","Eighteen","Nineteen"];
-  const tens = ["","","Twenty","Thirty","Forty","Fifty","Sixty","Seventy","Eighty","Ninety"];
-  
+  const ones = ["", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"];
+  const teens = ["Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen"];
+  const tens = ["", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"];
+
   function underThousand(n) {
     let words = "";
     if (n >= 100) {
-      words += ones[Math.floor(n/100)] + " Hundred ";
+      words += ones[Math.floor(n / 100)] + " Hundred ";
       n %= 100;
     }
     if (n >= 10 && n < 20) {
-      words += teens[n-10] + " ";
+      words += teens[n - 10] + " ";
     } else if (n >= 20) {
-      words += tens[Math.floor(n/10)] + " ";
+      words += tens[Math.floor(n / 10)] + " ";
       n %= 10;
     }
     if (n > 0 && n < 10) {
@@ -92,9 +92,9 @@ export function getAgreementYearWords() {
 
 // Converts 0–999 to words
 function threeDigitToWords(num) {
-  const ones = ["","one","two","three","four","five","six","seven","eight","nine"];
-  const teens = ["ten","eleven","twelve","thirteen","fourteen","fifteen","sixteen","seventeen","eighteen","nineteen"];
-  const tens = ["","","twenty","thirty","forty","fifty","sixty","seventy","eighty","ninety"];
+  const ones = ["", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"];
+  const teens = ["ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen"];
+  const tens = ["", "", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"];
 
   let word = "";
 
@@ -133,10 +133,10 @@ export function naturalNumberToWords(input) {
 
   const scales = [
     { value: 1e12, name: "trillion" },
-    { value: 1e9,  name: "billion"  },
-    { value: 1e6,  name: "million"  },
-    { value: 1e3,  name: "thousand" },
-    { value: 1,    name: ""         }
+    { value: 1e9, name: "billion" },
+    { value: 1e6, name: "million" },
+    { value: 1e3, name: "thousand" },
+    { value: 1, name: "" }
   ];
 
   let [intPart, decPart] = num.toString().split(".");
@@ -159,7 +159,7 @@ export function naturalNumberToWords(input) {
   if (decPart) {
     result += " point";
     for (let digit of decPart) {
-      result += " " + ["zero","one","two","three","four","five","six","seven","eight","nine"][+digit];
+      result += " " + ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"][+digit];
     }
   }
 
@@ -173,16 +173,16 @@ const formatDate = (date) => {
   const year = date.getFullYear();
   const hours = date.getHours().toString().padStart(2, '0'); // Ensure 2 digits
   const minutes = date.getMinutes().toString().padStart(2, '0'); // Ensure 2 digits
-  
+
   return `${month}/${day}/${year} ${hours}:${minutes}`;
 }
 
-export const dateAndTimeNow = ()=>{
-   //  const now = new Date().toISOString();
-   //const now = new Date();
-   //return formatDate(now).replace('/','-').replace('/','-');
-   return Date.now()
-   //return formatDate(now);
+export const dateAndTimeNow = () => {
+  //  const now = new Date().toISOString();
+  //const now = new Date();
+  //return formatDate(now).replace('/','-').replace('/','-');
+  return Date.now()
+  //return formatDate(now);
 }
 
 // export const createYouTubeEmbedLink = (url)=>{
@@ -210,97 +210,97 @@ export const validateUrl = (url) => {
   const urlRegex = /^(https?:\/\/)?([a-z0-9-]+\.)+[a-z]{2,}(:\d+)?(\/.*)?$/i;
 
   if (!url || url.length === 0) {
-      return null // for now it means no error
-      // return 'URL cannot be empty.' // Optional: Check for empty input
+    return null // for now it means no error
+    // return 'URL cannot be empty.' // Optional: Check for empty input
   }
 
   if (!urlRegex.test(url)) {
     console.log(url)
-      return 'Please enter a valid URL.'; // Error message for invalid URL
+    return 'Please enter a valid URL.'; // Error message for invalid URL
   }
 
   return null; // No error
 }
 
-const getIDFromDashedString = (dashed_title)=>{
-    const parts = dashed_title.split('-')
-    return parts[parts.length - 1]
+const getIDFromDashedString = (dashed_title) => {
+  const parts = dashed_title.split('-')
+  return parts[parts.length - 1]
 }
-export const generateDashedString = (str)=> {
+export const generateDashedString = (str) => {
   // Trim the string to 100 characters if it's longer
   let trimmedStr = str.length > 100 ? str.substring(0, 100) : str;
   // Replace spaces with dashes and return the result
   return trimmedStr.trim().replace(/\s+/g, '-');
 }
 
-export const generateUniqueText = ()=>{
-    const timestamp = Date.now().toString(36); // Convert timestamp to a base-36 string
-    const randomPart = Math.random().toString(36).substr(2, 9); // Random base-36 string
-    return `untitled${timestamp}-${randomPart}`;
+export const generateUniqueText = () => {
+  const timestamp = Date.now().toString(36); // Convert timestamp to a base-36 string
+  const randomPart = Math.random().toString(36).substr(2, 9); // Random base-36 string
+  return `untitled${timestamp}-${randomPart}`;
 }
 
-export const removeIdFromArray = (arr,id)=>{
-    // Find the index of the element you want to remove
-    let index = arr.indexOf(id);
-    // Check if the element is found
-    if (index !== -1) {
-        // Remove the element at the found index
-        arr.splice(index, 1);
-    }
-    return arr
+export const removeIdFromArray = (arr, id) => {
+  // Find the index of the element you want to remove
+  let index = arr.indexOf(id);
+  // Check if the element is found
+  if (index !== -1) {
+    // Remove the element at the found index
+    arr.splice(index, 1);
+  }
+  return arr
 }
 
-export const scrolltoTopOFPage = ()=>{
-  if(typeof window !== "undefined"){
-      window.scrollTo({
-          top: 0,
-          behavior: 'smooth' // Enables smooth scrolling
-        })
+export const scrolltoTopOFPage = () => {
+  if (typeof window !== "undefined") {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth' // Enables smooth scrolling
+    })
   }
 }
 
-export const dynamicConfig = (config="auto")=>{
-    return config
+export const dynamicConfig = (config = "auto") => {
+  return config
 }
 
 export const handleCountsDisplay = (counts) => { // formating counts like: likes, views, shares, etc
-    if(counts === null) return "0"
-    if (parseInt(counts) >= 1_000_000_000) {
-      return (parseInt(counts) / 1_000_000_000).toFixed(2).replace(/\.00$/, '') + 'B'
-    } else if (parseInt(counts) >= 1_000_000) {
-      return (parseInt(counts) / 1_000_000).toFixed(2).replace(/\.00$/, '') + 'M'
-    } else if (parseInt(counts) >= 1_000) {
-      return (parseInt(counts) / 1_000).toFixed(2).replace(/\.00$/, '') + 'K'
-    } else {
-      return counts.toString()
-    }
+  if (counts === null) return "0"
+  if (parseInt(counts) >= 1_000_000_000) {
+    return (parseInt(counts) / 1_000_000_000).toFixed(2).replace(/\.00$/, '') + 'B'
+  } else if (parseInt(counts) >= 1_000_000) {
+    return (parseInt(counts) / 1_000_000).toFixed(2).replace(/\.00$/, '') + 'M'
+  } else if (parseInt(counts) >= 1_000) {
+    return (parseInt(counts) / 1_000).toFixed(2).replace(/\.00$/, '') + 'K'
+  } else {
+    return counts.toString()
   }
+}
 
-  export const validateEmail = (email) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
+export const validateEmail = (email) => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+}
+
+export const truncateText = (text, maxLength) => {
+  if (!text) {
+    return ''
   }
-
- export const truncateText = (text, maxLength)=> {
-    if(!text){
-      return ''
-    }
-    // Check if the text length exceeds the specified maxLength
-    if (text.length > maxLength) {
-        // Cut the text to the maxLength, subtracting 3 to account for the "..."
-        return text.slice(0, maxLength - 3) + "...";
-    }
-    // If the text is within the limit, return it as is
-    return text;
+  // Check if the text length exceeds the specified maxLength
+  if (text.length > maxLength) {
+    // Cut the text to the maxLength, subtracting 3 to account for the "..."
+    return text.slice(0, maxLength - 3) + "...";
+  }
+  // If the text is within the limit, return it as is
+  return text;
 }
 
 function simpleInterestLoanCalculator({ principal, ratePercent, termMonths }) {
-  principal   = parseFloat(principal);
+  principal = parseFloat(principal);
   ratePercent = parseFloat(ratePercent);
-  termMonths  = parseFloat(termMonths);
+  termMonths = parseFloat(termMonths);
 
-  const totalInterest  = +(principal * ratePercent * termMonths / 100).toFixed(2);
-  const totalPayment   = +(principal + totalInterest).toFixed(2);
+  const totalInterest = +(principal * ratePercent * termMonths / 100).toFixed(2);
+  const totalPayment = +(principal + totalInterest).toFixed(2);
   const monthlyPayment = +(totalPayment / termMonths).toFixed(2);
 
   return {
@@ -315,7 +315,7 @@ function simpleInterestLoanCalculator({ principal, ratePercent, termMonths }) {
  * All inputs are parsed as floats and all outputs are rounded to 2 decimal places.
  */
 function compoundInterest({ principal, ratePercent, termPeriods }) {
-  principal   = parseFloat(principal);
+  principal = parseFloat(principal);
   ratePercent = parseFloat(ratePercent);
   termPeriods = parseFloat(termPeriods);
 
@@ -335,10 +335,10 @@ function compoundInterest({ principal, ratePercent, termPeriods }) {
  * All inputs are parsed as floats and all outputs are rounded to 2 decimal places.
  */
 function loanAmortizationCalculator({ principal, annualRatePercent, termMonths, periodsPerYear = 12 }) {
-  principal         = parseFloat(principal);
+  principal = parseFloat(principal);
   annualRatePercent = parseFloat(annualRatePercent);
-  termMonths        = parseFloat(termMonths);
-  periodsPerYear    = parseFloat(periodsPerYear);
+  termMonths = parseFloat(termMonths);
+  periodsPerYear = parseFloat(periodsPerYear);
 
   const r = annualRatePercent / 100 / periodsPerYear;
   const n = termMonths;
@@ -347,9 +347,9 @@ function loanAmortizationCalculator({ principal, annualRatePercent, termMonths, 
     payment = principal / n;
   } else {
     payment = (principal * r * Math.pow(1 + r, n)) /
-              (Math.pow(1 + r, n) - 1);
+      (Math.pow(1 + r, n) - 1);
   }
-  const totalPayment  = +(payment * n).toFixed(2);
+  const totalPayment = +(payment * n).toFixed(2);
   const totalInterest = +(totalPayment - principal).toFixed(2);
 
   return {
@@ -360,7 +360,7 @@ function loanAmortizationCalculator({ principal, annualRatePercent, termMonths, 
 }
 
 
-export const calculateLoan  = async ({ amount, loanType, termMonths = null })=> {
+export const calculateLoan = async ({ amount, loanType, termMonths = null }) => {
   const settings = await getLoansInformation()
   const isSalary = loanType === 'salaryBased'
   const defaultRate = isSalary
@@ -392,48 +392,48 @@ export const calculateLoan  = async ({ amount, loanType, termMonths = null })=> 
 }
 
 export const getImage = (image, size = "normal", use = "normal") => {
-    // Default URLs for profile pictures and cover photos
-    const defaultProfilePicture = "/default-profile.png"
-    const defaultCoverPhoto = "/no-cover-photo.jpg"
+  // Default URLs for profile pictures and cover photos
+  const defaultProfilePicture = "/default-profile.png"
+  const defaultCoverPhoto = "/no-cover-photo.jpg"
 
-    // Check if the image object is valid and contains necessary attributes
-    if (!image) {
-        // If the image is not provided, return the appropriate default image based on the usage context
-        return use === "profilePicture" ? defaultProfilePicture : defaultCoverPhoto;
-    }
+  // Check if the image object is valid and contains necessary attributes
+  if (!image) {
+    // If the image is not provided, return the appropriate default image based on the usage context
+    return use === "profilePicture" ? defaultProfilePicture : defaultCoverPhoto;
+  }
 
-    // Handle the first format where the image object contains 'attributes' property
-    let formats, defaultUrl;
-    if (image.attributes) {
-        formats = image.attributes.formats;
-        defaultUrl = image.attributes.url || null;
-    } else {
-        // Handle the second format where the image object directly contains the necessary properties
-        formats = image.formats;
-        defaultUrl = image.url || null;
-    }
+  // Handle the first format where the image object contains 'attributes' property
+  let formats, defaultUrl;
+  if (image.attributes) {
+    formats = image.attributes.formats;
+    defaultUrl = image.attributes.url || null;
+  } else {
+    // Handle the second format where the image object directly contains the necessary properties
+    formats = image.formats;
+    defaultUrl = image.url || null;
+  }
 
-    // Ensure formats exist before proceeding
-    if (!formats) {
-        return use === "profilePicture" ? defaultProfilePicture : defaultCoverPhoto;
-    }
+  // Ensure formats exist before proceeding
+  if (!formats) {
+    return use === "profilePicture" ? defaultProfilePicture : defaultCoverPhoto;
+  }
 
-    // Return the appropriate image URL based on the requested size
-    switch (size) {
-        case "thumbnail":
-            return formats.thumbnail?.url ? backEndUrl + formats.thumbnail.url : backEndUrl + defaultUrl;
-        case "small":
-            return formats.small?.url ? backEndUrl + formats.small.url : backEndUrl + defaultUrl;
-        case "medium":
-            return formats.medium?.url ? backEndUrl + formats.medium.url : backEndUrl + defaultUrl;
-        case "large":
-            return formats.large?.url ? backEndUrl + formats.large.url : backEndUrl + defaultUrl;
-        default:
-            return backEndUrl + defaultUrl;
-    }
+  // Return the appropriate image URL based on the requested size
+  switch (size) {
+    case "thumbnail":
+      return formats.thumbnail?.url ? backEndUrl + formats.thumbnail.url : backEndUrl + defaultUrl;
+    case "small":
+      return formats.small?.url ? backEndUrl + formats.small.url : backEndUrl + defaultUrl;
+    case "medium":
+      return formats.medium?.url ? backEndUrl + formats.medium.url : backEndUrl + defaultUrl;
+    case "large":
+      return formats.large?.url ? backEndUrl + formats.large.url : backEndUrl + defaultUrl;
+    default:
+      return backEndUrl + defaultUrl;
+  }
 }
 
-export const saveReferralCode = ()=>{
+export const saveReferralCode = () => {
   // Only run in the browser
   if (typeof window === 'undefined') return null
 
@@ -441,7 +441,7 @@ export const saveReferralCode = ()=>{
   const params = new URLSearchParams(window.location.search)
   const code = params.get('code')
   if (!code) return null
-  localStorage.setItem("referralCode",code)
+  localStorage.setItem("referralCode", code)
 }
 
 export const getReferrerFromReferralCode = async (code) => {
@@ -451,11 +451,11 @@ export const getReferrerFromReferralCode = async (code) => {
     const url = `${api_url}/referrals` +
       `?filters[referralCode][$eq]=${encodeURIComponent(code)}` +
       `&populate=user`
-    
+
     const response = await fetch(url, {
-      headers: { 
+      headers: {
         'Content-Type': 'application/json'
-       }
+      }
     })
     const json = await response.json()
     const entry = json.data?.[0]
@@ -479,60 +479,60 @@ export const getContentCount = async ({
   orderType = "desc",
 }) => {
   try {
-      // Construct the base URL
-      let url = `${api_url}/${contentName}?pagination[limit]=0&pagination[withCount]=true&sort=${orderByFieldName}:${orderType}`
+    // Construct the base URL
+    let url = `${api_url}/${contentName}?pagination[limit]=0&pagination[withCount]=true&sort=${orderByFieldName}:${orderType}`
 
-      // Add filtering for contentToFilterById if provided
-      if (contentToFilterById) {
-          url += `&filters[${idField}][id][$eq]=${contentToFilterById}`
-      }
+    // Add filtering for contentToFilterById if provided
+    if (contentToFilterById) {
+      url += `&filters[${idField}][id][$eq]=${contentToFilterById}`
+    }
 
-      // Add status filter only if the content is 'posts'
-      if (contentName === "posts" && status) {
-          url += `&filters[status][$eq]=${status}`
-      }
+    // Add status filter only if the content is 'posts'
+    if (contentName === "posts" && status) {
+      url += `&filters[status][$eq]=${status}`
+    }
 
-      // Fetch the data
-      const response = await fetch(url, {
-          headers: {
-              "Content-Type": "application/json",
-              'Authorization': `Bearer ${getJwt()}`
-          },
-      })
+    // Fetch the data
+    const response = await fetch(url, {
+      headers: {
+        "Content-Type": "application/json",
+        'Authorization': `Bearer ${getJwt()}`
+      },
+    })
 
-      const data = await response.json()
+    const data = await response.json()
 
-      // Return the count if meta and pagination exist
-      if (data?.meta?.pagination) {
-          return data.meta.pagination.total
-      }
-      if(data){
-        return data.length
-      }
-      // Fallback if count is not available
-      return null
+    // Return the count if meta and pagination exist
+    if (data?.meta?.pagination) {
+      return data.meta.pagination.total
+    }
+    if (data) {
+      return data.length
+    }
+    // Fallback if count is not available
+    return null
   } catch (error) {
-      console.error("Error fetching content count:", error)
-      return null
+    console.error("Error fetching content count:", error)
+    return null
   }
 }
 
-  
- 
-  export const updateUserAccount = async (updateObject,userId,customJwt=null)=>{
-    console.log(updateObject)
-    const jwt = customJwt || getJwt()
-    return await fetch(api_url+'/users/'+userId, {
-      method: 'PUT',
-      headers: {
-       'Authorization': `Bearer ${jwt}`,
-       'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(updateObject),
-    })
+
+
+export const updateUserAccount = async (updateObject, userId, customJwt = null) => {
+  console.log(updateObject)
+  const jwt = customJwt || getJwt()
+  return await fetch(api_url + '/users/' + userId, {
+    method: 'PUT',
+    headers: {
+      'Authorization': `Bearer ${jwt}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(updateObject),
+  })
     .then(response => response.json())
     .then(data => data)
-  }
+}
 
 //   export async function getAllLoans(page) {
 //     try {
@@ -558,7 +558,7 @@ export const getContentCount = async ({
 export async function getAllLoans(page = 1, pageSize = 10) {
   try {
     const loans = await fetch(
-      `${api_url}/loans?sort=id:desc&pagination[page]=${page}&pagination[pageSize]=${pageSize}`, 
+      `${api_url}/loans?sort=id:desc&pagination[page]=${page}&pagination[pageSize]=${pageSize}`,
       {
         method: 'GET',
         headers: {
@@ -596,33 +596,33 @@ export const getAllUsers = async ({ search = '', page = 1 }) => {
     totalPages: users.totalPages || 1
   }
 }
-  
-  export const pushUserIntoLoanClientsList = async (createObject)=>{
-    return await fetch(api_url+'/loans-clients', {
-      method: 'POST',
-      headers: {
-       'Authorization': `Bearer ${getJwt()}`,
-       'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(createObject),
-    })
-    .then(response => response.json())
-    .then(data => data)
-  }
 
-  export const pushUserIntoInvestmentClientsList = async (createObject)=>{
-    return await fetch(api_url+'/investment-clients', {
-      method: 'POST',
-      headers: {
-       'Authorization': `Bearer ${getJwt()}`,
-       'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(createObject),
-    })
+export const pushUserIntoLoanClientsList = async (createObject) => {
+  return await fetch(api_url + '/loans-clients', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${getJwt()}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(createObject),
+  })
     .then(response => response.json())
     .then(data => data)
-  }
-  
+}
+
+export const pushUserIntoInvestmentClientsList = async (createObject) => {
+  return await fetch(api_url + '/investment-clients', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${getJwt()}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(createObject),
+  })
+    .then(response => response.json())
+    .then(data => data)
+}
+
 
 // getFormByName
 // Returns the first matching form or null if none found
@@ -657,240 +657,161 @@ export async function getFormByName(formName) {
 
 
 // REFERRAL STUFF
-export const createReferralAccount = async (userId)=>{
-    const referralAccount = await fetch(api_url+'/referrals/', {
-      method: 'POST',
-      headers: {
-       'Authorization': `Bearer ${getJwt()}`,
-       'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({data:{referralCode:"ref"+userId}}),
-    })
+export const createReferralAccount = async (userId) => {
+  const referralAccount = await fetch(api_url + '/referrals/', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${getJwt()}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ data: { referralCode: "ref" + userId } }),
+  })
     .then(response => response.json())
     .then(data => data)
-    if(referralAccount && referralAccount.data && referralAccount.data.attributes){
-        updateUserAccount({referral: referralAccount.data.id},userId)
-     }
+  if (referralAccount && referralAccount.data && referralAccount.data.attributes) {
+    updateUserAccount({ referral: referralAccount.data.id }, userId)
+  }
 }
 
-export const getReferralsById = async (referralId,populateString="")=>{
-    let populate = '?populate='+populateString
-    if(populateString.length === 0){
-       populate = "" // it means populate nothing
-    }
-    const referral = await fetch(api_url+'/referrals/'+referralId+populate,{
-        headers: {
-          'Authorization': `Bearer ${getJwt()}`,
-          'Content-Type': 'application/json'
-        }
-      }).then(response => response.json())
-        .then(data => data)
-        .catch(error => console.error(error))
-         
-        if(referral && referral.data && referral.data.attributes){
-           referral.data.attributes.id = referral.data.id
-           return referral.data.attributes
-        }
-        return null
+export const getReferralsById = async (referralId, populateString = "") => {
+  let populate = '?populate=' + populateString
+  if (populateString.length === 0) {
+    populate = "" // it means populate nothing
   }
+  const referral = await fetch(api_url + '/referrals/' + referralId + populate, {
+    headers: {
+      'Authorization': `Bearer ${getJwt()}`,
+      'Content-Type': 'application/json'
+    }
+  }).then(response => response.json())
+    .then(data => data)
+    .catch(error => console.error(error))
+
+  if (referral && referral.data && referral.data.attributes) {
+    referral.data.attributes.id = referral.data.id
+    return referral.data.attributes
+  }
+  return null
+}
 
 
-  export const updateReferralCode = async (data,referralId)=>{
-    const referral =  await fetch(api_url+'/referrals/'+referralId, {
-        method: 'PUT',
-        headers: {
-        'Authorization': `Bearer ${getJwt()}`,
-        'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data),
-      })
-      .then(response => response.json())
-      .then(data => data)
-    if(referral && referral.data && referral.data.attributes){
-        referral.data.attributes.id = referral.data.id
-        return referral.data.attributes
-    }
-    if(referral && referral.error && referral.error.message === "This attribute must be unique"){
-       return referral // expose the object with the error object inside it
-    }
-    return null
+export const updateReferralCode = async (data, referralId) => {
+  const referral = await fetch(api_url + '/referrals/' + referralId, {
+    method: 'PUT',
+    headers: {
+      'Authorization': `Bearer ${getJwt()}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data),
+  })
+    .then(response => response.json())
+    .then(data => data)
+  if (referral && referral.data && referral.data.attributes) {
+    referral.data.attributes.id = referral.data.id
+    return referral.data.attributes
+  }
+  if (referral && referral.error && referral.error.message === "This attribute must be unique") {
+    return referral // expose the object with the error object inside it
+  }
+  return null
 }
 
 
 
 // LOAN FUNCTIONS
 
-export const createNewLoan = async (data)=>{
-    const loan =  await fetch(api_url+'/loans', {
-        method: 'POST',
-        headers: {
-         'Authorization': `Bearer ${getJwt()}`,
-         'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data),
-      })
-      .then(response => response.json())
-      .then(data => data)
-    if(loan && loan.data && loan.data.attributes){
-        loan.data.attributes.id = loan.data.id
-        return loan.data.attributes
-     }
-    return null
-}
-
-export const logNewTransactionHistory = async (data)=>{
-  const transactionHistory =  await fetch(api_url+'/transaction-histories', {
-      method: 'POST',
-      headers: {
-       'Authorization': `Bearer ${getJwt()}`,
-       'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(data),
-    })
-    .then(response => response.json())
-    .then(data => data)
-  if(transactionHistory && transactionHistory.data && transactionHistory.data.attributes){
-      transactionHistory.data.attributes.id = transactionHistory.data.id
-      return transactionHistory.data.attributes
-   }
-  return null
-}
-
-export const logNewNotification = async (data)=>{
-  const notification =  await fetch(api_url+'/notifications', {
-      method: 'POST',
-      headers: {
-       'Authorization': `Bearer ${getJwt()}`,
-       'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(data),
-    })
-    .then(response => response.json())
-    .then(data => data)
-  if(notification && notification.data && notification.data.attributes){
-      notification.data.attributes.id = notification.data.id
-      return notification.data.attributes
-   }
-  return null
-}
-export const logNewAdminNotification = async (data)=>{
-  const notification =  await fetch(api_url+'/admin-notifications', {
-      method: 'POST',
-      headers: {
-       'Authorization': `Bearer ${getJwt()}`,
-       'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(data),
-    })
-    .then(response => response.json())
-    .then(data => data)
-  if(notification && notification.data && notification.data.attributes){
-      notification.data.attributes.id = notification.data.id
-      return notification.data.attributes
-   }
-  return null
-}
-
-
-export const updateLoan = async (data,loanId)=>{
-  const loan =  await fetch(api_url+'/loans/'+loanId, {
-      method: 'PUT',
-      headers: {
-       'Authorization': `Bearer ${getJwt()}`,
-       'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(data),
-    })
-    .then(response => response.json())
-    .then(data => data)
-  if(loan && loan.data && loan.data.attributes){
-      loan.data.attributes.id = loan.data.id
-      return loan.data.attributes
-   }
-  return null
-}
-
-export const getPhoneNumbers = async ()=>{
-  const phoneNumbers = await fetch(api_url+'/phone-numbers-list',{
+export const createNewLoan = async (data) => {
+  const loan = await fetch(api_url + '/loans', {
+    method: 'POST',
     headers: {
       'Authorization': `Bearer ${getJwt()}`,
       'Content-Type': 'application/json'
-    }
-  }).then(response => response.json())
+    },
+    body: JSON.stringify(data),
+  })
+    .then(response => response.json())
     .then(data => data)
-    .catch(error => console.error(error))
-  if(phoneNumbers && phoneNumbers.data){
-     return phoneNumbers.data.attributes
+  if (loan && loan.data && loan.data.attributes) {
+    loan.data.attributes.id = loan.data.id
+    return loan.data.attributes
   }
- }
- 
- export const getEmailAddresses = async ()=>{
-  const emailAddresses = await fetch(api_url+'/email-addresses-list',{
+  return null
+}
+
+export const logNewTransactionHistory = async (data) => {
+  const transactionHistory = await fetch(api_url + '/transaction-histories', {
+    method: 'POST',
     headers: {
       'Authorization': `Bearer ${getJwt()}`,
       'Content-Type': 'application/json'
-    }
-  }).then(response => response.json())
+    },
+    body: JSON.stringify(data),
+  })
+    .then(response => response.json())
     .then(data => data)
-    .catch(error => console.error(error))
-  if(emailAddresses && emailAddresses.data){
-     return emailAddresses.data.attributes
+  if (transactionHistory && transactionHistory.data && transactionHistory.data.attributes) {
+    transactionHistory.data.attributes.id = transactionHistory.data.id
+    return transactionHistory.data.attributes
   }
- }
+  return null
+}
 
- export const updatePhoneNumbers = async (data)=>{
-  const loan =  await fetch(api_url+'/phone-numbers-list', {
-      method: 'PUT',
-      headers: {
-       'Authorization': `Bearer ${getJwt()}`,
-       'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(data),
-    })
+export const logNewNotification = async (data) => {
+  const notification = await fetch(api_url + '/notifications', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${getJwt()}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data),
+  })
     .then(response => response.json())
     .then(data => data)
+  if (notification && notification.data && notification.data.attributes) {
+    notification.data.attributes.id = notification.data.id
+    return notification.data.attributes
+  }
+  return null
 }
-
-export const updateEmailAddresses = async (data)=>{
-  const loan =  await fetch(api_url+'/email-addresses-list', {
-      method: 'PUT',
-      headers: {
-       'Authorization': `Bearer ${getJwt()}`,
-       'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(data),
-    })
+export const logNewAdminNotification = async (data) => {
+  const notification = await fetch(api_url + '/admin-notifications', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${getJwt()}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data),
+  })
     .then(response => response.json())
     .then(data => data)
-}
- 
-export const sendOTP = async (identifier,identifierType) => {
-  // Make request to resend OTP
-  fetch(api_url+'/auths?identifier='+identifier+'&auth_stage=sendotp&identifierType='+identifierType,{
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    }).then(response => response.json())
-      .then(data => data)
-      .catch(error => console.error(error))
+  if (notification && notification.data && notification.data.attributes) {
+    notification.data.attributes.id = notification.data.id
+    return notification.data.attributes
+  }
+  return null
 }
 
-export const checkClientIdStatus = async (idNumber,clientId) => {
-  // Make request to resend OTP
-    const clientIdStatus = await fetch(api_url+'/client-ids?idNumber='+idNumber+"&clientId="+clientId,{
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    }).then(response => response.json())
-      .then(data => data)
-      .catch(error => console.error(error))
-     if(clientIdStatus && clientIdStatus.status) {
-      return clientIdStatus.status
-     }
+
+export const updateLoan = async (data, loanId) => {
+  const loan = await fetch(api_url + '/loans/' + loanId, {
+    method: 'PUT',
+    headers: {
+      'Authorization': `Bearer ${getJwt()}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data),
+  })
+    .then(response => response.json())
+    .then(data => data)
+  if (loan && loan.data && loan.data.attributes) {
+    loan.data.attributes.id = loan.data.id
+    return loan.data.attributes
+  }
+  return null
 }
 
-export const getLoanCategoryIds = async ()=>{
-  const loanCategories = await fetch(api_url+'/loan-categories',{
+export const getPhoneNumbers = async () => {
+  const phoneNumbers = await fetch(api_url + '/phone-numbers-list', {
     headers: {
       'Authorization': `Bearer ${getJwt()}`,
       'Content-Type': 'application/json'
@@ -898,17 +819,96 @@ export const getLoanCategoryIds = async ()=>{
   }).then(response => response.json())
     .then(data => data)
     .catch(error => console.error(error))
-  let loanCategoryIdsObject = {}  
-  if(loanCategories && loanCategories.data){
+  if (phoneNumbers && phoneNumbers.data) {
+    return phoneNumbers.data.attributes
+  }
+}
+
+export const getEmailAddresses = async () => {
+  const emailAddresses = await fetch(api_url + '/email-addresses-list', {
+    headers: {
+      'Authorization': `Bearer ${getJwt()}`,
+      'Content-Type': 'application/json'
+    }
+  }).then(response => response.json())
+    .then(data => data)
+    .catch(error => console.error(error))
+  if (emailAddresses && emailAddresses.data) {
+    return emailAddresses.data.attributes
+  }
+}
+
+export const updatePhoneNumbers = async (data) => {
+  const loan = await fetch(api_url + '/phone-numbers-list', {
+    method: 'PUT',
+    headers: {
+      'Authorization': `Bearer ${getJwt()}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data),
+  })
+    .then(response => response.json())
+    .then(data => data)
+}
+
+export const updateEmailAddresses = async (data) => {
+  const loan = await fetch(api_url + '/email-addresses-list', {
+    method: 'PUT',
+    headers: {
+      'Authorization': `Bearer ${getJwt()}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data),
+  })
+    .then(response => response.json())
+    .then(data => data)
+}
+
+export const sendOTP = async (identifier, identifierType) => {
+  // Make request to resend OTP
+  fetch(api_url + '/auths?identifier=' + identifier + '&auth_stage=sendotp&identifierType=' + identifierType, {
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  }).then(response => response.json())
+    .then(data => data)
+    .catch(error => console.error(error))
+}
+
+export const checkClientIdStatus = async (idNumber, clientId) => {
+  // Make request to resend OTP
+  const clientIdStatus = await fetch(api_url + '/client-ids?idNumber=' + idNumber + "&clientId=" + clientId, {
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  }).then(response => response.json())
+    .then(data => data)
+    .catch(error => console.error(error))
+  if (clientIdStatus && clientIdStatus.status) {
+    return clientIdStatus.status
+  }
+}
+
+export const getLoanCategoryIds = async () => {
+  const loanCategories = await fetch(api_url + '/loan-categories', {
+    headers: {
+      'Authorization': `Bearer ${getJwt()}`,
+      'Content-Type': 'application/json'
+    }
+  }).then(response => response.json())
+    .then(data => data)
+    .catch(error => console.error(error))
+  let loanCategoryIdsObject = {}
+  if (loanCategories && loanCategories.data) {
     loanCategories.data.forEach(loanCategory => {
       loanCategoryIdsObject[loanCategory.attributes.categoryName] = loanCategory.id
     })
   }
   return loanCategoryIdsObject
- }
- 
- export const getLoanTypesIds = async ()=>{
-  const loanTypes = await fetch(api_url+'/types',{
+}
+
+export const getLoanTypesIds = async () => {
+  const loanTypes = await fetch(api_url + '/types', {
     headers: {
       'Authorization': `Bearer ${getJwt()}`,
       'Content-Type': 'application/json'
@@ -916,17 +916,17 @@ export const getLoanCategoryIds = async ()=>{
   }).then(response => response.json())
     .then(data => data)
     .catch(error => console.error(error))
-  let loanTypesIdsObject = {}  
-  if(loanTypes && loanTypes.data){
+  let loanTypesIdsObject = {}
+  if (loanTypes && loanTypes.data) {
     loanTypes.data.forEach(loanType => {
       loanTypesIdsObject[loanType.attributes.typeName] = loanType.id
     })
   }
   return loanTypesIdsObject
- }
+}
 
- export const getLoansInformation = async ()=>{
-  const loansInformation = await fetch(api_url+'/loans-information',{
+export const getLoansInformation = async () => {
+  const loansInformation = await fetch(api_url + '/loans-information', {
     headers: {
       'Authorization': `Bearer ${getJwt()}`,
       'Content-Type': 'application/json'
@@ -934,16 +934,16 @@ export const getLoanCategoryIds = async ()=>{
   }).then(response => response.json())
     .then(data => data)
     .catch(error => console.error(error))
-  if(loansInformation && loansInformation.data){
+  if (loansInformation && loansInformation.data) {
     return loansInformation.data.attributes
   }
-  else{
+  else {
     return loansInformation
   }
- }
+}
 
- export const getAdminInitials = async ()=>{
-  const adminInitials = await fetch(api_url+'/admin-initial?populate=*',{
+export const getAdminInitials = async () => {
+  const adminInitials = await fetch(api_url + '/admin-initial?populate=*', {
     headers: {
       'Authorization': `Bearer ${getJwt()}`,
       'Content-Type': 'application/json'
@@ -951,19 +951,19 @@ export const getLoanCategoryIds = async ()=>{
   }).then(response => response.json())
     .then(data => data)
     .catch(error => console.error(error))
-  if(adminInitials && adminInitials.data && adminInitials.data.attributes){
-     const ceoFullNames  = adminInitials.data.attributes.ceoFullNames || null
-     const directorFullNames = adminInitials.data.attributes.directorFullNames || null
-     const directorInitials  = adminInitials.data.attributes.director?.data?.attributes || null
-     const ceoInitials = adminInitials.data.attributes.ceo?.data?.attributes || null
-     return {directorInitials,ceoInitials,ceoFullNames,directorFullNames}
+  if (adminInitials && adminInitials.data && adminInitials.data.attributes) {
+    const ceoFullNames = adminInitials.data.attributes.ceoFullNames || null
+    const directorFullNames = adminInitials.data.attributes.directorFullNames || null
+    const directorInitials = adminInitials.data.attributes.director?.data?.attributes || null
+    const ceoInitials = adminInitials.data.attributes.ceo?.data?.attributes || null
+    return { directorInitials, ceoInitials, ceoFullNames, directorFullNames }
   }
-  else{
+  else {
     return null
   }
- }
-  export const getAdminSignature = async ()=>{
-  const adminSignature = await fetch(api_url+'/admin-signature?populate=*',{
+}
+export const getAdminSignature = async () => {
+  const adminSignature = await fetch(api_url + '/admin-signature?populate=*', {
     headers: {
       'Authorization': `Bearer ${getJwt()}`,
       'Content-Type': 'application/json'
@@ -971,36 +971,36 @@ export const getLoanCategoryIds = async ()=>{
   }).then(response => response.json())
     .then(data => data)
     .catch(error => console.error(error))
-  if(adminSignature && adminSignature.data && adminSignature.data.attributes){
-     const directorSignature  = adminSignature.data.attributes.director?.data?.attributes || null
-     const ceoSignature = adminSignature.data.attributes.ceo?.data?.attributes || null
-     return {directorSignature,ceoSignature}
+  if (adminSignature && adminSignature.data && adminSignature.data.attributes) {
+    const directorSignature = adminSignature.data.attributes.director?.data?.attributes || null
+    const ceoSignature = adminSignature.data.attributes.ceo?.data?.attributes || null
+    return { directorSignature, ceoSignature }
   }
-  else{
+  else {
     return null
   }
- }
+}
 
-  export const getLoanFromId = async (loanid,populateString="")=>{
-    let populate = '?populate='+populateString
-    if(populateString.length === 0){
-       populate = "" // it means populate nothing
-    }
-    const loan = await fetch(api_url+'/loans/'+loanid+populate,{
-        headers: {
-          'Authorization': `Bearer ${getJwt()}`,
-          'Content-Type': 'application/json'
-        }
-      }).then(response => response.json())
-        .then(data => data)
-        .catch(error => console.error(error))
-         
-        if(loan && loan.data && loan.data.attributes){
-           loan.data.attributes.id = loan.data.id
-           return loan.data.attributes
-        }
-        return null
+export const getLoanFromId = async (loanid, populateString = "") => {
+  let populate = '?populate=' + populateString
+  if (populateString.length === 0) {
+    populate = "" // it means populate nothing
   }
+  const loan = await fetch(api_url + '/loans/' + loanid + populate, {
+    headers: {
+      'Authorization': `Bearer ${getJwt()}`,
+      'Content-Type': 'application/json'
+    }
+  }).then(response => response.json())
+    .then(data => data)
+    .catch(error => console.error(error))
+
+  if (loan && loan.data && loan.data.attributes) {
+    loan.data.attributes.id = loan.data.id
+    return loan.data.attributes
+  }
+  return null
+}
 
 
 export const getLoansFromClientId = async (clientId, populate = '') => {
@@ -1032,68 +1032,68 @@ export const getLoansFromClientId = async (clientId, populate = '') => {
   }
 }
 
- export const getLoanRepaymentSchedule = async (loanId)=>{
-    const schedule = await fetch(api_url+'/get-repayment-schedule?loanId='+loanId,{
-        headers: {
-          'Authorization': `Bearer ${getJwt()}`,
-          'Content-Type': 'application/json'
-        }
-      }).then(response => response.json())
-        .then(data => data)
-        .catch(error => console.error(error))
-         
-        if(schedule && schedule.data && schedule.data.attributes){
-           return schedule.data.attributes.data
-        }
-        return null
+export const getLoanRepaymentSchedule = async (loanId) => {
+  const schedule = await fetch(api_url + '/get-repayment-schedule?loanId=' + loanId, {
+    headers: {
+      'Authorization': `Bearer ${getJwt()}`,
+      'Content-Type': 'application/json'
+    }
+  }).then(response => response.json())
+    .then(data => data)
+    .catch(error => console.error(error))
+
+  if (schedule && schedule.data && schedule.data.attributes) {
+    return schedule.data.attributes.data
   }
+  return null
+}
 
-  // INVESTMENTS FUNCTIONS
+// INVESTMENTS FUNCTIONS
 
-export const createNewDraftInvestment = async (data)=>{
-  const draftInvestment =  await fetch(api_url+'/investment-drafts', {
-      method: 'POST',
-      headers: {
-       'Authorization': `Bearer ${getJwt()}`,
-       'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(data),
-    })
+export const createNewDraftInvestment = async (data) => {
+  const draftInvestment = await fetch(api_url + '/investment-drafts', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${getJwt()}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data),
+  })
     .then(response => response.json())
     .then(data => data)
-  if(draftInvestment && draftInvestment.data && draftInvestment.data.attributes){
+  if (draftInvestment && draftInvestment.data && draftInvestment.data.attributes) {
     draftInvestment.data.attributes.id = draftInvestment.data.id
-      return draftInvestment.data.attributes
-   }
+    return draftInvestment.data.attributes
+  }
   return null
 }
 
 
- // uploads stuff
- 
- export const getMediaFile = async (uploadId)=>{
-  const upload = await fetch(api_url+'/upload/files/'+uploadId,{
+// uploads stuff
+
+export const getMediaFile = async (uploadId) => {
+  const upload = await fetch(api_url + '/upload/files/' + uploadId, {
     headers: {
       'Content-Type': 'application/json'
     }
   }).then(response => response.json())
     .then(data => data)
     .catch(error => console.error(error))
-    log('this is a post with media',post)
-    
-    if(upload && upload.data && upload.data.attributes && upload.data.attributes.media){
-       return upload.data.attributes.media.data
-    }
-    return null
+  log('this is a post with media', post)
+
+  if (upload && upload.data && upload.data.attributes && upload.data.attributes.media) {
+    return upload.data.attributes.media.data
+  }
+  return null
 }
 
 // USER FUNCTIONS
 
-export const getUsers = async (customUri=null)=>{
+export const getUsers = async (customUri = null) => {
   console.log(customUri)
   let users = null
-  if(customUri){
-    users = await fetch(customUri,{
+  if (customUri) {
+    users = await fetch(customUri, {
       headers: {
         'Content-Type': 'application/json'
       }
@@ -1101,8 +1101,8 @@ export const getUsers = async (customUri=null)=>{
       .then(data => data)
       .catch(error => console.error(error))
   }
-  else{
-    users = await fetch(api_url+'/users',{
+  else {
+    users = await fetch(api_url + '/users', {
       headers: {
         'Content-Type': 'application/json'
       }
@@ -1111,79 +1111,79 @@ export const getUsers = async (customUri=null)=>{
       .catch(error => console.error(error))
   }
   console.log(users)
-  if(!users || !users.data){
+  if (!users || !users.data) {
     return users
   }
   return users
- }
+}
 
-export const getUserById = async (id,populateString="")=>{
-    let populate = '?populate='+populateString
-    if(populateString.length === 0){
-       populate = "" // it means populate nothing
+export const getUserById = async (id, populateString = "") => {
+  let populate = '?populate=' + populateString
+  if (populateString.length === 0) {
+    populate = "" // it means populate nothing
+  }
+
+  const response = await fetch(api_url + '/users/' + id + populate, {
+    headers: {
+      'Authorization': `Bearer ${getJwt()}`,
+      'Content-Type': 'application/json'
     }
-
-    const response = await fetch(api_url+'/users/'+id+populate,{
-        headers: {
-          'Authorization': `Bearer ${getJwt()}`,
-          'Content-Type': 'application/json'
-        }
-      }).then(response => response.json())
-        .then(data => data)
-        .catch(error => console.error(error))
-        if(response){
-           return response
-        }
-        return null
+  }).then(response => response.json())
+    .then(data => data)
+    .catch(error => console.error(error))
+  if (response) {
+    return response
+  }
+  return null
 }
 
 
-export const getUserFromDashedId = async (dashedId,populateString)=>{
-    const userId = getIDFromDashedString(dashedId)
-    return await getUserById(userId,populateString)
+export const getUserFromDashedId = async (dashedId, populateString) => {
+  const userId = getIDFromDashedString(dashedId)
+  return await getUserById(userId, populateString)
 }
 
-   export const getUserFromUsername = async (username, populateString)=>{
-    const response = await fetch(api_url+'/auths?username='+username,{
-        headers: {
-          'Content-Type': 'application/json',
-           'Authorization': `Bearer ${getJwt()}`
-        }
-      }).then(response => response.json())
-        .then(data => data)
-        .catch(error => console.error(error))
-    if(!response.hasOwnProperty('user')){
-       return null
-    }    
-    return await getUserById(response.user.id,populateString)
-   }
+export const getUserFromUsername = async (username, populateString) => {
+  const response = await fetch(api_url + '/auths?username=' + username, {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${getJwt()}`
+    }
+  }).then(response => response.json())
+    .then(data => data)
+    .catch(error => console.error(error))
+  if (!response.hasOwnProperty('user')) {
+    return null
+  }
+  return await getUserById(response.user.id, populateString)
+}
 
 
 
-   // notifications logging
+// notifications logging
 
-   export const logNotification = async(title,userId,notifiedUserIds,contentType="user",contentId="")=>{
-       const notificationObject = {
-          data:{
-            title: title,
-            notifier: {connect: [parseInt(userId)]},
-            notifiedUsers: { connect: notifiedUserIds},
-            type: contentType
-          } 
-       }
-       console.log('inside notifications object',notificationObject)
-       if(contentType === "post"){
-           notificationObject.data.post = {connect: [parseInt(contentId)]}  
-       }
-       // if it is a user, then the activity logger is the user of interest
-       await fetch(api_url+'/notifications', {
-        method: 'POST',
-        headers: {
-         'Authorization': `Bearer ${getJwt()}`,
-         'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(notificationObject),
-      })
-      .then(response => response.json())
-      .then(data => data)
-   }
+export const logNotification = async (title, userId, notifiedUserIds, contentType = "user", contentId = "") => {
+  const notificationObject = {
+    data: {
+      title: title,
+      notifier: { connect: [parseInt(userId)] },
+      notifiedUsers: { connect: notifiedUserIds },
+      type: contentType
+    }
+  }
+  console.log('inside notifications object', notificationObject)
+  if (contentType === "post") {
+    notificationObject.data.post = { connect: [parseInt(contentId)] }
+  }
+  // if it is a user, then the activity logger is the user of interest
+  await fetch(api_url + '/notifications', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${getJwt()}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(notificationObject),
+  })
+    .then(response => response.json())
+    .then(data => data)
+}

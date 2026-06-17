@@ -281,17 +281,15 @@ export default class UpdateClientDetailsForm extends React.Component {
                     </div>
                     <span className="vf-sublabel" style={{ marginBottom: 16, display: 'block' }}>NRC · Passport · Driving Licence</span>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
-                      <div>
-                        <label className="vf-label" style={{ marginBottom: 10 }}>Front Side</label>
-                        <Uploader addFiles={this.addIDfront} displayType="circular" refId={this.state.clientDetailsId} refName="user-profile.client-details" fieldName="IDfront" allowMultiple={false} allowedTypes={['image/*', 'application/pdf']} />
-                        {this.renderFiles(this.state.IDfront, "IDfront")}
-                      </div>
-                      <div>
-                        <label className="vf-label" style={{ marginBottom: 10 }}>Back Side</label>
-                        <Uploader addFiles={this.addIDback} displayType="circular" refId={this.state.clientDetailsId} refName="user-profile.client-details" fieldName="IDback" allowMultiple={false} allowedTypes={['image/*', 'application/pdf']} />
-                        {this.renderFiles(this.state.IDback, "IDback")}
-                      </div>
+                    <div>
+                      <label className="vf-label" style={{ marginBottom: 10 }}>Front Side</label>
+                      <Uploader addFiles={this.addIDfront} displayType="circular" refId={this.state.clientDetailsId} refName="user-profile.client-details" fieldName="IDfront" allowMultiple={false} allowedTypes={['image/*', 'application/pdf']} />
+                      {this.renderFiles(this.state.IDfront, "IDfront")}
+                    </div>
+                    <div>
+                      <label className="vf-label" style={{ marginBottom: 10 }}>Back Side</label>
+                      <Uploader addFiles={this.addIDback} displayType="circular" refId={this.state.clientDetailsId} refName="user-profile.client-details" fieldName="IDback" allowMultiple={false} allowedTypes={['image/*', 'application/pdf']} />
+                      {this.renderFiles(this.state.IDback, "IDback")}
                     </div>
                   </div>
                 )}

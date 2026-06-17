@@ -33,6 +33,7 @@
     "filepond-plugin-image-transform": "^3.8.7",
     "filepond-plugin-image-validate-size": "^1.2.7",
     "firebase": "^10.14.0",
+    "framer-motion": "^12.40.0",
     "html2canvas": "^1.4.1",
     "install": "^0.13.0",
     "jspdf": "^2.5.2",

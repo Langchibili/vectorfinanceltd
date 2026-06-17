@@ -3,27 +3,59 @@
 // import { usePage } from '@/Contexts/PageContext'
 // import { useUser } from '@/Contexts/UserContext'
 // import { getLoansFromClientId, scrolltoTopOFPage, updateUserAccount } from '@/Functions'
+// import { useRouter } from 'next/navigation'
 // import { useEffect, useState, useRef } from 'react'
-// import Link from 'next/link'
+// import { useThemeMode } from '@/components/ThemeProvider'
+
+// /* ─── theme-aware token builder ─────────────────────────────── */
+// function useTokens() {
+//   const { isDark } = useThemeMode()
+//   return {
+//     isDark,
+//     page: isDark ? '#0A0F1E' : '#F0F4F1',
+//     headerGrad: isDark
+//       ? 'linear-gradient(160deg, #0A0F1E 0%, #0F1930 55%, #071A10 100%)'
+//       : 'linear-gradient(160deg, #0D2A1C 0%, #0F3B27 55%, #082016 100%)',
+//     headerEyebrow: isDark ? 'rgba(16,185,129,0.75)' : 'rgba(110,231,183,0.85)',
+//     headerSub: isDark ? 'rgba(255,255,255,0.38)' : 'rgba(255,255,255,0.55)',
+//     card: isDark ? 'rgba(255,255,255,0.05)' : '#FFFFFF',
+//     cardBorder: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(13,31,23,0.08)',
+//     text: isDark ? '#FFFFFF' : '#0D1F17',
+//     textSub: isDark ? 'rgba(255,255,255,0.55)' : 'rgba(13,31,23,0.55)',
+//     textFaint: isDark ? '#9CA3AF' : 'rgba(13,31,23,0.42)',
+//     skel: isDark ? 'rgba(255,255,255,0.07)' : 'rgba(13,31,23,0.06)',
+//     divider: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(13,31,23,0.07)',
+//     modalBg: isDark ? '#0D1A10' : '#FFFFFF',
+//     modalCardBg: isDark
+//       ? 'linear-gradient(135deg,rgba(5,150,105,0.10),rgba(16,185,129,0.04))'
+//       : 'linear-gradient(135deg,rgba(5,150,105,0.06),rgba(16,185,129,0.03))',
+//     modalCardBorder: isDark ? 'rgba(16,185,129,0.28)' : 'rgba(16,185,129,0.2)',
+//     overlay: 'rgba(10,15,30,0.72)',
+//   }
+// }
 
 // // ── Loan status config — NEVER change these string values ─────────
-// const STATUS_CONFIG = {
-//   'initiated': { label: 'Initiated', color: '#FBBF24', bg: 'rgba(251,191,36,0.13)' },
-//   'pending-collateral-addition': { label: 'Add Collateral', color: '#FBBF24', bg: 'rgba(251,191,36,0.13)' },
-//   'pending-collateral-inspection': { label: 'Pending Inspection', color: '#FBBF24', bg: 'rgba(251,191,36,0.13)' },
-//   'collateral-inspection': { label: 'Under Inspection', color: '#A78BFA', bg: 'rgba(167,139,250,0.13)' },
-//   'request-approval': { label: 'Awaiting Approval', color: '#818CF8', bg: 'rgba(129,140,248,0.13)' },
-//   'accepted': { label: 'Accepted', color: '#34D399', bg: 'rgba(52,211,153,0.13)' },
-//   'pending-approval': { label: 'Processing', color: '#A78BFA', bg: 'rgba(167,139,250,0.13)' },
-//   'approved': { label: 'Approved', color: '#10B981', bg: 'rgba(16,185,129,0.13)' },
-//   'rejected': { label: 'Rejected', color: '#F87171', bg: 'rgba(248,113,113,0.13)' },
-//   'disbursed': { label: 'Disbursed', color: '#10B981', bg: 'rgba(16,185,129,0.13)' },
-//   'completed': { label: 'Completed', color: '#9CA3AF', bg: 'rgba(156,163,175,0.13)' },
-//   'defaulted': { label: 'Defaulted', color: '#DC2626', bg: 'rgba(220,38,38,0.18)' },
+// function useStatusConfig() {
+//   const { isDark } = useThemeMode()
+//   return {
+//     'initiated': { label: 'Initiated', color: '#D97706', bg: isDark ? 'rgba(251,191,36,0.13)' : 'rgba(217,119,6,0.10)' },
+//     'pending-collateral-addition': { label: 'Add Collateral', color: '#D97706', bg: isDark ? 'rgba(251,191,36,0.13)' : 'rgba(217,119,6,0.10)' },
+//     'pending-collateral-inspection': { label: 'Pending Inspection', color: '#D97706', bg: isDark ? 'rgba(251,191,36,0.13)' : 'rgba(217,119,6,0.10)' },
+//     'collateral-inspection': { label: 'Under Inspection', color: '#7C3AED', bg: isDark ? 'rgba(167,139,250,0.13)' : 'rgba(124,58,237,0.09)' },
+//     'request-approval': { label: 'Awaiting Approval', color: '#4F46E5', bg: isDark ? 'rgba(129,140,248,0.13)' : 'rgba(79,70,229,0.09)' },
+//     'accepted': { label: 'Accepted', color: '#059669', bg: isDark ? 'rgba(52,211,153,0.13)' : 'rgba(5,150,105,0.10)' },
+//     'pending-approval': { label: 'Processing', color: '#7C3AED', bg: isDark ? 'rgba(167,139,250,0.13)' : 'rgba(124,58,237,0.09)' },
+//     'approved': { label: 'Approved', color: '#0E9F71', bg: isDark ? 'rgba(16,185,129,0.13)' : 'rgba(14,159,113,0.10)' },
+//     'rejected': { label: 'Rejected', color: '#DC2626', bg: isDark ? 'rgba(248,113,113,0.13)' : 'rgba(220,38,38,0.09)' },
+//     'disbursed': { label: 'Disbursed', color: '#0E9F71', bg: isDark ? 'rgba(16,185,129,0.13)' : 'rgba(14,159,113,0.10)' },
+//     'completed': { label: 'Completed', color: isDark ? '#9CA3AF' : '#6B7280', bg: isDark ? 'rgba(156,163,175,0.13)' : 'rgba(107,114,128,0.10)' },
+//     'defaulted': { label: 'Defaulted', color: '#DC2626', bg: isDark ? 'rgba(220,38,38,0.18)' : 'rgba(220,38,38,0.12)' },
+//   }
 // }
 
 // // ── Loan type selection modal ──────────────────────────────────────
 // function LoanTypeModal({ onClose, onSelect, loading }) {
+//   const T = useTokens()
 //   const overlayRef = useRef(null)
 //   const handleOverlay = (e) => { if (e.target === overlayRef.current) onClose() }
 
@@ -48,14 +80,14 @@
 //     <div
 //       ref={overlayRef}
 //       onClick={handleOverlay}
-//       style={{ position: 'fixed', inset: 0, zIndex: 1000, background: 'rgba(10,15,30,0.72)', backdropFilter: 'blur(6px)', display: 'flex', alignItems: 'flex-end' }}
+//       style={{ position: 'fixed', inset: 0, zIndex: 1000, background: T.overlay, backdropFilter: 'blur(6px)', display: 'flex', alignItems: 'flex-end' }}
 //     >
-//       <div style={{ width: '100%', maxWidth: 560, margin: '0 auto', background: '#fff', borderRadius: '20px 20px 0 0', padding: '28px 20px 40px', animation: 'slideUpModal 0.35s cubic-bezier(0.22,1,0.36,1)' }}>
-//         <div style={{ width: 36, height: 4, borderRadius: 100, background: 'rgba(26,26,46,0.12)', margin: '0 auto 24px' }} />
+//       <div style={{ width: '100%', maxWidth: 560, margin: '0 auto', background: T.modalBg, borderRadius: '20px 20px 0 0', padding: '28px 20px 40px', animation: 'slideUpModal 0.35s cubic-bezier(0.22,1,0.36,1)' }}>
+//         <div style={{ width: 36, height: 4, borderRadius: 100, background: T.isDark ? 'rgba(255,255,255,0.14)' : 'rgba(26,26,46,0.12)', margin: '0 auto 24px' }} />
 
 //         <div style={{ textAlign: 'center', marginBottom: 24 }}>
-//           <h2 style={{ fontFamily: "'DM Serif Display', serif", fontSize: 24, color: '#1A1A2E', fontWeight: 400, margin: '0 0 6px' }}>Choose Loan Type</h2>
-//           <p style={{ fontSize: 14, color: '#6B7280', margin: 0 }}>Select the loan that fits your situation</p>
+//           <h2 style={{ fontFamily: "'DM Serif Display', serif", fontSize: 24, color: T.text, fontWeight: 400, margin: '0 0 6px' }}>Choose Loan Type</h2>
+//           <p style={{ fontSize: 14, color: T.textSub, margin: 0 }}>Select the loan that fits your situation</p>
 //         </div>
 
 //         <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginBottom: 20 }}>
@@ -66,31 +98,31 @@
 //               disabled={loading}
 //               style={{
 //                 display: 'flex', alignItems: 'flex-start', gap: 16, padding: '18px',
-//                 background: 'linear-gradient(135deg,rgba(5,150,105,0.06),rgba(16,185,129,0.03))',
-//                 border: '1.5px solid rgba(16,185,129,0.2)',
+//                 background: T.modalCardBg,
+//                 border: `1.5px solid ${T.modalCardBorder}`,
 //                 borderRadius: 14, cursor: 'pointer', textAlign: 'left', width: '100%',
 //                 transition: 'all 0.2s', opacity: loading ? 0.6 : 1,
 //                 fontFamily: "'DM Sans',system-ui,sans-serif",
 //               }}
 //               onMouseEnter={e => { e.currentTarget.style.borderColor = '#10B981'; e.currentTarget.style.boxShadow = '0 4px 20px rgba(16,185,129,0.2)' }}
-//               onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(16,185,129,0.2)'; e.currentTarget.style.boxShadow = 'none' }}
+//               onMouseLeave={e => { e.currentTarget.style.borderColor = T.modalCardBorder; e.currentTarget.style.boxShadow = 'none' }}
 //             >
 //               <div style={{ width: 46, height: 46, borderRadius: 12, flexShrink: 0, background: 'linear-gradient(135deg,#059669,#10B981)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(16,185,129,0.35)' }}>
 //                 {t.icon}
 //               </div>
 //               <div style={{ flex: 1 }}>
-//                 <p style={{ fontSize: 16, fontWeight: 700, color: '#1A1A2E', margin: '0 0 2px' }}>{t.title}</p>
-//                 <p style={{ fontSize: 12, color: '#6B7280', margin: '0 0 10px' }}>{t.subtitle}</p>
+//                 <p style={{ fontSize: 16, fontWeight: 700, color: T.text, margin: '0 0 2px' }}>{t.title}</p>
+//                 <p style={{ fontSize: 12, color: T.textSub, margin: '0 0 10px' }}>{t.subtitle}</p>
 //                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px 12px' }}>
 //                   {t.features.map(f => <span key={f} style={{ fontSize: 11, color: '#059669', fontWeight: 600 }}>✓ {f}</span>)}
 //                 </div>
 //               </div>
-//               <ChevronRight />
+//               <ChevronRight color={T.textSub} />
 //             </button>
 //           ))}
 //         </div>
 
-//         <button onClick={onClose} style={{ width: '100%', padding: '14px', borderRadius: 12, background: 'rgba(26,26,46,0.04)', border: '1px solid rgba(26,26,46,0.08)', color: '#6B7280', fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: "'DM Sans',system-ui,sans-serif" }}>
+//         <button onClick={onClose} style={{ width: '100%', padding: '14px', borderRadius: 12, background: T.isDark ? 'rgba(255,255,255,0.05)' : 'rgba(26,26,46,0.04)', border: `1px solid ${T.cardBorder}`, color: T.textSub, fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: "'DM Sans',system-ui,sans-serif" }}>
 //           Cancel
 //         </button>
 //       </div>
@@ -105,6 +137,8 @@
 // export default function Loans() {
 //   const loggedInUser = useUser()
 //   const { setPage } = usePage()
+//   const router = useRouter()
+//   const T = useTokens()
 //   const currentLoan = loggedInUser.user?.currentLoan || null
 //   const [loans, setLoans] = useState([])
 //   const [loading, setLoading] = useState(true)
@@ -116,6 +150,7 @@
 //   setPage('/loans')
 //   scrolltoTopOFPage()
 
+//   // ── Fetch all loans for this client ───────────────────────────
 //   useEffect(() => {
 //     if (!loggedInUser.user) return
 //     const run = async () => {
@@ -129,26 +164,33 @@
 //     run()
 //   }, [loggedInUser.user])
 
-//   // Clicking a loan card — set as current loan and go to dashboard
+//   // ── Select a loan — connect it as currentLoan, go to dashboard ─
 //   const handleSelectLoan = async (loanId) => {
 //     if (!loggedInUser.user) return
 //     setSwitchingId(loanId)
 //     const updateObj = { currentLoan: { connect: [loanId] } }
-//     await updateUserAccount(updateObj, loggedInUser.user.id)
-//     window.location = '/'
+//     const updatedUserAccount = await updateUserAccount(updateObj, loggedInUser.user.id)
+//     if (!updatedUserAccount.hasOwnProperty('error')) {
+//       window.location = '/'
+//     }
+//     setSwitchingId(null)
 //   }
 
-//   // New loan — disconnect current, redirect (triggers new loan flow on dashboard)
+//   // ── New loan — disconnect current, redirect to dashboard ───────
 //   const handleNewLoanSelect = async (/* type unused here — loan creation handled server-side */) => {
+//     if (!loggedInUser.user) return
 //     setApplying(true)
 //     try {
 //       const updateObj = { currentLoan: { disconnect: currentLoan?.id ? [currentLoan.id] : [] } }
-//       await updateUserAccount(updateObj, loggedInUser.user.id)
-//       window.location = '/'
+//       const updatedUserAccount = await updateUserAccount(updateObj, loggedInUser.user.id)
+//       if (!updatedUserAccount.hasOwnProperty('error')) {
+//         window.location = '/'
+//       }
 //     } catch (e) { console.error(e) }
 //     finally { setApplying(false); setShowModal(false) }
 //   }
 
+//   // ── Auth guard ─────────────────────────────────────────────────
 //   if (!loggedIn) {
 //     if (typeof window !== 'undefined') window.location = '/signin'
 //     return null
@@ -159,25 +201,25 @@
 
 //   return (
 //     <>
-//       <div className="page-content page-enter" style={{ padding: 0, background: '#F7F5F0', minHeight: '100vh' }}>
+//       <div className="page-content page-enter" style={{ padding: 0, background: T.page, minHeight: '100vh' }}>
 
 //         {/* ── Header ──────────────────────────────────────────── */}
 //         <div style={{
-//           background: 'linear-gradient(160deg, #0A0F1E 0%, #0F1930 55%, #071A10 100%)',
-//           padding: '28px 20px 80px', position: 'relative', overflow: 'hidden',
+//           background: T.headerGrad,
+//           padding: '28px 20px 80px', position: 'relative', overflow: 'visible',
 //         }}>
 //           <div style={{ position: 'absolute', top: -80, right: -60, width: 280, height: 280, borderRadius: '50%', background: 'radial-gradient(circle, rgba(16,185,129,0.12) 0%, transparent 70%)', pointerEvents: 'none' }} />
 //           <div style={{ maxWidth: 640, margin: '0 auto', position: 'relative', zIndex: 1 }}>
-//             <p style={{ color: 'rgba(16,185,129,0.75)', fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', margin: '0 0 6px' }}>Loan Management</p>
+//             <p style={{ color: T.headerEyebrow, fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', margin: '0 0 6px' }}>Loan Management</p>
 //             <h1 style={{ fontFamily: "'DM Serif Display', serif", fontSize: 'clamp(24px,5vw,32px)', color: '#fff', fontWeight: 400, margin: '0 0 6px' }}>My Loans</h1>
-//             <p style={{ color: 'rgba(255,255,255,0.38)', fontSize: 13, margin: 0 }}>{loans.length} loan{loans.length !== 1 ? 's' : ''} total</p>
+//             <p style={{ color: T.headerSub, fontSize: 13, margin: 0 }}>{loans.length} loan{loans.length !== 1 ? 's' : ''} total</p>
 //           </div>
 //         </div>
 
-//         <div style={{ maxWidth: 640, margin: '0 auto', padding: '0 16px' }}>
+//         <div style={{ maxWidth: 640, margin: '0 auto', padding: '0 16px', position: 'relative', zIndex: 2 }}>
 
 //           {/* ── Apply CTA (pulled up over header) ─────────────── */}
-//           <div style={{ marginTop: -44, marginBottom: 24 }}>
+//           <div style={{ marginTop: -44, marginBottom: 24, position: 'relative', zIndex: 3 }}>
 //             <button
 //               onClick={() => setShowModal(true)}
 //               disabled={applying}
@@ -204,12 +246,12 @@
 //           {loading && (
 //             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
 //               {[1, 2, 3].map(i => (
-//                 <div key={i} className="vf-card" style={{ padding: 20, display: 'flex', gap: 14, alignItems: 'center' }}>
-//                   <div className="skel-light skel" style={{ width: 44, height: 44, borderRadius: 12, flexShrink: 0 }} />
+//                 <div key={i} style={{ background: T.card, border: `1px solid ${T.cardBorder}`, borderRadius: 14, padding: 20, display: 'flex', gap: 14, alignItems: 'center' }}>
+//                   <div style={{ background: T.skel, width: 44, height: 44, borderRadius: 12, flexShrink: 0 }} className="skel" />
 //                   <div style={{ flex: 1 }}>
-//                     <div className="skel-light skel" style={{ height: 12, width: '40%', borderRadius: 4, marginBottom: 8 }} />
-//                     <div className="skel-light skel" style={{ height: 22, width: '60%', borderRadius: 4, marginBottom: 8 }} />
-//                     <div className="skel-light skel" style={{ height: 10, width: '30%', borderRadius: 4 }} />
+//                     <div style={{ background: T.skel, height: 12, width: '40%', borderRadius: 4, marginBottom: 8 }} className="skel" />
+//                     <div style={{ background: T.skel, height: 22, width: '60%', borderRadius: 4, marginBottom: 8 }} className="skel" />
+//                     <div style={{ background: T.skel, height: 10, width: '30%', borderRadius: 4 }} className="skel" />
 //                   </div>
 //                 </div>
 //               ))}
@@ -219,7 +261,7 @@
 //           {/* ── Active loans ──────────────────────────────────── */}
 //           {!loading && activeLoans.length > 0 && (
 //             <div style={{ marginBottom: 28 }}>
-//               <SectionLabel>Active Loans</SectionLabel>
+//               <SectionLabel T={T}>Active Loans</SectionLabel>
 //               <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
 //                 {activeLoans.map((loan, i) => (
 //                   <LoanCard
@@ -229,6 +271,7 @@
 //                     isSwitching={switchingId === loan.id}
 //                     onSelect={() => handleSelectLoan(loan.id)}
 //                     delay={i * 0.06}
+//                     T={T}
 //                   />
 //                 ))}
 //               </div>
@@ -238,7 +281,7 @@
 //           {/* ── Closed loans ─────────────────────────────────── */}
 //           {!loading && completedLoans.length > 0 && (
 //             <div style={{ marginBottom: 28 }}>
-//               <SectionLabel>Closed Loans</SectionLabel>
+//               <SectionLabel T={T}>Closed Loans</SectionLabel>
 //               <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
 //                 {completedLoans.map((loan, i) => (
 //                   <LoanCard
@@ -249,6 +292,7 @@
 //                     onSelect={() => { }}
 //                     delay={i * 0.05}
 //                     muted
+//                     T={T}
 //                   />
 //                 ))}
 //               </div>
@@ -257,12 +301,12 @@
 
 //           {/* ── Empty state ───────────────────────────────────── */}
 //           {!loading && loans.length === 0 && (
-//             <div className="vf-card page-enter" style={{ padding: '48px 24px', textAlign: 'center', marginTop: 8 }}>
+//             <div className="page-enter" style={{ background: T.card, border: `1px solid ${T.cardBorder}`, borderRadius: 16, padding: '48px 24px', textAlign: 'center', marginTop: 8 }}>
 //               <div style={{ width: 60, height: 60, borderRadius: 18, background: 'rgba(16,185,129,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
 //                 <EmptyIcon />
 //               </div>
-//               <h3 style={{ fontFamily: "'DM Serif Display', serif", fontSize: 20, color: '#1A1A2E', fontWeight: 400, margin: '0 0 8px' }}>No Loans Yet</h3>
-//               <p style={{ color: '#6B7280', fontSize: 14, lineHeight: 1.6, margin: '0 0 24px' }}>Apply for your first low-interest loan and receive funds within 24 hours.</p>
+//               <h3 style={{ fontFamily: "'DM Serif Display', serif", fontSize: 20, color: T.text, fontWeight: 400, margin: '0 0 8px' }}>No Loans Yet</h3>
+//               <p style={{ color: T.textSub, fontSize: 14, lineHeight: 1.6, margin: '0 0 24px' }}>Apply for your first low-interest loan and receive funds within 24 hours.</p>
 //               <button
 //                 onClick={() => setShowModal(true)}
 //                 style={{
@@ -290,14 +334,30 @@
 //           loading={applying}
 //         />
 //       )}
+
+//       <style>{`
+//         @keyframes spin { to { transform: rotate(360deg); } }
+//         .skel { position: relative; overflow: hidden; }
+//         .skel::after {
+//           content: '';
+//           position: absolute; inset: 0;
+//           background: linear-gradient(90deg, transparent, rgba(16,185,129,0.10), transparent);
+//           animation: skelShimmer 1.4s linear infinite;
+//         }
+//         @keyframes skelShimmer {
+//           0% { transform: translateX(-100%); }
+//           100% { transform: translateX(100%); }
+//         }
+//       `}</style>
 //     </>
 //   )
 // }
 
 // // ── Loan card ─────────────────────────────────────────────────────
-// function LoanCard({ loan, isCurrent, isSwitching, onSelect, delay, muted }) {
+// function LoanCard({ loan, isCurrent, isSwitching, onSelect, delay, muted, T }) {
+//   const STATUS_CONFIG = useStatusConfig()
 //   const s = loan.loanStatus
-//   const cfg = STATUS_CONFIG[s] || { label: s, color: '#9CA3AF', bg: 'rgba(156,163,175,0.13)' }
+//   const cfg = STATUS_CONFIG[s] || { label: s, color: T.textFaint, bg: T.skel }
 //   const amt = Number(loan.loanAmount || 0).toLocaleString()
 
 //   const outstanding = Number(loan.outstandingAmount) || 0
@@ -309,20 +369,20 @@
 //       className="page-enter"
 //       onClick={muted ? undefined : onSelect}
 //       style={{
-//         background: '#fff',
-//         border: isCurrent ? '1.5px solid rgba(16,185,129,0.35)' : '1px solid rgba(26,26,46,0.07)',
+//         background: T.card,
+//         border: isCurrent ? '1.5px solid rgba(16,185,129,0.35)' : `1px solid ${T.cardBorder}`,
 //         borderLeft: `3px solid ${cfg.color}`,
 //         borderRadius: 14,
 //         padding: '18px 18px 16px',
 //         cursor: muted ? 'default' : 'pointer',
 //         transition: 'transform 0.15s, box-shadow 0.15s',
-//         boxShadow: isCurrent ? '0 4px 20px rgba(5,150,105,0.12)' : '0 2px 10px rgba(0,0,0,0.04)',
+//         boxShadow: isCurrent ? '0 4px 20px rgba(5,150,105,0.12)' : (T.isDark ? 'none' : '0 2px 10px rgba(0,0,0,0.04)'),
 //         opacity: muted ? 0.7 : 1,
 //         animationDelay: `${delay}s`,
 //         position: 'relative',
 //       }}
-//       onMouseEnter={e => { if (!muted && !isCurrent) { e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.boxShadow = '0 6px 24px rgba(0,0,0,0.09)' } }}
-//       onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = isCurrent ? '0 4px 20px rgba(5,150,105,0.12)' : '0 2px 10px rgba(0,0,0,0.04)' }}
+//       onMouseEnter={e => { if (!muted && !isCurrent) { e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.boxShadow = T.isDark ? '0 6px 24px rgba(0,0,0,0.3)' : '0 6px 24px rgba(0,0,0,0.09)' } }}
+//       onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = isCurrent ? '0 4px 20px rgba(5,150,105,0.12)' : (T.isDark ? 'none' : '0 2px 10px rgba(0,0,0,0.04)') }}
 //     >
 //       {/* Current badge */}
 //       {isCurrent && (
@@ -333,8 +393,8 @@
 
 //       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
 //         <div>
-//           <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#6B7280', margin: '0 0 4px' }}>Loan #{loan.id}</p>
-//           <p style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 22, fontWeight: 700, color: '#1A1A2E', margin: 0, letterSpacing: '-0.02em' }}>
+//           <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: T.textSub, margin: '0 0 4px' }}>Loan #{loan.id}</p>
+//           <p style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 22, fontWeight: 700, color: T.text, margin: 0, letterSpacing: '-0.02em' }}>
 //             K{amt}
 //           </p>
 //         </div>
@@ -347,20 +407,20 @@
 //       <div style={{ display: 'flex', gap: 20, marginBottom: 12 }}>
 //         {loan.loanTerm > 0 && (
 //           <div>
-//             <p style={{ fontSize: 9, color: '#9CA3AF', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', margin: '0 0 2px' }}>Term</p>
-//             <p style={{ fontSize: 13, color: '#1A1A2E', fontWeight: 600, margin: 0 }}>{loan.loanTerm} months</p>
+//             <p style={{ fontSize: 9, color: T.textFaint, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', margin: '0 0 2px' }}>Term</p>
+//             <p style={{ fontSize: 13, color: T.text, fontWeight: 600, margin: 0 }}>{loan.loanTerm} months</p>
 //           </div>
 //         )}
 //         {outstanding > 0 && (
 //           <div>
-//             <p style={{ fontSize: 9, color: '#9CA3AF', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', margin: '0 0 2px' }}>Outstanding</p>
-//             <p style={{ fontSize: 13, color: '#F87171', fontWeight: 700, margin: 0, fontFamily: "'JetBrains Mono',monospace" }}>K{Number(outstanding).toLocaleString()}</p>
+//             <p style={{ fontSize: 9, color: T.textFaint, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', margin: '0 0 2px' }}>Outstanding</p>
+//             <p style={{ fontSize: 13, color: '#DC2626', fontWeight: 700, margin: 0, fontFamily: "'JetBrains Mono',monospace" }}>K{Number(outstanding).toLocaleString()}</p>
 //           </div>
 //         )}
 //         {loan.disbursementDate && (
 //           <div>
-//             <p style={{ fontSize: 9, color: '#9CA3AF', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', margin: '0 0 2px' }}>Disbursed</p>
-//             <p style={{ fontSize: 13, color: '#1A1A2E', fontWeight: 600, margin: 0 }}>{new Date(loan.disbursementDate).toLocaleDateString('en-ZM', { day: 'numeric', month: 'short', year: '2-digit' })}</p>
+//             <p style={{ fontSize: 9, color: T.textFaint, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', margin: '0 0 2px' }}>Disbursed</p>
+//             <p style={{ fontSize: 13, color: T.text, fontWeight: 600, margin: 0 }}>{new Date(loan.disbursementDate).toLocaleDateString('en-ZM', { day: 'numeric', month: 'short', year: '2-digit' })}</p>
 //           </div>
 //         )}
 //       </div>
@@ -369,10 +429,10 @@
 //       {['disbursed', 'approved', 'accepted'].includes(s) && loan.loanAmount > 0 && (
 //         <div style={{ marginBottom: 12 }}>
 //           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
-//             <span style={{ fontSize: 10, color: '#9CA3AF' }}>Repaid</span>
+//             <span style={{ fontSize: 10, color: T.textFaint }}>Repaid</span>
 //             <span style={{ fontSize: 10, color: '#059669', fontWeight: 700 }}>{pct}%</span>
 //           </div>
-//           <div style={{ height: 5, background: 'rgba(26,26,46,0.06)', borderRadius: 100, overflow: 'hidden' }}>
+//           <div style={{ height: 5, background: T.skel, borderRadius: 100, overflow: 'hidden' }}>
 //             <div style={{ height: '100%', width: `${pct}%`, background: 'linear-gradient(90deg,#059669,#10B981)', borderRadius: 100 }} />
 //           </div>
 //         </div>
@@ -380,10 +440,10 @@
 
 //       {/* Footer — set as active prompt */}
 //       {!muted && !isCurrent && (
-//         <div style={{ paddingTop: 12, borderTop: '1px solid rgba(26,26,46,0.06)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-//           <span style={{ fontSize: 12, color: '#6B7280' }}>Tap to set as active loan</span>
+//         <div style={{ paddingTop: 12, borderTop: `1px solid ${T.divider}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+//           <span style={{ fontSize: 12, color: T.textSub }}>Tap to set as active loan</span>
 //           <span style={{ fontSize: 12, color: '#059669', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4 }}>
-//             {isSwitching ? 'Switching…' : <><span>Switch</span><ChevronRight /></>}
+//             {isSwitching ? 'Switching…' : <><span>Switch</span><ChevronRight color="#059669" /></>}
 //           </span>
 //         </div>
 //       )}
@@ -391,15 +451,15 @@
 //   )
 // }
 
-// function SectionLabel({ children }) {
-//   return <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#6B7280', margin: '0 0 12px' }}>{children}</p>
+// function SectionLabel({ children, T }) {
+//   return <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: T.textSub, margin: '0 0 12px' }}>{children}</p>
 // }
 
 // // ── Icons ─────────────────────────────────────────────────────────
 // function PlusIcon() { return <svg width={16} height={16} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg> }
 // function EmptyIcon() { return <svg width={28} height={28} fill="none" viewBox="0 0 24 24" stroke="#10B981" strokeWidth={1.5}><rect x="2" y="5" width="20" height="14" rx="2" /><line x1="2" y1="10" x2="22" y2="10" /></svg> }
 // function Spinner() { return <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} style={{ animation: 'spin 0.8s linear infinite', flexShrink: 0 }}><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" /></svg> }
-// function ChevronRight() { return <svg width={14} height={14} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><polyline points="9 18 15 12 9 6" /></svg> }
+// function ChevronRight({ color = 'currentColor' }) { return <svg width={14} height={14} fill="none" viewBox="0 0 24 24" stroke={color} strokeWidth={2.5}><polyline points="9 18 15 12 9 6" /></svg> }
 // function BuildingIcon() { return <svg width={22} height={22} fill="none" viewBox="0 0 24 24" stroke="#fff" strokeWidth={1.7}><rect x="2" y="7" width="20" height="14" rx="2" /><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16" /></svg> }
 // function WalletIcon() { return <svg width={22} height={22} fill="none" viewBox="0 0 24 24" stroke="#fff" strokeWidth={1.7}><path d="M20 12V8a2 2 0 00-2-2H4a2 2 0 00-2 2v8a2 2 0 002 2h14a2 2 0 002-2v-4" /><circle cx="18" cy="12" r="2" /></svg> }
 'use client'
@@ -409,25 +469,57 @@ import { useUser } from '@/Contexts/UserContext'
 import { getLoansFromClientId, scrolltoTopOFPage, updateUserAccount } from '@/Functions'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState, useRef } from 'react'
+import { useThemeMode } from '@/components/ThemeProvider'
+
+/* ─── theme-aware token builder ─────────────────────────────── */
+function useTokens() {
+  const { isDark } = useThemeMode()
+  return {
+    isDark,
+    page: isDark ? '#0A0F1E' : '#F0F4F1',
+    headerGrad: isDark
+      ? 'linear-gradient(160deg, #0A0F1E 0%, #0F1930 55%, #071A10 100%)'
+      : 'linear-gradient(160deg, #1B2A4A 0%, #243B6A 55%, #0F1C3A 100%)', // blue for light mode
+    headerEyebrow: isDark ? 'rgba(16,185,129,0.75)' : 'rgba(110,231,183,0.85)',
+    headerSub: isDark ? 'rgba(255,255,255,0.38)' : 'rgba(255,255,255,0.55)',
+    card: isDark ? 'rgba(255,255,255,0.05)' : '#FFFFFF',
+    cardBorder: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(13,31,23,0.08)',
+    text: isDark ? '#FFFFFF' : '#0D1F17',
+    textSub: isDark ? 'rgba(255,255,255,0.55)' : 'rgba(13,31,23,0.55)',
+    textFaint: isDark ? '#9CA3AF' : 'rgba(13,31,23,0.42)',
+    skel: isDark ? 'rgba(255,255,255,0.07)' : 'rgba(13,31,23,0.06)',
+    divider: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(13,31,23,0.07)',
+    modalBg: isDark ? '#0D1A10' : '#FFFFFF',
+    modalCardBg: isDark
+      ? 'linear-gradient(135deg,rgba(5,150,105,0.10),rgba(16,185,129,0.04))'
+      : 'linear-gradient(135deg,rgba(5,150,105,0.06),rgba(16,185,129,0.03))',
+    modalCardBorder: isDark ? 'rgba(16,185,129,0.28)' : 'rgba(16,185,129,0.2)',
+    overlay: 'rgba(10,15,30,0.72)',
+  }
+}
 
 // ── Loan status config — NEVER change these string values ─────────
-const STATUS_CONFIG = {
-  'initiated': { label: 'Initiated', color: '#FBBF24', bg: 'rgba(251,191,36,0.13)' },
-  'pending-collateral-addition': { label: 'Add Collateral', color: '#FBBF24', bg: 'rgba(251,191,36,0.13)' },
-  'pending-collateral-inspection': { label: 'Pending Inspection', color: '#FBBF24', bg: 'rgba(251,191,36,0.13)' },
-  'collateral-inspection': { label: 'Under Inspection', color: '#A78BFA', bg: 'rgba(167,139,250,0.13)' },
-  'request-approval': { label: 'Awaiting Approval', color: '#818CF8', bg: 'rgba(129,140,248,0.13)' },
-  'accepted': { label: 'Accepted', color: '#34D399', bg: 'rgba(52,211,153,0.13)' },
-  'pending-approval': { label: 'Processing', color: '#A78BFA', bg: 'rgba(167,139,250,0.13)' },
-  'approved': { label: 'Approved', color: '#10B981', bg: 'rgba(16,185,129,0.13)' },
-  'rejected': { label: 'Rejected', color: '#F87171', bg: 'rgba(248,113,113,0.13)' },
-  'disbursed': { label: 'Disbursed', color: '#10B981', bg: 'rgba(16,185,129,0.13)' },
-  'completed': { label: 'Completed', color: '#9CA3AF', bg: 'rgba(156,163,175,0.13)' },
-  'defaulted': { label: 'Defaulted', color: '#DC2626', bg: 'rgba(220,38,38,0.18)' },
+function useStatusConfig() {
+  const { isDark } = useThemeMode()
+  return {
+    'initiated': { label: 'Initiated', color: '#D97706', bg: isDark ? 'rgba(251,191,36,0.13)' : 'rgba(217,119,6,0.10)' },
+    'pending-collateral-addition': { label: 'Add Collateral', color: '#D97706', bg: isDark ? 'rgba(251,191,36,0.13)' : 'rgba(217,119,6,0.10)' },
+    'pending-collateral-inspection': { label: 'Pending Inspection', color: '#D97706', bg: isDark ? 'rgba(251,191,36,0.13)' : 'rgba(217,119,6,0.10)' },
+    'collateral-inspection': { label: 'Under Inspection', color: '#7C3AED', bg: isDark ? 'rgba(167,139,250,0.13)' : 'rgba(124,58,237,0.09)' },
+    'request-approval': { label: 'Awaiting Approval', color: '#4F46E5', bg: isDark ? 'rgba(129,140,248,0.13)' : 'rgba(79,70,229,0.09)' },
+    'accepted': { label: 'Accepted', color: '#059669', bg: isDark ? 'rgba(52,211,153,0.13)' : 'rgba(5,150,105,0.10)' },
+    'pending-approval': { label: 'Processing', color: '#7C3AED', bg: isDark ? 'rgba(167,139,250,0.13)' : 'rgba(124,58,237,0.09)' },
+    'approved': { label: 'Approved', color: '#0E9F71', bg: isDark ? 'rgba(16,185,129,0.13)' : 'rgba(14,159,113,0.10)' },
+    'rejected': { label: 'Rejected', color: '#DC2626', bg: isDark ? 'rgba(248,113,113,0.13)' : 'rgba(220,38,38,0.09)' },
+    'disbursed': { label: 'Disbursed', color: '#0E9F71', bg: isDark ? 'rgba(16,185,129,0.13)' : 'rgba(14,159,113,0.10)' },
+    'completed': { label: 'Completed', color: isDark ? '#9CA3AF' : '#6B7280', bg: isDark ? 'rgba(156,163,175,0.13)' : 'rgba(107,114,128,0.10)' },
+    'defaulted': { label: 'Defaulted', color: '#DC2626', bg: isDark ? 'rgba(220,38,38,0.18)' : 'rgba(220,38,38,0.12)' },
+  }
 }
 
 // ── Loan type selection modal ──────────────────────────────────────
 function LoanTypeModal({ onClose, onSelect, loading }) {
+  const T = useTokens()
   const overlayRef = useRef(null)
   const handleOverlay = (e) => { if (e.target === overlayRef.current) onClose() }
 
@@ -452,14 +544,14 @@ function LoanTypeModal({ onClose, onSelect, loading }) {
     <div
       ref={overlayRef}
       onClick={handleOverlay}
-      style={{ position: 'fixed', inset: 0, zIndex: 1000, background: 'rgba(10,15,30,0.72)', backdropFilter: 'blur(6px)', display: 'flex', alignItems: 'flex-end' }}
+      style={{ position: 'fixed', inset: 0, zIndex: 1000, background: T.overlay, backdropFilter: 'blur(6px)', display: 'flex', alignItems: 'flex-end' }}
     >
-      <div style={{ width: '100%', maxWidth: 560, margin: '0 auto', background: '#fff', borderRadius: '20px 20px 0 0', padding: '28px 20px 40px', animation: 'slideUpModal 0.35s cubic-bezier(0.22,1,0.36,1)' }}>
-        <div style={{ width: 36, height: 4, borderRadius: 100, background: 'rgba(26,26,46,0.12)', margin: '0 auto 24px' }} />
+      <div style={{ width: '100%', maxWidth: 560, margin: '0 auto', background: T.modalBg, borderRadius: '20px 20px 0 0', padding: '28px 20px 40px', animation: 'slideUpModal 0.35s cubic-bezier(0.22,1,0.36,1)' }}>
+        <div style={{ width: 36, height: 4, borderRadius: 100, background: T.isDark ? 'rgba(255,255,255,0.14)' : 'rgba(26,26,46,0.12)', margin: '0 auto 24px' }} />
 
         <div style={{ textAlign: 'center', marginBottom: 24 }}>
-          <h2 style={{ fontFamily: "'DM Serif Display', serif", fontSize: 24, color: '#1A1A2E', fontWeight: 400, margin: '0 0 6px' }}>Choose Loan Type</h2>
-          <p style={{ fontSize: 14, color: '#6B7280', margin: 0 }}>Select the loan that fits your situation</p>
+          <h2 style={{ fontFamily: "'DM Serif Display', serif", fontSize: 24, color: T.text, fontWeight: 400, margin: '0 0 6px' }}>Choose Loan Type</h2>
+          <p style={{ fontSize: 14, color: T.textSub, margin: 0 }}>Select the loan that fits your situation</p>
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginBottom: 20 }}>
@@ -470,31 +562,31 @@ function LoanTypeModal({ onClose, onSelect, loading }) {
               disabled={loading}
               style={{
                 display: 'flex', alignItems: 'flex-start', gap: 16, padding: '18px',
-                background: 'linear-gradient(135deg,rgba(5,150,105,0.06),rgba(16,185,129,0.03))',
-                border: '1.5px solid rgba(16,185,129,0.2)',
+                background: T.modalCardBg,
+                border: `1.5px solid ${T.modalCardBorder}`,
                 borderRadius: 14, cursor: 'pointer', textAlign: 'left', width: '100%',
                 transition: 'all 0.2s', opacity: loading ? 0.6 : 1,
                 fontFamily: "'DM Sans',system-ui,sans-serif",
               }}
               onMouseEnter={e => { e.currentTarget.style.borderColor = '#10B981'; e.currentTarget.style.boxShadow = '0 4px 20px rgba(16,185,129,0.2)' }}
-              onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(16,185,129,0.2)'; e.currentTarget.style.boxShadow = 'none' }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = T.modalCardBorder; e.currentTarget.style.boxShadow = 'none' }}
             >
               <div style={{ width: 46, height: 46, borderRadius: 12, flexShrink: 0, background: 'linear-gradient(135deg,#059669,#10B981)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(16,185,129,0.35)' }}>
                 {t.icon}
               </div>
               <div style={{ flex: 1 }}>
-                <p style={{ fontSize: 16, fontWeight: 700, color: '#1A1A2E', margin: '0 0 2px' }}>{t.title}</p>
-                <p style={{ fontSize: 12, color: '#6B7280', margin: '0 0 10px' }}>{t.subtitle}</p>
+                <p style={{ fontSize: 16, fontWeight: 700, color: T.text, margin: '0 0 2px' }}>{t.title}</p>
+                <p style={{ fontSize: 12, color: T.textSub, margin: '0 0 10px' }}>{t.subtitle}</p>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px 12px' }}>
                   {t.features.map(f => <span key={f} style={{ fontSize: 11, color: '#059669', fontWeight: 600 }}>✓ {f}</span>)}
                 </div>
               </div>
-              <ChevronRight />
+              <ChevronRight color={T.textSub} />
             </button>
           ))}
         </div>
 
-        <button onClick={onClose} style={{ width: '100%', padding: '14px', borderRadius: 12, background: 'rgba(26,26,46,0.04)', border: '1px solid rgba(26,26,46,0.08)', color: '#6B7280', fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: "'DM Sans',system-ui,sans-serif" }}>
+        <button onClick={onClose} style={{ width: '100%', padding: '14px', borderRadius: 12, background: T.isDark ? 'rgba(255,255,255,0.05)' : 'rgba(26,26,46,0.04)', border: `1px solid ${T.cardBorder}`, color: T.textSub, fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: "'DM Sans',system-ui,sans-serif" }}>
           Cancel
         </button>
       </div>
@@ -510,6 +602,7 @@ export default function Loans() {
   const loggedInUser = useUser()
   const { setPage } = usePage()
   const router = useRouter()
+  const T = useTokens()
   const currentLoan = loggedInUser.user?.currentLoan || null
   const [loans, setLoans] = useState([])
   const [loading, setLoading] = useState(true)
@@ -528,7 +621,6 @@ export default function Loans() {
       setLoading(true)
       try {
         const data = await getLoansFromClientId(loggedInUser.user.id)
-        console.log('loans', loggedInUser.user.id)
         setLoans(Array.isArray(data) ? data : [])
       } catch (e) { console.error(e) }
       finally { setLoading(false) }
@@ -573,25 +665,29 @@ export default function Loans() {
 
   return (
     <>
-      <div className="page-content page-enter" style={{ padding: 0, background: '#F7F5F0', minHeight: '100vh' }}>
+      <div className="page-content page-enter" style={{ padding: 0, background: T.page, minHeight: '100vh' }}>
 
-        {/* ── Header ──────────────────────────────────────────── */}
+        {/* ── Header (fixed: combined background, no absolute glow) ── */}
         <div style={{
-          background: 'linear-gradient(160deg, #0A0F1E 0%, #0F1930 55%, #071A10 100%)',
-          padding: '28px 20px 80px', position: 'relative', overflow: 'hidden',
+          background: `
+            radial-gradient(circle at 85% 15%, rgba(16,185,129,0.18) 0%, transparent 55%),
+            ${T.headerGrad}
+          `,
+          padding: '28px 20px 80px',
+          position: 'relative',
+          overflow: 'visible',
         }}>
-          <div style={{ position: 'absolute', top: -80, right: -60, width: 280, height: 280, borderRadius: '50%', background: 'radial-gradient(circle, rgba(16,185,129,0.12) 0%, transparent 70%)', pointerEvents: 'none' }} />
           <div style={{ maxWidth: 640, margin: '0 auto', position: 'relative', zIndex: 1 }}>
-            <p style={{ color: 'rgba(16,185,129,0.75)', fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', margin: '0 0 6px' }}>Loan Management</p>
+            <p style={{ color: T.headerEyebrow, fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', margin: '0 0 6px' }}>Loan Management</p>
             <h1 style={{ fontFamily: "'DM Serif Display', serif", fontSize: 'clamp(24px,5vw,32px)', color: '#fff', fontWeight: 400, margin: '0 0 6px' }}>My Loans</h1>
-            <p style={{ color: 'rgba(255,255,255,0.38)', fontSize: 13, margin: 0 }}>{loans.length} loan{loans.length !== 1 ? 's' : ''} total</p>
+            <p style={{ color: T.headerSub, fontSize: 13, margin: 0 }}>{loans.length} loan{loans.length !== 1 ? 's' : ''} total</p>
           </div>
         </div>
 
-        <div style={{ maxWidth: 640, margin: '0 auto', padding: '0 16px' }}>
+        <div style={{ maxWidth: 640, margin: '0 auto', padding: '0 16px', position: 'relative', zIndex: 2 }}>
 
           {/* ── Apply CTA (pulled up over header) ─────────────── */}
-          <div style={{ marginTop: -44, marginBottom: 24 }}>
+          <div style={{ marginTop: -44, marginBottom: 24, position: 'relative', zIndex: 3 }}>
             <button
               onClick={() => setShowModal(true)}
               disabled={applying}
@@ -618,12 +714,12 @@ export default function Loans() {
           {loading && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               {[1, 2, 3].map(i => (
-                <div key={i} className="vf-card" style={{ padding: 20, display: 'flex', gap: 14, alignItems: 'center' }}>
-                  <div className="skel-light skel" style={{ width: 44, height: 44, borderRadius: 12, flexShrink: 0 }} />
+                <div key={i} style={{ background: T.card, border: `1px solid ${T.cardBorder}`, borderRadius: 14, padding: 20, display: 'flex', gap: 14, alignItems: 'center' }}>
+                  <div style={{ background: T.skel, width: 44, height: 44, borderRadius: 12, flexShrink: 0 }} className="skel" />
                   <div style={{ flex: 1 }}>
-                    <div className="skel-light skel" style={{ height: 12, width: '40%', borderRadius: 4, marginBottom: 8 }} />
-                    <div className="skel-light skel" style={{ height: 22, width: '60%', borderRadius: 4, marginBottom: 8 }} />
-                    <div className="skel-light skel" style={{ height: 10, width: '30%', borderRadius: 4 }} />
+                    <div style={{ background: T.skel, height: 12, width: '40%', borderRadius: 4, marginBottom: 8 }} className="skel" />
+                    <div style={{ background: T.skel, height: 22, width: '60%', borderRadius: 4, marginBottom: 8 }} className="skel" />
+                    <div style={{ background: T.skel, height: 10, width: '30%', borderRadius: 4 }} className="skel" />
                   </div>
                 </div>
               ))}
@@ -633,7 +729,7 @@ export default function Loans() {
           {/* ── Active loans ──────────────────────────────────── */}
           {!loading && activeLoans.length > 0 && (
             <div style={{ marginBottom: 28 }}>
-              <SectionLabel>Active Loans</SectionLabel>
+              <SectionLabel T={T}>Active Loans</SectionLabel>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 {activeLoans.map((loan, i) => (
                   <LoanCard
@@ -643,6 +739,7 @@ export default function Loans() {
                     isSwitching={switchingId === loan.id}
                     onSelect={() => handleSelectLoan(loan.id)}
                     delay={i * 0.06}
+                    T={T}
                   />
                 ))}
               </div>
@@ -652,7 +749,7 @@ export default function Loans() {
           {/* ── Closed loans ─────────────────────────────────── */}
           {!loading && completedLoans.length > 0 && (
             <div style={{ marginBottom: 28 }}>
-              <SectionLabel>Closed Loans</SectionLabel>
+              <SectionLabel T={T}>Closed Loans</SectionLabel>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 {completedLoans.map((loan, i) => (
                   <LoanCard
@@ -663,6 +760,7 @@ export default function Loans() {
                     onSelect={() => { }}
                     delay={i * 0.05}
                     muted
+                    T={T}
                   />
                 ))}
               </div>
@@ -671,12 +769,12 @@ export default function Loans() {
 
           {/* ── Empty state ───────────────────────────────────── */}
           {!loading && loans.length === 0 && (
-            <div className="vf-card page-enter" style={{ padding: '48px 24px', textAlign: 'center', marginTop: 8 }}>
+            <div className="page-enter" style={{ background: T.card, border: `1px solid ${T.cardBorder}`, borderRadius: 16, padding: '48px 24px', textAlign: 'center', marginTop: 8 }}>
               <div style={{ width: 60, height: 60, borderRadius: 18, background: 'rgba(16,185,129,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
                 <EmptyIcon />
               </div>
-              <h3 style={{ fontFamily: "'DM Serif Display', serif", fontSize: 20, color: '#1A1A2E', fontWeight: 400, margin: '0 0 8px' }}>No Loans Yet</h3>
-              <p style={{ color: '#6B7280', fontSize: 14, lineHeight: 1.6, margin: '0 0 24px' }}>Apply for your first low-interest loan and receive funds within 24 hours.</p>
+              <h3 style={{ fontFamily: "'DM Serif Display', serif", fontSize: 20, color: T.text, fontWeight: 400, margin: '0 0 8px' }}>No Loans Yet</h3>
+              <p style={{ color: T.textSub, fontSize: 14, lineHeight: 1.6, margin: '0 0 24px' }}>Apply for your first low-interest loan and receive funds within 24 hours.</p>
               <button
                 onClick={() => setShowModal(true)}
                 style={{
@@ -704,14 +802,30 @@ export default function Loans() {
           loading={applying}
         />
       )}
+
+      <style>{`
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .skel { position: relative; overflow: hidden; }
+        .skel::after {
+          content: '';
+          position: absolute; inset: 0;
+          background: linear-gradient(90deg, transparent, rgba(16,185,129,0.10), transparent);
+          animation: skelShimmer 1.4s linear infinite;
+        }
+        @keyframes skelShimmer {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(100%); }
+        }
+      `}</style>
     </>
   )
 }
 
 // ── Loan card ─────────────────────────────────────────────────────
-function LoanCard({ loan, isCurrent, isSwitching, onSelect, delay, muted }) {
+function LoanCard({ loan, isCurrent, isSwitching, onSelect, delay, muted, T }) {
+  const STATUS_CONFIG = useStatusConfig()
   const s = loan.loanStatus
-  const cfg = STATUS_CONFIG[s] || { label: s, color: '#9CA3AF', bg: 'rgba(156,163,175,0.13)' }
+  const cfg = STATUS_CONFIG[s] || { label: s, color: T.textFaint, bg: T.skel }
   const amt = Number(loan.loanAmount || 0).toLocaleString()
 
   const outstanding = Number(loan.outstandingAmount) || 0
@@ -723,20 +837,20 @@ function LoanCard({ loan, isCurrent, isSwitching, onSelect, delay, muted }) {
       className="page-enter"
       onClick={muted ? undefined : onSelect}
       style={{
-        background: '#fff',
-        border: isCurrent ? '1.5px solid rgba(16,185,129,0.35)' : '1px solid rgba(26,26,46,0.07)',
+        background: T.card,
+        border: isCurrent ? '1.5px solid rgba(16,185,129,0.35)' : `1px solid ${T.cardBorder}`,
         borderLeft: `3px solid ${cfg.color}`,
         borderRadius: 14,
         padding: '18px 18px 16px',
         cursor: muted ? 'default' : 'pointer',
         transition: 'transform 0.15s, box-shadow 0.15s',
-        boxShadow: isCurrent ? '0 4px 20px rgba(5,150,105,0.12)' : '0 2px 10px rgba(0,0,0,0.04)',
+        boxShadow: isCurrent ? '0 4px 20px rgba(5,150,105,0.12)' : (T.isDark ? 'none' : '0 2px 10px rgba(0,0,0,0.04)'),
         opacity: muted ? 0.7 : 1,
         animationDelay: `${delay}s`,
         position: 'relative',
       }}
-      onMouseEnter={e => { if (!muted && !isCurrent) { e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.boxShadow = '0 6px 24px rgba(0,0,0,0.09)' } }}
-      onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = isCurrent ? '0 4px 20px rgba(5,150,105,0.12)' : '0 2px 10px rgba(0,0,0,0.04)' }}
+      onMouseEnter={e => { if (!muted && !isCurrent) { e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.boxShadow = T.isDark ? '0 6px 24px rgba(0,0,0,0.3)' : '0 6px 24px rgba(0,0,0,0.09)' } }}
+      onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = isCurrent ? '0 4px 20px rgba(5,150,105,0.12)' : (T.isDark ? 'none' : '0 2px 10px rgba(0,0,0,0.04)') }}
     >
       {/* Current badge */}
       {isCurrent && (
@@ -747,8 +861,8 @@ function LoanCard({ loan, isCurrent, isSwitching, onSelect, delay, muted }) {
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
         <div>
-          <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#6B7280', margin: '0 0 4px' }}>Loan #{loan.id}</p>
-          <p style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 22, fontWeight: 700, color: '#1A1A2E', margin: 0, letterSpacing: '-0.02em' }}>
+          <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: T.textSub, margin: '0 0 4px' }}>Loan #{loan.id}</p>
+          <p style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 22, fontWeight: 700, color: T.text, margin: 0, letterSpacing: '-0.02em' }}>
             K{amt}
           </p>
         </div>
@@ -761,20 +875,20 @@ function LoanCard({ loan, isCurrent, isSwitching, onSelect, delay, muted }) {
       <div style={{ display: 'flex', gap: 20, marginBottom: 12 }}>
         {loan.loanTerm > 0 && (
           <div>
-            <p style={{ fontSize: 9, color: '#9CA3AF', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', margin: '0 0 2px' }}>Term</p>
-            <p style={{ fontSize: 13, color: '#1A1A2E', fontWeight: 600, margin: 0 }}>{loan.loanTerm} months</p>
+            <p style={{ fontSize: 9, color: T.textFaint, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', margin: '0 0 2px' }}>Term</p>
+            <p style={{ fontSize: 13, color: T.text, fontWeight: 600, margin: 0 }}>{loan.loanTerm} months</p>
           </div>
         )}
         {outstanding > 0 && (
           <div>
-            <p style={{ fontSize: 9, color: '#9CA3AF', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', margin: '0 0 2px' }}>Outstanding</p>
-            <p style={{ fontSize: 13, color: '#F87171', fontWeight: 700, margin: 0, fontFamily: "'JetBrains Mono',monospace" }}>K{Number(outstanding).toLocaleString()}</p>
+            <p style={{ fontSize: 9, color: T.textFaint, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', margin: '0 0 2px' }}>Outstanding</p>
+            <p style={{ fontSize: 13, color: '#DC2626', fontWeight: 700, margin: 0, fontFamily: "'JetBrains Mono',monospace" }}>K{Number(outstanding).toLocaleString()}</p>
           </div>
         )}
         {loan.disbursementDate && (
           <div>
-            <p style={{ fontSize: 9, color: '#9CA3AF', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', margin: '0 0 2px' }}>Disbursed</p>
-            <p style={{ fontSize: 13, color: '#1A1A2E', fontWeight: 600, margin: 0 }}>{new Date(loan.disbursementDate).toLocaleDateString('en-ZM', { day: 'numeric', month: 'short', year: '2-digit' })}</p>
+            <p style={{ fontSize: 9, color: T.textFaint, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', margin: '0 0 2px' }}>Disbursed</p>
+            <p style={{ fontSize: 13, color: T.text, fontWeight: 600, margin: 0 }}>{new Date(loan.disbursementDate).toLocaleDateString('en-ZM', { day: 'numeric', month: 'short', year: '2-digit' })}</p>
           </div>
         )}
       </div>
@@ -783,10 +897,10 @@ function LoanCard({ loan, isCurrent, isSwitching, onSelect, delay, muted }) {
       {['disbursed', 'approved', 'accepted'].includes(s) && loan.loanAmount > 0 && (
         <div style={{ marginBottom: 12 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
-            <span style={{ fontSize: 10, color: '#9CA3AF' }}>Repaid</span>
+            <span style={{ fontSize: 10, color: T.textFaint }}>Repaid</span>
             <span style={{ fontSize: 10, color: '#059669', fontWeight: 700 }}>{pct}%</span>
           </div>
-          <div style={{ height: 5, background: 'rgba(26,26,46,0.06)', borderRadius: 100, overflow: 'hidden' }}>
+          <div style={{ height: 5, background: T.skel, borderRadius: 100, overflow: 'hidden' }}>
             <div style={{ height: '100%', width: `${pct}%`, background: 'linear-gradient(90deg,#059669,#10B981)', borderRadius: 100 }} />
           </div>
         </div>
@@ -794,10 +908,10 @@ function LoanCard({ loan, isCurrent, isSwitching, onSelect, delay, muted }) {
 
       {/* Footer — set as active prompt */}
       {!muted && !isCurrent && (
-        <div style={{ paddingTop: 12, borderTop: '1px solid rgba(26,26,46,0.06)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <span style={{ fontSize: 12, color: '#6B7280' }}>Tap to set as active loan</span>
+        <div style={{ paddingTop: 12, borderTop: `1px solid ${T.divider}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span style={{ fontSize: 12, color: T.textSub }}>Tap to set as active loan</span>
           <span style={{ fontSize: 12, color: '#059669', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4 }}>
-            {isSwitching ? 'Switching…' : <><span>Switch</span><ChevronRight /></>}
+            {isSwitching ? 'Switching…' : <><span>Switch</span><ChevronRight color="#059669" /></>}
           </span>
         </div>
       )}
@@ -805,14 +919,14 @@ function LoanCard({ loan, isCurrent, isSwitching, onSelect, delay, muted }) {
   )
 }
 
-function SectionLabel({ children }) {
-  return <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#6B7280', margin: '0 0 12px' }}>{children}</p>
+function SectionLabel({ children, T }) {
+  return <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: T.textSub, margin: '0 0 12px' }}>{children}</p>
 }
 
 // ── Icons ─────────────────────────────────────────────────────────
 function PlusIcon() { return <svg width={16} height={16} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg> }
 function EmptyIcon() { return <svg width={28} height={28} fill="none" viewBox="0 0 24 24" stroke="#10B981" strokeWidth={1.5}><rect x="2" y="5" width="20" height="14" rx="2" /><line x1="2" y1="10" x2="22" y2="10" /></svg> }
 function Spinner() { return <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} style={{ animation: 'spin 0.8s linear infinite', flexShrink: 0 }}><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" /></svg> }
-function ChevronRight() { return <svg width={14} height={14} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><polyline points="9 18 15 12 9 6" /></svg> }
+function ChevronRight({ color = 'currentColor' }) { return <svg width={14} height={14} fill="none" viewBox="0 0 24 24" stroke={color} strokeWidth={2.5}><polyline points="9 18 15 12 9 6" /></svg> }
 function BuildingIcon() { return <svg width={22} height={22} fill="none" viewBox="0 0 24 24" stroke="#fff" strokeWidth={1.7}><rect x="2" y="7" width="20" height="14" rx="2" /><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16" /></svg> }
 function WalletIcon() { return <svg width={22} height={22} fill="none" viewBox="0 0 24 24" stroke="#fff" strokeWidth={1.7}><path d="M20 12V8a2 2 0 00-2-2H4a2 2 0 00-2 2v8a2 2 0 002 2h14a2 2 0 002-2v-4" /><circle cx="18" cy="12" r="2" /></svg> }
