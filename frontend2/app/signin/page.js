@@ -469,7 +469,7 @@ export default function Signin() {
   /* ── identifier field renderer ─────────────── */
   const renderIdentifierField = (identifierName) => {
     const inputStyle = {
-      backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : '#fff',
+      backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(16, 185, 129, 0.02)',
       color: isDark ? '#fff' : '#0D1F17',
       borderColor: isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.18)',
     };
@@ -585,7 +585,7 @@ export default function Signin() {
                                   id="password-input"
                                   ref={passwordRef}
                                   style={{
-                                    backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : '#fff',
+                                    backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(16, 185, 129, 0.02)',
                                     color: isDark ? '#fff' : '#0D1F17',
                                     borderColor: isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.18)',
                                   }}

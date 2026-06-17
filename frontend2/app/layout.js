@@ -757,11 +757,10 @@ const Content = ({ children }) => {
   }
 
   // ── 2. Not logged in / not activated ────────────────────────
-  if (!user || status === false) {
+  if (!(user || false) || status === false) {
     if (typeof window !== 'undefined' && shouldRedirect(window.location.pathname)) {
       window.location.href = '/signin'
     }
-    return null
   }
 
   // ── 3. Logged in — normal render ────────────────────────────
