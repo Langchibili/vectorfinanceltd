@@ -60,6 +60,96 @@ backend/code.txt
 backend/code_collection.js
 
 
+# dependencies
+vectorfin/node_modules/
+
+# Expo
+vectorfin/.expo/
+vectorfin/dist/
+vectorfin/web-build/
+vectorfin/expo-env.d.ts
+
+# Native
+vectorfin/.kotlin/
+vectorfin/*.orig.*
+vectorfin/*.jks
+vectorfin/*.p8
+vectorfin/*.p12
+vectorfin/*.key
+vectorfin/*.mobileprovision
+
+# Metro
+vectorfin/.metro-health-check*
+
+# debug
+vectorfin/npm-debug.*
+vectorfin/yarn-debug.*
+vectorfin/yarn-error.*
+
+# macOS
+vectorfin/.DS_Store
+vectorfin/*.pem
+
+# local env files
+vectorfin/.env*.local
+
+# typescript
+vectorfin/*.tsbuildinfo
+vectorfin/AppleApptsx.txt
+vectorfin/dev-eas.txt
+
+# generated native folders
+vectorfin/ios
+vectorfin/android
+vectorfin/.env
+vectorfin/modules/**/android/.gradle/
+vectorfin/modules/**/android/build/
+
+# dependencies
+vectorfinadmin/node_modules/
+
+# Expo
+vectorfinadmin/.expo/
+vectorfinadmin/dist/
+vectorfinadmin/web-build/
+vectorfinadmin/expo-env.d.ts
+
+# Native
+vectorfinadmin/.kotlin/
+vectorfinadmin/*.orig.*
+vectorfinadmin/*.jks
+vectorfinadmin/*.p8
+vectorfinadmin/*.p12
+vectorfinadmin/*.key
+vectorfinadmin/*.mobileprovision
+
+# Metro
+vectorfinadmin/.metro-health-check*
+
+# debug
+vectorfinadmin/npm-debug.*
+vectorfinadmin/yarn-debug.*
+vectorfinadmin/yarn-error.*
+
+# macOS
+vectorfinadmin/.DS_Store
+vectorfinadmin/*.pem
+
+# local env files
+vectorfinadmin/.env*.local
+
+# typescript
+vectorfinadmin/*.tsbuildinfo
+vectorfinadmin/AppleApptsx.txt
+vectorfinadmin/dev-eas.txt
+
+# generated native folders
+vectorfinadmin/ios
+vectorfinadmin/android
+vectorfinadmin/.env
+vectorfinadmin/modules/**/android/.gradle/
+vectorfinadmin/modules/**/android/build/
+
 
 
 
