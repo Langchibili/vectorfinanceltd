@@ -14,8 +14,10 @@ import Select from '@mui/material/Select'
 import MenuItem from '@mui/material/MenuItem'
 import Stack from '@mui/material/Stack'
 import Alert from '@mui/material/Alert'
+import Box from '@mui/material/Box'
+import { ThemeProvider } from '@mui/material/styles'
+import { adminTheme, G } from '@/styles/admin-theme'
 import { updateLoan } from '@/Functions'
-import { Box } from '@mui/system'
 
 export default class RejectionForm extends React.Component {
   state = {
@@ -26,7 +28,6 @@ export default class RejectionForm extends React.Component {
     error: ''
   }
 
-  // Practical common reasons for loan rejection
   reasons = [
     { value: 'insufficient_collateral', label: 'Insufficient collateral' },
     { value: 'poor_credit_history', label: 'Poor credit history' },
@@ -40,94 +41,53 @@ export default class RejectionForm extends React.Component {
 
   open = () => this.setState({ open: true, error: '' })
   close = () => {
-    if(this.props.handleActionClose && typeof this.props.handleActionClose === 'function'){
-       this.props.handleActionClose()
+    if (this.props.handleActionClose && typeof this.props.handleActionClose === 'function') {
+      this.props.handleActionClose()
     }
     this.setState({ open: false, reasonKey: '', reasonText: '', loading: false, error: '' })
-   }
-
-  handleReasonChange = e => {
-    this.setState({ reasonKey: e.target.value, error: '' })
   }
 
-  handleTextChange = e => {
-    this.setState({ reasonText: e.target.value, error: '' })
-  }
+  handleReasonChange = e => { this.setState({ reasonKey: e.target.value, error: '' }) }
+  handleTextChange = e => { this.setState({ reasonText: e.target.value, error: '' }) }
 
-  // main reject that enforces a reason (unless reasonText provided)
-  
-  // main reject that enforces a reason (unless reasonText provided)
-submitWithReason = async () => {
-  const { reasonKey, reasonText } = this.state
-  const { loan, role, onUpdated } = this.props
-
-  // require either a chosen reason (not empty) or some text
-  if (!reasonKey && (!reasonText || String(reasonText).trim() === '')) {
-    this.setState({ error: 'Please select a reason or provide a reason in the text box' })
-    return
-  }
-
-  // if reasonKey is 'other' we also require reasonText
-  if (reasonKey === 'other' && (!reasonText || String(reasonText).trim() === '')) {
-    this.setState({ error: 'Please provide the reason in the text box' })
-    return
-  }
-
-  // derive the single human reason string: if other -> reasonText, else -> selected label
-  let humanReason = ''
-  if (reasonKey === 'other') {
-    humanReason = String(reasonText || '').trim()
-  } else if (reasonKey) {
-    const found = this.reasons.find(r => r.value === reasonKey)
-    humanReason = found ? found.label : String(reasonKey)
-  } else {
-    humanReason = String(reasonText || '').trim()
-  }
-
-  this.setState({ loading: true, error: '' })
-  try {
-    const updateData = {
-              data:{
-                  loanStatus:'rejected',
-                  loanRejectionReason:humanReason
-              }
+  submitWithReason = async () => {
+    const { reasonKey, reasonText } = this.state
+    const { loan, onUpdated } = this.props
+    if (!reasonKey && (!reasonText || String(reasonText).trim() === '')) {
+      this.setState({ error: 'Please select a reason or provide one in the text box' }); return
     }
-    const updated = await updateLoan(updateData, loan.id)
-    if (onUpdated && typeof onUpdated === 'function') {
-      onUpdated(updated)
+    if (reasonKey === 'other' && (!reasonText || String(reasonText).trim() === '')) {
+      this.setState({ error: 'Please provide the reason in the text box' }); return
     }
-    this.setState({ loading: false, open: false, reasonKey: '', reasonText: '' })
-  } catch (err) {
-    console.error('RejectionForm submit error', err)
-    this.setState({ loading: false, error: 'Failed to reject loan. Try again.' })
+    let humanReason = ''
+    if (reasonKey === 'other') { humanReason = String(reasonText || '').trim() }
+    else if (reasonKey) { const found = this.reasons.find(r => r.value === reasonKey); humanReason = found ? found.label : String(reasonKey) }
+    else { humanReason = String(reasonText || '').trim() }
+    this.setState({ loading: true, error: '' })
+    try {
+      const updateData = { data: { loanStatus: 'rejected', loanRejectionReason: humanReason } }
+      const updated = await updateLoan(updateData, loan.id)
+      if (onUpdated) onUpdated(updated)
+      this.setState({ loading: false, open: false, reasonKey: '', reasonText: '' })
+    } catch (err) {
+      this.setState({ loading: false, error: 'Failed to reject loan. Try again.' })
+    }
   }
-}
 
-// Reject without reason: always allowed, will send reason: null
-submitWithoutReason = async () => {
-  const { loan, role, onUpdated } = this.props
-  const confirm = window.confirm('Are you sure you want to reject this loan without providing a reason?')
-  if (!confirm) return
-
-  this.setState({ loading: true, error: '' })
-  try {
-    const updateData = {
-            data:{
-                loanStatus:'rejected'
-            }
+  submitWithoutReason = async () => {
+    const { loan, onUpdated } = this.props
+    const confirm = window.confirm('Are you sure you want to reject this loan without providing a reason?')
+    if (!confirm) return
+    this.setState({ loading: true, error: '' })
+    try {
+      const updateData = { data: { loanStatus: 'rejected' } }
+      const updated = await updateLoan(updateData, loan.id)
+      if (onUpdated) onUpdated(updated)
+      this.setState({ loading: false, open: false, reasonKey: '', reasonText: '' })
+    } catch (err) {
+      this.setState({ loading: false, error: 'Failed to reject loan. Try again.' })
     }
-    const updated = await updateLoan(updateData, loan.id)
-
-    if(onUpdated && typeof onUpdated === 'function') {
-      onUpdated(updated)
-    }
-    this.setState({ loading: false, open: false, reasonKey: '', reasonText: '' })
-  } catch (err) {
-    console.error('RejectionForm submitWithoutReason error', err)
-    this.setState({ loading: false, error: 'Failed to reject loan. Try again.' })
   }
-}
-
 
   render() {
     const { open, reasonKey, reasonText, loading, error } = this.state
@@ -135,16 +95,25 @@ submitWithoutReason = async () => {
     if (!loan) return null
 
     return (
-      <>
-        <Button variant="outlined" size="small" color="error" onClick={this.open}>
+      <ThemeProvider theme={adminTheme}>
+        <Button
+          variant="outlined"
+          size="small"
+          color="error"
+          onClick={this.open}
+          sx={{
+            color: G.red, borderColor: 'rgba(248,113,113,0.35)', borderRadius: '10px',
+            fontWeight: 600, textTransform: 'none',
+            '&:hover': { background: 'rgba(248,113,113,0.08)', borderColor: 'rgba(248,113,113,0.55)' },
+          }}
+        >
           Reject loan
         </Button>
 
         <Dialog open={open} onClose={() => this.close()} fullWidth maxWidth="sm">
           <DialogTitle>Reject Loan</DialogTitle>
-
           <DialogContent>
-            <Typography variant="body2" sx={{ mb: 2 }}>
+            <Typography variant="body2" sx={{ mb: 2, color: G.muted }}>
               Select a reason for rejecting this loan. You may also enter a custom reason below.
             </Typography>
 
@@ -182,31 +151,40 @@ submitWithoutReason = async () => {
               <Box sx={{ flex: 1 }}>
                 <Button
                   variant="contained"
-                  color="error"
                   onClick={this.submitWithReason}
                   disabled={loading}
                   fullWidth
+                  sx={{
+                    background: 'linear-gradient(135deg, #b91c1c, #dc2626)', color: '#fff',
+                    fontWeight: 700, borderRadius: '10px', textTransform: 'none',
+                    boxShadow: '0 4px 14px rgba(220,38,38,0.28)',
+                  }}
                 >
-                  {loading ? <CircularProgress size={18} /> : 'Reject'}
+                  {loading ? <CircularProgress size={18} sx={{ color: '#fff' }} /> : 'Reject'}
                 </Button>
               </Box>
-
               <Box sx={{ flex: 1 }}>
                 <Button
                   variant="outlined"
-                  color="error"
                   onClick={this.submitWithoutReason}
                   disabled={loading}
                   fullWidth
+                  sx={{
+                    color: G.red, borderColor: 'rgba(248,113,113,0.35)', borderRadius: '10px',
+                    textTransform: 'none',
+                    '&:hover': { background: 'rgba(248,113,113,0.08)' },
+                  }}
                 >
                   {loading ? <CircularProgress size={18} /> : 'Reject Without Reason'}
                 </Button>
               </Box>
             </Stack>
           </DialogActions>
-          <Button onClick={this.close} disabled={loading}>Cancel</Button>
+          <Button onClick={this.close} disabled={loading} sx={{ color: G.muted, textTransform: 'none', mx: 'auto', mb: 1 }}>
+            Cancel
+          </Button>
         </Dialog>
-      </>
+      </ThemeProvider>
     )
   }
 }

@@ -1,12 +1,13 @@
 "use client"
 
 import { useEffect } from "react"
+import { isNative, request } from "@/lib/nativeBridge"
 
 export default function logout({searchParams}) {
-    useEffect(()=>{
-      if(searchParams){
+    useEffect(() => {
+      if (searchParams && typeof window !== "undefined") {
          const {ref} = searchParams
-         if(typeof window !== "undefined"){
+         const finishLogout = () => {
             // Clear all localStorage and sessionStorage
             localStorage.clear();
             sessionStorage.clear();
@@ -19,6 +20,14 @@ export default function logout({searchParams}) {
             });
 
             window.location = ref === "admin"? "/admin" : "/"
+        }
+
+        if (isNative()) {
+           request("STOP_SERVICES")
+             .catch((error) => console.error("Could not stop native services during logout", error))
+             .finally(finishLogout)
+        } else {
+           finishLogout()
         }
       }
     },[searchParams])

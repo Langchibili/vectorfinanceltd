@@ -5,6 +5,18 @@ import { updateUserAccount } from "@/Functions";
 import { Slide } from "@material-ui/core";
 import React from "react";
 import WarningSnapBack from "../Includes/SnapBacks/WarningSnapBack";
+import { FORM_CSS } from "./FormTheme";
+
+/* ── inject CSS once ── */
+let _cssInjected = false;
+function injectCSS() {
+  if (typeof document === "undefined" || _cssInjected) return;
+  _cssInjected = true;
+  const tag = document.createElement("style");
+  tag.setAttribute("data-vf-forms", "1");
+  tag.textContent = FORM_CSS;
+  document.head.appendChild(tag);
+}
 
 export default class UpdateDetailsForm extends React.Component {
   constructor(props) {
@@ -16,279 +28,256 @@ export default class UpdateDetailsForm extends React.Component {
       gender: '',
       address: '',
       dateOfBirth: '',
-      // More fields can be added as necessary
       isFormValid: false,
       saving: false,
       saved: false,
-      error:null,
+      error: null,
       openErrorSnapBack: false,
       errorMessage: ''
     };
   }
 
   async componentDidMount() {
+    injectCSS();
     let details = this.props.loggedInUser.details;
-    if(this.props.formReOpened){ // this means a user has clicked the previous button on the next form
-        const loggedInUser = await checkUserLogginStatus()
-        details  = loggedInUser.user.details
+    if (this.props.formReOpened) {
+      const loggedInUser = await checkUserLogginStatus();
+      details = loggedInUser.user.details;
     }
-    // Set default values, ensure nulls are handled
     this.setState({
       firstname: details?.firstname || '',
       lastname: details?.lastname || '',
       age: details?.age || '',
       gender: details?.gender || '',
       address: details?.address || '',
-      dateOfBirth: details?.dateOfBirth
-        ? details.dateOfBirth // format MM/DD/YYYY
-        : '',
-    },()=>{
-      this.checkFormValidity(true)
+      dateOfBirth: details?.dateOfBirth ? details.dateOfBirth : '',
+    }, () => {
+      this.checkFormValidity(true);
     });
   }
 
   handleInputChange = (e) => {
-    //new Date(details.dateOfBirth).toLocaleDateString('en-US')
     const { name, value } = e.target;
-    // Update state based on field name
-    // name === "dateOfBirth"? new Date(value).toLocaleDateString('en-US') :
-    this.setState({ [name]: !value? '' : value, saved: false}, this.checkFormValidity);
+    this.setState({ [name]: !value ? '' : value, saved: false }, this.checkFormValidity);
   };
 
-  checkFormValidity = (initialCheck=false) => {
+  checkFormValidity = (initialCheck = false) => {
     const { firstname, lastname, age, gender, address, dateOfBirth } = this.state;
-
-    // Validate that all fields are filled
-    const isFormValid =
-      firstname.trim() &&
-      lastname.trim() &&
-      age &&
-      gender &&
-      address &&
-      dateOfBirth;
-
-      if(!initialCheck){
+    const isFormValid = firstname.trim() && lastname.trim() && age && gender && address && dateOfBirth;
+    if (!initialCheck) {
+      this.setState({ isFormValid });
+    } else {
+      if (isFormValid) {
+        this.setState({ isFormValid: isFormValid, saved: true });
+      } else {
         this.setState({ isFormValid });
       }
-      else{
-        if(isFormValid){
-          this.setState({ isFormValid:isFormValid, saved: true})
-        }
-        else{
-          this.setState({ isFormValid})
-        }
-      }
+    }
   }
 
-  handleSubmit = async (e)=>{
-     e.preventDefault()
-     const updateObject = this.state
-     delete updateObject.isFormValid
-     delete updateObject.saving
-     delete updateObject.error
-     
-     if(!updateObject.age){
-        updateObject.age = null
-     }
-     if(!updateObject.gender){
-        updateObject.gender = null
-     }
-     if(!updateObject.dateOfBirth){
-        updateObject.dateOfBirth = null
-     }
-     if(!updateObject.firstname){
-      updateObject.firstname = null
-     }
-     if(!updateObject.lastname){
-        updateObject.lastname = null
-     }
-     if(!updateObject.address){
-        updateObject.address = null
-     }
-     this.setState({
-        saving: true
-     })
-     const updatedUser = await updateUserAccount({details:updateObject},this.props.loggedInUser.id)
-     console.log(updatedUser)
-     if(updatedUser.hasOwnProperty('error')){
-        this.setState({
-            error: 'something went wrong, try again',
-            saving: false
-        })
-        return
-     }
-     this.checkFormValidity()
-     this.setState({
-        saving: false,
-        saved: true
-    })
+  handleSubmit = async (e) => {
+    e.preventDefault();
+    const updateObject = this.state;
+    delete updateObject.isFormValid;
+    delete updateObject.saving;
+    delete updateObject.error;
+    if (!updateObject.age) updateObject.age = null;
+    if (!updateObject.gender) updateObject.gender = null;
+    if (!updateObject.dateOfBirth) updateObject.dateOfBirth = null;
+    if (!updateObject.firstname) updateObject.firstname = null;
+    if (!updateObject.lastname) updateObject.lastname = null;
+    if (!updateObject.address) updateObject.address = null;
+    this.setState({ saving: true });
+    const updatedUser = await updateUserAccount({ details: updateObject }, this.props.loggedInUser.id);
+    if (updatedUser.hasOwnProperty('error')) {
+      this.setState({ error: 'Something went wrong, please try again.', saving: false });
+      return;
+    }
+    this.checkFormValidity();
+    this.setState({ saving: false, saved: true });
   }
 
-  handleOpenErrorSnapBack = ()=>{
-         this.setState({
-           openErrorSnapBack: false 
-         })
+  handleOpenErrorSnapBack = () => {
+    this.setState({ openErrorSnapBack: false });
+  }
+
+  handleNextButton = () => {
+    const { isFormValid, saved } = this.state;
+    if (!isFormValid) {
+      this.setState({ openErrorSnapBack: true, errorMessage: 'Please fill all fields and save before proceeding.' });
+      return;
     }
-  
-    handleNextButton = ()=>{
-      const {isFormValid,saved} = this.state
-      if(!isFormValid){
-        this.setState({
-          openErrorSnapBack: true,
-          errorMessage: 'Please ensure all fields are filled and saved before you can proceed.'
-        })
-        return
-      }
-      if(!saved){
-        this.setState({
-          openErrorSnapBack: true,
-          errorMessage: 'Please save the form to proceed.'
-        })
-        return
-      }
-      this.props.handleOpenUpdateClientDetailsForm()
-      updateUserAccount({basicDetailsUpdated:true},this.props.loggedInUser.id) //updating the basic details update status to true
+    if (!saved) {
+      this.setState({ openErrorSnapBack: true, errorMessage: 'Please save the form before proceeding.' });
+      return;
     }
-  
+    this.props.handleOpenUpdateClientDetailsForm();
+    updateUserAccount({ basicDetailsUpdated: true }, this.props.loggedInUser.id);
+  }
 
   render() {
-    const { firstname, lastname, age, gender, saved, address, dateOfBirth, isFormValid } = this.state;
+    const { firstname, lastname, age, gender, saved, address, dateOfBirth } = this.state;
+
+    const isPersonal = this.props.loanCategory === "personal";
 
     return (
       <Slide in={true} direction="left">
-        <div className="row">
-        {this.state.openErrorSnapBack? <WarningSnapBack handleOpenErrorSnapBack={this.handleOpenErrorSnapBack} errorMessage={this.state.errorMessage}/> : null}
-          <div className="col-lg-12">
-            <div className="card">
-              <div className="card-header align-items-center d-flex">
-                {this.props.loanCategory !== "personal"? <h4 className="card-title mb-0 flex-grow-1">Basic Details Of Either</h4> : <h4 className="card-title mb-0 flex-grow-1">Your Basic Details </h4>}
+        <div className="vf-page" style={{ paddingTop: 0 }}>
+          {this.state.openErrorSnapBack && (
+            <WarningSnapBack
+              handleOpenErrorSnapBack={this.handleOpenErrorSnapBack}
+              errorMessage={this.state.errorMessage}
+            />
+          )}
+
+          <div className="vf-page-inner" style={{ maxWidth: 640 }}>
+            <div className="vf-card">
+              {/* Header */}
+              <div className="vf-card-header">
+                <h2 className="vf-card-title">
+                  {!isPersonal ? "Basic Details" : "Your Basic Details"}
+                </h2>
+                {!isPersonal && (
+                  <p className="vf-card-subtitle">Owner · Representative · Board Member</p>
+                )}
               </div>
-              {this.props.loanCategory !== "personal"? <h6 style={{paddingLeft:'16px', marginTop:'10px'}}><small  style={{color:'gray'}}> (Owner/Representative/Board Member)</small></h6> : <></>}
-              <div className="card-body">
-                <div className="live-preview">
-                  <div className="row gy-4">
-                    <div className="col-xxl-3 col-md-6 col-lg-12">
-                      <div>
-                        <label htmlFor="firstnameInput" className="form-label">
-                          Firstname
-                        </label>
-                        <input
-                          className="form-control"
-                          id="firstnameInput"
-                          name="firstname"
-                          type="text"
-                          autoComplete="off"
-                          value={firstname}
-                          onChange={this.handleInputChange}
-                        />
-                      </div>
-                    </div>
-                    <div className="col-xxl-3 col-md-6 col-lg-12">
-                      <div>
-                        <label htmlFor="lastnameInput" className="form-label">
-                          Lastname
-                        </label>
-                        <input
-                          className="form-control"
-                          id="lastnameInput"
-                          name="lastname"
-                          type="text"
-                          autoComplete="off"
-                          value={lastname}
-                          onChange={this.handleInputChange}
-                        />
-                      </div>
-                    </div>
-                    <div className="col-lg-12">
-                      <div className="input-group">
-                        <span className="input-group-text" id="inputGroup-sizing-default">
-                          Age
-                        </span>
-                        <input
-                          type="number"
-                          name="age"
-                          value={age}
-                          autoComplete="off"
-                          onChange={this.handleInputChange}
-                          className="form-control"
-                          aria-label="Sizing example input"
-                          aria-describedby="inputGroup-sizing-default"
-                        />
-                      </div>
-                    </div>
-                    <div className="col-lg-12">
-                      <div className="input-group">
-                        <select
-                          className="form-select"
-                          id="inputGroupSelect02"
-                          name="gender"
-                          autoComplete="off"
-                          value={gender}
-                          onChange={this.handleInputChange}
-                        >
-                          <option value="">Choose...</option>
-                          <option value="male">Male</option>
-                          <option value="female">Female</option>
-                        </select>
-                        <label className="input-group-text" htmlFor="inputGroupSelect02">
-                          Gender
-                        </label>
-                      </div>
-                    </div>
-                    <div className="col-xxl-3 col-md-6 col-lg-12">
-                      <div>
-                        <label htmlFor="lastnameInput" className="form-label">
-                          Address <small  style={{color:'lightgray'}}>(House No. Area City Province)</small>
-                        </label>
-                        <input
-                          className="form-control"
-                          id="lastnameInput"
-                          name="address"
-                          type="text"
-                          autoComplete="off"
-                          value={address}
-                          onChange={this.handleInputChange}
-                        />
-                      </div>
-                    </div>
-                    <div className="col-xxl-3 col-md-6 col-lg-12">
-                            <div>
-                                <label htmlFor="exampleInputdate" className="form-label">
-                                Date Of Birth
-                                </label>
-                                <input type="date" name="dateOfBirth" defaultValue={dateOfBirth} onChange={this.handleInputChange} className="form-control" id="exampleInputdate" />
-                            </div>
+
+              <div className="vf-card-body">
+                {/* Name row */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+                  <div className="vf-field">
+                    <label className="vf-label">First Name</label>
+                    <input
+                      className="vf-input"
+                      name="firstname"
+                      type="text"
+                      autoComplete="off"
+                      value={firstname}
+                      onChange={this.handleInputChange}
+                      placeholder="John"
+                    />
                   </div>
+                  <div className="vf-field">
+                    <label className="vf-label">Last Name</label>
+                    <input
+                      className="vf-input"
+                      name="lastname"
+                      type="text"
+                      autoComplete="off"
+                      value={lastname}
+                      onChange={this.handleInputChange}
+                      placeholder="Banda"
+                    />
                   </div>
-                  
-                  {/* Save and Next Buttons */}
-                  <div style={{ width: "100%", display: "flex", justifyContent: "space-between" }}>
-                    <div style={{ width: "100%" }}>
-                      <button
-                        disabled={this.state.saving}
-                        onClick={this.handleSubmit}
-                        type="button"
-                        className="btn btn-success w-90 mt-3"
-                        id="confirm-btn"
-                        // Submit button logic to be handled separately
-                      >
-                        {this.state.saving? "Saving..." : "save"}
-                      </button>
-                    </div>
-                    {this.props.formDisplay === "profile"? <></> : <div style={{ width: "100%", textAlign: "right" }}>
-                      <button
-                        type="button"
-                        className="btn btn-danger w-50 mt-3"
-                        id="next-btn"
-                        onClick={() => { this.handleNextButton() }}
-                      >
-                        Next
-                      </button>
-                    </div>}
-                  </div>
-                 {this.state.error? <p className="text text-danger">{this.state.error}</p> : <></>}
-                 <p className="text text-warning mt-2">Note that all the information you provide here is kept strictly confidential, and it's solely meant for verification and loan eligibility determination purposes</p>
                 </div>
+
+                {/* Age + Gender row */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+                  <div className="vf-field">
+                    <label className="vf-label">Age</label>
+                    <input
+                      className="vf-input"
+                      type="number"
+                      name="age"
+                      value={age}
+                      autoComplete="off"
+                      onChange={this.handleInputChange}
+                      placeholder="25"
+                    />
+                  </div>
+                  <div className="vf-field">
+                    <label className="vf-label">Gender</label>
+                    <div style={{ position: 'relative' }}>
+                      <select
+                        className="vf-select"
+                        name="gender"
+                        value={gender}
+                        autoComplete="off"
+                        onChange={this.handleInputChange}
+                      >
+                        <option value="">Select…</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                      </select>
+                      <span style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: 'rgba(16,185,129,0.7)', fontSize: 10 }}>▼</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="vf-field">
+                  <label className="vf-label">Residential Address</label>
+                  <span className="vf-sublabel">House No. · Area · City · Province</span>
+                  <input
+                    className="vf-input"
+                    name="address"
+                    type="text"
+                    autoComplete="off"
+                    value={address}
+                    onChange={this.handleInputChange}
+                    placeholder="123 Kaunda Square, Lusaka, Lusaka Province"
+                  />
+                </div>
+
+                <div className="vf-field">
+                  <label className="vf-label">Date of Birth</label>
+                  <input
+                    className="vf-input"
+                    type="date"
+                    name="dateOfBirth"
+                    defaultValue={dateOfBirth}
+                    onChange={this.handleInputChange}
+                  />
+                </div>
+
+                {/* Summary strip */}
+                {saved && (
+                  <div style={{
+                    display: 'flex', alignItems: 'center', gap: 8,
+                    padding: '11px 14px', borderRadius: 10,
+                    background: 'rgba(16,185,129,0.09)',
+                    border: '1px solid rgba(16,185,129,0.22)',
+                    marginBottom: 16, animation: 'vfFadeIn 0.3s ease',
+                  }}>
+                    <span style={{ width: 20, height: 20, borderRadius: '50%', background: 'rgba(16,185,129,0.18)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 900, color: '#34D399', flexShrink: 0 }}>✓</span>
+                    <span style={{ fontSize: 13, color: '#6EE7B7', fontWeight: 500 }}>Details saved successfully</span>
+                  </div>
+                )}
+
+                {this.state.error && (
+                  <div className="vf-alert" style={{ background: 'rgba(220,38,38,0.09)', border: '1px solid rgba(220,38,38,0.25)', color: '#FCA5A5', marginBottom: 12 }}>
+                    <span className="vf-alert-icon" style={{ background: 'rgba(220,38,38,0.18)', color: '#FCA5A5' }}>✕</span>
+                    <span>{this.state.error}</span>
+                  </div>
+                )}
+
+                {/* Action buttons */}
+                <div className="vf-btn-row">
+                  <button
+                    type="button"
+                    className="vf-btn vf-btn-primary"
+                    disabled={this.state.saving}
+                    onClick={this.handleSubmit}
+                    style={{ flex: this.props.formDisplay === "profile" ? 1 : undefined }}
+                  >
+                    {this.state.saving ? (
+                      <><SpinnerIcon /> Saving…</>
+                    ) : saved ? '✓ Saved' : 'Save Details'}
+                  </button>
+
+                  {this.props.formDisplay !== "profile" && (
+                    <button
+                      type="button"
+                      className="vf-btn vf-btn-danger"
+                      onClick={this.handleNextButton}
+                    >
+                      Next →
+                    </button>
+                  )}
+                </div>
+
+                <p style={{ fontSize: 11.5, color: 'rgba(255,255,255,0.25)', marginTop: 18, lineHeight: 1.6 }}>
+                  All information is kept strictly confidential and used solely for verification and loan eligibility purposes.
+                </p>
               </div>
             </div>
           </div>
@@ -296,4 +285,13 @@ export default class UpdateDetailsForm extends React.Component {
       </Slide>
     );
   }
+}
+
+function SpinnerIcon() {
+  return (
+    <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} style={{ animation: 'spin 0.8s linear infinite' }}>
+      <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
+      <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
+    </svg>
+  );
 }

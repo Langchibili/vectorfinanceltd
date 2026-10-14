@@ -1,0 +1,62 @@
+vectorfinanceltd - USER PREFERENCES AND WORKING NOTES
+
+Project scope and safety
+- Make changes only inside the vectorfinanceltd project vectorfinanceltd is short for vector finance limited the project name. Do not modify neighboring
+  projects.
+- Preserve the MySQL data. Do not run destructive migrations, seed data, or
+  create persistent smoke-test records without approval.
+- Make changes only for verified issues. Inspect the relevant code and existing
+  patterns first; keep changes focused and update directly relevant docs or
+  todo-2 as appropriate.
+- Do not stop processes used by Windows or other system functions.
+- Before starting any service, check its configured port. Reuse a healthy
+  service already listening instead of starting duplicates. If a port is
+  occupied by an unknown or system process, do not stop it.
+- Relevant service ports: frontend 3005, admin 3006, Strapi backend 1350, main socket 4000,
+  device socket 3008. Native tooling has also used port 8081; check it before
+  starting or building native tooling.
+- Leave no redundant processes. Do not stop an existing process unless it is
+  known to be a vectorfinanceltd process started for the current task and stopping it
+  is safe.
+
+Build and browser verification workflow
+- Never run `npm run dev`. This is an explicit user constraint because dev
+  servers consume too many system resources. A later mention of running
+  `npm run dev` conflicts with this rule; prefer the explicit no-dev constraint.
+- For frontend changes, run `npm run build` first. Run the project ESLint as
+  appropriate, preferably focused on touched files before broader lint.
+- If browser inspection is needed, first check port 3005. Reuse an existing
+  healthy frontend when possible. Otherwise, use the production build and
+  `npm start` (not dev mode), then inspect the relevant pages in the browser.
+- Check browser console and network errors during relevant smoke tests. Stop
+  only the production process started for the task after inspection; do not
+  interfere with pre-existing or system processes.
+- For backend changes, build with `npm run build` in backend. Do not start
+  Strapi in dev mode. Check ports before any runtime validation.
+- Do not start apps just to inspect them when a build or static inspection is
+  enough. Do not launch redundant server instances.
+- Do not claim live browser, socket, device, or database verification unless
+  it was actually performed. Record manual follow-up checks in todo-2.
+
+Browser test account
+- The user named `test1@example.test` as the browser authentication account.
+- The user supplied a password in conversation. Do not copy passwords or other
+  credentials into project files, source control, logs, or final responses.
+- Use credentials only for authorized local vectorfinanceltd browser checks. If the
+  password is unavailable in a later session, ask the user rather than guessing
+  or reading unrelated files.
+
+Implementation and communication style
+- First inspect relevant files, current worktree changes, existing runtime
+  ports/processes when execution is proposed, and prior todo-2 notes.
+- Follow established project APIs, MUI components, notifications, socket
+  conventions, naming, and formatting. Prefer root-cause fixes over UI-only
+  workarounds.
+- Do not weaken endpoint authorization or grant permissions automatically.
+  Permission changes in Strapi Admin are manual and must be limited to required
+  roles.
+- Preserve unrelated worktree changes. Never revert another change just to
+  obtain a clean diff. Do not commit unless explicitly asked.
+- Report what changed, what validation passed or failed, existing lint
+  warnings where relevant, and any remaining live/manual verification.
+and if you must read the backend or add something i explicit say that you add, like some dummy data, use the token you can access at process.env.APIACCESSTOKEN

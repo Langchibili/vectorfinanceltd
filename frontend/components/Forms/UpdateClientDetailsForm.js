@@ -6,7 +6,17 @@ import React from "react";
 import Uploader from "../Includes/Uploader/Uploader";
 import { Slide } from "@material-ui/core";
 import WarningSnapBack from "../Includes/SnapBacks/WarningSnapBack";
-import { Alert } from "@mui/material";
+import { FORM_CSS } from "./FormTheme";
+
+let _cssInjected = false;
+function injectCSS() {
+  if (typeof document === "undefined" || _cssInjected) return;
+  _cssInjected = true;
+  const tag = document.createElement("style");
+  tag.setAttribute("data-vf-forms", "1");
+  tag.textContent = FORM_CSS;
+  document.head.appendChild(tag);
+}
 
 export default class UpdateClientDetailsForm extends React.Component {
   constructor(props) {
@@ -14,10 +24,9 @@ export default class UpdateClientDetailsForm extends React.Component {
     this.state = {
       employementStatus: this.props.loanCategory !== "personal" ? 'self-employed' : '',
       idType: '',
-      idNumber: '', // Added idNumber state property
+      idNumber: '',
       IDfront: null,
       IDback: null,
-      // More fields can be added as necessary
       isFormValid: false,
       saving: false,
       clientDetailsId: null,
@@ -27,43 +36,27 @@ export default class UpdateClientDetailsForm extends React.Component {
       errorMessage: '',
       clientId: null,
       hasLoan: this.props.loggedInUser.loans && this.props.loggedInUser.loans.length > 0
-    }
+    };
   }
 
   getClientDetails = async () => {
     return await fetch(api_url + '/users/me?populate=clientDetails.IDfront,clientDetails.IDback,', {
-      headers: {
-        'Authorization': `Bearer ${getJwt()}`,
-        'Content-Type': 'application/json'
-      }
-    })
-      .then(response => response.json())
-      .then(data => data)
+      headers: { 'Authorization': `Bearer ${getJwt()}`, 'Content-Type': 'application/json' }
+    }).then(r => r.json()).then(d => d);
   }
 
   async componentDidMount() {
-    console.log("this.props.constants",this.props.constants)
-    if(this.props.constants.loansInformation.allowSalaryLoans && this.props.constants.loansInformation.allowSalaryLoans === "no"){
-       this.setState({
-        employementStatus: "self-employed"
-       })
+    injectCSS();
+    if (this.props.constants.loansInformation.allowSalaryLoans === "no") {
+      this.setState({ employementStatus: "self-employed" });
     }
-    let { clientDetails } = this.props.loggedInUser; // because the user object has the client details, though no nrc
+    let { clientDetails } = this.props.loggedInUser;
     if (!clientDetails) {
-      const blankDetailsObject = {
-        employementStatus: null,
-        idType: null,
-        IDfront: null,
-        IDback: null
-      } // create a blank slate of clientDetails to obtain the component's id
-      const updatedUser = await updateUserAccount({ clientDetails: blankDetailsObject }, this.props.loggedInUser.id)
-      if (updatedUser.hasOwnProperty('error')) {
-        return
-      }
+      const updatedUser = await updateUserAccount({ clientDetails: { employementStatus: null, idType: null, IDfront: null, IDback: null } }, this.props.loggedInUser.id);
+      if (updatedUser.hasOwnProperty('error')) return;
     }
     const user = await this.getClientDetails();
-    clientDetails = user.clientDetails
-    // Set default values, ensure nulls are handled
+    clientDetails = user.clientDetails;
     this.setState({
       idNumber: clientDetails?.idNumber || '',
       employementStatus: clientDetails?.employementStatus || '',
@@ -71,421 +64,272 @@ export default class UpdateClientDetailsForm extends React.Component {
       IDfront: clientDetails?.IDfront || '',
       IDback: clientDetails?.IDback || '',
       clientDetailsId: clientDetails?.id || null
-    }, () => {
-      this.checkFormValidity(true)
-    })
+    }, () => { this.checkFormValidity(true); });
   }
 
   handleInputChange = (e) => {
-    //new Date(details.dateOfBirth).toLocaleDateString('en-US')
     const { name, value } = e.target;
-    // Update state based on field name
     this.setState({ [name]: !value ? '' : value, saved: false }, this.checkFormValidity);
   }
 
   checkFormValidity = (initialCheck = false) => {
     const { employementStatus, idNumber, idType, IDfront, IDback } = this.state;
-
-    // Validate that all fields are filled
-    const isFormValid =
-      idNumber.trim() &&
-      employementStatus.trim() &&
-      idType.trim() &&
-      IDfront &&
-      IDback;
-
+    const isFormValid = idNumber.trim() && employementStatus.trim() && idType.trim() && IDfront && IDback;
     if (!initialCheck) {
       this.setState({ isFormValid });
-    }
-    else {
-      if (isFormValid) {
-        this.setState({ isFormValid: isFormValid, saved: true })
-      }
-      else {
-        this.setState({ isFormValid })
-      }
+    } else {
+      if (isFormValid) { this.setState({ isFormValid, saved: true }); }
+      else { this.setState({ isFormValid }); }
     }
   }
 
   handleSubmit = async (e) => {
-    e.preventDefault()
-    const { employementStatus, idType, clientDetailsId, idNumber, IDfront, IDback, saved, isFormValid } = this.state;
+    e.preventDefault();
+    const { employementStatus, idType, clientDetailsId, idNumber, IDfront, IDback } = this.state;
     if (!employementStatus || !idType) {
-      this.setState({
-        errorMessage: 'Please ensure all fields are filled.',
-        openErrorSnapBack: true,
-        saving: false
-      })
-      return
+      this.setState({ errorMessage: 'Please ensure all fields are filled.', openErrorSnapBack: true, saving: false });
+      return;
     }
-
-    const clientIdStatus = await checkClientIdStatus(idNumber,this.props.loggedInUser.id)
-    if(clientIdStatus === 'id-taken'){
-      this.setState({
-        errorMessage: 'Someone is already using this '+idType,
-        openErrorSnapBack: true
-      })
-      return
+    const clientIdStatus = await checkClientIdStatus(idNumber, this.props.loggedInUser.id);
+    if (clientIdStatus === 'id-taken') {
+      this.setState({ errorMessage: 'Someone is already using this ' + idType, openErrorSnapBack: true });
+      return;
     }
-
-    const updateObject = this.state
-    delete updateObject.isFormValid
-    delete updateObject.saving
-    delete updateObject.error
-    delete updateObject.IDfront
-    delete updateObject.IDback
-    delete updateObject.clientDetailsId
-
-    if(!updateObject.employementStatus){
-      updateObject.employementStatus = null
-    }
-
-    if(!updateObject.idType){
-      updateObject.idType = null
-    }
-
-    this.setState({
-      saving: true,
-      IDfront: IDfront,
-      IDback: IDback,
-      clientDetailsId: clientDetailsId
-    })
-    
-    updateObject.id = clientDetailsId
-    const updatedUser = await updateUserAccount({ clientDetails: updateObject }, this.props.loggedInUser.id)
+    const updateObject = this.state;
+    delete updateObject.isFormValid;
+    delete updateObject.saving;
+    delete updateObject.error;
+    delete updateObject.IDfront;
+    delete updateObject.IDback;
+    delete updateObject.clientDetailsId;
+    if (!updateObject.employementStatus) updateObject.employementStatus = null;
+    if (!updateObject.idType) updateObject.idType = null;
+    this.setState({ saving: true, IDfront, IDback, clientDetailsId });
+    updateObject.id = clientDetailsId;
+    const updatedUser = await updateUserAccount({ clientDetails: updateObject }, this.props.loggedInUser.id);
     if (updatedUser.hasOwnProperty('error')) {
-      this.setState({
-        error: 'something went wrong, try again',
-        saving: false,
-        IDfront: IDfront,
-        IDback: IDback,
-        clientDetailsId: clientDetailsId
-      })
-      return
+      this.setState({ error: 'Something went wrong, try again.', saving: false, IDfront, IDback, clientDetailsId });
+      return;
     }
-    this.setState({
-      saving: false,
-      IDfront: IDfront,
-      IDback: IDback,
-      clientDetailsId: clientDetailsId,
-      saved: true
-    }, () => {
-      this.checkFormValidity()
-      console.log(this.state)
-    })
-    
+    this.setState({ saving: false, IDfront, IDback, clientDetailsId, saved: true }, () => {
+      this.checkFormValidity();
+    });
   }
 
   addIDfront = (files) => {
-    if (!this.state.IDfront) {
-      this.setState({
-        IDfront: files,
-        saving: false,
-        error: null
-      }, () => {
-        this.checkFormValidity()
-      })
-    }
-    else {
-      const newFiles = [...this.state.IDfront, ...files]
-      this.setState({
-        IDfront: newFiles,
-        saving: false,
-        error: null
-      }, () => {
-        this.checkFormValidity()
-      })
-    }
+    this.setState({ IDfront: this.state.IDfront ? [...this.state.IDfront, ...files] : files, saving: false, error: null }, this.checkFormValidity);
   }
   addIDback = (files) => {
-    if (!this.state.IDback) {
-      this.setState({
-        IDback: files,
-        saving: false,
-        error: null
-      }, () => {
-        this.checkFormValidity()
-      })
-    }
-    else {
-      const newFiles = [...this.state.IDback, ...files]
-      this.setState({
-        IDback: newFiles,
-        saving: false,
-        error: null
-      }, () => {
-        this.checkFormValidity()
-      })
-    }
+    this.setState({ IDback: this.state.IDback ? [...this.state.IDback, ...files] : files, saving: false, error: null }, this.checkFormValidity);
   }
 
   handleRemoveImage = async (uploadid, filesArr, arrName) => {
     const removed = await fetch(api_url + '/upload/files/' + uploadid, {
       method: 'DELETE',
-      headers: {
-        'Authorization': `Bearer ${getJwt()}`,
-        'Content-Type': 'application/json'
-      }
-    }).then(response => response.json())
-      .then(data => data)
-      .catch(error => console.error(error))
+      headers: { 'Authorization': `Bearer ${getJwt()}`, 'Content-Type': 'application/json' }
+    }).then(r => r.json()).then(d => d).catch(e => console.error(e));
     if (removed) {
-      // remove from state
-      const newArray = filesArr.filter((file) => {
-        return file.id !== uploadid
-      })
-      this.setState({
-        [arrName]: newArray.length < 1 ? null : newArray
-      }, () => {
-        this.checkFormValidity()
-      })
-      // remove from the dom
+      const newArray = filesArr.filter(f => f.id !== uploadid);
+      this.setState({ [arrName]: newArray.length < 1 ? null : newArray }, this.checkFormValidity);
       if (typeof document !== 'undefined') {
-        document.getElementById("#" + uploadid).style.display = "none"
+        document.getElementById("#" + uploadid).style.display = "none";
       }
     }
   }
 
   renderFiles = (files, arrName) => {
-    if (!files) {
-      return <></>
-    }
+    if (!files) return <></>;
     return files.map((file) => {
-      if (file.hasOwnProperty("attributes")) {
-        file.attributes.id = file.id
-        file = file.attributes
-      }
-      if (file.mime.startsWith('application/')) {
-        return (<div id={"#" + file.id} key={file.id}>
-          <p>File: <strong>{file.name}</strong></p>
-          <button className="btn btn-sm btn-danger" onClick={() => { this.handleRemoveImage(file.id, files, arrName) }}>Remove</button>
-        </div>)
-      }
-      else if (file.mime.startsWith('image/')) {
-        return (<div id={"#" + file.id} key={file.id}>
-          <img className="mt-1 mb-1" style={{ width: '35%' }} src={getImage(file, "thumbnail")} />
-          <button className="btn btn-sm btn-danger" onClick={() => { this.handleRemoveImage(file.id, files, arrName) }}>Remove</button>
-        </div>)
-      }
-      else {
-        return (<div id={"#" + file.id} key={file.id}>
-          <p className="text text-warning">File failed to be displayed</p>
-          <button className="btn btn-sm btn-danger" onClick={() => { this.handleRemoveImage(file.id, files, arrName) }}>Remove</button>
-        </div>)
-      }
-    })
-  }
-
-  renderEmploymentSection = (handleInputChange, employementStatus) => {
-    if (this.props.purpose) {
-      if (this.props.purpose === "investment") {
-        return <></>
-      }
-    }
-    return (
-      <div className="row gy-4">
-        {this.props.loanCategory === "personal" ? <div className="col-lg-12">
-          <div className="input-group">
-            <label className="input-group-text" htmlFor="inputGroupSelect02">
-              Employement Status
-            </label>
-            <select
-              className="form-select"
-              id="inputGroupSelect01"
-              name="employementStatus"
-              autoComplete="off"
-              value={employementStatus}
-              disabled={!this.state.clientDetailsId}
-              onChange={handleInputChange}
-            >
-              <option value="">Choose...</option>
-              {this.props.constants.loansInformation.allowSalaryLoans && this.props.constants.loansInformation.allowSalaryLoans === "no"? null : <option value="employed">Employed</option>}
-              <option value="self-employed">Self-Employed</option>
-              <option value="unemployed">UnEmployed</option>
-            </select>
+      if (file.hasOwnProperty("attributes")) { file.attributes.id = file.id; file = file.attributes; }
+      if (file.mime.startsWith('image/')) {
+        return (
+          <div id={"#" + file.id} key={file.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px', borderRadius: 10, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', marginTop: 8 }}>
+            <img style={{ width: 48, height: 48, objectFit: 'cover', borderRadius: 8 }} src={getImage(file, "thumbnail")} alt={file.name} />
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <p style={{ margin: 0, fontSize: 12, color: 'rgba(255,255,255,0.7)', fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{file.name}</p>
+            </div>
+            <button className="vf-btn vf-btn-danger" style={{ padding: '6px 12px', fontSize: 12, borderRadius: 8, minWidth: 'auto', flex: 'none' }} onClick={() => { this.handleRemoveImage(file.id, files, arrName); }}>Remove</button>
           </div>
-        </div> : <></>
-        }
-      </div>
-    )
-  }
-
-  renderFormTitle = () => {
-    if (this.props.purpose) {
-      if (this.props.purpose === "investment") {
-        return (<div className="card-header align-items-center d-flex">
-          <h5 className="card-title mb-0 flex-grow-1"> Identity Details </h5>
-        </div>)
+        );
       }
-    }
-    else {
       return (
-        <><div className="card-header align-items-center d-flex">
-          <h5 className="card-title mb-0 flex-grow-1">{this.props.loanCategory === "personal" ? "Employement Status & Id" : "Identity Details Of"}</h5>
+        <div id={"#" + file.id} key={file.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px', borderRadius: 10, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', marginTop: 8 }}>
+          <div style={{ width: 36, height: 36, borderRadius: 8, background: 'rgba(16,185,129,0.10)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>📄</div>
+          <p style={{ flex: 1, margin: 0, fontSize: 12, color: 'rgba(255,255,255,0.7)', fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{file.name}</p>
+          <button className="vf-btn vf-btn-danger" style={{ padding: '6px 12px', fontSize: 12, borderRadius: 8, minWidth: 'auto', flex: 'none' }} onClick={() => { this.handleRemoveImage(file.id, files, arrName); }}>Remove</button>
         </div>
-          {this.props.loanCategory !== "personal" ? <h6 style={{ paddingLeft: '16px', marginTop: '10px' }}><small style={{ color: 'gray' }}> (Owner/Representative/Board Member)</small></h6> : <></>}</>
-      )
-    }
+      );
+    });
   }
 
-  handleOpenErrorSnapBack = ()=>{
-       this.setState({
-         openErrorSnapBack: false 
-       })
-  }
+  handleOpenErrorSnapBack = () => { this.setState({ openErrorSnapBack: false }); }
 
-  handleNextButton = ()=>{
-    const {isFormValid,saved} = this.state
-    if(!isFormValid){
-      this.setState({
-        openErrorSnapBack: true,
-        errorMessage: 'Please ensure all fields are filled and saved before you can proceed.'
-      })
-      return
-    }
-    if(!saved){
-      this.setState({
-        openErrorSnapBack: true,
-        errorMessage: 'Please save the form to proceed.'
-      })
-      return
-    }
-    this.props.handleOpenAddLoanAmountForm()
-    updateUserAccount({identityDetailsUpdated:true},this.props.loggedInUser.id) //updating the basic details update status to true
+  handleNextButton = () => {
+    const { isFormValid, saved } = this.state;
+    if (!isFormValid) { this.setState({ openErrorSnapBack: true, errorMessage: 'Please fill all fields and save before proceeding.' }); return; }
+    if (!saved) { this.setState({ openErrorSnapBack: true, errorMessage: 'Please save the form before proceeding.' }); return; }
+    this.props.handleOpenAddLoanAmountForm();
+    updateUserAccount({ identityDetailsUpdated: true }, this.props.loggedInUser.id);
   }
 
   render() {
-    const { employementStatus, idType, hasLoan, saved, isFormValid } = this.state;
-    const idAddedStyles = {
-      marginTop:'10px',
-      padding: '10px', 
-      backgroundColor: '#f2f2f2', // Use a light gray color
-      opacity: 0.8, // Reduce opacity for a more subtle effect
-      pointerEvents: 'none', // Disable pointer events on the content
-    }; // if id has been added already and a loan has been created with it
+    const { employementStatus, idType, hasLoan, saved } = this.state;
+    const isPersonal = this.props.loanCategory === "personal";
+    const isInvestment = this.props.purpose === "investment";
+    const allowSalary = !(this.props.constants.loansInformation.allowSalaryLoans === "no");
+
+    const lockedStyle = hasLoan ? { opacity: 0.45, pointerEvents: 'none', filter: 'grayscale(0.3)' } : {};
+
     return (
       <Slide in={true} direction="left">
-        <div className="row">
-          {this.state.openErrorSnapBack? <WarningSnapBack handleOpenErrorSnapBack={this.handleOpenErrorSnapBack} errorMessage={this.state.errorMessage}/> : null}
-          <div className="col-lg-12">
-            <div className="card">
-              {this.renderFormTitle()}
-              <div className="card-body">
-                <div className="live-preview">
-                  {this.renderEmploymentSection(this.handleInputChange, employementStatus)}
-                  <div className="col-lg-12 mt-4">
-                    <div className="input-group">
-                      <label className="input-group-text" htmlFor="inputGroupSelect02">
-                        Select Id Type
-                      </label>
+        <div className="vf-page" style={{ paddingTop: 0 }}>
+          {this.state.openErrorSnapBack && (
+            <WarningSnapBack handleOpenErrorSnapBack={this.handleOpenErrorSnapBack} errorMessage={this.state.errorMessage} />
+          )}
+
+          <div className="vf-page-inner" style={{ maxWidth: 640 }}>
+            <div className="vf-card">
+              <div className="vf-card-header">
+                <h2 className="vf-card-title">
+                  {isInvestment ? "Identity Details" : isPersonal ? "Employment & Identity" : "Identity Details"}
+                </h2>
+                {!isPersonal && !isInvestment && (
+                  <p className="vf-card-subtitle">Owner · Representative · Board Member</p>
+                )}
+              </div>
+
+              <div className="vf-card-body">
+                {/* Employment status — only for personal loans, not investment */}
+                {!isInvestment && isPersonal && (
+                  <div className="vf-field">
+                    <label className="vf-label">Employment Status</label>
+                    <div style={{ position: 'relative' }}>
                       <select
-                        className="form-select"
-                        id="inputGroupSelect01"
-                        name="idType"
+                        className="vf-select"
+                        name="employementStatus"
+                        value={employementStatus}
+                        disabled={!this.state.clientDetailsId}
                         autoComplete="off"
-                        value={idType}
-                        disabled={!this.state.clientDetailsId|| hasLoan}
                         onChange={this.handleInputChange}
                       >
-                        <option value="">Choose...</option>
-                        <option value="nrc">Nrc</option>
-                        <option value="passport">Passport</option>
-                        <option value="driving-license">Driving License</option>
+                        <option value="">Select status…</option>
+                        {allowSalary && <option value="employed">Employed</option>}
+                        <option value="self-employed">Self-Employed</option>
+                        <option value="unemployed">Unemployed</option>
                       </select>
+                      <span style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: 'rgba(16,185,129,0.7)', fontSize: 10 }}>▼</span>
                     </div>
                   </div>
-                  {/* Conditionally render the ID Number input when an idType is selected */}
-                  {this.state.idType && (
-                    <div className="col-lg-12 mt-4">
-                      <div className="input-group">
-                        <label className="input-group-text" htmlFor="idNumberInput">
-                          Enter ID Number
-                        </label>
-                        <input
-                          type="text"
-                          className="form-control"
-                          id="idNumberInput"
-                          name="idNumber"
-                          disabled={hasLoan}
-                          autoComplete="off"
-                          value={this.state.idNumber}
-                          onChange={this.handleInputChange}
-                        />
-                      </div>
+                )}
+
+                <hr className="vf-divider" />
+
+                {/* ID Type */}
+                <div className="vf-field">
+                  <label className="vf-label">ID Type</label>
+                  <div style={{ position: 'relative' }}>
+                    <select
+                      className="vf-select"
+                      name="idType"
+                      value={idType}
+                      disabled={!this.state.clientDetailsId || hasLoan}
+                      autoComplete="off"
+                      onChange={this.handleInputChange}
+                    >
+                      <option value="">Select ID type…</option>
+                      <option value="nrc">NRC</option>
+                      <option value="passport">Passport</option>
+                      <option value="driving-license">Driving Licence</option>
+                    </select>
+                    <span style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: 'rgba(16,185,129,0.7)', fontSize: 10 }}>▼</span>
+                  </div>
+                </div>
+
+                {/* ID Number */}
+                {idType && (
+                  <div className="vf-field" style={{ animation: 'vfFadeIn 0.3s ease' }}>
+                    <label className="vf-label">ID Number</label>
+                    <input
+                      className="vf-input"
+                      type="text"
+                      name="idNumber"
+                      autoComplete="off"
+                      disabled={hasLoan}
+                      value={this.state.idNumber}
+                      onChange={this.handleInputChange}
+                      placeholder="Enter your ID number"
+                    />
+                  </div>
+                )}
+
+                {/* Lock notice */}
+                {hasLoan && (
+                  <div className="vf-alert" style={{ background: 'rgba(245,158,11,0.09)', border: '1px solid rgba(245,158,11,0.25)', color: '#FCD34D', marginBottom: 12 }}>
+                    <span className="vf-alert-icon" style={{ background: 'rgba(245,158,11,0.18)', color: '#FCD34D' }}>!</span>
+                    <span>Identity details cannot be changed once a loan is active. Contact us from the Help page to request updates.</span>
+                  </div>
+                )}
+
+                {/* ID Documents */}
+                {this.state.clientDetailsId && (
+                  <div style={lockedStyle}>
+                    <hr className="vf-divider" />
+
+                    <div className="vf-section-title">
+                      <span className="vf-section-title-bar" />
+                      <h5>ID Documents</h5>
                     </div>
-                  )}
-                  <div id="identity-documents" style={hasLoan? idAddedStyles : {}}>
-                  {hasLoan? <Alert severity="warning" style={{marginBottom:'10px'}}> Connot update Identity details after you have initiated at least 1 loan.</Alert>: <></>}
-                  {hasLoan? <Alert severity="info" style={{marginBottom:'10px'}}> To have your details removed or updated, please contact us from the help page.</Alert>: <></>}
-                  {this.state.clientDetailsId ? <>
-                    <div style={{ marginTop: '20px' }}>
-                      <h5>Valid ID<small style={{ color: 'gray' }}> (Front Side)</small></h5><small style={{ color: 'lightgray' }}>(NRC or Passport or Driving Licence)</small>
-                      <Uploader
-                        addFiles={this.addIDfront}
-                        displayType="circular"
-                        refId={this.state.clientDetailsId}
-                        refName="user-profile.client-details"
-                        fieldName="IDfront"
-                        allowMultiple={false}
-                        allowedTypes={['image/*', 'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain', 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']}
-                      />
-                      <small style={{ color: 'lightgray' }}>(image or document)</small>
+                    <span className="vf-sublabel" style={{ marginBottom: 16, display: 'block' }}>NRC · Passport · Driving Licence</span>
+
+                    <div>
+                      <label className="vf-label" style={{ marginBottom: 10 }}>Front Side</label>
+                      <Uploader addFiles={this.addIDfront} displayType="circular" refId={this.state.clientDetailsId} refName="user-profile.client-details" fieldName="IDfront" allowMultiple={false} allowedTypes={['image/*', 'application/pdf']} />
                       {this.renderFiles(this.state.IDfront, "IDfront")}
                     </div>
-                    <div style={{ marginTop: '10px' }}>
-                      <h5>Valid ID<small style={{ color: 'gray' }}> (Back Side)</small></h5> <small style={{ color: 'lightgray' }}>(NRC or Passport or Driving Licence)</small>
-                      <Uploader
-                        addFiles={this.addIDback}
-                        displayType="circular"
-                        refId={this.state.clientDetailsId}
-                        refName="user-profile.client-details"
-                        fieldName="IDback"
-                        allowMultiple={false}
-                        allowedTypes={['image/*', 'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain', 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']}
-                      />
-                      <small style={{ color: 'lightgray' }}>(image or document)</small>
+                    <div>
+                      <label className="vf-label" style={{ marginBottom: 10 }}>Back Side</label>
+                      <Uploader addFiles={this.addIDback} displayType="circular" refId={this.state.clientDetailsId} refName="user-profile.client-details" fieldName="IDback" allowMultiple={false} allowedTypes={['image/*', 'application/pdf']} />
                       {this.renderFiles(this.state.IDback, "IDback")}
                     </div>
-                  </> : <></>}
-                </div>
-                  {/* Save and Next Buttons */}
-                  <div style={{ width: "100%", display: "flex", justifyContent: "space-between" }}>
-                    <div style={{ width: "100%" }}>
-                      <button
-                        disabled={this.state.saving}
-                        onClick={this.handleSubmit}
-                        type="button"
-                        className="btn btn-success w-90 mt-3"
-                        id="confirm-btn"
-                        // Submit button logic to be handled separately
-                      >
-                        {this.state.saving ? "Saving..." : "save"}
-                      </button>
-                    </div>
-                    {this.props.formDisplay === "profile" ? <></> : <div style={{ width: "100%", textAlign: "right" }}>
-                      <button
-                        type="button"
-                        className="btn btn-info w-90 mt-3"
-                        id="next-btn"
-                        onClick={() => { this.props.handleOpenUpdateDetailsForm(); this.props.handleFormReopen(); }}
-                      >
-                        Previous
-                      </button>
-                    </div>}
-                    {this.props.formDisplay === "profile" ? <></> : <div style={{ width: "100%", textAlign: "right" }}>
-                      <button
-                        type="button"
-                        className="btn btn-danger w-90 mt-3"
-                        id="next-btn"
-                        onClick={() => { this.handleNextButton() }}
-                      >
-                        Next
-                      </button>
-                    </div>}
                   </div>
-                  {this.state.error ? <p className="text text-danger">{this.state.error}</p> : <></>}
-                  <p className="text text-warning mt-2">Note that all the information you provide here is kept strictly confidential, and it's solely meant for verification and loan eligibility determination purposes</p>
+                )}
+
+                {/* Saved confirmation */}
+                {saved && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '11px 14px', borderRadius: 10, background: 'rgba(16,185,129,0.09)', border: '1px solid rgba(16,185,129,0.22)', marginTop: 16, marginBottom: 8, animation: 'vfFadeIn 0.3s ease' }}>
+                    <span style={{ width: 20, height: 20, borderRadius: '50%', background: 'rgba(16,185,129,0.18)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 900, color: '#34D399', flexShrink: 0 }}>✓</span>
+                    <span style={{ fontSize: 13, color: '#6EE7B7', fontWeight: 500 }}>Identity details saved</span>
+                  </div>
+                )}
+
+                {this.state.error && (
+                  <div className="vf-alert" style={{ background: 'rgba(220,38,38,0.09)', border: '1px solid rgba(220,38,38,0.25)', color: '#FCA5A5', marginTop: 12 }}>
+                    <span className="vf-alert-icon" style={{ background: 'rgba(220,38,38,0.18)', color: '#FCA5A5' }}>✕</span>
+                    <span>{this.state.error}</span>
+                  </div>
+                )}
+
+                {/* Action buttons */}
+                <div className="vf-btn-row">
+                  <button type="button" className="vf-btn vf-btn-primary" disabled={this.state.saving} onClick={this.handleSubmit}>
+                    {this.state.saving ? <><SpinnerIcon /> Saving…</> : saved ? '✓ Saved' : 'Save Details'}
+                  </button>
+
+                  {this.props.formDisplay !== "profile" && (
+                    <>
+                      <button type="button" className="vf-btn vf-btn-outline" onClick={() => { this.props.handleOpenUpdateDetailsForm(); this.props.handleFormReopen(); }}>
+                        ← Previous
+                      </button>
+                      <button type="button" className="vf-btn vf-btn-danger" onClick={this.handleNextButton}>
+                        Next →
+                      </button>
+                    </>
+                  )}
                 </div>
+
+                <p style={{ fontSize: 11.5, color: 'rgba(255,255,255,0.25)', marginTop: 18, lineHeight: 1.6 }}>
+                  All information is kept strictly confidential and used solely for verification and loan eligibility purposes.
+                </p>
               </div>
             </div>
           </div>
@@ -494,5 +338,12 @@ export default class UpdateClientDetailsForm extends React.Component {
     );
   }
 }
-//  id
-//  sign a letter of sale
+
+function SpinnerIcon() {
+  return (
+    <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} style={{ animation: 'spin 0.8s linear infinite' }}>
+      <style>{`@keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }`}</style>
+      <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
+    </svg>
+  );
+}

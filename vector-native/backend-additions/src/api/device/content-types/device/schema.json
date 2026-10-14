@@ -1,0 +1,17 @@
+{
+  "kind": "collectionType",
+  "collectionName": "devices",
+  "info": { "singularName": "device", "pluralName": "devices", "displayName": "device" },
+  "options": { "draftAndPublish": false },
+  "pluginOptions": {},
+  "attributes": {
+    "deviceId": { "type": "string", "required": true },
+    "user": { "type": "relation", "relation": "manyToOne", "target": "plugin::users-permissions.user" },
+    "appKey": { "type": "enumeration", "enum": ["vectorfin", "vectorfinadmin"] },
+    "notificationToken": { "type": "string" },
+    "platform": { "type": "string" },
+    "deviceInfo": { "type": "json" },
+    "currentLocation": { "type": "json" },
+    "lastSeenAt": { "type": "datetime" }
+  }
+}

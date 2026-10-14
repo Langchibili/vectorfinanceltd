@@ -14,20 +14,10 @@ import TextField from '@mui/material/TextField'
 import CircularProgress from '@mui/material/CircularProgress'
 import Alert from '@mui/material/Alert'
 import Snackbar from '@mui/material/Snackbar'
+import { ThemeProvider } from '@mui/material/styles'
+import { adminTheme, G, FONTS } from '@/styles/admin-theme'
 import { updateLoan } from '@/Functions'
 
-/**
- * OfferDecision component
- *
- * Props:
- * - loan: the loan object (optional, used for id/context)
- * - offeredAmount: number | string - the amount offered to the client (displayed)
- * - onAccepted: optional callback after accept flow (receives { loan, offeredAmount })
- * - onDeclined: optional callback after decline flow (receives { loan, reason, clientRequestedAmount })
- *
- * NOTE: actual submission calls (API / updateLoan) are intentionally left as comments
- * per your request — replace the comment stubs with your real logic.
- */
 export default function OfferDecision({
   loan = null,
   offeredAmount = 0,
@@ -44,109 +34,66 @@ export default function OfferDecision({
 
   const fmt = amt => {
     if (amt === null || amt === undefined || amt === '') return 'K0'
-    const n = Number(amt) || 0
-    return 'K' + n.toLocaleString()
+    return 'K' + (Number(amt) || 0).toLocaleString()
   }
 
   const handleAccept = async () => {
-    // quick guard/confirm
-    if (!window.confirm(`Mark client as having accepted the offer of ${fmt(offeredAmount)} ?`)) return
+    if (!window.confirm(`Mark client as having accepted the offer of ${fmt(offeredAmount)}?`)) return
     try {
-      setLoadingAccept(true)
-      setError('')
-
-      const updateData = {
-                data:{
-                    loanAmount:offeredAmount,
-                    newLoanAmountOfferAccepted: true
-                }
-      }
+      setLoadingAccept(true); setError('')
+      const updateData = { data: { loanAmount: offeredAmount, newLoanAmountOfferAccepted: true } }
       const updated = await updateLoan(updateData, loan.id)
-      if (onAccepted && typeof onAccepted === 'function') {
-        onAccepted(updated)
-      }
+      if (onAccepted) onAccepted(updated)
       setSnack({ open: true, message: 'Client acceptance recorded', severity: 'success' })
     } catch (err) {
-      console.error('handleAccept error', err)
       setError('Failed to record acceptance. Try again.')
       setSnack({ open: true, message: 'Failed to record acceptance', severity: 'error' })
-    } finally {
-      setLoadingAccept(false)
-    }
+    } finally { setLoadingAccept(false) }
   }
 
-  const openDecline = () => {
-    setReason('')
-    setClientAmount('')
-    setError('')
-    setDeclineOpen(true)
-  }
-
-  const closeDecline = () => {
-    if (loadingDecline) return
-    setDeclineOpen(false)
-    setError('')
-  }
+  const openDecline = () => { setReason(''); setClientAmount(''); setError(''); setDeclineOpen(true) }
+  const closeDecline = () => { if (loadingDecline) return; setDeclineOpen(false); setError('') }
 
   const validateDeclinePayload = () => {
-    // require either reason text OR clientAmount (positive number)
     const hasReason = reason && String(reason).trim().length > 0
     const amt = clientAmount === '' ? null : Number(clientAmount)
     const hasAmount = amt !== null && !isNaN(amt) && amt > 0
-    if (!hasReason && !hasAmount) {
-      return 'Provide a client reason or the amount the client wants (or use "Submit without reason")'
-    }
-    if (hasAmount && (isNaN(amt) || amt <= 0)) {
-      return 'Client amount must be a positive number'
-    }
+    if (!hasReason && !hasAmount) return 'Provide a client reason or the amount the client wants'
+    if (hasAmount && (isNaN(amt) || amt <= 0)) return 'Client amount must be a positive number'
     return null
   }
 
   const submitDecline = async (forced = false) => {
-    // forced=false => require reason or amount, forced=true => submit anyway with no reason
     if (!forced) {
       const vErr = validateDeclinePayload()
-      if (vErr) {
-        setError(vErr)
-        return
-      }
+      if (vErr) { setError(vErr); return }
     }
-
     try {
-      setLoadingDecline(true)
-      setError('')
-     const updateData = {
-                data:{
-                    newLoanAmountOfferDeclined: true,
-                    newLoanAmountOfferDeclineReason: forced
-                        ? "The client declined the offer."
-                        : (() => {
-                            const trimmedReason = reason && reason.trim().length > 0 ? reason.trim() : '';
-                            if (clientAmount && !isNaN(Number(clientAmount)) && Number(clientAmount) > 0) {
-                            const amountText = `Client is asking for K${Number(clientAmount)}`;
-                            return trimmedReason
-                                ? `${trimmedReason} | ${amountText}`
-                                : amountText;
-                            }
-                            return trimmedReason || null;
-                        })(),
-                    clientRequestedAmount: forced ? null : (clientAmount ? Number(clientAmount) : null)
-                }
+      setLoadingDecline(true); setError('')
+      const updateData = {
+        data: {
+          newLoanAmountOfferDeclined: true,
+          newLoanAmountOfferDeclineReason: forced
+            ? 'The client declined the offer.'
+            : (() => {
+              const trimmedReason = reason && reason.trim().length > 0 ? reason.trim() : ''
+              if (clientAmount && !isNaN(Number(clientAmount)) && Number(clientAmount) > 0) {
+                const amountText = `Client is asking for K${Number(clientAmount)}`
+                return trimmedReason ? `${trimmedReason} | ${amountText}` : amountText
+              }
+              return trimmedReason || null
+            })(),
+          clientRequestedAmount: forced ? null : (clientAmount ? Number(clientAmount) : null)
+        }
       }
       const updated = await updateLoan(updateData, loan.id)
-      if (onDeclined && typeof onDeclined === 'function') {
-        onDeclined(updated)
-      }
-
+      if (onDeclined) onDeclined(updated)
       setSnack({ open: true, message: forced ? 'Declined without reason submitted' : 'Decline submitted', severity: 'success' })
       setDeclineOpen(false)
     } catch (err) {
-      console.error('submitDecline error', err)
       setError('Failed to submit decline. Try again.')
       setSnack({ open: true, message: 'Failed to submit decline', severity: 'error' })
-    } finally {
-      setLoadingDecline(false)
-    }
+    } finally { setLoadingDecline(false) }
   }
 
   const handleCloseSnack = (_, reasonEvent) => {
@@ -155,49 +102,69 @@ export default function OfferDecision({
   }
 
   return (
-    <>
-      <Card sx={{ maxWidth: 680, width: '100%', mx: 'auto', borderRadius: 2, boxShadow: 2 }}>
-        <CardContent>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-            An offer of amount <strong>{fmt(offeredAmount)}</strong> was offered to the client on this loan
+    <ThemeProvider theme={adminTheme}>
+      {/* Offer card */}
+      <Box
+        sx={{
+          p: '18px 20px',
+          background: 'linear-gradient(135deg, rgba(201,168,76,0.10), rgba(201,168,76,0.03))',
+          border: '1px solid rgba(201,168,76,0.28)',
+          borderRadius: '16px',
+          backdropFilter: 'blur(16px)',
+        }}
+      >
+        {/* Label */}
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+          <Box sx={{ width: 6, height: 6, borderRadius: '50%', background: G.gold }} />
+          <Typography sx={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: G.gold }}>
+            Amount Offered
           </Typography>
+        </Box>
 
-          <Stack direction="row" spacing={2}>
-            <Button
-              variant="contained"
-              color="success"
-              onClick={handleAccept}
-              disabled={loadingAccept}
-              startIcon={loadingAccept ? <CircularProgress size={16} /> : null}
-              sx={{ textTransform: 'none' }}
-            >
-              Client Accepted
-            </Button>
+        <Typography sx={{ fontFamily: FONTS.mono, fontSize: '26px', fontWeight: 700, color: '#fff', letterSpacing: '-0.02em', mb: 0.5 }}>
+          {fmt(offeredAmount)}
+        </Typography>
+        <Typography variant="body2" sx={{ color: G.muted, mb: 2 }}>
+          An offer was made to the client on this loan
+        </Typography>
 
-            <Button
-              variant="outlined"
-              color="inherit"
-              onClick={openDecline}
-              disabled={loadingAccept || loadingDecline}
-              sx={{ textTransform: 'none' }}
-            >
-              Client Declined
-            </Button>
-          </Stack>
+        <Stack direction="row" spacing={1.5}>
+          <Button
+            variant="contained"
+            onClick={handleAccept}
+            disabled={loadingAccept}
+            sx={{
+              background: `linear-gradient(135deg, ${G.green1}, ${G.green2})`,
+              color: '#fff', fontWeight: 700, borderRadius: '10px', textTransform: 'none', flex: 1,
+              boxShadow: '0 4px 14px rgba(16,185,129,0.25)',
+            }}
+            startIcon={loadingAccept ? <CircularProgress size={16} sx={{ color: '#fff' }} /> : null}
+          >
+            Client Accepted
+          </Button>
 
-          {error && (
-            <Box sx={{ mt: 2 }}>
-              <Alert severity="error">{error}</Alert>
-            </Box>
-          )}
-        </CardContent>
-      </Card>
+          <Button
+            variant="outlined"
+            onClick={openDecline}
+            disabled={loadingAccept || loadingDecline}
+            sx={{
+              color: G.red, borderColor: 'rgba(248,113,113,0.35)', borderRadius: '10px',
+              textTransform: 'none', flex: 1,
+              '&:hover': { background: 'rgba(248,113,113,0.08)', borderColor: 'rgba(248,113,113,0.55)' },
+            }}
+          >
+            Client Declined
+          </Button>
+        </Stack>
+
+        {error && <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>}
+      </Box>
 
       {/* Decline dialog */}
       <Dialog open={declineOpen} onClose={closeDecline} fullWidth maxWidth="sm">
         <DialogTitle>Client Declined Offer</DialogTitle>
         <DialogContent>
-          <Typography variant="body2" sx={{ mb: 2 }}>
+          <Typography variant="body2" sx={{ mb: 2, color: G.muted }}>
             Provide the client's reason for declining. You may optionally record an amount the client requests instead.
           </Typography>
 
@@ -205,11 +172,8 @@ export default function OfferDecision({
             label="Client reason (optional if you provide amount)"
             value={reason}
             onChange={e => setReason(e.target.value)}
-            fullWidth
-            multiline
-            rows={3}
-            sx={{ mb: 2 }}
-            placeholder="e.g. They asked for a lower amount due to ..."
+            fullWidth multiline rows={3} sx={{ mb: 2 }}
+            placeholder="e.g. They asked for a lower amount..."
           />
 
           <TextField
@@ -229,26 +193,32 @@ export default function OfferDecision({
           <Stack direction="row" spacing={1} sx={{ width: '100%' }}>
             <Button
               variant="contained"
-              color="error"
               fullWidth
               onClick={() => submitDecline(false)}
               disabled={loadingDecline}
-              startIcon={loadingDecline ? <CircularProgress size={16} /> : null}
-              sx={{ textTransform: 'none' }}
+              startIcon={loadingDecline ? <CircularProgress size={16} sx={{ color: '#fff' }} /> : null}
+              sx={{
+                background: 'linear-gradient(135deg, #b91c1c, #dc2626)', color: '#fff',
+                fontWeight: 700, borderRadius: '10px', textTransform: 'none',
+                boxShadow: '0 4px 14px rgba(220,38,38,0.28)',
+              }}
             >
               Submit Decline
             </Button>
 
             <Button
               variant="outlined"
-              color="error"
               fullWidth
               onClick={() => {
-                if (!window.confirm('Reject without a reason? This will record no reason.')) return
+                if (!window.confirm('Reject without a reason?')) return
                 submitDecline(true)
               }}
               disabled={loadingDecline}
-              sx={{ textTransform: 'none' }}
+              sx={{
+                color: G.red, borderColor: 'rgba(248,113,113,0.35)', borderRadius: '10px',
+                textTransform: 'none',
+                '&:hover': { background: 'rgba(248,113,113,0.08)' },
+              }}
             >
               Submit Without Reason
             </Button>
@@ -256,16 +226,11 @@ export default function OfferDecision({
         </DialogActions>
       </Dialog>
 
-      <Snackbar
-        open={snack.open}
-        autoHideDuration={3000}
-        onClose={handleCloseSnack}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      >
+      <Snackbar open={snack.open} autoHideDuration={3000} onClose={handleCloseSnack} anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}>
         <Alert onClose={handleCloseSnack} severity={snack.severity} sx={{ width: '100%' }}>
           {snack.message}
         </Alert>
       </Snackbar>
-    </>
+    </ThemeProvider>
   )
 }

@@ -1,0 +1,16 @@
+{
+  "name": "vectorfin-sockets",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node server.js",
+    "start:device": "node device-socket-server.js"
+  },
+  "type": "commonjs",
+  "dependencies": {
+    "axios": "^1.7.7",
+    "dotenv": "^16.4.5",
+    "socket.io": "^4.8.1",
+    "socket.io-client": "^4.8.1"
+  }
+}

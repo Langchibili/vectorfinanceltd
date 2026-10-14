@@ -1,0 +1,30 @@
+{
+  "name": "vectorfin",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "scripts": {
+    "sync": "bash ../sync-shared.sh",
+    "start": "npm run sync && expo start",
+    "android": "npm run sync && expo run:android",
+    "ios": "npm run sync && expo run:ios"
+  },
+  "dependencies": {
+    "expo": "~57.0.0",
+    "react": "*",
+    "react-native": "*",
+    "react-native-webview": "*",
+    "react-native-safe-area-context": "*",
+    "@react-native-community/netinfo": "*",
+    "socket.io-client": "^4.8.1",
+    "expo-application": "*",
+    "expo-constants": "*",
+    "expo-device": "*",
+    "expo-file-system": "*",
+    "expo-intent-launcher": "*",
+    "expo-notifications": "*",
+    "expo-secure-store": "*",
+    "expo-sharing": "*",
+    "expo-task-manager": "*"
+  },
+  "devDependencies": { "typescript": "*", "@types/react": "*" }
+}

@@ -8,6 +8,7 @@ import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css';
 import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type';
 import FilePondPluginFileValidateSize from 'filepond-plugin-file-validate-size';
 import { api_url, getJwt, log } from '@/Constants';
+import { publicUploadJwt } from '@/Secrets';
 
 registerPlugin(
   FilePondPluginImagePreview,
@@ -28,24 +29,28 @@ export default function Uploader(props) {
 
     const request = new XMLHttpRequest();
     request.open('POST', `${api_url}/upload`);
-    request.setRequestHeader('Authorization', `Bearer ${getJwt()}`);
-
+    if (props.uploadPublicly) {
+      request.setRequestHeader('Authorization', `Bearer ${publicUploadJwt}`);
+    }
+    else {
+      request.setRequestHeader('Authorization', `Bearer ${getJwt()}`);
+    }
     request.upload.onprogress = (e) => {
       progress(e.lengthComputable, e.loaded, e.total);
     };
 
     request.onload = async function () {
       if (request.status >= 200 && request.status < 300) {
-        if(props.addFiles){ // means a user is updating their profile pic
+        if (props.addFiles) { // means a user is updating their profile pic
           const responseData = await JSON.parse(request.responseText)
           props.addFiles(responseData)
           load(request.responseText)
           return
         }
-        if(props.refName === "forms.application-forms"){
-          if(props.handleSignedForm){
+        if (props.refName === "forms.application-forms") {
+          if (props.handleSignedForm) {
             const responseData = await JSON.parse(request.responseText)
-            props.handleSignedForm(props.formName,responseData)
+            props.handleSignedForm(props.formName, responseData)
           }
         }
         // if (props.addMediaOnUpload) {

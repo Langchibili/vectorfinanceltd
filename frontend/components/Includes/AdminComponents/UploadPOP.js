@@ -10,121 +10,69 @@ import CircularProgress from '@mui/material/CircularProgress'
 import Alert from '@mui/material/Alert'
 import Stack from '@mui/material/Stack'
 import Box from '@mui/material/Box'
+import { ThemeProvider } from '@mui/material/styles'
+import { adminTheme, G } from '@/styles/admin-theme'
 import { updateLoan } from '@/Functions'
 import Uploader from '../Uploader/Uploader'
 
-// NOTE: Uploader is an existing component in your app. We only render it here and expect
-// it to call addFiles (this.addPOP) with the uploaded file info (object or array).
-// Adjust how addPOP extracts the uploaded id if your Uploader returns a different shape.
-
 export default class UploadPOP extends React.Component {
-  state = {
-    open: false,
-    loading: false,
-    error: '',
-    disbursementPOP: null // initialised from loan in open()
-  }
+  state = { open: false, loading: false, error: '', disbursementPOP: null }
 
   open = () => {
     const { loan } = this.props
-    // prefill from loan
     let disbursementPOP = loan?.disbursementPOP ?? null
-    // If disbursementPOP is an object with .data, use .data
-    if (disbursementPOP && disbursementPOP.data) {
-        disbursementPOP = disbursementPOP.data
-    }
-    this.setState({
-        open: true,
-        error: '',
-        disbursementPOP
-    })
+    if (disbursementPOP && disbursementPOP.data) disbursementPOP = disbursementPOP.data
+    this.setState({ open: true, error: '', disbursementPOP })
   }
 
+  close = () => { this.setState({ open: false, loading: false, error: '' }) }
 
-  close = () => {
-    this.setState({ open: false, loading: false, error: '' })
-  }
-
-  // helper to extract an id/object from uploader payload
   extractUploaded = (payload) => {
-    // payload might be an array of files or a single file object
     const item = Array.isArray(payload) ? payload[0] : payload
     if (!item) return null
-    // common shapes: { id, attributes }, { data: { id } }, a raw id number, or the full upload response
     if (typeof item === 'number') return { id: item, raw: item }
     if (item.id) return { id: item.id, raw: item }
     if (item.data && item.data.id) return { id: item.data.id, raw: item }
-    // fallback: return entire object
     return { id: null, raw: item }
   }
 
-  // this will be passed to the Uploader component's addFiles prop
   addPOP = async (uploaded) => {
-    // uploaded may be an array or an object depending on your Uploader
     const { loan, role, onUpdated } = this.props
     if (!loan) return
-
     const extracted = this.extractUploaded(uploaded)
-    // if uploader couldn't provide an id, keep the raw and still attempt to update
     const uploadedId = extracted?.id ?? null
     const uploadedRaw = extracted?.raw ?? null
-
-    // if there is already a POP uploaded, ask for confirmation to replace
     const disbursementPOP = uploaded.disbursementPOP
-    let existing = false;
+    let existing = false
     if (disbursementPOP && disbursementPOP.data) {
-        // If it's an array, check the first item
-        const data = Array.isArray(disbursementPOP.data)
-            ? disbursementPOP.data[0]
-            : disbursementPOP.data;
-        existing = !!(data && (data.id || data.url));
+      const data = Array.isArray(disbursementPOP.data) ? disbursementPOP.data[0] : disbursementPOP.data
+      existing = !!(data && (data.id || data.url))
     } else if (disbursementPOP && (disbursementPOP.id || disbursementPOP.url)) {
-        existing = true;
+      existing = true
     } else if (loan.disbursementPOP) {
-        const pop = loan.disbursementPOP;
-        if (pop.data) {
-            const data = Array.isArray(pop.data) ? pop.data[0] : pop.data;
-            existing = !!(data && (data.id || data.url));
-        } 
-        else {
-            existing = !!(pop.id || pop.url);
-        }
+      const pop = loan.disbursementPOP
+      if (pop.data) { const data = Array.isArray(pop.data) ? pop.data[0] : pop.data; existing = !!(data && (data.id || data.url)) }
+      else { existing = !!(pop.id || pop.url) }
     }
     if (existing) {
-      const ok = window.confirm('A POP is already uploaded for this loan. Do you want to replace the existing POP?')
+      const ok = window.confirm('A POP is already uploaded. Do you want to replace it?')
       if (!ok) return
     }
-
-    // perform update
     this.setState({ loading: true, error: '' })
     try {
-      // update the loan with the pop info. adjust body if your backend expects a different shape.
-      // we include both a direct field (disbursementPOP) and actionPayload for audit
       const body = {
         data: {
-          // do not change loanStatus here; this action only attaches the POP
           lastAction: 'upload-pop',
           lastActionByRole: role,
           lastActionAt: new Date().toISOString(),
-          actionPayload: {
-            disbursementPOP: uploadedId ?? uploadedRaw
-          },
-          // write the disbursementPOP field too (backend mapping may expect an id or object)
+          actionPayload: { disbursementPOP: uploadedId ?? uploadedRaw },
           disbursementPOP: uploadedId ?? uploadedRaw
         }
       }
-
       const updated = await updateLoan(body, loan.id)
-
-      // call parent refresh / updater
-      if (onUpdated && typeof onUpdated === 'function') {
-        onUpdated(updated)
-      }
-
-      // reflect updated value in our state and close
+      if (onUpdated) onUpdated(updated)
       this.setState({ loading: false, disbursementPOP: uploadedId ?? uploadedRaw, open: false })
     } catch (err) {
-      console.error('UploadPOP addPOP error', err)
       this.setState({ loading: false, error: 'Failed to attach POP. Try again.' })
     }
   }
@@ -132,48 +80,47 @@ export default class UploadPOP extends React.Component {
   render() {
     const { loan, role } = this.props
     const { open, loading, error, disbursementPOP } = this.state
-
     if (!loan) return null
-    if (role === "Collateral Inspector") return null
+    if (role === 'Collateral Inspector') return null
 
-    // Check existence for both .data and direct object
-    let hasPOP = false;
+    let hasPOP = false
     if (disbursementPOP && disbursementPOP.data) {
-        // If it's an array, check the first item
-        const data = Array.isArray(disbursementPOP.data)
-            ? disbursementPOP.data[0]
-            : disbursementPOP.data;
-        hasPOP = !!(data && (data.id || data.url));
+      const data = Array.isArray(disbursementPOP.data) ? disbursementPOP.data[0] : disbursementPOP.data
+      hasPOP = !!(data && (data.id || data.url))
     } else if (disbursementPOP && (disbursementPOP.id || disbursementPOP.url)) {
-        hasPOP = true;
+      hasPOP = true
     } else if (loan.disbursementPOP) {
-        const pop = loan.disbursementPOP;
-        if (pop.data) {
-            const data = Array.isArray(pop.data) ? pop.data[0] : pop.data;
-            hasPOP = !!(data && (data.id || data.url));
-        } 
-        else {
-            hasPOP = !!(pop.id || pop.url);
-        }
+      const pop = loan.disbursementPOP
+      if (pop.data) { const data = Array.isArray(pop.data) ? pop.data[0] : pop.data; hasPOP = !!(data && (data.id || data.url)) }
+      else { hasPOP = !!(pop.id || pop.url) }
     }
 
-    const buttonLabel = hasPOP ? 'Replace Disbursement POP' : 'Upload Disbursement POP';
-   
-return (
-      <>
-        <Button variant="contained" size="small" onClick={this.open}>
+    const buttonLabel = hasPOP ? 'Replace Disbursement POP' : 'Upload Disbursement POP'
+
+    return (
+      <ThemeProvider theme={adminTheme}>
+        <Button
+          variant="contained"
+          size="small"
+          onClick={this.open}
+          sx={{
+            background: `linear-gradient(135deg, ${G.green1}, ${G.green2})`,
+            color: '#fff', fontWeight: 700, borderRadius: '10px', textTransform: 'none',
+            boxShadow: '0 4px 14px rgba(16,185,129,0.25)',
+          }}
+        >
           {buttonLabel}
         </Button>
 
         <Dialog open={open} onClose={this.close} fullWidth maxWidth="sm">
-          <DialogTitle>{hasPOP? "Reupload Proof of Payment (POP)": "Upload Proof of Payment (POP)"}</DialogTitle>
-
+          <DialogTitle>{hasPOP ? 'Reupload Proof of Payment (POP)' : 'Upload Proof of Payment (POP)'}</DialogTitle>
           <DialogContent>
             <Alert severity="info" sx={{ mb: 2 }}>
-            <Typography variant="body2" sx={{ mb: 2 }}>
-              Upload the disbursement POP. This will be attached to the loan and the user will be notified that their loan has been disbursed, and their loan dashboard shall appear.
-            </Typography>
-           </Alert>
+              <Typography variant="body2">
+                Upload the disbursement POP. The user will be notified that their loan has been disbursed and their loan dashboard will appear.
+              </Typography>
+            </Alert>
+
             {hasPOP && (
               <Alert severity="warning" sx={{ mb: 2 }}>
                 {loan.disbursementPOP ? 'A POP is already uploaded for this loan.' : 'A POP exists in draft.'}
@@ -181,8 +128,12 @@ return (
               </Alert>
             )}
 
-            <Box sx={{ mb: 2 }}>
-              {/* render the Uploader exactly as you specified */}
+            <Box
+              sx={{
+                mb: 2, p: '16px', background: G.dim, border: `1px solid ${G.border}`,
+                borderRadius: '12px',
+              }}
+            >
               <Uploader
                 addFiles={this.addPOP}
                 refId={loan.id}
@@ -190,12 +141,9 @@ return (
                 fieldName="disbursementPOP"
                 allowMultiple={false}
                 allowedTypes={[
-                  'image/*',
-                  'application/pdf',
-                  'application/msword',
+                  'image/*', 'application/pdf', 'application/msword',
                   'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-                  'text/plain',
-                  'application/vnd.ms-excel',
+                  'text/plain', 'application/vnd.ms-excel',
                   'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
                 ]}
               />
@@ -205,38 +153,33 @@ return (
 
             {loading && (
               <Stack direction="row" spacing={1} alignItems="center" sx={{ mt: 1 }}>
-                <CircularProgress size={18} />
-                <Typography variant="body2">Uploading POP…</Typography>
+                <CircularProgress size={18} sx={{ color: G.green2 }} />
+                <Typography variant="body2" sx={{ color: G.muted }}>Uploading POP…</Typography>
               </Stack>
             )}
           </DialogContent>
 
           <DialogActions>
-            <Button onClick={this.close} disabled={loading}>Cancel</Button>
+            <Button onClick={this.close} disabled={loading} sx={{ color: G.muted, textTransform: 'none' }}>Cancel</Button>
             <Button
               onClick={() => {
-                // if user wants to replace but hasn't used uploader, prompt them to upload via the Uploader
-                if (!hasPOP) {
-                  alert('Please choose a file to upload using the uploader above')
-                  return
-                }
-                // if there is a POP already but user hasn't uploaded new one, simply close (nothing to do)
+                if (!hasPOP) { alert('Please choose a file to upload using the uploader above'); return }
                 const confirmReplace = hasPOP && window.confirm('Keep the existing POP? Click OK to close, or Cancel to upload a new one.')
-                if (confirmReplace) {
-                  this.close()
-                } else {
-                  // user wants to replace: instruct to use uploader input
-                  alert('Use the uploader component to select and upload a replacement file')
-                }
+                if (confirmReplace) { this.close() }
+                else { alert('Use the uploader component to select and upload a replacement file') }
               }}
               variant="contained"
               disabled={loading}
+              sx={{
+                background: `linear-gradient(135deg, ${G.green1}, ${G.green2})`,
+                color: '#fff', fontWeight: 700, borderRadius: '10px', textTransform: 'none',
+              }}
             >
-              {loading ? <CircularProgress size={18} /> : 'Done'}
+              {loading ? <CircularProgress size={18} sx={{ color: '#fff' }} /> : 'Done'}
             </Button>
           </DialogActions>
         </Dialog>
-      </>
+      </ThemeProvider>
     )
   }
 }

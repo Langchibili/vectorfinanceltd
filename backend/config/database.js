@@ -2,6 +2,8 @@ const path = require('path');
 
 module.exports = ({ env }) => {
   const client = env('DATABASE_CLIENT', 'sqlite');
+  const knexClient = client === 'mysql' || client === 'mysql2' ? 'mysql2' : client;
+  const connectionClient = client === 'mysql2' ? 'mysql' : client;
 
   const connections = {
     mysql: {
@@ -52,8 +54,8 @@ module.exports = ({ env }) => {
 
   return {
     connection: {
-      client,
-      ...connections[client],
+      client: knexClient,
+      ...connections[connectionClient],
       acquireConnectionTimeout: env.int('DATABASE_CONNECTION_TIMEOUT', 60000),
     },
   };

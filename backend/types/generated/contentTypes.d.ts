@@ -1218,6 +1218,46 @@ export interface ApiClientIdClientId extends Schema.CollectionType {
   };
 }
 
+export interface ApiDeviceDevice extends Schema.CollectionType {
+  collectionName: 'devices';
+  info: {
+    singularName: 'device';
+    pluralName: 'devices';
+    displayName: 'Device';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    deviceId: Attribute.String & Attribute.Required;
+    user: Attribute.Relation<
+      'api::device.device',
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+    appKey: Attribute.Enumeration<['vectorfin', 'vectorfinadmin']>;
+    notificationToken: Attribute.String;
+    platform: Attribute.String;
+    deviceInfo: Attribute.JSON;
+    currentLocation: Attribute.JSON;
+    lastSeenAt: Attribute.DateTime;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::device.device',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::device.device',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
 export interface ApiEmailAddressesListEmailAddressesList
   extends Schema.SingleType {
   collectionName: 'email_addresses_lists';
@@ -2582,6 +2622,7 @@ declare module '@strapi/types' {
       'api::approval.approval': ApiApprovalApproval;
       'api::auth.auth': ApiAuthAuth;
       'api::client-id.client-id': ApiClientIdClientId;
+      'api::device.device': ApiDeviceDevice;
       'api::email-addresses-list.email-addresses-list': ApiEmailAddressesListEmailAddressesList;
       'api::finance.finance': ApiFinanceFinance;
       'api::form.form': ApiFormForm;

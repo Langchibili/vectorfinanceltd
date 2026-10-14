@@ -46,7 +46,7 @@ let apiurl, backendUrl, clienturl
  
 
 if(environment === 'local'){
-  /*localhost: */  clienturl = 'http://localhost:3004'
+  /*localhost: */  clienturl = 'http://localhost:3005'
 }
 else if(environment === 'live'){
   /*liveserver1: */ clienturl = 'https://portal.vectorfinancelimited.com' // for production's sake
@@ -57,9 +57,17 @@ else if(environment === 'live2'){
 else{ // if environment is default, it means it's a test server
   /*testserver: */  clienturl = 'https://portal.vectorfinancelimited.com' // the api to be used when deployed to the test site
 }
+
+const nativeConfig = typeof window !== 'undefined' ? window.__VF_NATIVE__ : null
+if (nativeConfig?.backendUrl) {
+ const nativeBackend = nativeConfig.backendUrl.replace(/\/+$/, '')
+ apiurl = nativeBackend.endsWith('/api') ? nativeBackend : `${nativeBackend}/api`
+ backendUrl = apiurl.slice(0, -4)
+}
+if (nativeConfig?.portalUrl) clienturl = nativeConfig.portalUrl.replace(/\/+$/, '')
  
 
- export let api_url = apiurl
+export let api_url = apiurl
  export let backEndUrl = backendUrl
  export let clientUrl = clienturl
  

@@ -8,6 +8,8 @@ import DialogActions from '@mui/material/DialogActions'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 import CircularProgress from '@mui/material/CircularProgress'
+import { ThemeProvider } from '@mui/material/styles'
+import { adminTheme, G } from '@/styles/admin-theme'
 import { updateLoan } from '@/Functions'
 import { frontendUpdateKey } from '@/Secrets'
 
@@ -35,28 +37,23 @@ export default class OfferAmountForm extends React.Component {
       this.setState({ error: 'Please enter a valid offered amount' })
       return
     }
-    if(amount === loan.newLoanAmountOffer){
-        this.setState({ loading: false, error: 'You already offered this amount' })
+    if (amount === loan.newLoanAmountOffer) {
+      this.setState({ loading: false, error: 'You already offered this amount' })
     }
 
     this.setState({ loading: true, error: '' })
 
     try {
-      // We leave status as request-approval but record offered amount
-    
       const updateData = {
-              data:{
-                loanStatus:'request-approval',
-                newLoanAmountOffer: Number(amount),
-                newLoanAmountOfferedReason: explanation || null,
-                frontendUpdateKey:frontendUpdateKey 
-              }
-            }
-      const updated = await updateLoan(updateData, loan.id)
-      if (onUpdated && typeof onUpdated === 'function') {
-          onUpdated(updated)
+        data: {
+          loanStatus: 'request-approval',
+          newLoanAmountOffer: Number(amount),
+          newLoanAmountOfferedReason: explanation || null,
+          frontendUpdateKey: frontendUpdateKey
+        }
       }
-
+      const updated = await updateLoan(updateData, loan.id)
+      if (onUpdated && typeof onUpdated === 'function') onUpdated(updated)
       this.setState({ loading: false, open: false, amount: '', explanation: '' })
     } catch (err) {
       console.error('OfferAmountForm submit error', err)
@@ -74,15 +71,27 @@ export default class OfferAmountForm extends React.Component {
     if (String(loan.loanStatus).toLowerCase() !== 'request-approval') return null
 
     return (
-      <>
-        <Button color='warning' variant="outlined" size="small" onClick={this.open}>
+      <ThemeProvider theme={adminTheme}>
+        <Button
+          variant="outlined"
+          size="small"
+          onClick={this.open}
+          sx={{
+            color: G.amber,
+            borderColor: 'rgba(251,191,36,0.35)',
+            borderRadius: '10px',
+            fontWeight: 600,
+            textTransform: 'none',
+            '&:hover': { background: 'rgba(251,191,36,0.08)', borderColor: 'rgba(251,191,36,0.55)' },
+          }}
+        >
           Offer New Amount To Client
         </Button>
 
         <Dialog open={open} onClose={this.close} fullWidth maxWidth="sm">
           <DialogTitle>Offer New Amount</DialogTitle>
           <DialogContent>
-            <Typography variant="body2" sx={{ mb: 1 }}>
+            <Typography variant="body2" sx={{ mb: 2, color: G.muted }}>
               Enter the new loan amount you'd like to offer to the client. Optionally provide an explanation.
             </Typography>
 
@@ -107,17 +116,42 @@ export default class OfferAmountForm extends React.Component {
               sx={{ mt: 2 }}
             />
 
-            {error && <Typography color="error" sx={{ mt: 2 }}>{error}</Typography>}
+            {error && (
+              <Typography
+                sx={{
+                  mt: 2, p: '10px 14px', borderRadius: '10px',
+                  background: 'rgba(248,113,113,0.10)', border: '1px solid rgba(248,113,113,0.28)',
+                  color: G.red, fontSize: '13px'
+                }}
+              >
+                {error}
+              </Typography>
+            )}
           </DialogContent>
 
           <DialogActions>
-            <Button onClick={this.close} disabled={loading}>Cancel</Button>
-            <Button onClick={this.submit} disabled={loading} variant="contained">
-              {loading ? <CircularProgress size={18} /> : 'Send Offer'}
+            <Button
+              onClick={this.close}
+              disabled={loading}
+              sx={{ color: G.muted, borderRadius: '10px', textTransform: 'none' }}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={this.submit}
+              disabled={loading}
+              variant="contained"
+              sx={{
+                background: `linear-gradient(135deg, #B8922A, ${G.gold})`,
+                color: '#fff', fontWeight: 700, borderRadius: '10px', textTransform: 'none',
+                boxShadow: '0 4px 14px rgba(201,168,76,0.25)',
+              }}
+            >
+              {loading ? <CircularProgress size={18} sx={{ color: '#fff' }} /> : 'Send Offer'}
             </Button>
           </DialogActions>
         </Dialog>
-      </>
+      </ThemeProvider>
     )
   }
 }

@@ -1,0 +1,1228 @@
+
+================================================================================
+FILE: .env.example
+================================================================================
+
+# Use the same long, random value in backend/.env and sockets/.env.
+# The backend client and Socket.IO services use it for trusted event forwarding.
+SOCKET_INTERNAL_TOKEN=replace-with-a-long-random-value
+
+================================================================================
+FILE: code_collection.js
+================================================================================
+
+const fs = require('fs');
+const path = require('path');
+const { promisify } = require('util');
+
+// Promisify fs functions for async/await usage
+const readdir = promisify(fs.readdir);
+const stat = promisify(fs.stat);
+const readFile = promisify(fs.readFile);
+const writeFile = promisify(fs.writeFile);
+
+// ============================================
+// CONFIGURATION - Customize these as needed
+// ============================================
+
+// Directories to ignore (by name - anywhere in the tree)
+const IGNORED_DIRECTORIES = [
+    'node_modules',
+    '.git',
+    '.vscode',
+    '.idea',
+    'dist',
+    'build',
+    'public',
+    'coverage',
+    '.next',
+    '.strapi',
+    '.nuxt',
+    '.cache',
+    '.DS_Store'
+];
+
+// Specific directory paths to ignore (relative to root)
+const IGNORED_DIRECTORY_PATHS = [
+    'app/(auth)',
+    'components/Map',
+    'components/Rider',
+    'lib/api',
+    'app/(main)',
+    'app/finding-driver',
+    'app/trip-summary',
+    'src/extensions/documentation'
+];
+
+// Files to ignore (by filename - anywhere in the tree)
+const IGNORED_FILES = [
+    'package-lock.json',
+    'yarn.lock',
+    'pnpm-lock.yaml',
+    '.gitignore',
+    '.env',
+    '.env.local',
+    '.env.development',
+    '.env.production',
+    'code.txt',
+    'code.min.txt',
+    'Thumbs.db',
+    'desktop.ini',
+    'collect-code.js'  // This script itself
+];
+
+// Specific file paths to ignore (relative to root)
+const IGNORED_FILE_PATHS = [
+    'lib/hooks/useAuth.js',
+    'lib/hooks/useRide.js',
+    'app/page.js'
+];
+
+// File extensions to ignore
+const IGNORED_FILE_EXTENSIONS = [
+    '.log', '.tmp', '.temp', '.bak', '.swp', '.swo',
+    '.pid', '.seed', '.pem', '.cert', '.key',
+    '.zip', '.rar', '.7z', '.gz', '.tar',
+    '.jpg', '.jpeg', '.png', '.gif', '.ico', '.svg',
+    '.mp3', '.mp4', '.avi', '.mov', '.wmv',
+    '.exe', '.dll', '.so', '.dylib',
+    '.pdf', '.doc', '.docx', '.xls', '.xlsx'
+];
+
+// Custom ignored items - Add your own here
+const CUSTOM_IGNORED_FILES = [
+    // 'secrets.json',
+    // 'private.key'
+];
+
+const CUSTOM_IGNORED_PATHS = [
+    'backend/src/extensions/documentation'
+    // 'app/specific-folder/specific-file.js'
+];
+
+// Combine all ignored files
+const ALL_IGNORED_FILES = [...IGNORED_FILES, ...CUSTOM_IGNORED_FILES];
+const ALL_IGNORED_FILE_PATHS = [...IGNORED_FILE_PATHS, ...CUSTOM_IGNORED_PATHS];
+
+// Output file configuration
+const OUTPUT_FILE = path.join(process.cwd(), 'code.txt');
+const OUTPUT_MIN_FILE = path.join(process.cwd(), 'code.min.txt');
+
+// Statistics tracking
+let stats = {
+    processed: 0,
+    skipped: 0,
+    errors: 0
+};
+
+// ============================================
+// HELPER FUNCTIONS
+// ============================================
+
+/**
+ * Get normalized relative path from root directory
+ */
+function getRelativePath(filePath) {
+    const relative = path.relative(process.cwd(), filePath);
+    return relative ? relative.replace(/\\/g, '/') : '.';
+}
+
+/**
+ * Check if a directory should be ignored
+ */
+function shouldIgnoreDirectory(dirPath) {
+    const relativePath = getRelativePath(dirPath);
+    const dirName = path.basename(dirPath);
+
+    // Check by directory name (global)
+    if (IGNORED_DIRECTORIES.includes(dirName)) {
+        return true;
+    }
+
+    // Check exact directory path
+    if (IGNORED_DIRECTORY_PATHS.includes(relativePath)) {
+        return true;
+    }
+
+    return false;
+}
+
+/**
+ * Check if a file should be ignored
+ */
+function shouldIgnoreFile(fileName, filePath) {
+    const relativePath = getRelativePath(filePath);
+    const ext = path.extname(fileName).toLowerCase();
+
+    // Check by filename
+    if (ALL_IGNORED_FILES.includes(fileName)) {
+        return true;
+    }
+
+    // Check by extension
+    if (IGNORED_FILE_EXTENSIONS.includes(ext)) {
+        return true;
+    }
+
+    // Check exact file path
+    if (ALL_IGNORED_FILE_PATHS.includes(relativePath)) {
+        return true;
+    }
+
+    // Check if file is in an ignored directory
+    const fileDir = path.dirname(relativePath);
+    if (IGNORED_DIRECTORY_PATHS.includes(fileDir)) {
+        return true;
+    }
+
+    // Check hidden files (except allowed ones)
+    if (fileName.startsWith('.') && !fileName.startsWith('.env')) {
+        const allowedHidden = ['.eslintrc', '.prettierrc', '.babelrc', '.npmrc'];
+        if (!allowedHidden.some(allowed => fileName.startsWith(allowed))) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+/**
+ * Recursively traverse directory and collect all non-ignored files
+ */
+async function traverseDirectory(dirPath) {
+    const files = [];
+
+    // Skip if this directory should be ignored
+    if (shouldIgnoreDirectory(dirPath)) {
+        console.log(`  ⏭️  Skipping directory: ${getRelativePath(dirPath)}`);
+        stats.skipped++;
+        return files;
+    }
+
+    try {
+        const items = await readdir(dirPath);
+
+        for (const item of items) {
+            const fullPath = path.join(dirPath, item);
+
+            try {
+                const fileStat = await stat(fullPath);
+
+                if (fileStat.isDirectory()) {
+                    const subFiles = await traverseDirectory(fullPath);
+                    files.push(...subFiles);
+                } else if (fileStat.isFile()) {
+                    if (!shouldIgnoreFile(item, fullPath)) {
+                        files.push(fullPath);
+                    } else {
+                        console.log(`  ⏭️  Skipping file: ${getRelativePath(fullPath)}`);
+                        stats.skipped++;
+                    }
+                }
+            } catch (err) {
+                console.error(`  ❌ Error accessing ${fullPath}: ${err.message}`);
+                stats.errors++;
+            }
+        }
+    } catch (err) {
+        console.error(`  ❌ Error reading directory ${dirPath}: ${err.message}`);
+        stats.errors++;
+    }
+
+    return files;
+}
+
+/**
+ * Read file content with encoding detection
+ */
+async function readFileContent(filePath) {
+    try {
+        const buffer = await readFile(filePath);
+
+        // Try UTF-8 first
+        try {
+            return buffer.toString('utf8');
+        } catch (err) {
+            // Fallback to latin1 for binary files
+            return `[BINARY FILE]\n${buffer.toString('base64')}\n[/BINARY FILE]`;
+        }
+    } catch (err) {
+        console.error(`  ❌ Error reading file: ${err.message}`);
+        stats.errors++;
+        return `[ERROR: ${err.message}]`;
+    }
+}
+
+/**
+ * Format file size for display
+ */
+function formatFileSize(bytes) {
+    if (bytes < 1024) return `${bytes} bytes`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(2)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+}
+
+/**
+ * Display configuration summary
+ */
+function displayConfig() {
+    console.log('\n⚙️  Configuration:');
+    console.log(`  • Ignored directories (by name): ${IGNORED_DIRECTORIES.length}`);
+    console.log(`  • Ignored directory paths: ${IGNORED_DIRECTORY_PATHS.length}`);
+    console.log(`  • Ignored files (by name): ${ALL_IGNORED_FILES.length}`);
+    console.log(`  • Ignored file paths: ${ALL_IGNORED_FILE_PATHS.length}`);
+    console.log(`  • Ignored extensions: ${IGNORED_FILE_EXTENSIONS.length}`);
+
+    if (IGNORED_DIRECTORY_PATHS.length > 0) {
+        console.log('\n  📁 Ignored directories:');
+        IGNORED_DIRECTORY_PATHS.forEach(dir => console.log(`    - ${dir}`));
+    }
+
+    if (ALL_IGNORED_FILE_PATHS.length > 0) {
+        console.log('\n  📄 Ignored files:');
+        ALL_IGNORED_FILE_PATHS.forEach(file => console.log(`    - ${file}`));
+    }
+}
+
+// ============================================
+// MAIN FUNCTIONS
+// ============================================
+
+/**
+ * Create the complete source code document
+ */
+async function createCodeDocument() {
+    console.log('\n📂 Scanning directory:', process.cwd());
+    console.log('🔍 Gathering files...\n');
+
+    const allFiles = await traverseDirectory(process.cwd());
+
+    if (allFiles.length === 0) {
+        console.log('❌ No files found to process!');
+        return null;
+    }
+
+    console.log(`\n📊 Found ${allFiles.length} files to process\n`);
+
+    let outputContent = '';
+
+    // Process each file
+    for (let i = 0; i < allFiles.length; i++) {
+        const filePath = allFiles[i];
+        const relativePath = getRelativePath(filePath);
+
+        console.log(`📝 Processing (${i + 1}/${allFiles.length}): ${relativePath}`);
+
+        // Add file header with path
+        outputContent += `\n${'='.repeat(80)}\n`;
+        outputContent += `FILE: ${relativePath}\n`;
+        outputContent += `${'='.repeat(80)}\n\n`;
+
+        // Add file content
+        const content = await readFileContent(filePath);
+        outputContent += content;
+
+        // Ensure trailing newline
+        if (content && !content.endsWith('\n')) {
+            outputContent += '\n';
+        }
+
+        stats.processed++;
+    }
+
+    // Write to file
+    try {
+        await writeFile(OUTPUT_FILE, outputContent, 'utf8');
+        console.log(`\n✅ Created: ${OUTPUT_FILE}`);
+        console.log(`📏 Size: ${formatFileSize(outputContent.length)}`);
+        return outputContent;
+    } catch (err) {
+        console.error(`❌ Error writing file: ${err.message}`);
+        return null;
+    }
+}
+
+/**
+ * Create minified version (remove all whitespace)
+ */
+async function createMinifiedVersion(sourceContent) {
+    if (!sourceContent) {
+        console.log('❌ No source content to minify');
+        return false;
+    }
+
+    console.log('\n⚡ Creating minified version...');
+
+    try {
+        // Remove all whitespace
+        const minified = sourceContent.replace(/\s/g, '');
+
+        await writeFile(OUTPUT_MIN_FILE, minified, 'utf8');
+        console.log(`✅ Created: ${OUTPUT_MIN_FILE}`);
+        console.log(`📏 Size: ${formatFileSize(minified.length)}`);
+
+        const reduction = ((1 - minified.length / sourceContent.length) * 100).toFixed(2);
+        console.log(`📉 Reduction: ${reduction}%`);
+
+        return true;
+    } catch (err) {
+        console.error(`❌ Error creating minified file: ${err.message}`);
+        return false;
+    }
+}
+
+/**
+ * Display final summary
+ */
+function displaySummary() {
+    console.log('\n' + '='.repeat(50));
+    console.log('📊 SUMMARY');
+    console.log('='.repeat(50));
+    console.log(`✅ Files processed: ${stats.processed}`);
+    console.log(`⏭️  Files/directories skipped: ${stats.skipped}`);
+    console.log(`❌ Errors encountered: ${stats.errors}`);
+    console.log(`📁 Output files:`);
+    console.log(`   - ${path.basename(OUTPUT_FILE)}`);
+    console.log(`   - ${path.basename(OUTPUT_MIN_FILE)}`);
+    console.log('\n🎉 Done!');
+}
+
+// ============================================
+// SCRIPT ENTRY POINT
+// ============================================
+
+async function main() {
+    console.log('🔍 Source Code Collector');
+    console.log('='.repeat(50));
+
+    displayConfig();
+
+    try {
+        const sourceContent = await createCodeDocument();
+
+        if (!sourceContent) {
+            console.log('❌ Failed to create code document');
+            return;
+        }
+
+        await createMinifiedVersion(sourceContent);
+        displaySummary();
+
+    } catch (error) {
+        console.error('💥 Unexpected error:', error.message);
+        if (error.stack) console.error(error.stack);
+    }
+}
+
+// Run the script
+main();
+
+================================================================================
+FILE: device-socket-server.js
+================================================================================
+
+require('dotenv').config();
+
+// device-socket-server/src/index.js
+// ==================== DEVICE SOCKET SERVER (Smart Menu AI) ====================
+// Allows ALL origins for native staff device connections and routes
+// order / waiter-call / table events between the main socket server and devices.
+
+const { createServer } = require("http");
+const { Server } = require("socket.io");
+const fs = require('fs');
+const path = require('path');
+const axios = require("axios");
+const winston = require("winston");
+const { io: ioClient } = require("socket.io-client");
+
+// ==================== ENVIRONMENT CONFIGURATION ====================
+const environment = process.env.NODE_ENV || 'local';
+const MAIN_SOCKET_URL = process.env.MAIN_SOCKET_URL || 'http://localhost:4000';
+const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:1357';
+const BACKEND_API_URL = `${BACKEND_URL.replace(/\/$/, '').replace(/\/api$/, '')}/api`;
+const PORT = process.env.DEVICESPORT || 3008;
+const SOCKET_INTERNAL_TOKEN = process.env.SOCKET_INTERNAL_TOKEN;
+const LOG_FILE_MAX_SIZE = 100 * 1024 * 1024; // 100MB
+
+// ==================== LOGGER SETUP ====================
+const checkAndRotateLog = (filename) => {
+    const filepath = path.join(__dirname, '..', 'logs', filename);
+    try {
+        const stats = fs.statSync(filepath);
+        if (stats.size > LOG_FILE_MAX_SIZE) {
+            fs.unlinkSync(filepath);
+            console.error(`Rotated log file: ${filename}`);
+        }
+    } catch (error) {
+        // File doesn't exist yet
+    }
+};
+
+const logger = winston.createLogger({
+    level: 'error',
+    format: winston.format.combine(
+        winston.format.timestamp(),
+        winston.format.json()
+    ),
+    transports: [
+        new winston.transports.Console({
+            format: winston.format.combine(
+                winston.format.colorize(),
+                winston.format.simple()
+            ),
+            level: 'error'
+        }),
+        new winston.transports.File({
+            filename: 'logs/device-error.log',
+            level: 'error',
+            maxsize: LOG_FILE_MAX_SIZE,
+            maxFiles: 1
+        })
+    ]
+});
+
+checkAndRotateLog('device-error.log');
+checkAndRotateLog('device-combined.log');
+
+// ==================== HTTP & SOCKET.IO SERVER SETUP ====================
+const httpServer = createServer();
+
+// ALLOW ALL ORIGINS - Critical for native devices
+const io = new Server(httpServer, {
+    cors: {
+        origin: "*",
+        methods: ["GET", "POST"],
+        credentials: true
+    },
+    pingTimeout: 60000,
+    pingInterval: 25000,
+    transports: ['websocket', 'polling']
+});
+
+// ==================== DEVICE CONNECTION TRACKING ====================
+const deviceConnections = new Map(); // deviceId -> { socketId, userId, userType, metadata }
+const userDevices = new Map();       // userId (string) -> Set of deviceIds
+
+// ==================== HELPER: Normalize userId to string ====================
+function normalizeUserId(userId) {
+    return String(userId);
+}
+
+// ==================== SOCKET.IO CLIENT TO MAIN SERVER ====================
+let mainSocket = null;
+
+function connectToMainServer() {
+    mainSocket = ioClient(MAIN_SOCKET_URL, {
+        autoConnect: true,
+        reconnection: true,
+        reconnectionDelay: 1000,
+        reconnectionAttempts: Infinity,
+        transports: ['websocket', 'polling']
+    });
+
+    mainSocket.on('connect', () => {
+        console.log('✅ Device server connected to main socket server');
+    });
+
+    mainSocket.on('disconnect', (reason) => {
+        logger.warn('❌ Device server disconnected from main socket server:', reason);
+    });
+
+    mainSocket.on('connect_error', (error) => {
+        logger.error('❌ Connection error to main server:', error.message);
+    });
+
+    setupMainServerEventForwarding();
+}
+
+// ==================== HELPER FUNCTION ====================
+function forwardToUserDevices(userId, eventName, data) {
+    if (!userId) return;
+    const key = normalizeUserId(userId);
+    const deviceIds = userDevices.get(key);
+    if (!deviceIds || deviceIds.size === 0) {
+        console.log(`No devices found for user ${key} for event ${eventName}`);
+        return;
+    }
+
+    let sentCount = 0;
+    deviceIds.forEach(deviceId => {
+        const device = deviceConnections.get(deviceId);
+        if (device) {
+            const socket = io.sockets.sockets.get(device.socketId);
+            if (socket) {
+                socket.emit(eventName, data);
+                sentCount++;
+            }
+        }
+    });
+
+    console.log(`📤 Forwarded '${eventName}' to ${sentCount} device(s) for user ${key}`);
+}
+
+function setupMainServerEventForwarding() {
+    // ==================== ORDER EVENTS ====================
+
+    // payload: { ownerId, waiterId, payload }
+    mainSocket.on('order:new', (data) => {
+        const { ownerId, waiterId, payload } = data;
+        if (ownerId) forwardToUserDevices(ownerId, 'order:new', payload);
+        if (waiterId) forwardToUserDevices(waiterId, 'order:new', payload);
+    });
+
+    mainSocket.on('order:status:updated', (data) => {
+        const { ownerId, waiterId, payload } = data;
+        if (ownerId) forwardToUserDevices(ownerId, 'order:status:updated', payload);
+        if (waiterId) forwardToUserDevices(waiterId, 'order:status:updated', payload);
+    });
+
+    // ==================== WAITER CALL EVENTS ====================
+
+    // payload: { ownerId, waiterId, payload, eventType }
+    mainSocket.on('waiter_call:new', (data) => {
+        const { ownerId, waiterId, waiterIds = [], payload, eventType } = data;
+        const eventName = eventType === 'create'
+            ? 'waiter_call:new'
+            : eventType === 'acknowledged'
+                ? 'waiter_call:acknowledged'
+                : `waiter_call:${eventType || 'updated'}`;
+        if (ownerId) forwardToUserDevices(ownerId, eventName, payload);
+        if (waiterId) forwardToUserDevices(waiterId, eventName, payload);
+        waiterIds.forEach((id) => forwardToUserDevices(id, eventName, payload));
+    });
+
+    mainSocket.on('waiter_call:resolved', (data) => {
+        const { ownerId, waiterId, waiterIds = [], payload } = data;
+        if (ownerId) forwardToUserDevices(ownerId, 'waiter_call:resolved', payload);
+        if (waiterId) forwardToUserDevices(waiterId, 'waiter_call:resolved', payload);
+        waiterIds.forEach((id) => forwardToUserDevices(id, 'waiter_call:resolved', payload));
+    });
+
+    // ==================== TABLE EVENTS ====================
+
+    mainSocket.on('table:status:updated', (data) => {
+        const { ownerId, payload } = data;
+        if (ownerId) forwardToUserDevices(ownerId, 'table:status:updated', payload);
+    });
+
+    // ==================== NOTIFICATION EVENTS ====================
+
+    mainSocket.on('notification:new', (data) => {
+        const { userId } = data;
+        if (userId) forwardToUserDevices(userId, 'notification:new', data);
+    });
+
+    mainSocket.on('device:notification:send', (data) => {
+        const { userId, notification } = data;
+        if (userId) forwardToUserDevices(userId, 'showNotification', notification);
+    });
+
+    mainSocket.on('notification:broadcast', (data) => {
+        deviceConnections.forEach((device) => {
+            const socket = io.sockets.sockets.get(device.socketId);
+            if (socket) {
+                socket.emit('notification:broadcast', data);
+            }
+        });
+        console.log(`📢 Broadcast notification to ${deviceConnections.size} devices`);
+    });
+
+    // ==================== SYSTEM EVENTS ====================
+
+    mainSocket.on('system:announcement', (data) => {
+        deviceConnections.forEach((device) => {
+            const socket = io.sockets.sockets.get(device.socketId);
+            if (socket) {
+                socket.emit('system:announcement', data);
+            }
+        });
+        console.log(`📢 System announcement sent to ${deviceConnections.size} devices`);
+    });
+
+    // ==================== SESSION REPLACED EVENTS ====================
+
+    mainSocket.on('owner:session-replaced', (data) => {
+        const { ownerId } = data;
+        if (ownerId) forwardToUserDevices(ownerId, 'owner:session-replaced', data);
+    });
+
+    mainSocket.on('employee:session-replaced', (data) => {
+        const { employeeId } = data;
+        if (employeeId) forwardToUserDevices(employeeId, 'employee:session-replaced', data);
+    });
+
+    // ==================== ERROR EVENTS ====================
+
+    mainSocket.on('error', (data) => {
+        const { userId } = data;
+        if (userId) forwardToUserDevices(userId, 'error', data);
+    });
+
+    // ==================== PONG EVENTS ====================
+
+    mainSocket.on('pong', (data) => {
+        console.log('Received pong from main server');
+    });
+}
+
+// ==================== DEVICE SOCKET HANDLERS ====================
+io.on("connection", (socket) => {
+    console.log(`📱 New device connection: ${socket.id}`);
+    const isInternalRelay = Boolean(
+        SOCKET_INTERNAL_TOKEN &&
+        socket.handshake.auth?.internalToken === SOCKET_INTERNAL_TOKEN
+    );
+    const onInternalRelayEvent = (eventName, handler) => (data = {}) => {
+        if (!isInternalRelay) {
+            logger.warn(`Rejected untrusted relay event '${eventName}' from socket ${socket.id}`);
+            socket.emit('device:relay:error', { message: 'Internal relay authentication failed' });
+            return;
+        }
+        handler(data);
+    };
+
+    socket.on('order:new', onInternalRelayEvent('order:new', ({ ownerId, waiterId, payload }) => {
+        if (ownerId) forwardToUserDevices(ownerId, 'order:new', payload);
+        if (waiterId) forwardToUserDevices(waiterId, 'order:new', payload);
+    }));
+
+    socket.on('order:status:updated', onInternalRelayEvent('order:status:updated', ({ ownerId, waiterId, payload }) => {
+        if (ownerId) forwardToUserDevices(ownerId, 'order:status:updated', payload);
+        if (waiterId) forwardToUserDevices(waiterId, 'order:status:updated', payload);
+    }));
+
+    socket.on('waiter_call:new', onInternalRelayEvent('waiter_call:new', ({ ownerId, waiterId, waiterIds = [], payload, eventType }) => {
+        const eventName = eventType === 'create'
+            ? 'waiter_call:new'
+            : eventType === 'acknowledged'
+                ? 'waiter_call:acknowledged'
+                : eventType === 'resolved'
+                    ? 'waiter_call:resolved'
+                    : `waiter_call:${eventType || 'updated'}`;
+        if (ownerId) forwardToUserDevices(ownerId, eventName, payload);
+        if (waiterId) forwardToUserDevices(waiterId, eventName, payload);
+        waiterIds.forEach((id) => forwardToUserDevices(id, eventName, payload));
+    }));
+
+    socket.on('table:status:updated', onInternalRelayEvent('table:status:updated', ({ ownerId, payload }) => {
+        if (ownerId) forwardToUserDevices(ownerId, 'table:status:updated', payload);
+    }));
+
+    socket.on('notification:new', onInternalRelayEvent('notification:new', (data) => {
+        const userId = data.userId || data.user_id;
+        if (userId) forwardToUserDevices(userId, 'notification:new', data);
+    }));
+
+    // ── Device registration ────────────────────────────────────────────────
+    socket.on('device:register', async (data) => {
+        if (!data?.deviceId || !data?.userId || !data?.userType || !data?.authToken) {
+            socket.emit('device:register:error', { message: 'Authentication and device details are required' });
+            return;
+        }
+
+        try {
+            const response = await axios.get(`${BACKEND_API_URL}/users/me`, {
+                headers: { Authorization: `Bearer ${data.authToken}` },
+                timeout: 5000,
+            });
+            if (String(response.data?.id) !== String(data.userId)) {
+                socket.emit('device:register:error', { message: 'Device user does not match the authenticated user' });
+                return;
+            }
+        } catch (error) {
+            socket.emit('device:register:error', { message: 'Device authentication failed' });
+            logger.error('Device authentication failed:', error.message);
+            return;
+        }
+
+        const {
+            deviceId,
+            userType,        // 'owner' | 'employee'
+            frontendName,
+            notificationToken,
+            deviceInfo,
+            authToken,
+        } = data;
+
+        const userId = normalizeUserId(data.userId);
+
+        if (!deviceId || !userId || !userType) {
+            socket.emit('device:register:error', { message: 'Missing required fields' });
+            return;
+        }
+
+        // Handle re-registration from the same device (reconnect scenario).
+        const existingDevice = deviceConnections.get(deviceId);
+        if (existingDevice && existingDevice.socketId !== socket.id) {
+            const oldUserId = normalizeUserId(existingDevice.userId);
+            const oldSocket = io.sockets.sockets.get(existingDevice.socketId);
+
+            if (!oldSocket) {
+                const oldUserDeviceSet = userDevices.get(oldUserId);
+                if (oldUserDeviceSet) {
+                    oldUserDeviceSet.delete(deviceId);
+                    if (oldUserDeviceSet.size === 0) userDevices.delete(oldUserId);
+                }
+                console.log(`🧹 Evicted stale device entry for deviceId=${deviceId} (old socketId=${existingDevice.socketId})`);
+            }
+        }
+
+        deviceConnections.set(deviceId, {
+            socketId: socket.id,
+            userId,
+            userType,
+            frontendName,
+            notificationToken,
+            deviceInfo,
+            authToken,
+            registeredAt: Date.now()
+        });
+
+        if (!userDevices.has(userId)) {
+            userDevices.set(userId, new Set());
+        }
+        userDevices.get(userId).add(deviceId);
+
+        console.log(`✅ Device ${deviceId} registered for user ${userId} (${userType}) on socket ${socket.id}`);
+
+        // Notify main socket server about device registration
+        if (mainSocket && mainSocket.connected) {
+            mainSocket.emit('device:registered', {
+                deviceId,
+                userId,
+                userType,
+                frontendName,
+                notificationToken,
+                deviceInfo
+            });
+        }
+
+        // Persist device info to backend API
+        try {
+            await axios.post(`${BACKEND_API_URL}/devices/register`, {
+                userId,
+                devices: [{
+                    deviceId,
+                    notificationToken,
+                    deviceInfo,
+                    frontendName,
+                    registeredAt: new Date().toISOString()
+                }]
+            }, {
+                headers: authToken ? { Authorization: `Bearer ${authToken}` } : {},
+            });
+        } catch (error) {
+            logger.error('Error saving device to backend:', error.message);
+        }
+
+        socket.emit('device:register:success', { deviceId, userId });
+
+        // Join the relevant room on the main socket server
+        if (mainSocket && mainSocket.connected) {
+            if (userType === 'owner') {
+                mainSocket.emit('join_business_room_request', { ownerId: userId, metadata: deviceInfo });
+            } else if (userType === 'employee') {
+                mainSocket.emit('join_employee_room_request', { employeeId: userId, metadata: deviceInfo });
+            }
+        }
+    });
+
+    // ── One-shot current location update (no persistent tracking) ──────────
+    socket.on('device:location:update', async (data) => {
+        const { deviceId, location } = data;
+        const device = deviceConnections.get(deviceId);
+        if (!device || device.socketId !== socket.id) {
+            logger.warn(`Location update from unregistered device: ${deviceId}`);
+            return;
+        }
+
+        try {
+            await axios.post(`${BACKEND_API_URL}/devices/updatecurrentloc`, {
+                deviceId,
+                location: {
+                    latitude: location.lat,
+                    longitude: location.lng,
+                    accuracy: location.accuracy,
+                    heading: location.heading,
+                    timestamp: data.timestamp,
+                }
+            }, {
+                headers: device.authToken ? { Authorization: `Bearer ${device.authToken}` } : {},
+            });
+        } catch (error) {
+            logger.error('Error saving current location to backend:', error.message);
+        }
+
+        logger.debug(`Location update from device ${deviceId}`);
+    });
+
+    // ── Notification acknowledgment ────────────────────────────────────────
+    socket.on('device:notification:acknowledged', (data) => {
+        const { deviceId, notificationId } = data;
+        const device = deviceConnections.get(deviceId);
+        if (device && mainSocket && mainSocket.connected) {
+            mainSocket.emit('device:notification:acknowledged', {
+                userId: device.userId,
+                notificationId
+            });
+        }
+    });
+
+    // ── Order accepted / waiter call acknowledged from device ──────────────
+    socket.on('device:order:accepted', (data) => {
+        const { deviceId, orderId, businessId } = data;
+        const device = deviceConnections.get(deviceId);
+        if (device && mainSocket && mainSocket.connected) {
+            mainSocket.emit('order_accepted_by_device', {
+                userId: device.userId,
+                orderId,
+                businessId
+            });
+        }
+    });
+
+    socket.on('device:waiter_call:acknowledged', (data) => {
+        const { deviceId, callId, businessId } = data;
+        const device = deviceConnections.get(deviceId);
+        if (device && mainSocket && mainSocket.connected) {
+            mainSocket.emit('waiter_call_acknowledged_by_device', {
+                userId: device.userId,
+                callId,
+                businessId
+            });
+        }
+    });
+
+    // ── Permission status update ───────────────────────────────────────────
+    socket.on('device:permissions:update', async (data) => {
+        const { deviceId, permissions } = data;
+        const device = deviceConnections.get(deviceId);
+        if (!device) return;
+
+        try {
+            await axios.put(
+                `${BACKEND_API_URL}/devices/${device.userId}/${deviceId}`,
+                { deviceInfo: { permissions } },
+                { headers: device.authToken ? { Authorization: `Bearer ${device.authToken}` } : {} }
+            );
+        } catch (error) {
+            logger.error('Error updating device permissions:', error.message);
+        }
+    });
+
+    // ── Generic forwarding to main server ─────────────────────────────────
+    socket.on('forward:to:main', (data) => {
+        const { event, payload } = data;
+        if (mainSocket && mainSocket.connected) {
+            mainSocket.emit(event, payload);
+        }
+    });
+
+    // ── Keepalive ──────────────────────────────────────────────────────────
+    socket.on('ping', () => {
+        socket.emit('pong', { timestamp: Date.now() });
+    });
+
+    // ── Disconnect handler ─────────────────────────────────────────────────
+    socket.on('disconnect', (reason) => {
+        console.log(`📱 Device disconnected: ${socket.id}, reason: ${reason}`);
+
+        for (const [deviceId, device] of deviceConnections.entries()) {
+            if (device.socketId === socket.id) {
+                const userId = normalizeUserId(device.userId);
+
+                const userDeviceSet = userDevices.get(userId);
+                if (userDeviceSet) {
+                    userDeviceSet.delete(deviceId);
+                    if (userDeviceSet.size === 0) {
+                        userDevices.delete(userId);
+                    }
+                }
+
+                deviceConnections.delete(deviceId);
+                console.log(`🧹 Cleaned up device ${deviceId} for user ${userId}`);
+                break;
+            }
+        }
+    });
+});
+
+// ==================== HTTP HEALTH CHECK (FIXED) ====================
+httpServer.on('request', (req, res) => {
+    // 🛑 Let Socket.io handle its own polling/upgrade requests.
+    // Without this early return, the else branch below sends a 404
+    // before Engine.io can respond, causing ERR_HTTP_HEADERS_SENT.
+    if (req.url.startsWith('/socket.io')) {
+        return; // hands off to Socket.io/Engine.io
+    }
+
+    if (req.url === '/health') {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({
+            status: 'ok',
+            environment,
+            connections: {
+                devices: deviceConnections.size,
+                users: userDevices.size,
+                mainServerConnected: mainSocket?.connected || false
+            },
+            timestamp: new Date().toISOString()
+        }));
+    } else if (req.url === '/stats') {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+
+        const devicesByType = {};
+        deviceConnections.forEach(device => {
+            devicesByType[device.userType] = (devicesByType[device.userType] || 0) + 1;
+        });
+
+        res.end(JSON.stringify({
+            connections: {
+                totalDevices: deviceConnections.size,
+                uniqueUsers: userDevices.size,
+                devicesByType
+            },
+            mainServer: {
+                connected: mainSocket?.connected || false,
+                url: MAIN_SOCKET_URL
+            },
+            timestamp: new Date().toISOString()
+        }));
+    } else {
+        res.writeHead(404);
+        res.end('Not Found');
+    }
+});
+
+// ==================== SERVER START ====================
+connectToMainServer();
+
+if (!SOCKET_INTERNAL_TOKEN) {
+    console.error('SOCKET_INTERNAL_TOKEN is unset; device event forwarding is disabled');
+}
+
+httpServer.listen(PORT, () => {
+    console.log(`🚀 Device Socket Server started`);
+    console.log(`📡 Listening on port ${PORT}`);
+    console.log(`🌍 Environment: ${environment}`);
+    console.log(`🔓 CORS: Allow ALL origins (for native devices)`);
+    console.log(`🔗 Main Socket Server: ${MAIN_SOCKET_URL}`);
+});
+
+// ==================== GRACEFUL SHUTDOWN ====================
+process.on('SIGTERM', () => {
+    console.log('SIGTERM received, closing server gracefully...');
+    if (mainSocket) mainSocket.disconnect();
+    httpServer.close(() => {
+        console.log('Server closed');
+        process.exit(0);
+    });
+});
+
+process.on('SIGINT', () => {
+    console.log('SIGINT received, closing server gracefully...');
+    if (mainSocket) mainSocket.disconnect();
+    httpServer.close(() => {
+        console.log('Server closed');
+        process.exit(0);
+    });
+});
+
+================================================================================
+FILE: package.json
+================================================================================
+
+{
+  "name": "sockets",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server.js",
+    "start:device": "node device-socket-server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "axios": "^1.18.1",
+    "cors": "^2.8.6",
+    "dotenv": "^18.0.5",
+    "express": "^5.2.1",
+    "socket.io": "^4.8.3",
+    "socket.io-client": "^4.8.3",
+    "winston": "^3.19.0"
+  }
+}
+
+================================================================================
+FILE: server.js
+================================================================================
+
+require("dotenv").config();
+
+const { Server } = require("socket.io");
+const { io: ioClient } = require("socket.io-client");
+const axios = require("axios");
+
+const DEVICE_SERVER_URL = process.env.DEVICE_SOCKET_URL || "http://localhost:3008";
+const BACKEND_URL = (process.env.BACKEND_URL || "http://localhost:1357").replace(/\/$/, "");
+const SOCKET_INTERNAL_TOKEN = process.env.SOCKET_INTERNAL_TOKEN;
+const io = new Server({ cors: { origin: "*" } });
+
+io.use((socket, next) => {
+    socket.data.isInternalRelay = Boolean(
+        SOCKET_INTERNAL_TOKEN &&
+        socket.handshake.auth?.internalToken === SOCKET_INTERNAL_TOKEN
+    );
+    next();
+});
+
+function requireInternalRelay(socket, eventName) {
+    if (socket.data.isInternalRelay) return true;
+    console.warn(`Rejected untrusted '${eventName}' event from socket ${socket.id}`);
+    socket.emit("socket_event_error", { message: "Internal relay authentication failed" });
+    return false;
+}
+
+// Outbound connection to device socket server for push forwarding
+const deviceServer = ioClient(DEVICE_SERVER_URL, {
+    autoConnect: true,
+    reconnection: true,
+    auth: SOCKET_INTERNAL_TOKEN ? { internalToken: SOCKET_INTERNAL_TOKEN } : {},
+});
+deviceServer.on("connect", () => {
+    console.log("✅ Main server connected to device server");
+    if (!SOCKET_INTERNAL_TOKEN) {
+        console.error("SOCKET_INTERNAL_TOKEN is unset; device event forwarding is disabled");
+    }
+});
+deviceServer.on("connect_error", (e) => console.error("Device server connect error:", e.message));
+
+io.on("connection", (socket) => {
+    console.log(`Client connected: ${socket.id}`);
+
+    socket.on("join_business_room", async (businessId) => {
+        const token = socket.handshake.auth?.token;
+        if (!businessId || !token) {
+            socket.emit("business_room_error", { message: "Authentication and a business ID are required" });
+            return;
+        }
+        try {
+            const response = await axios.post(
+                `${BACKEND_URL}/api/custom-functions/getMyBusiness`,
+                {},
+                { headers: { Authorization: `Bearer ${token}` }, timeout: 5000 }
+            );
+            if (String(response.data?.business?.id) !== String(businessId)) {
+                socket.emit("business_room_error", { message: "You do not have access to this business" });
+                return;
+            }
+            socket.join(`business_${businessId}`);
+            console.log(`Socket ${socket.id} joined business_${businessId}`);
+            socket.emit("business_room_joined", { businessId });
+        } catch (error) {
+            socket.emit("business_room_error", { message: "Could not verify business access" });
+            console.warn(`Socket ${socket.id} business-room authorization failed: ${error.message}`);
+        }
+    });
+
+    socket.on("leave_business_room", (businessId) => {
+        if (businessId) socket.leave(`business_${businessId}`);
+    });
+
+    socket.on("join_employee_room", async (employeeId) => {
+        const token = socket.handshake.auth?.token;
+        if (!employeeId || !token) {
+            socket.emit("employee_room_error", { message: "Authentication and an employee ID are required" });
+            return;
+        }
+        try {
+            const response = await axios.get(`${BACKEND_URL}/api/users/me`, {
+                headers: { Authorization: `Bearer ${token}` },
+                timeout: 5000,
+            });
+            if (String(response.data?.id) !== String(employeeId)) {
+                socket.emit("employee_room_error", { message: "You do not have access to this employee room" });
+                return;
+            }
+            socket.join(`employee_${employeeId}`);
+            socket.emit("employee_room_joined", { employeeId });
+        } catch (error) {
+            socket.emit("employee_room_error", { message: "Could not verify employee access" });
+            console.warn(`Socket ${socket.id} employee-room authorization failed: ${error.message}`);
+        }
+    });
+
+    // ── Waiter calls ──────────────────────────────────────────────────────
+    socket.on("waiter_calls_event", (payload = {}) => {
+        if (!requireInternalRelay(socket, "waiter_calls_event")) return;
+        const d = payload?.data || {};
+        if (d.business_id) {
+            io.to(`business_${d.business_id}`).emit("waiter_calls_event", payload);
+        }
+        // Forward to device server for push notification (background/native)
+        deviceServer.emit("waiter_call:new", {
+            ownerId: d.owner_id || d.ownerId,
+            waiterId: d.assigned_waiter_id || d.waiter_id || d.waiterId,
+            waiterIds: d.available_waiter_ids || [],
+            payload: d,
+            eventType: payload.type,
+        });
+    });
+
+    // ── Orders ────────────────────────────────────────────────────────────
+    socket.on("orders_event", (payload = {}) => {
+        if (!requireInternalRelay(socket, "orders_event")) return;
+        const d = payload?.data || {};
+        if (d.business_id) {
+            io.to(`business_${d.business_id}`).emit("orders_event", payload);
+        }
+        const eventName = payload.type === "create" ? "order:new" : "order:status:updated";
+        deviceServer.emit(eventName, {
+            ownerId: d.owner_id || d.ownerId,
+            waiterId: d.waiter_id || d.waiterId,
+            payload: d,
+        });
+    });
+
+    socket.on("table_status_updated", (payload = {}) => {
+        if (!requireInternalRelay(socket, "table_status_updated")) return;
+        const d = payload?.data || payload || {};
+        if (d.business_id) {
+            io.to(`business_${d.business_id}`).emit("table_status_updated", d);
+        }
+        deviceServer.emit("table:status:updated", {
+            ownerId: d.owner_id || d.ownerId,
+            waiterId: d.waiter_id || d.waiterId,
+            payload: d,
+        });
+    });
+
+    socket.on("notification:new", (payload = {}) => {
+        if (!requireInternalRelay(socket, "notification:new")) return;
+        const userId = payload.user_id || payload.userId;
+        const businessId = payload.business_id || payload.businessId;
+        let target = io;
+        if (businessId) target = target.to(`business_${businessId}`);
+        if (userId) {
+            target = target.to(`employee_${userId}`);
+        }
+        if (businessId || userId) {
+            target.emit("notification:new", payload);
+        }
+        if (userId) {
+            deviceServer.emit("notification:new", { ...payload, userId });
+        }
+    });
+
+    socket.on("disconnect", () => {
+        console.log(`Client disconnected: ${socket.id}`);
+    });
+});
+
+io.listen(4000);
+console.log("Socket server running on port 4000");
